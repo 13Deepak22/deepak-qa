@@ -1,0 +1,440 @@
+.about-mark {
+  display: grid;
+  justify-items: end;
+}
+
+.about-mark-stage {
+  display: grid;
+  width: 4.5rem;
+  height: 4.5rem;
+  overflow: hidden;
+}
+
+.about-mark-icon {
+  grid-area: 1 / 1;
+  width: 4.5rem;
+  height: 4.5rem;
+  color: var(--pass);
+  transform: translateY(110%);
+}
+
+.about-mark-icon[data-state="in"] {
+  transform: translateY(0);
+}
+
+.about-mark-rule {
+  display: block;
+  width: 2.25rem;
+  height: 2px;
+  margin-top: 0.65rem;
+  margin-left: auto;
+  background: var(--pass);
+  transform-origin: right center;
+  transform: scaleX(1);
+}
+
+.about-block {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "title mark"
+    "copy copy";
+  column-gap: 1rem;
+  row-gap: 1rem;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding-block: 3.25rem;
+}
+
+.about-block-title {
+  grid-area: title;
+}
+
+.about-block-mark {
+  grid-area: mark;
+}
+
+.about-block-copy {
+  grid-area: copy;
+}
+
+@media (min-width: 640px) {
+  .about-mark-stage,
+  .about-mark-icon {
+    width: 6.5rem;
+    height: 6.5rem;
+  }
+
+  .about-mark-rule {
+    width: 3.25rem;
+    margin-top: 0.85rem;
+  }
+
+  .about-block {
+    column-gap: 2rem;
+    padding-block: 4rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .about-mark-stage,
+  .about-mark-icon {
+    width: 9rem;
+    height: 9rem;
+  }
+
+  .about-mark-rule {
+    width: 4.5rem;
+  }
+
+  .about-block {
+    grid-template-areas:
+      "title mark"
+      "copy mark";
+    column-gap: 4rem;
+    row-gap: 1rem;
+    align-items: center;
+    padding-block: 5rem;
+  }
+}
+
+.about-portrait {
+  position: relative;
+  padding: 0.75rem;
+}
+
+.about-corner {
+  position: absolute;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 0 solid var(--pass);
+}
+
+.about-corner[data-corner="tl"] {
+  top: 0;
+  left: 0;
+  border-top-width: 1.5px;
+  border-left-width: 1.5px;
+}
+
+.about-corner[data-corner="tr"] {
+  top: 0;
+  right: 0;
+  border-top-width: 1.5px;
+  border-right-width: 1.5px;
+}
+
+.about-corner[data-corner="bl"] {
+  bottom: 0;
+  left: 0;
+  border-bottom-width: 1.5px;
+  border-left-width: 1.5px;
+}
+
+.about-corner[data-corner="br"] {
+  right: 0;
+  bottom: 0;
+  border-right-width: 1.5px;
+  border-bottom-width: 1.5px;
+}
+
+.about-scan {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  left: 0.75rem;
+  height: 3rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--pass) 70%, transparent);
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--pass) 12%, transparent));
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes about-scan {
+  0% {
+    top: 0.75rem;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  55% {
+    top: calc(100% - 3.75rem);
+    opacity: 1;
+  }
+  65%,
+  100% {
+    top: calc(100% - 3.75rem);
+    opacity: 0;
+  }
+}
+
+.about-chapter-track {
+  position: relative;
+  margin-top: 1rem;
+  padding-left: 1.25rem;
+}
+
+.about-rail,
+.about-rail-fill {
+  position: absolute;
+  top: 0.9rem;
+  bottom: 0.9rem;
+  left: 3px;
+  width: 1px;
+}
+
+.about-rail {
+  background: var(--line);
+}
+
+.about-rail-fill {
+  background: var(--pass);
+  transform-origin: top center;
+}
+
+.about-chapter {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding-block: 0.45rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.about-chapter::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: calc(-1.25rem);
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.about-chapter:hover,
+.about-chapter[data-active="true"] {
+  color: var(--ink);
+}
+
+.about-chapter[data-active="true"] > span {
+  color: var(--pass);
+}
+
+.about-chapter[data-active="true"]::before {
+  border-color: var(--pass);
+  background: var(--pass);
+}
+
+.about-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+  padding: 0.3rem 0.6rem;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.about-chip[data-tone="pass"] {
+  border-color: color-mix(in srgb, var(--pass) 45%, var(--line));
+  color: var(--pass);
+}
+
+.about-chip:hover {
+  border-color: var(--pass);
+}
+
+.about-chip-link {
+  min-height: 2.25rem;
+}
+
+.about-chip-link:hover {
+  color: var(--pass);
+}
+
+.journey {
+  position: relative;
+}
+
+.journey-steps {
+  display: grid;
+  gap: 1.5rem;
+  padding-left: 1.75rem;
+}
+
+.journey-rail,
+.journey-fill {
+  position: absolute;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  left: 5px;
+  width: 1px;
+}
+
+.journey-rail {
+  background: var(--line);
+}
+
+.journey-fill {
+  background: var(--pass);
+  transform-origin: top center;
+}
+
+.journey-step {
+  position: relative;
+}
+
+.journey-dot {
+  position: absolute;
+  top: 0.1rem;
+  left: -1.75rem;
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid var(--pass);
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.journey-step:last-child .journey-dot {
+  background: var(--pass);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--pass) 18%, transparent);
+}
+
+.goal-box {
+  color: var(--pass);
+}
+
+.goal-tick {
+  stroke-dasharray: 16;
+  stroke-dashoffset: 0;
+}
+
+@media (min-width: 768px) {
+  .journey-steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.25rem;
+    padding-top: 1.75rem;
+    padding-left: 0;
+  }
+
+  .journey-rail,
+  .journey-fill {
+    top: 5px;
+    right: 5px;
+    bottom: auto;
+    left: 5px;
+    width: auto;
+    height: 1px;
+  }
+
+  .journey-fill {
+    transform-origin: left center;
+  }
+
+  .journey-dot {
+    top: -1.75rem;
+    left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .about-scan {
+    animation: about-scan 6s var(--ease) 1.2s infinite;
+  }
+
+  .about-rail-fill {
+    transition: transform 220ms linear;
+  }
+
+  .about-chapter,
+  .about-chapter::before,
+  .about-chip {
+    transition:
+      color 200ms var(--ease),
+      background-color 200ms var(--ease),
+      border-color 200ms var(--ease);
+  }
+
+  .journey-fill {
+    transition: transform 1300ms var(--ease) 150ms;
+  }
+
+  .journey-dot {
+    transition: transform 420ms var(--ease) calc(var(--i, 0) * 280ms + 250ms);
+  }
+
+  .goal-tick {
+    transition: stroke-dashoffset 420ms var(--ease) calc(var(--i, 0) * 140ms + 120ms);
+  }
+
+  .in-view:not([data-in]) .journey-fill {
+    transform: scaleY(0);
+  }
+
+  .in-view:not([data-in]) .journey-dot {
+    transform: scale(0);
+  }
+
+  .in-view:not([data-in]) .goal-tick {
+    stroke-dashoffset: 16;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
+  .in-view:not([data-in]) .journey-fill {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes about-mark-in {
+  from { transform: translateY(110%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes about-mark-out {
+  from { transform: translateY(0); }
+  to { transform: translateY(-110%); }
+}
+
+@keyframes about-mark-meter {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes about-mark-meter-out {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+
+@media (prefers-reduced-motion: no-preference) {
+  .about-mark-stage[data-played="true"] .about-mark-icon[data-state="in"] {
+    animation: about-mark-in 720ms var(--ease-enter) both;
+  }
+
+  .about-mark-icon[data-state="out"] {
+    animation: about-mark-out 720ms var(--ease-exit) both;
+  }
+
+  .about-mark-rule[data-state="wait"],
+  .about-mark-rule[data-state="run"] {
+    transform: scaleX(0);
+  }
+
+  .about-mark-rule[data-state="run"] {
+    animation: about-mark-meter 2400ms var(--ease) forwards;
+  }
+
+  .about-mark-rule[data-state="out"] {
+    animation: about-mark-meter-out 720ms var(--ease-exit) forwards;
+  }
+}

@@ -1,0 +1,108 @@
+@keyframes rise {
+  from {
+    transform: translateY(14px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -0.35rem;
+  left: 0;
+  height: 1px;
+  background: var(--pass);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.mobile-nav {
+  display: grid;
+  grid-template-rows: 0fr;
+}
+
+.mobile-nav[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+
+.mobile-nav > ul {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .enter {
+    animation: rise 680ms var(--ease) both;
+  }
+
+  .enter-1 { animation-delay: 40ms; }
+  .enter-2 { animation-delay: 120ms; }
+  .enter-3 { animation-delay: 200ms; }
+  .enter-4 { animation-delay: 280ms; }
+  .enter-5 { animation-delay: 360ms; }
+
+  .runner-caret {
+    transform-origin: bottom center;
+    animation: runner-caret 700ms steps(1) infinite;
+  }
+
+  .nav-link::after,
+  .press,
+  .mobile-nav,
+  .link-line {
+    transition:
+      transform 240ms var(--ease),
+      background-color 240ms var(--ease),
+      color 240ms var(--ease),
+      border-color 240ms var(--ease),
+      grid-template-rows 280ms var(--ease);
+  }
+
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  .press:active {
+    transform: translateY(1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .skip-link,
+  .nav-link::after,
+  .press,
+  .mobile-nav,
+  .link-line,
+  .xp-cursor,
+  .xp-org::after,
+  .xp-meter,
+  .work-chevron,
+  .work-name,
+  .work-panel {
+    transition: none;
+  }
+
+  .xp-meter,
+  .xp-org::after {
+    transform: scaleX(1);
+  }
+
+  .about-mark-icon,
+  .about-mark-rule,
+  .practice-icon path,
+  .practice-icon rect {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

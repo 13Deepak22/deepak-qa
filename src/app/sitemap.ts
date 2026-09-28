@@ -7,6 +7,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteUrl();
   return [
     { url: base, lastModified: updated, changeFrequency: "monthly", priority: 1 },
-    { url: `${base}/about`, lastModified: updated, changeFrequency: "monthly", priority: 0.8 },
+    {
+      url: `${base}/about`,
+      lastModified: updated,
+      changeFrequency: "monthly",
+      priority: 0.8,
+      images: [`${base}/portrait.png`],
+    },
+    { url: `${base}/resume`, lastModified: updated, changeFrequency: "monthly", priority: 0.9 },
   ];
 }

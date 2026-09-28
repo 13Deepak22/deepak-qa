@@ -1,24 +1,21 @@
 import Link from "next/link";
-import { ExperienceLog } from "@/components/experience-log";
-import { HeadlineCycle } from "@/components/headline-cycle";
-import { PracticeIcon } from "@/components/practice-icon";
-import { PublicApps } from "@/components/public-apps";
-import { TestRun } from "@/components/test-run";
+import { ExperienceLog } from "@/components/home/experience-log";
+import { HeadlineCycle } from "@/components/home/headline-cycle";
+import { PracticeIcon } from "@/components/home/practice-icon";
+import { PublicApps } from "@/components/home/public-apps";
+import { TestRun } from "@/components/home/test-run";
 import {
   unpublishedWork,
   practices,
   profile,
   toolkit,
-} from "@/data/portfolio";
+} from "@/data";
 
 export default function HomePage() {
   return (
     <main id="content" tabIndex={-1} className="outline-none">
       <section className="mx-auto grid max-w-6xl gap-10 px-4 pt-12 pb-14 sm:px-6 sm:pt-14 sm:pb-16 md:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.9fr)] md:items-start md:gap-x-8 lg:gap-x-14 lg:pt-20 lg:pb-24">
         <div className="min-w-0">
-          <p className="enter enter-1 font-mono text-[0.72rem] tracking-[0.18em] text-pass uppercase">
-            {profile.role}
-          </p>
           <HeadlineCycle />
           <p className="enter enter-3 mt-6 max-w-lg text-xl leading-relaxed text-ink-soft">
             {profile.lede}
@@ -51,45 +48,53 @@ export default function HomePage() {
       <section id="practice" className="scroll-mt-20 border-t border-line bg-paper-deep">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-            <span className="text-pass">01</span> / What I do
+            <span className="text-pass">01</span> / Testing services
           </p>
-          <h2 className="mt-3 max-w-2xl font-serif text-4xl tracking-tight sm:text-5xl">
+          <h2 className="mt-3 max-w-2xl font-serif text-4xl tracking-tight text-balance sm:text-5xl">
             How a release earns the right to ship.
           </h2>
           <ol className="mt-12 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3">
             {practices.map((item, index) => (
-              <li key={item.title} className="bg-paper px-5 py-7 sm:px-6 sm:py-8">
+              <li key={item.title} className="bg-paper px-5 py-6 sm:px-6 sm:py-8">
                 <div className="flex items-center gap-3">
                   <PracticeIcon name={item.title} />
                   <p className="font-mono text-[0.72rem] tracking-[0.16em] text-pass">
                     {String(index + 1).padStart(2, "0")}
                   </p>
                 </div>
-                <h3 className="practice-title mt-5 font-serif text-3xl tracking-tight">
+                <h3 className="practice-title mt-4 font-serif text-2xl tracking-tight sm:mt-5 sm:text-3xl">
                   {item.title}
                 </h3>
-                <p className="mt-4 text-sm leading-relaxed text-ink-soft">{item.body}</p>
+                <p className="mt-3 text-sm leading-relaxed text-ink-soft sm:mt-4">{item.body}</p>
               </li>
             ))}
           </ol>
         </div>
       </section>
 
-      <section id="skills" className="scroll-mt-20 border-t border-line bg-paper-deep">
+      <section id="skills" className="scroll-mt-20 border-t border-line">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-            <span className="text-pass">02</span> / What I know
+            <span className="text-pass">02</span> / Skills
           </p>
-          <h2 className="mt-3 font-serif text-4xl tracking-tight sm:text-5xl">
+          <h2 className="mt-3 font-serif text-4xl tracking-tight text-balance sm:text-5xl">
             Tools I reach for.
           </h2>
-          <ul className="mt-12 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-12 border-t border-line">
             {toolkit.map((group) => (
-              <li key={group.label} className="flex flex-col bg-paper px-5 py-6 sm:px-6 sm:py-7">
-                <h3 className="practice-title font-mono text-[0.72rem] tracking-[0.16em] text-pass uppercase">
-                  {group.label}
-                </h3>
-                <ul className="mt-5 flex flex-wrap gap-2 sm:mt-6">
+              <li
+                key={group.label}
+                className="grid gap-4 border-b border-line py-6 sm:py-7 md:grid-cols-[12rem_minmax(0,1fr)] md:items-start md:gap-8 lg:px-1"
+              >
+                <div>
+                  <h3 className="practice-title font-mono text-[0.72rem] tracking-[0.16em] text-pass uppercase">
+                    {group.label}
+                  </h3>
+                  {group.label === "Exposure" ? (
+                    <p className="mt-4 max-w-[12rem] text-xs leading-snug text-muted">Followed those efforts. Did not run the tests.</p>
+                  ) : null}
+                </div>
+                <ul className="flex flex-wrap gap-2">
                   {group.items.map((item) => (
                     <li
                       key={item}
@@ -110,7 +115,7 @@ export default function HomePage() {
           <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
             <span className="text-pass">03</span> / Experience
           </p>
-          <h2 className="mt-3 max-w-2xl font-serif text-4xl tracking-tight sm:text-5xl">
+          <h2 className="mt-3 max-w-2xl font-serif text-4xl tracking-tight text-balance sm:text-5xl">
             Where I have worked.
           </h2>
           <ExperienceLog />
@@ -122,9 +127,9 @@ export default function HomePage() {
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-                <span className="text-pass">04</span> / Selected work
+                <span className="text-pass">04</span> / Projects
               </p>
-              <h2 className="mt-3 font-serif text-4xl tracking-tight sm:text-5xl">
+              <h2 className="mt-3 font-serif text-4xl tracking-tight text-balance sm:text-5xl">
                 Public apps.
               </h2>
             </div>

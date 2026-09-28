@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { experience } from "@/data/portfolio";
+import { experience } from "@/data";
 
 export function ExperienceLog() {
   const listRef = useRef<HTMLOListElement>(null);
@@ -100,7 +100,8 @@ export function ExperienceLog() {
               <div>
                 <button type="button" className="text-left" data-cursor="Inspect this chapter" onClick={() => focusRole(index)}>
                   <span data-period className="block font-mono text-xs tracking-[0.14em] text-muted uppercase">
-                    {role.period}
+                    <span className="whitespace-nowrap">{role.period.split(" — ")[0]} —</span>{" "}
+                    <span className="whitespace-nowrap">{role.period.split(" — ")[1]}</span>
                   </span>
                   <span className="mt-2 block text-sm text-pass">{role.title}</span>
                   <span

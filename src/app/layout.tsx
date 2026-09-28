@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, IBM_Plex_Mono, Source_Sans_3 } from "next/font/google";
-import { BackToTop } from "@/components/back-to-top";
-import { SiteCursor } from "@/components/site-cursor";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { profile } from "@/data/portfolio";
-import { personJsonLd, siteDescription, siteKeywords } from "@/lib/site";
+import { BackToTop } from "@/components/layout/back-to-top";
+import { SiteCursor } from "@/components/layout/site-cursor";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
+import { profile } from "@/data";
+import { personJsonLd, siteDescription, siteKeywords, siteTitle, siteTitleSuffix } from "@/lib/site";
 import "./globals.css";
 
 const sourceSans = Source_Sans_3({
@@ -31,9 +31,11 @@ const plex = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
-    default: `${profile.name} — ${profile.role}`,
-    template: `%s — ${profile.name}`,
+    default: siteTitle,
+    template: `%s — ${siteTitleSuffix}`,
   },
+  applicationName: profile.name,
+  category: "portfolio",
   description: siteDescription,
   keywords: siteKeywords,
   authors: [{ name: profile.name, url: profile.linkedin }],
@@ -45,7 +47,7 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
   openGraph: {
-    title: `${profile.name} — ${profile.role}`,
+    title: siteTitle,
     description: siteDescription,
     url: "/",
     siteName: profile.name,
@@ -54,7 +56,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${profile.name} — ${profile.role}`,
+    title: siteTitle,
     description: siteDescription,
   },
 };

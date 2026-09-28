@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { ContactPanel } from "@/components/contact-panel";
-import { Mark } from "@/components/mark";
-import { nav, profile } from "@/data/portfolio";
+import { ContactPanel } from "@/components/layout/contact-panel";
+import { Mark } from "@/components/ui/mark";
+import { nav, profile } from "@/data";
 
 export function SiteFooter() {
   return (
     <footer id="contact" className="band scroll-mt-20 bg-band text-on-band">
       <div className="mx-auto max-w-6xl px-4 pt-8 pb-5 sm:px-6 sm:pt-10">
-        <ContactPanel />
+        <ContactPanel direct={Boolean(process.env.RESEND_API_KEY)} />
 
         <div className="mt-8 grid gap-4 border-t border-on-band/15 pt-4 text-xs text-on-band/55 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:gap-10 lg:pr-16 xl:pr-0">
           <Link href="/" className="flex w-fit items-center gap-3 text-on-band" data-cursor="Reset to the start">

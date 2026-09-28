@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { releaseGate } from "@/data/portfolio";
+import { releaseGate } from "@/data";
 
 const PLAYBACK_MS = 2800;
 

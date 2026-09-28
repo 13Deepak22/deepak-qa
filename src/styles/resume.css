@@ -1,0 +1,58 @@
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 16mm;
+  }
+
+  :root {
+    --paper: #fff !important;
+    --paper-deep: #fff !important;
+    --card: #fff !important;
+    --ink: #111 !important;
+    --ink-soft: #222 !important;
+    --muted: #444 !important;
+    --line: #bbb !important;
+    --pass: #0f5132 !important;
+    color-scheme: light;
+  }
+
+  body:has(.resume-sheet) > :not(main),
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  body:has(.resume-sheet) main > div {
+    max-width: none;
+    padding: 0;
+  }
+
+  .resume-sheet {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    box-shadow: none;
+    animation: none;
+    font-size: 10.5pt;
+  }
+
+  .resume-sheet a {
+    text-decoration: none;
+  }
+
+  .resume-section {
+    margin-top: 1.1rem;
+    padding-top: 0.9rem;
+  }
+
+  .resume-section h2 {
+    break-after: avoid;
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .resume-item {
+    break-inside: avoid;
+  }
+}

@@ -1,23 +1,34 @@
-import { about, education, experience, profile } from "@/data/portfolio";
+import { about, education, experience, profile, roleTitles } from "@/data";
+
+const roleNames = roleTitles.flatMap((title) =>
+  title === "SDET" ? ["SDET", "Software Development Engineer in Test"] : [title],
+);
 
 export function siteUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 }
 
+export const siteTitle = `${profile.name} — ${profile.role} | Manual & Automation Testing`;
+
+export const siteTitleSuffix = `${profile.name}, ${profile.role}`;
+
 export const siteDescription =
-  "Deepak Gupta is a QA engineer in India. Manual and automation testing for fintech: UPI, lending, cards, API testing, Selenium, Appium, and Playwright.";
+  "Deepak Gupta, QA engineer in India (Noida). 3+ years of manual and automation testing for fintech: UPI, lending, APIs, Selenium, Appium, and Playwright.";
 
 export const siteKeywords = [
   "Deepak Gupta",
-  "QA Engineer",
+  ...roleNames,
   "QA engineer India",
+  "QA engineer Noida",
   "fintech testing",
   "manual testing",
   "test automation",
+  "mobile app testing",
   "Selenium",
   "Appium",
   "Playwright",
   "API testing",
+  "Postman",
   "JMeter",
   "UPI testing",
 ];
@@ -31,7 +42,7 @@ export function personJsonLd() {
         "@type": "WebSite",
         "@id": `${base}/#website`,
         url: base,
-        name: `${profile.name} — ${profile.role}`,
+        name: siteTitle,
         description: siteDescription,
         inLanguage: "en",
         publisher: { "@id": `${base}/#person` },
@@ -48,7 +59,15 @@ export function personJsonLd() {
         image: `${base}/portrait.png`,
         address: {
           "@type": "PostalAddress",
+          addressLocality: profile.places,
           addressCountry: "IN",
+        },
+        hasOccupation: {
+          "@type": "Occupation",
+          name: profile.role,
+          alternateName: roleNames.filter((name) => name !== profile.role),
+          occupationLocation: { "@type": "City", name: profile.places },
+          skills: about.expertiseTerms.join(", "),
         },
         alumniOf: {
           "@type": "CollegeOrUniversity",
@@ -62,5 +81,18 @@ export function personJsonLd() {
         sameAs: [profile.linkedin, profile.github],
       },
     ],
+  };
+}
+
+export function profilePageJsonLd() {
+  const base = siteUrl();
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "@id": `${base}/about#profile`,
+    url: `${base}/about`,
+    name: `About Me — ${siteTitleSuffix}`,
+    isPartOf: { "@id": `${base}/#website` },
+    mainEntity: { "@id": `${base}/#person` },
   };
 }

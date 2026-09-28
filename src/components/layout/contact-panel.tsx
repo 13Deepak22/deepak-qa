@@ -1,11 +1,22 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState, useTransition } from "react";
+import { usePathname } from "next/navigation";
 import { ArrowUpRight, Mail, MapPin, Phone, Send } from "lucide-react";
-import { profile } from "@/data/portfolio";
+import { sendContact } from "@/app/actions/contact";
+import { profile } from "@/data";
 
-export function ContactPanel() {
-  const [sent, setSent] = useState(false);
+type Result = { status: "sent" | "invalid" | "error" | "mailto"; message: string };
+
+export function ContactPanel({ direct }: { direct: boolean }) {
+  const [result, setResult] = useState<Result | null>(null);
+  const [pending, startTransition] = useTransition();
+  const startedAt = useRef(0);
+  const home = usePathname() === "/";
+
+  useEffect(() => {
+    startedAt.current = Date.now();
+  }, []);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,10 +39,21 @@ export function ContactPanel() {
       return;
     }
 
-    const subject = encodeURIComponent(`QA portfolio — note from ${name}`);
-    const body = encodeURIComponent(`— ${name}\n${email}\n\n${query}`);
-    window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
-    setSent(true);
+    if (!direct) {
+      const subject = encodeURIComponent(`QA portfolio — note from ${name}`);
+      const body = encodeURIComponent(`— ${name}\n${email}\n\n${query}`);
+      window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
+      setResult({ status: "mailto", message: "Your mail app should open with this note." });
+      return;
+    }
+
+    data.set("started", String(startedAt.current));
+    setResult(null);
+    startTransition(async () => {
+      const response = await sendContact(data);
+      setResult(response);
+      if (response.status === "sent") form.reset();
+    });
   }
 
   const field =
@@ -44,10 +66,16 @@ export function ContactPanel() {
     <div className="grid gap-7 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:items-start md:gap-x-10 lg:gap-x-16">
       <div>
         <p className="font-mono text-[0.68rem] tracking-[0.16em] uppercase">
-          <span className="text-pass">05</span>
-          <span className="text-on-band/60"> / Contact</span>
+          {home ? (
+            <>
+              <span className="text-pass">05</span>
+              <span className="text-on-band/60"> / Contact</span>
+            </>
+          ) : (
+            <span className="text-pass">Contact</span>
+          )}
         </p>
-        <h2 className="mt-1.5 max-w-md font-serif text-2xl leading-tight tracking-tight text-on-band sm:text-[1.7rem]">
+        <h2 className="mt-1.5 max-w-md font-serif text-2xl leading-tight tracking-tight text-balance text-on-band sm:text-[1.7rem]">
           Tell me what you are about to ship.
         </h2>
         <p className="mt-1.5 max-w-sm text-sm leading-snug text-on-band/70">
@@ -111,9 +139,13 @@ export function ContactPanel() {
         <div className="flex items-baseline justify-between gap-4">
           <h3 className="font-serif text-xl tracking-tight text-on-band">Connect me.</h3>
           <span className="hidden font-mono text-[0.62rem] tracking-[0.14em] text-pass uppercase sm:inline">
-            Opens your mail app
+            {direct ? "Lands in my inbox" : "Opens your mail app"}
           </span>
         </div>
+        <label className="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+          Leave this empty
+          <input name="contact_ref" tabIndex={-1} autoComplete="off" />
+        </label>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:gap-x-5">
           <label className="block">
             <span className={caption}>Name</span>
@@ -152,17 +184,20 @@ export function ContactPanel() {
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3">
           <button
             type="submit"
-            className="press inline-flex h-11 items-center gap-2 bg-pass-fill px-5 text-sm sm:h-9 text-on-band hover:brightness-110"
+            disabled={pending}
+            className="press inline-flex h-11 items-center gap-2 bg-pass-fill px-5 text-sm text-on-band hover:brightness-110 disabled:cursor-wait disabled:opacity-70 sm:h-9"
             data-cursor="Ship it"
           >
-            Send
+            {pending ? "Sending…" : "Send"}
             <Send className="size-3.5" size={14} strokeWidth={1.75} aria-hidden="true" />
           </button>
-          {sent ? (
-            <p className="text-sm text-on-band/75" role="status">
-              Your mail app should open with this note.
-            </p>
-          ) : null}
+          <p
+            className={`text-sm ${result?.status === "sent" || result?.status === "mailto" ? "text-on-band/80" : "text-[#f2a38f]"}`}
+            role="status"
+            hidden={!result}
+          >
+            {result?.message}
+          </p>
         </div>
       </form>
     </div>

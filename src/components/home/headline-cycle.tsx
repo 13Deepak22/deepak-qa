@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { headlines, profile } from "@/data/portfolio";
+import { RoleTyper } from "@/components/home/role-typer";
+import { headlines, profile } from "@/data";
 
 export function HeadlineCycle() {
   const rootRef = useRef<HTMLHeadingElement>(null);
@@ -49,12 +50,19 @@ export function HeadlineCycle() {
   const line = headlines[reduce ? 0 : index];
 
   return (
-    <h1
-      ref={rootRef}
-      className="headline enter enter-2 mt-5 w-full max-w-2xl font-serif tracking-[-0.035em]"
-    >
-      <span className="sr-only">{profile.headline}</span>
-      <span className="headline-stage" data-played={played ? "true" : "false"} aria-hidden="true">
+    <h1 ref={rootRef} className="headline w-full max-w-2xl font-serif tracking-[-0.035em]">
+      <span className="enter enter-1 block font-mono text-[0.72rem] leading-normal tracking-[0.18em] uppercase">
+        <span className="block text-muted">{profile.name}</span>
+        <span className="mt-1 block text-pass">
+          <RoleTyper />
+        </span>
+      </span>
+      <span className="sr-only">{` — ${profile.headline}`}</span>
+      <span
+        className="headline-stage enter enter-2 mt-5"
+        data-played={played ? "true" : "false"}
+        aria-hidden="true"
+      >
         <span
           key={line.mark}
           className="headline-line"

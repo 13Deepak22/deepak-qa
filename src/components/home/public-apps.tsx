@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { publicApps } from "@/data/portfolio";
+import { publicApps } from "@/data";
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;

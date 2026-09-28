@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Mark } from "@/components/mark";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { nav, profile } from "@/data/portfolio";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { Mark } from "@/components/ui/mark";
+import { nav, profile } from "@/data";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);

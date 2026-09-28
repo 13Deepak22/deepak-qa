@@ -5,7 +5,7 @@ import { SiteCursor } from "@/components/layout/site-cursor";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { profile } from "@/data";
-import { personJsonLd, siteDescription, siteKeywords, siteTitle, siteTitleSuffix } from "@/lib/site";
+import { personJsonLd, siteDescription, siteKeywords, siteTitle, siteTitleSuffix, siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const sourceSans = Source_Sans_3({
@@ -29,7 +29,7 @@ const plex = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(siteUrl()),
   title: {
     default: siteTitle,
     template: `%s — ${siteTitleSuffix}`,

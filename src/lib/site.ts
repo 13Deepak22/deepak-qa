@@ -5,7 +5,11 @@ const roleNames = roleTitles.flatMap((title) =>
 );
 
 export function siteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  const vercelDomain = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  const url =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (vercelDomain ? `https://${vercelDomain}` : "http://localhost:3000");
+  return url.replace(/\/$/, "");
 }
 
 export const siteTitle = `${profile.name} — ${profile.role} | Manual & Automation Testing`;

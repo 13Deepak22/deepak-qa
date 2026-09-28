@@ -67,7 +67,7 @@ The form sends each message to your inbox through [Resend](https://resend.com), 
 
 A hidden trap field, a minimum fill time, length limits, and a per-visitor rate limit keep out most spam.
 
-Set `NEXT_PUBLIC_SITE_URL` to the production URL so the sitemap and social cards use it.
+On Vercel, the sitemap and social cards use the project's production domain automatically. Set `NEXT_PUBLIC_SITE_URL` only when you add a custom domain.
 
 ## Deploy
 

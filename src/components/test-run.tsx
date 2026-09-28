@@ -39,14 +39,13 @@ export function TestRun() {
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let frame = 0;
     if (reduce) {
-      setSimulated(totalSeconds);
-      return;
+      frame = window.requestAnimationFrame(() => setSimulated(totalSeconds));
+      return () => window.cancelAnimationFrame(frame);
     }
 
-    setSimulated(0);
     const startedAt = performance.now();
-    let frame = 0;
     const tick = (now: number) => {
       const progress = Math.min((now - startedAt) / PLAYBACK_MS, 1);
       setSimulated(progress * totalSeconds);
@@ -70,7 +69,10 @@ export function TestRun() {
         <button
           type="button"
           className="press border border-ink px-3 py-2 font-mono text-xs tracking-[0.12em] uppercase hover:bg-ink hover:text-paper"
-          onClick={() => setRun((value) => value + 1)}
+          onClick={() => {
+            setSimulated(0);
+            setRun((value) => value + 1);
+          }}
         >
           Rerun
         </button>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Mark } from "@/components/mark";
 import { nav, profile } from "@/data/portfolio";
 
@@ -31,14 +31,17 @@ export function SiteHeader() {
     });
   }
 
-  function closeMenu() {
+  const closeMenu = useCallback(() => {
     menuToken.current += 1;
     setOpen(false);
     setExpanded(false);
-    clearCloseTimer();
+    if (closeTimer.current !== null) {
+      window.clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     closeTimer.current = window.setTimeout(() => setPanel(false), reduce ? 0 : 280);
-  }
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -47,7 +50,7 @@ export function SiteHeader() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [open, closeMenu]);
 
   useEffect(() => {
     const media = window.matchMedia("(min-width: 1024px)");
@@ -56,7 +59,7 @@ export function SiteHeader() {
     };
     media.addEventListener("change", close);
     return () => media.removeEventListener("change", close);
-  }, []);
+  }, [closeMenu]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);

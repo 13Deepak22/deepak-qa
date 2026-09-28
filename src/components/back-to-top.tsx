@@ -22,7 +22,7 @@ export function BackToTop() {
       aria-label="Back to top"
       onClick={() => {
         const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const root = document.scrollingElement ?? document.documentElement;
+        const root = (document.scrollingElement ?? document.documentElement) as HTMLElement;
         if (reduce) {
           const previous = root.style.scrollBehavior;
           root.style.scrollBehavior = "auto";

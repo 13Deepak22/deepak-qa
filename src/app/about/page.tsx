@@ -13,7 +13,7 @@ export default function AboutPage() {
       <section className="mx-auto grid max-w-6xl items-start gap-12 px-6 py-14 lg:grid-cols-12 lg:gap-16 lg:py-20">
         <figure className="enter enter-1 max-w-sm lg:col-span-5">
           <img
-            src="/portrait.png?v=5"
+            src="/portrait.jpeg?v=6"
             alt="Portrait of Deepak Gupta"
             width={1254}
             height={1254}

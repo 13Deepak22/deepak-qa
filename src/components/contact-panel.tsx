@@ -45,21 +45,21 @@ export function ContactPanel() {
   }
 
   return (
-    <div className="grid gap-12 lg:grid-cols-12 lg:items-start">
+    <div className="grid gap-8 lg:grid-cols-12 lg:items-start">
       <div className="lg:col-span-5">
         <p className="font-mono text-[0.72rem] tracking-[0.16em] uppercase">
           <span className="text-[#9ddec0]">05</span>
           <span className="text-white/55"> / Contact</span>
         </p>
-        <h2 className="mt-4 font-serif text-5xl tracking-tight text-paper sm:text-6xl">
+        <h2 className="mt-2 font-serif text-3xl tracking-tight text-paper sm:text-4xl">
           Tell me what you are about to ship.
         </h2>
-        <p className="mt-5 max-w-md text-lg leading-relaxed text-white/75">
+        <p className="mt-3 max-w-md text-sm leading-relaxed text-white/75">
           A release, a flaky suite, or a role. I read the risk first.
         </p>
 
-        <dl className="mt-10 border-t border-white/20">
-          <div className="grid gap-2 border-b border-white/15 py-5 sm:grid-cols-[7.5rem_1fr] sm:items-center">
+        <dl className="mt-6 border-t border-white/20">
+          <div className="grid gap-1 border-b border-white/15 py-3 sm:grid-cols-[7.5rem_1fr] sm:items-center">
             <dt className="font-mono text-[0.68rem] tracking-[0.16em] text-[#9ddec0] uppercase">
               Phone
             </dt>
@@ -73,7 +73,7 @@ export function ContactPanel() {
               </a>
             </dd>
           </div>
-          <div className="grid gap-2 border-b border-white/15 py-5 sm:grid-cols-[7.5rem_1fr] sm:items-center">
+          <div className="grid gap-1 border-b border-white/15 py-3 sm:grid-cols-[7.5rem_1fr] sm:items-center">
             <dt className="font-mono text-[0.68rem] tracking-[0.16em] text-[#9ddec0] uppercase">
               Email
             </dt>
@@ -93,7 +93,7 @@ export function ContactPanel() {
               </button>
             </dd>
           </div>
-          <div className="grid gap-2 border-b border-white/15 py-5 sm:grid-cols-[7.5rem_1fr] sm:items-center">
+          <div className="grid gap-1 border-b border-white/15 py-3 sm:grid-cols-[7.5rem_1fr] sm:items-center">
             <dt className="font-mono text-[0.68rem] tracking-[0.16em] text-[#9ddec0] uppercase">
               LinkedIn
             </dt>
@@ -125,10 +125,11 @@ export function ContactPanel() {
       </div>
 
       <form
+        noValidate
         onSubmit={onSubmit}
-        className="flex flex-col gap-6 border border-white/20 bg-white/[0.04] p-6 sm:p-8 lg:col-span-6 lg:col-start-7"
+        className="flex flex-col gap-4 border border-white/20 bg-white/[0.04] p-5 lg:col-span-6 lg:col-start-7"
       >
-        <h3 className="font-serif text-4xl tracking-tight text-paper sm:text-5xl">Connect me.</h3>
+        <h3 className="font-serif text-2xl tracking-tight text-paper">Connect me.</h3>
         <label className="block">
           <span className="font-mono text-[0.68rem] tracking-[0.16em] text-white/60 uppercase">
             Name
@@ -137,7 +138,7 @@ export function ContactPanel() {
             name="name"
             required
             autoComplete="name"
-            className="mt-2 w-full border-b border-white/25 bg-transparent py-3 text-paper outline-none transition-colors duration-200 placeholder:text-white/35 focus:border-[#9ddec0]"
+            className="mt-1 w-full border-b border-white/25 bg-transparent py-2 text-sm text-paper outline-none transition-colors duration-200 placeholder:text-white/35 focus:border-[#9ddec0]"
             placeholder="Your name"
             onInput={(event) => event.currentTarget.setCustomValidity("")}
           />
@@ -151,7 +152,7 @@ export function ContactPanel() {
             type="email"
             required
             autoComplete="email"
-            className="mt-2 w-full border-b border-white/25 bg-transparent py-3 text-paper outline-none transition-colors duration-200 placeholder:text-white/35 focus:border-[#9ddec0]"
+            className="mt-1 w-full border-b border-white/25 bg-transparent py-2 text-sm text-paper outline-none transition-colors duration-200 placeholder:text-white/35 focus:border-[#9ddec0]"
             placeholder="you@company.com"
           />
         </label>
@@ -162,14 +163,14 @@ export function ContactPanel() {
           <textarea
             name="query"
             required
-            rows={4}
-            className="mt-2 w-full resize-y border-b border-white/25 bg-transparent py-3 text-paper outline-none transition-colors duration-200 placeholder:text-white/35 focus:border-[#9ddec0]"
+            rows={2}
+            className="mt-1 w-full resize-y border-b border-white/25 bg-transparent py-2 text-sm text-paper outline-none transition-colors duration-200 placeholder:text-white/35 focus:border-[#9ddec0]"
             placeholder="Your query"
             onInput={(event) => event.currentTarget.setCustomValidity("")}
           />
         </label>
         <div className="flex flex-wrap items-center gap-4">
-          <button type="submit" className="press bg-paper px-5 py-3 text-sm text-ink hover:bg-white">
+          <button type="submit" className="press bg-paper px-4 py-2 text-sm text-ink hover:bg-white">
             Send
           </button>
           {sent ? (

@@ -68,11 +68,11 @@ test.describe("home", () => {
     }
 
     for (const practice of practices) {
-      await expect(page.getByRole("heading", { name: practice.title })).toBeVisible();
+      await expect(page.locator("#practice").getByRole("heading", { name: practice.title })).toBeVisible();
     }
     await expect(page.getByRole("heading", { name: "A bug worth fixing." })).toHaveCount(0);
     for (const group of toolkit) {
-      await expect(page.getByRole("heading", { name: group.label, exact: true })).toBeVisible();
+      await expect(page.locator("#skills").getByRole("heading", { name: group.label, exact: true })).toBeVisible();
       for (const item of group.items) {
         await expect(page.getByText(item, { exact: true }).first()).toBeVisible();
       }
@@ -136,7 +136,7 @@ test.describe("about", () => {
     }
     const portrait = page.getByRole("img", { name: "Portrait of Deepak Gupta" });
     await expect(portrait).toBeVisible();
-    await expect(portrait).toHaveAttribute("src", /\/portrait\.png/);
+    await expect(portrait).toHaveAttribute("src", /\/portrait\.jpeg/);
   });
 });
 

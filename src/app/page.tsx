@@ -141,7 +141,7 @@ export default function HomePage() {
       </section>
 
       <section id="contact" className="reveal scroll-mt-20 bg-ink text-paper">
-        <div className="mx-auto max-w-6xl px-6 py-20 lg:py-28">
+        <div className="mx-auto max-w-6xl px-6 py-12 lg:py-14">
           <ContactPanel />
         </div>
       </section>

@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import {
   publicApps,
   unpublishedWork,
+  about,
   education,
   experience,
   nav,
@@ -116,27 +117,39 @@ test.describe("home", () => {
 test.describe("about", () => {
   test("shows the updated portrait with the resume identity", async ({ page }) => {
     await page.goto("/about");
-    await expect(page).toHaveTitle(`About — ${profile.name}`);
+    await expect(page).toHaveTitle(`About Me — ${profile.name}`);
     await expect(page.getByRole("heading", { level: 1, name: profile.name })).toBeVisible();
-    await expect(page.getByText(profile.lede)).toBeVisible();
-    await expect(page.getByText(profile.location)).toBeVisible();
-    for (const role of experience) {
-      await expect(page.getByText(role.org).first()).toBeVisible();
-      await expect(page.getByText(role.title, { exact: true }).first()).toBeVisible();
+    for (const title of ["Who I am", "How I started", "Expertise", "Interests", "Goals"]) {
+      await expect(page.getByRole("heading", { name: title })).toBeVisible();
     }
-    await expect(page.getByText(profile.places)).toBeVisible();
-    await expect(page.getByRole("heading", { name: education.degree })).toBeVisible();
+    await expect(page.getByText(about.who)).toBeVisible();
+    await expect(page.getByText(about.started)).toBeVisible();
+    await expect(page.getByText(about.expertise)).toBeVisible();
+    await expect(page.getByText(about.interests)).toBeVisible();
+    await expect(page.getByText(about.goals)).toBeVisible();
+    for (const term of about.expertiseTerms) {
+      await expect(page.getByText(term, { exact: true })).toBeVisible();
+    }
+    await expect(page.getByText(profile.location)).toBeVisible();
+    await expect(page.locator("#content").getByText(profile.places, { exact: true })).toBeVisible();
     await expect(page.getByText(education.school)).toBeVisible();
-    await expect(page.getByText(education.period)).toBeVisible();
+    const story = page.locator("#content");
+    expect(await story.innerText()).not.toMatch(/\b[Hh]e\b/);
+    for (const role of experience) {
+      await expect(story.getByText(role.org)).toHaveCount(0);
+    }
+    await expect(page.getByRole("link", { name: "Selected work" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Start a conversation" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Full profile on LinkedIn" })).toHaveCount(0);
     for (const course of education.courses) {
-      await expect(page.getByText(course, { exact: true })).toBeVisible();
+      await expect(page.getByText(course, { exact: true })).toHaveCount(0);
     }
     for (const item of education.credentials) {
-      await expect(page.getByText(item.name)).toBeVisible();
+      await expect(page.getByText(item.name)).toHaveCount(0);
     }
     const portrait = page.getByRole("img", { name: "Portrait of Deepak Gupta" });
     await expect(portrait).toBeVisible();
-    await expect(portrait).toHaveAttribute("src", /\/portrait\.jpeg/);
+    await expect(portrait).toHaveAttribute("src", /\/portrait\.png/);
   });
 });
 
@@ -188,6 +201,25 @@ test.describe("navigation", () => {
     await expect(page.getByRole("button", { name: "Menu" })).toBeVisible();
   });
 
+  test("theme follows the system until the header toggle picks a mode", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.goto("/");
+    const toggle = page.getByRole("button", { name: /color theme|switch to/i });
+    await expect(toggle).toBeVisible();
+    await expect(page.locator("html")).not.toHaveAttribute("data-theme", /light|dark/);
+    await expect(toggle).toHaveAccessibleName("Switch to light mode");
+
+    await toggle.click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await expect(page.locator("body")).toHaveCSS("background-color", "rgb(239, 234, 225)");
+
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await page.getByRole("button", { name: "Switch to dark mode" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await expect(page.locator("body")).toHaveCSS("background-color", "rgb(28, 25, 21)");
+  });
+
   test("hero shortcuts land on work and contact", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("link", { name: "Selected work" }).click();
@@ -225,8 +257,7 @@ test.describe("public apps", () => {
 });
 
 test.describe("contact", () => {
-  test.beforeEach(async ({ context, page }) => {
-    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  test.beforeEach(async ({ page }) => {
     await page.goto("/#contact");
   });
 
@@ -253,25 +284,19 @@ test.describe("contact", () => {
     await expect(page.getByRole("status")).toHaveCount(0);
   });
 
-  test("sends a note and copies the email", async ({ page }) => {
+  test("sends a note", async ({ page }) => {
     await page.getByPlaceholder("Your name").fill("Asha");
     await page.getByPlaceholder("you@company.com").fill("asha@example.com");
     await page.getByPlaceholder("Your query").fill("Can you review a payments release?");
     await page.getByRole("button", { name: "Send" }).click();
     await expect(page.getByRole("status")).toHaveText("Your mail app should open with this note.");
-
-    await page.getByRole("button", { name: "Copy email" }).click();
-    await expect(page.getByRole("button", { name: "Copied" })).toBeVisible();
-    await expect(page.getByText("Email copied")).toBeAttached();
-    const copied = await page.evaluate(() => navigator.clipboard.readText());
-    expect(copied).toBe(profile.email);
+    await expect(page.getByRole("button", { name: /copy email/i })).toHaveCount(0);
   });
 
-  test("groups phone, email, and LinkedIn without an address", async ({ page }) => {
+  test("groups phone, email, city, and profiles", async ({ page }) => {
     const contact = page.locator("#contact");
-    await expect(contact.getByText("Phone", { exact: true })).toBeVisible();
-    await expect(contact.getByText("Email", { exact: true }).first()).toBeVisible();
-    await expect(contact.getByText("LinkedIn", { exact: true }).first()).toBeVisible();
+    await expect(contact.getByText("Phone", { exact: true })).toHaveCount(0);
+    await expect(contact.getByRole("link", { name: "LinkedIn", exact: true })).toBeVisible();
     await expect(contact.getByRole("heading", { name: "Connect me." })).toBeVisible();
     await expect(page.getByPlaceholder("Your query")).toBeVisible();
     await expect(page.getByRole("link", { name: profile.phone })).toHaveAttribute(
@@ -282,12 +307,15 @@ test.describe("contact", () => {
     await expect(linkedin).toHaveAttribute("href", profile.linkedin);
     await expect(linkedin).toHaveAttribute("target", "_blank");
     await expect(linkedin).toHaveAttribute("rel", /noopener/);
+    const github = page.getByRole("link", { name: "GitHub", exact: true });
+    await expect(github).toHaveAttribute("href", profile.github);
+    await expect(github).toHaveAttribute("target", "_blank");
     await expect(page.getByRole("link", { name: profile.email }).first()).toHaveAttribute(
       "href",
       `mailto:${profile.email}`,
     );
     await expect(contact.getByText(profile.location)).toHaveCount(0);
-    await expect(contact.getByText(profile.places)).toHaveCount(0);
+    await expect(contact.getByText(profile.places, { exact: true })).toBeVisible();
     await expect(contact.getByRole("button", { name: "Send" })).toBeVisible();
   });
 
@@ -310,6 +338,16 @@ test.describe("layout", () => {
       await expectNoHorizontalOverflow(page);
       await page.locator("#contact").scrollIntoViewIfNeeded();
       await expectNoHorizontalOverflow(page);
+    });
+
+    test(`about and not-found do not scroll sideways at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      for (const path of ["/about", "/not-a-page"]) {
+        await page.goto(path);
+        await expectNoHorizontalOverflow(page);
+        await page.locator("#contact").scrollIntoViewIfNeeded();
+        await expectNoHorizontalOverflow(page);
+      }
     });
 
     test(`an open app note does not scroll sideways at ${width}px`, async ({ page }) => {
@@ -336,6 +374,19 @@ test.describe("crawl files", () => {
     const body = await robots.text();
     expect(body).toContain("Allow: /");
     expect(body).toContain("sitemap.xml");
+  });
+
+  test("home exposes a canonical link, a description, and person data", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "http://localhost:3000");
+    const description = page.locator('meta[name="description"]');
+    await expect(description).toHaveAttribute("content", /QA engineer in India/);
+    await expect(description).toHaveAttribute("content", /Selenium/);
+    const jsonLd = await page.locator('script[type="application/ld+json"]').textContent();
+    expect(jsonLd).toContain("Person");
+    expect(jsonLd).toContain(profile.name);
+    expect(jsonLd).toContain(profile.linkedin);
+    expect(jsonLd).toContain(profile.github);
   });
 
   test("social image responds", async ({ request }) => {

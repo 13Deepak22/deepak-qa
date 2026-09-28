@@ -11,8 +11,9 @@ export const profile = {
   phone: "+91 7888768621",
   phoneHref: "tel:+917888768621",
   linkedin: "https://www.linkedin.com/in/deepak-gupta13/",
+  github: "https://github.com/13Deepak22",
   availability: "Connect me",
-  places: "Chandigarh, Mohali, Noida, Gurugram, NCR · open to relocation",
+  places: "Noida",
   headline: "I test the money before it moves.",
   lede: "QA engineer with 3+ years in manual and automation testing. I find the critical bugs, build frameworks that hold up, and keep fintech releases accurate.",
   focus: ["Mobile", "Web", "API", "Automation", "Load"],
@@ -38,13 +39,11 @@ export const headlines = [
 ];
 
 export const nav = [
-  { href: "/about", label: "About" },
-  { href: "/#practice", label: "What I do" },
-  { href: "/#skills", label: "What I know" },
-  { href: "/about#education", label: "Education" },
-  { href: "/#experience", label: "Experience" },
-  { href: "/#work", label: "Work" },
-  { href: "/#contact", label: "Contact" },
+  { href: "/about", label: "About Me", hint: "Meet the tester" },
+  { href: "/#practice", label: "What I do", hint: "How a release gets cleared" },
+  { href: "/#skills", label: "What I know", hint: "Open the toolkit" },
+  { href: "/#experience", label: "Experience", hint: "Two teams, 3+ years" },
+  { href: "/#work", label: "Work", hint: "Six public apps" },
 ];
 
 export const releaseGate = {
@@ -227,6 +226,35 @@ export const experience = [
     ],
   },
 ];
+
+export const about = {
+  who: "I am a QA engineer with more than three years in manual testing and test automation. I work on mobile, web, and API releases in fintech. I look for the defect that can move money the wrong way, and I treat a release as ready only when the evidence is in.",
+  started:
+    "I started with a Bachelor of Computer Applications at Chandigarh Group of Colleges, from 2019 to 2022. Computer applications were the base. I then built a testing practice on live fintech releases: first the manual path, then automation for the path that has to ship again.",
+  expertise:
+    "I cover functional testing, regression testing, smoke, sanity, integration, and end-to-end testing. I test APIs in Postman and run load and performance checks in JMeter. I automate Android, iOS, and web with Appium, Selenium, and Playwright, in Java and JavaScript, with TestNG and the Page Object Model. I log defects in Jira and trace a critical bug to its cause. My domain is fintech: UPI, payment gateways, eKYC, cards, LOS, and LMS.",
+  expertiseTerms: [
+    "Manual testing",
+    "Test automation",
+    "Functional testing",
+    "Regression testing",
+    "API testing",
+    "Performance testing",
+    "Selenium",
+    "Appium",
+    "Playwright",
+    "Postman",
+    "JMeter",
+    "Jira",
+    "Mobile testing",
+    "Web testing",
+    "FinTech",
+  ],
+  interests:
+    "I am interested in technology and gaming, and in payment journeys, lending flows, and mobile apps where a small miss becomes a financial defect. I care about automation that stays readable, and about the gap between a passing check and a release that is actually safe.",
+  goals:
+    "I want the next release I own to ship with evidence: the critical path automated, the API checked, and the defect closed with a root cause. I am building frameworks that cut repeat manual work and still leave room for exploratory testing. I am open to relocation.",
+};
 
 export const education = {
   degree: "Bachelor of Computer Applications",

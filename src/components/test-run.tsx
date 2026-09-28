@@ -59,29 +59,30 @@ export function TestRun() {
 
   return (
     <section className="report-card max-w-full" aria-label="Release gate output">
-      <div className="flex items-start justify-between gap-4 border-b border-ink px-4 py-3 sm:px-5">
-        <div>
-          <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">
+      <div className="border-b border-line px-4 py-3 sm:px-5">
+        <div className="flex items-center justify-between gap-3">
+          <p className="min-w-0 font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">
             suite · {releaseGate.suite}
           </p>
-          <p className="mt-1 font-mono text-sm">runner · {releaseGate.runner}</p>
+          <button
+            type="button"
+            className="press shrink-0 border border-pass px-3 py-2 font-mono text-xs tracking-[0.12em] uppercase hover:bg-pass-fill hover:text-on-band"
+            data-cursor="Run the gate again"
+            onClick={() => {
+              setSimulated(0);
+              setRun((value) => value + 1);
+            }}
+          >
+            Rerun
+          </button>
         </div>
-        <button
-          type="button"
-          className="press border border-ink px-3 py-2 font-mono text-xs tracking-[0.12em] uppercase hover:bg-ink hover:text-paper"
-          onClick={() => {
-            setSimulated(0);
-            setRun((value) => value + 1);
-          }}
-        >
-          Rerun
-        </button>
+        <p className="mt-1 font-mono text-sm">runner · {releaseGate.runner}</p>
       </div>
       <ol className="px-4 py-4 sm:px-5">
         {rows.map(({ check, status, shown, progress }) => (
           <li key={check.file} className="py-1.5 font-mono text-[0.82rem] sm:text-sm">
             <div className="flex items-baseline justify-between gap-4">
-              <span className="min-w-0 break-all">
+              <span className="min-w-0">
                 <span
                   className={
                     status === "pass" ? "text-pass" : status === "run" ? "text-ink" : "text-muted"

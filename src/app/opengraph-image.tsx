@@ -33,7 +33,7 @@ export default function OpenGraphImage() {
           I test the money before it moves.
         </div>
         <div style={{ display: "flex", fontSize: 26, color: "#146c43" }}>
-          Noida · open to QA roles
+          India · open to relocation
         </div>
       </div>
     ),

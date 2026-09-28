@@ -96,9 +96,9 @@ export function ExperienceLog() {
             className="xp-station relative border-t border-line py-8 pl-8"
             aria-current={on ? "true" : undefined}
           >
-            <div className="grid gap-4 md:grid-cols-12">
-              <div className="md:col-span-3">
-                <button type="button" className="text-left" onClick={() => focusRole(index)}>
+            <div className="grid gap-4 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-8">
+              <div>
+                <button type="button" className="text-left" data-cursor="Inspect this chapter" onClick={() => focusRole(index)}>
                   <span data-period className="block font-mono text-xs tracking-[0.14em] text-muted uppercase">
                     {role.period}
                   </span>
@@ -116,8 +116,8 @@ export function ExperienceLog() {
                   <span className="xp-meter" aria-hidden="true" />
                 </button>
               </div>
-              <div className="md:col-span-9">
-                <h3 className="xp-org font-serif text-3xl tracking-tight">{role.org}</h3>
+              <div>
+                <h3 className="xp-org font-serif text-2xl tracking-tight sm:text-3xl">{role.org}</h3>
                 <ul className="mt-4 space-y-2 text-ink-soft">
                   {role.points.map((point) => (
                     <li key={point}>{point}</li>

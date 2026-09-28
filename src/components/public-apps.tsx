@@ -55,25 +55,26 @@ export function PublicApps() {
       {publicApps.map((app) => {
         const open = openTitle === app.title;
         return (
-          <div key={app.title} className="work-app border-b border-ink" data-open={open}>
+          <div key={app.title} className="work-app border-b border-line" data-open={open}>
             <button
               type="button"
-              className="work-toggle grid w-full cursor-pointer grid-cols-[auto_1fr_auto] items-baseline gap-x-4 gap-y-2 py-7 text-left hover:bg-paper-deep md:grid-cols-12 md:gap-6 md:px-3"
+              className="work-toggle grid w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2 py-6 text-left hover:bg-paper-deep sm:gap-x-4 sm:py-7 lg:grid-cols-[3.25rem_minmax(11rem,16rem)_minmax(0,1fr)_1.25rem] lg:items-center lg:gap-x-8 lg:px-1"
               aria-expanded={open}
+              data-cursor={open ? "Fold the notes back" : "See what I tested"}
               onClick={(event) => {
                 const next = event.currentTarget.nextElementSibling;
                 if (next instanceof HTMLDivElement) toggle(app.title, next);
               }}
             >
-              <span className="font-mono text-sm text-pass md:col-span-1">{app.index}</span>
-              <span className="md:col-span-6">
-                <span className="work-name block font-serif text-3xl tracking-tight">{app.title}</span>
-                <span className="mt-2 block text-sm text-muted">{app.domain}</span>
+              <span className="font-mono text-sm text-pass">{app.index}</span>
+              <span className="min-w-0">
+                <span className="work-name block font-serif text-2xl tracking-tight sm:text-3xl">{app.title}</span>
+                <span className="mt-1 block text-sm text-muted sm:mt-2">{app.domain}</span>
               </span>
-              <span className="col-span-2 text-sm leading-relaxed text-ink-soft md:col-span-4">
+              <span className="col-span-2 min-w-0 text-sm leading-relaxed text-ink-soft lg:col-span-1 lg:col-start-3 lg:row-start-1">
                 {app.outcome}
               </span>
-              <span className="col-start-3 row-start-1 self-center md:col-span-1 md:col-start-auto md:row-start-auto md:text-right">
+              <span className="col-start-3 row-start-1 self-center lg:col-start-4 lg:text-right">
                 <svg
                   className="work-chevron inline-block text-pass"
                   width="16"
@@ -87,7 +88,7 @@ export function PublicApps() {
               </span>
             </button>
             <div className="work-panel">
-              <p className="max-w-2xl pb-7 text-base leading-relaxed text-ink-soft md:ml-[8.333%] md:px-3">
+              <p className="max-w-2xl pb-6 text-base leading-relaxed text-ink-soft sm:pb-7 lg:pl-[5.25rem]">
                 {app.detail}
               </p>
             </div>

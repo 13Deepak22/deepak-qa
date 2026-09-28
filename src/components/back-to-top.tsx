@@ -18,8 +18,9 @@ export function BackToTop() {
   return (
     <button
       type="button"
-      className="press fixed right-5 bottom-5 z-40 inline-flex h-12 w-12 items-center justify-center border border-ink bg-paper text-pass shadow-[4px_4px_0_var(--ink)] hover:bg-ink hover:text-paper"
+      className="press fixed right-5 bottom-5 z-40 inline-flex h-12 w-12 items-center justify-center border border-pass bg-paper text-pass shadow-[4px_4px_0_var(--ink)] hover:bg-pass-fill hover:text-on-band"
       aria-label="Back to top"
+      data-cursor="Rewind to the top"
       onClick={() => {
         const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const root = (document.scrollingElement ?? document.documentElement) as HTMLElement;

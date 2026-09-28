@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Mark } from "@/components/mark";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { nav, profile } from "@/data/portfolio";
 
 export function SiteHeader() {
@@ -72,18 +73,19 @@ export function SiteHeader() {
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b bg-paper/90 backdrop-blur-md transition-[border-color,box-shadow] duration-300 ${
-        scrolled ? "border-ink/15 shadow-[0_10px_30px_-24px_rgba(28,25,21,0.7)]" : "border-line"
+      className={`sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur-md transition-shadow duration-300 ${
+        scrolled ? "header-shadow" : ""
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
+      <div className="mx-auto flex h-20 max-w-6xl items-center justify-between gap-3 pt-2 pr-16 pl-4 sm:gap-4 sm:pl-6">
         <Link
           href="/"
           className="flex min-w-0 items-center gap-3 text-ink"
+          data-cursor="Reset to the start"
           onClick={closeMenu}
         >
           <Mark className="h-8 w-8 shrink-0" />
-          <span className="truncate font-serif text-xl tracking-tight">{profile.name}</span>
+          <span className="truncate font-serif text-lg tracking-tight sm:text-xl">{profile.name}</span>
           <span className="hidden shrink-0 font-mono text-[0.68rem] tracking-[0.18em] text-pass uppercase sm:inline">
             QA
           </span>
@@ -91,16 +93,22 @@ export function SiteHeader() {
 
         <nav className="hidden items-center gap-4 lg:flex xl:gap-7" aria-label="Primary">
           {nav.map((item) => (
-            <Link key={item.href} href={item.href} className="nav-link text-sm text-ink-soft hover:text-ink">
+            <Link
+              key={item.href}
+              href={item.href}
+              className="nav-link text-sm text-ink-soft hover:text-pass"
+              data-cursor={item.hint}
+            >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/#contact"
-            className="press hidden shrink-0 border border-ink px-3 py-2 text-sm hover:bg-ink hover:text-paper xl:inline-flex"
+            className="press hidden shrink-0 border border-pass px-3 py-2 text-sm text-ink hover:bg-pass-fill hover:text-on-band xl:inline-flex"
+            data-cursor="Got a release? Let's talk"
           >
             {profile.availability}
           </Link>
@@ -109,12 +117,14 @@ export function SiteHeader() {
             className="inline-flex h-11 shrink-0 items-center px-3 font-mono text-xs tracking-[0.14em] uppercase lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
+            data-cursor={open ? "Fold the menu away" : "Every section, one list"}
             onClick={() => (open ? closeMenu() : openMenu())}
           >
             {open ? "Close" : "Menu"}
           </button>
         </div>
       </div>
+      <ThemeToggle />
 
       {panel ? (
         <nav
@@ -123,12 +133,13 @@ export function SiteHeader() {
           data-open={expanded ? "true" : "false"}
           className="mobile-nav border-t border-line lg:hidden"
         >
-          <ul className="mx-auto flex max-w-6xl flex-col px-6">
+          <ul className="mx-auto flex max-w-6xl flex-col px-4 sm:px-6">
             {nav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="link-line flex min-h-11 items-center border-b border-line text-lg hover:text-pass"
+                  className="link-line flex min-h-11 items-center border-b border-line text-lg hover:border-pass hover:text-pass"
+                  data-cursor={item.hint}
                   onClick={closeMenu}
                 >
                   {item.label}

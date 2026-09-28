@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ContactPanel } from "@/components/contact-panel";
 import { ExperienceLog } from "@/components/experience-log";
 import { HeadlineCycle } from "@/components/headline-cycle";
 import { PracticeIcon } from "@/components/practice-icon";
@@ -15,8 +14,8 @@ import {
 export default function HomePage() {
   return (
     <main id="content" tabIndex={-1} className="outline-none">
-      <section className="mx-auto grid max-w-6xl gap-12 px-6 pt-14 pb-16 lg:grid-cols-12 lg:pt-20 lg:pb-24">
-        <div className="min-w-0 lg:col-span-7">
+      <section className="mx-auto grid max-w-6xl gap-10 px-4 pt-12 pb-14 sm:px-6 sm:pt-14 sm:pb-16 md:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.9fr)] md:items-start md:gap-x-8 lg:gap-x-14 lg:pt-20 lg:pb-24">
+        <div className="min-w-0">
           <p className="enter enter-1 font-mono text-[0.72rem] tracking-[0.18em] text-pass uppercase">
             {profile.role}
           </p>
@@ -24,31 +23,33 @@ export default function HomePage() {
           <p className="enter enter-3 mt-6 max-w-lg text-xl leading-relaxed text-ink-soft">
             {profile.lede}
           </p>
-          <p className="enter enter-4 mt-6 font-mono text-xs tracking-[0.14em] text-muted uppercase">
+          <p className="enter enter-4 mt-6 max-w-lg text-balance font-mono text-xs tracking-[0.1em] text-muted uppercase sm:tracking-[0.14em]">
             {profile.focus.join("  ·  ")}
           </p>
-          <div className="enter enter-5 mt-8 flex flex-wrap gap-4">
+          <div className="enter enter-5 mt-8 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:flex-wrap">
             <Link
               href="/#work"
-              className="press bg-ink px-5 py-3 text-sm text-paper hover:bg-ink-soft"
+              className="press bg-ink px-5 py-3 text-center text-sm text-paper hover:bg-ink-soft min-[420px]:text-left"
+              data-cursor="Proof, app by app"
             >
               Selected work
             </Link>
             <Link
               href="/#contact"
-              className="press border border-ink px-5 py-3 text-sm hover:bg-ink hover:text-paper"
+              className="press border border-pass px-5 py-3 text-center text-sm hover:bg-pass-fill hover:text-on-band min-[420px]:text-left"
+              data-cursor="Tell me what's shipping"
             >
               Start a conversation
             </Link>
           </div>
         </div>
-        <div className="enter enter-5 min-w-0 lg:col-span-5 lg:pt-6">
+        <div className="enter enter-5 min-w-0 md:pt-2 lg:pt-6">
           <TestRun />
         </div>
       </section>
 
       <section id="practice" className="scroll-mt-20 border-t border-line bg-paper-deep">
-        <div className="mx-auto max-w-6xl px-6 py-20 lg:py-28">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
             <span className="text-pass">01</span> / What I do
           </p>
@@ -57,7 +58,7 @@ export default function HomePage() {
           </h2>
           <ol className="mt-12 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3">
             {practices.map((item, index) => (
-              <li key={item.title} className="bg-paper px-6 py-8">
+              <li key={item.title} className="bg-paper px-5 py-7 sm:px-6 sm:py-8">
                 <div className="flex items-center gap-3">
                   <PracticeIcon name={item.title} />
                   <p className="font-mono text-[0.72rem] tracking-[0.16em] text-pass">
@@ -75,20 +76,20 @@ export default function HomePage() {
       </section>
 
       <section id="skills" className="scroll-mt-20 border-t border-line bg-paper-deep">
-        <div className="mx-auto max-w-6xl px-6 py-20 lg:py-28">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
             <span className="text-pass">02</span> / What I know
           </p>
           <h2 className="mt-3 font-serif text-4xl tracking-tight sm:text-5xl">
             Tools I reach for.
           </h2>
-          <ul className="mt-12 grid gap-px bg-line md:grid-cols-3">
+          <ul className="mt-12 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3">
             {toolkit.map((group) => (
-              <li key={group.label} className="flex flex-col bg-paper px-6 py-7">
+              <li key={group.label} className="flex flex-col bg-paper px-5 py-6 sm:px-6 sm:py-7">
                 <h3 className="practice-title font-mono text-[0.72rem] tracking-[0.16em] text-pass uppercase">
                   {group.label}
                 </h3>
-                <ul className="mt-6 flex flex-wrap gap-2">
+                <ul className="mt-5 flex flex-wrap gap-2 sm:mt-6">
                   {group.items.map((item) => (
                     <li
                       key={item}
@@ -105,7 +106,7 @@ export default function HomePage() {
       </section>
 
       <section id="experience" className="scroll-mt-20 border-t border-line bg-card">
-        <div className="mx-auto max-w-6xl px-6 py-20 lg:py-28">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
             <span className="text-pass">03</span> / Experience
           </p>
@@ -117,7 +118,7 @@ export default function HomePage() {
       </section>
 
       <section id="work" className="scroll-mt-20 border-t border-line">
-        <div className="mx-auto max-w-6xl px-6 py-20 lg:py-28">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
@@ -128,21 +129,15 @@ export default function HomePage() {
               </h2>
             </div>
           </div>
-          <div className="mt-10 border-t border-ink">
+          <div className="mt-10 border-t border-line">
             <PublicApps />
-            <div className="grid gap-3 border-b border-ink py-7 md:grid-cols-12 md:items-baseline md:gap-6 md:px-3">
-              <span className="font-mono text-sm text-pass md:col-span-1">07</span>
-              <p className="font-serif text-2xl tracking-tight text-ink-soft md:col-span-10">
+            <div className="grid gap-3 border-b border-line py-6 sm:py-7 lg:grid-cols-[3.25rem_minmax(0,1fr)] lg:items-baseline lg:gap-8 lg:px-1">
+              <span className="font-mono text-sm text-pass">07</span>
+              <p className="font-serif text-xl tracking-tight text-ink-soft sm:text-2xl">
                 {unpublishedWork}
               </p>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section id="contact" className="reveal scroll-mt-20 bg-ink text-paper">
-        <div className="mx-auto max-w-6xl px-6 py-12 lg:py-14">
-          <ContactPanel />
         </div>
       </section>
     </main>

@@ -1,12 +1,15 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Mark } from "@/components/ui/mark";
 import { nav, profile } from "@/data";
 
 export function SiteHeader() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [panel, setPanel] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -133,20 +136,51 @@ export function SiteHeader() {
           data-open={expanded ? "true" : "false"}
           className="mobile-nav border-t border-line lg:hidden"
         >
-          <ul className="mx-auto flex max-w-6xl flex-col px-4 sm:px-6">
-            {nav.map((item) => (
-              <li key={item.href}>
+          <div className="min-h-0 overflow-hidden">
+            <div className="mx-auto w-full max-w-6xl px-4 pt-2 pb-6 sm:px-6">
+              <ul className="flex flex-col">
+                {nav.map((item, index) => {
+                  const current = item.href === pathname;
+                  return (
+                    <li key={item.href} className="mobile-nav-item" style={{ "--i": index } as CSSProperties}>
+                      <Link
+                        href={item.href}
+                        aria-current={current ? "page" : undefined}
+                        className={`link-line group flex min-h-14 items-center gap-4 border-b border-line py-2 hover:border-pass hover:text-pass ${
+                          current ? "text-pass" : "text-ink"
+                        }`}
+                        data-cursor={item.hint}
+                        onClick={closeMenu}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className="w-6 shrink-0 font-mono text-[0.68rem] tracking-[0.18em] text-muted group-hover:text-pass"
+                        >
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <span className="font-serif text-2xl tracking-tight">{item.label}</span>
+                        <ArrowRight
+                          aria-hidden="true"
+                          className="ml-auto h-4 w-4 shrink-0 text-muted transition-transform group-hover:translate-x-1 group-hover:text-pass"
+                        />
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="mobile-nav-item mt-6" style={{ "--i": nav.length } as CSSProperties}>
                 <Link
-                  href={item.href}
-                  className="link-line flex min-h-11 items-center border-b border-line text-lg hover:border-pass hover:text-pass"
-                  data-cursor={item.hint}
+                  href="/#contact"
+                  className="press flex min-h-12 items-center justify-between border border-pass px-4 text-ink hover:bg-pass-fill hover:text-on-band"
+                  data-cursor="Got a release? Let's talk"
                   onClick={closeMenu}
                 >
-                  {item.label}
+                  <span className="font-mono text-xs tracking-[0.14em] uppercase">{profile.availability}</span>
+                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
                 </Link>
-              </li>
-            ))}
-          </ul>
+              </div>
+            </div>
+          </div>
         </nav>
       ) : null}
     </header>

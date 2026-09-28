@@ -32,7 +32,8 @@
   grid-template-rows: 1fr;
 }
 
-.mobile-nav > ul {
+.mobile-nav > * {
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -71,6 +72,20 @@
 
   .press:active {
     transform: translateY(1px);
+  }
+
+  .mobile-nav-item {
+    opacity: 0;
+    transform: translateX(-12px);
+    transition:
+      opacity 260ms var(--ease),
+      transform 320ms var(--ease);
+  }
+
+  .mobile-nav[data-open="true"] .mobile-nav-item {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(60ms + var(--i, 0) * 40ms);
   }
 }
 

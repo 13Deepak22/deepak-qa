@@ -1,3 +1,4 @@
+import { LockKeyhole } from "lucide-react";
 import Link from "next/link";
 import { ExperienceLog } from "@/components/home/experience-log";
 import { HeadlineCycle } from "@/components/home/headline-cycle";
@@ -136,11 +137,21 @@ export default function HomePage() {
           </div>
           <div className="mt-10 border-t border-line">
             <PublicApps />
-            <div className="grid gap-3 border-b border-line py-6 sm:py-7 lg:grid-cols-[3.25rem_minmax(0,1fr)] lg:items-baseline lg:gap-8 lg:px-1">
-              <span className="font-mono text-sm text-pass">07</span>
-              <p className="font-serif text-xl tracking-tight text-ink-soft sm:text-2xl">
-                {unpublishedWork}
-              </p>
+            <div className="flex items-start gap-3 border-b border-line py-6 sm:gap-4 sm:py-7 lg:pl-[5.5rem]">
+              <span
+                aria-hidden="true"
+                className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center border border-dashed border-line text-muted sm:h-12 sm:w-12"
+              >
+                <LockKeyhole className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={1.5} />
+              </span>
+              <div className="min-w-0">
+                <p className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase">
+                  Internal and confidential
+                </p>
+                <p className="mt-2 max-w-3xl font-serif text-lg leading-snug tracking-tight text-ink-soft sm:text-xl">
+                  {unpublishedWork}
+                </p>
+              </div>
             </div>
           </div>
         </div>

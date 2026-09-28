@@ -18,7 +18,7 @@ export const experience = [
     points: [
       "End-to-end releases. Automation cut manual effort by 50%.",
       "API and JMeter load tests. Defects in Jira and Trello, with root cause on critical issues.",
-      "PaulPay, PaulOne, Gifty, Mayaa Money, and Presenza, including UPI through NPCI, Razorpay, and Cashfree.",
+      "PaulPay, PaulOne, Gifty, Mayaa Money, Presenza, and PML Forex Live, including UPI through NPCI, Razorpay, and Cashfree.",
       "Exposure to RBI audit support, DR/DC, server migration, and VAPT. I followed those efforts and did not run the tests. QA feedback on LOS, LMS, and LCS.",
     ],
   },

@@ -42,8 +42,8 @@ test.describe("home", () => {
   test("lists every case study and the resume sections", async ({ page }) => {
     await expect(page.getByRole("heading", { name: "Public apps." })).toBeVisible();
     await expect(page.getByText(unpublishedWork)).toBeVisible();
-    expect(publicApps).toHaveLength(6);
-    await expect(page.getByRole("button", { name: /07/ })).toHaveCount(0);
+    expect(publicApps).toHaveLength(7);
+    await expect(page.getByRole("button", { name: /08/ })).toHaveCount(0);
     await expect(page.locator('#work a[href^="/work/"]')).toHaveCount(0);
     for (const app of publicApps) {
       await expect(page.getByText(app.title, { exact: true })).toBeVisible();
@@ -134,6 +134,23 @@ test.describe("public apps", () => {
       await expect(page).toHaveURL(/\/#work$/);
       await row.click();
       await expect(page.getByText(app.detail)).toBeHidden();
+    }
+  });
+
+  test("an open app shows the product facts, the test scope, and its store link", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/#work");
+    for (const app of publicApps) {
+      const item = page.locator(".work-app").filter({ has: appRow(page, app) });
+      await appRow(page, app).click();
+      await expect(item.getByText(app.product)).toBeVisible();
+      for (const fact of app.facts) await expect(item.getByText(fact.value, { exact: true })).toBeVisible();
+      await expect(item.getByText(`${app.tested.length} checks · pass`)).toBeVisible();
+      for (const check of app.tested) await expect(item.getByText(check, { exact: true })).toBeVisible();
+      const link = item.getByRole("link", { name: new RegExp(app.link.label) });
+      await expect(link).toHaveAttribute("href", app.link.href);
+      await expect(link).toHaveAttribute("target", "_blank");
+      await expect(link).toHaveAttribute("rel", /noopener/);
     }
   });
 });

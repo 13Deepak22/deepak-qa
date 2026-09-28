@@ -2,11 +2,13 @@ import type { MetadataRoute } from "next";
 import { profile } from "@/data";
 import { siteDescription } from "@/lib/site";
 
+export const revalidate = 86400;
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: `${profile.name} — ${profile.role}`,
     short_name: profile.name,
-    description: siteDescription,
+    description: siteDescription(),
     start_url: "/",
     display: "standalone",
     background_color: "#efeae1",

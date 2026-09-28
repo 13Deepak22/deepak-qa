@@ -28,38 +28,44 @@ const plex = IBM_Plex_Mono({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl()),
-  title: {
-    default: siteTitle,
-    template: `%s — ${siteTitleSuffix}`,
-  },
-  applicationName: profile.name,
-  category: "portfolio",
-  description: siteDescription,
-  keywords: siteKeywords,
-  authors: [{ name: profile.name, url: profile.linkedin }],
-  creator: profile.name,
-  alternates: { canonical: "/" },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
-  },
-  openGraph: {
-    title: siteTitle,
-    description: siteDescription,
-    url: "/",
-    siteName: profile.name,
-    type: "website",
-    locale: "en_IN",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: siteTitle,
-    description: siteDescription,
-  },
-};
+/** Rebuild pages daily so the years of experience roll over on the career anniversary. */
+export const revalidate = 86400;
+
+export function generateMetadata(): Metadata {
+  const description = siteDescription();
+  return {
+    metadataBase: new URL(siteUrl()),
+    title: {
+      default: siteTitle,
+      template: `%s — ${siteTitleSuffix}`,
+    },
+    applicationName: profile.name,
+    category: "portfolio",
+    description,
+    keywords: siteKeywords,
+    authors: [{ name: profile.name, url: profile.linkedin }],
+    creator: profile.name,
+    alternates: { canonical: "/" },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+    },
+    openGraph: {
+      title: siteTitle,
+      description,
+      url: "/",
+      siteName: profile.name,
+      type: "website",
+      locale: "en_IN",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: siteTitle,
+      description,
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [
@@ -69,13 +75,12 @@ export const viewport: Viewport = {
   colorScheme: "light dark",
 };
 
-const jsonLd = personJsonLd();
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = personJsonLd();
   return (
     <html
       lang="en"

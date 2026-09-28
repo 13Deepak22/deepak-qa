@@ -1,4 +1,5 @@
 import { about, education, experience, profile, roleTitles } from "@/data";
+import { experienceLabel } from "@/lib/career";
 
 const roleNames = roleTitles.flatMap((title) =>
   title === "SDET" ? ["SDET", "Software Development Engineer in Test"] : [title],
@@ -16,8 +17,9 @@ export const siteTitle = `${profile.name} — ${profile.role} | Manual & Automat
 
 export const siteTitleSuffix = `${profile.name}, ${profile.role}`;
 
-export const siteDescription =
-  "Deepak Gupta, QA engineer in India (Noida). 3+ years of manual and automation testing for fintech: UPI, lending, APIs, Selenium, Appium, and Playwright.";
+export function siteDescription() {
+  return `Deepak Gupta, QA engineer in India (Noida). ${experienceLabel()} years of manual and automation testing for fintech: UPI, lending, APIs, Selenium, Appium, and Playwright.`;
+}
 
 export const siteKeywords = [
   "Deepak Gupta",
@@ -47,7 +49,7 @@ export function personJsonLd() {
         "@id": `${base}/#website`,
         url: base,
         name: siteTitle,
-        description: siteDescription,
+        description: siteDescription(),
         inLanguage: "en",
         publisher: { "@id": `${base}/#person` },
       },
@@ -56,7 +58,7 @@ export function personJsonLd() {
         "@id": `${base}/#person`,
         name: profile.name,
         jobTitle: profile.role,
-        description: siteDescription,
+        description: siteDescription(),
         email: profile.email,
         telephone: profile.phone,
         url: base,

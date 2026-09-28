@@ -3,6 +3,8 @@
  * product names, which live on the homepage.
  */
 
+import { experienceWords } from "@/lib/career";
+
 const expertiseGroups = [
   {
     label: "Practice",
@@ -46,7 +48,9 @@ export const about = {
     "Room for exploratory testing",
     "Open to relocation",
   ],
-  who: "I am a QA engineer with more than three years in manual testing and test automation. I work on mobile, web, and API releases in fintech. I look for the defect that can move money the wrong way, and I treat a release as ready only when the evidence is in.",
+  get who() {
+    return `I am a QA engineer with more than ${experienceWords()} years in manual testing and test automation. I work on mobile, web, and API releases in fintech. I look for the defect that can move money the wrong way, and I treat a release as ready only when the evidence is in.`;
+  },
   started:
     "I started with a Bachelor of Computer Applications at Chandigarh Group of Colleges, from 2019 to 2022. Computer applications were the base. I then built a testing practice on live fintech releases: first the manual path, then automation for the path that has to ship again.",
   expertise:

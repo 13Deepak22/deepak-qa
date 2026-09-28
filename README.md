@@ -55,6 +55,8 @@ Resume and photo originals sit outside the app in `../source/`.
 
 Phone, email, LinkedIn, and headlines live in `src/data/profile.ts`. Homepage sections live in `src/data/home.ts` and `src/data/experience.ts`, and the About page lives in `src/data/about.ts`. Tests import the same data, so most copy edits need no test changes.
 
+Years of experience ("3+", "more than three") are counted from the career start date in `src/lib/career.ts`. Pages rebuild daily, so the number goes up on each anniversary without a redeploy.
+
 The resume at `/resume` prints to a text-based PDF for applicant tracking systems. It has no photo and no date of birth.
 
 ## Contact form

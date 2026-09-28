@@ -3,6 +3,8 @@
  * Date of birth is intentionally omitted.
  */
 
+import { experienceLabel } from "@/lib/career";
+
 export const profile = {
   name: "Deepak Gupta",
   role: "QA Engineer",
@@ -15,7 +17,9 @@ export const profile = {
   availability: "Connect me",
   places: "Noida",
   headline: "I test the money before it moves.",
-  lede: "QA engineer with 3+ years in manual and automation testing. I find the critical bugs, build frameworks that hold up, and keep fintech releases accurate.",
+  get lede() {
+    return `QA engineer with ${experienceLabel()} years in manual and automation testing. I find the critical bugs, build frameworks that hold up, and keep fintech releases accurate.`;
+  },
   focus: ["Mobile", "Web", "API", "Automation", "Load"],
 };
 
@@ -61,7 +65,13 @@ export const nav = [
   { href: "/about", label: "About Me", hint: "Meet the tester" },
   { href: "/#practice", label: "What I do", hint: "How a release gets cleared" },
   { href: "/#skills", label: "What I know", hint: "Open the toolkit" },
-  { href: "/#experience", label: "Experience", hint: "Two teams, 3+ years" },
-  { href: "/#work", label: "Work", hint: "Six public apps" },
+  {
+    href: "/#experience",
+    label: "Experience",
+    get hint() {
+      return `Two teams, ${experienceLabel()} years`;
+    },
+  },
+  { href: "/#work", label: "Work", hint: "Seven public apps" },
   { href: "/resume", label: "Resume", hint: "Plain resume, ATS-ready" },
 ];

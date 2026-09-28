@@ -2,29 +2,30 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { PrintButton } from "@/components/resume/print-button";
 import { education, experience, profile, publicApps, resume, toolkit } from "@/data";
+import { experienceLabel } from "@/lib/career";
 import { siteTitleSuffix } from "@/lib/site";
 
-const description =
-  "Resume of Deepak Gupta, QA engineer in Noida, India: 3+ years of manual and automation testing, skills, experience, projects, education, and certifications.";
-
-export const metadata: Metadata = {
-  title: "Resume",
-  description,
-  alternates: { canonical: "/resume" },
-  openGraph: {
-    title: `Resume — ${siteTitleSuffix}`,
+export function generateMetadata(): Metadata {
+  const description = `Resume of Deepak Gupta, QA engineer in Noida, India: ${experienceLabel()} years of manual and automation testing, skills, experience, projects, education, and certifications.`;
+  return {
+    title: "Resume",
     description,
-    url: "/resume",
-    type: "profile",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${siteTitleSuffix} resume` }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `Resume — ${siteTitleSuffix}`,
-    description,
-    images: ["/opengraph-image"],
-  },
-};
+    alternates: { canonical: "/resume" },
+    openGraph: {
+      title: `Resume — ${siteTitleSuffix}`,
+      description,
+      url: "/resume",
+      type: "profile",
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${siteTitleSuffix} resume` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Resume — ${siteTitleSuffix}`,
+      description,
+      images: ["/opengraph-image"],
+    },
+  };
+}
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (

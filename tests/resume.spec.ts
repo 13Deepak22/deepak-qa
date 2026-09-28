@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { education, experience, profile, publicApps, resume, toolkit } from "../src/data";
+import { expectNoBirthDate } from "./support/helpers";
 
 test.describe("resume", () => {
   test.beforeEach(async ({ page }) => {
@@ -41,8 +42,7 @@ test.describe("resume", () => {
   });
 
   test("does not publish a date of birth", async ({ page }) => {
-    const text = await page.locator("body").innerText();
-    expect(text).not.toMatch(/date of birth|DOB/i);
+    expectNoBirthDate(await page.locator("body").innerText());
   });
 
   test("download opens the print dialog", async ({ page }) => {

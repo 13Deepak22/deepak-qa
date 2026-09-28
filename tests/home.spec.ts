@@ -10,7 +10,7 @@ import {
   toolkit,
   unpublishedWork,
 } from "../src/data";
-import { appRow } from "./support/helpers";
+import { appRow, expectNoBirthDate } from "./support/helpers";
 
 test.describe("home", () => {
   test.beforeEach(async ({ page }) => {
@@ -101,8 +101,7 @@ test.describe("home", () => {
   });
 
   test("does not publish a date of birth", async ({ page }) => {
-    const text = await page.locator("body").innerText();
-    expect(text).not.toMatch(/date of birth|DOB/i);
+    expectNoBirthDate(await page.locator("body").innerText());
   });
 
   test("skip link moves focus to the page content", async ({ page }) => {

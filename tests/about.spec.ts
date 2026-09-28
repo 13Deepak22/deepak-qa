@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { about, aboutChapters, education, experience, profile } from "../src/data";
+import { expectNoBirthDate } from "./support/helpers";
 
 test.describe("about", () => {
   test("shows the updated portrait with the resume identity", async ({ page }) => {
@@ -63,6 +64,11 @@ test.describe("about", () => {
     for (const goal of about.goalChecks) {
       await expect(page.getByText(goal, { exact: true })).toBeVisible();
     }
+  });
+
+  test("does not publish a date of birth", async ({ page }) => {
+    await page.goto("/about");
+    expectNoBirthDate(await page.locator("body").innerText());
   });
 
   test("phones get chapter shortcuts instead of the sidebar", async ({ page }) => {

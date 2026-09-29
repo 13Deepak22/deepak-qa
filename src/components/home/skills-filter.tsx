@@ -37,9 +37,8 @@ export function SkillsFilter() {
 
   return (
     <div className="mt-8">
-      {/* Search and Category Filter Controls */}
+      {/* Category Pills & Live Search */}
       <div className="flex flex-col gap-4 border-b border-line pb-6 sm:flex-row sm:items-center sm:justify-between">
-        {/* Category Pills */}
         <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Filter skills by category">
           {groups.map((group) => {
             const isSelected = selectedGroup === group.label;
@@ -65,7 +64,6 @@ export function SkillsFilter() {
           })}
         </div>
 
-        {/* Live Search Input */}
         <div className="relative w-full sm:w-64">
           <label htmlFor="skill-search" className="sr-only">
             Search {totalSkillsCount} skills
@@ -94,14 +92,12 @@ export function SkillsFilter() {
         </div>
       </div>
 
-      {/* Query status notification */}
       {query ? (
         <p className="mt-3 font-mono text-[0.68rem] tracking-[0.14em] text-muted uppercase">
           Showing {totalVisible} of {totalSkillsCount} skills matching &ldquo;{query}&rdquo;
         </p>
       ) : null}
 
-      {/* Grouped Skills List */}
       <ul className="divide-y divide-line">
         {filteredGroups.map((group) => (
           <li

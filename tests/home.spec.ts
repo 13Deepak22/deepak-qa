@@ -2,8 +2,10 @@ import { expect, test } from "@playwright/test";
 import {
   education,
   experience,
+  impactMetrics,
   profile,
   publicApps,
+  rcaCaseStudy,
   releaseGate,
   roleTitles,
   services,
@@ -79,6 +81,17 @@ test.describe("home", () => {
     }
     await expect(page.getByRole("heading", { name: education.degree })).toHaveCount(0);
     await expect(page.locator("#education")).toHaveCount(0);
+
+    for (const metric of impactMetrics) {
+      await expect(page.getByText(metric.label, { exact: true })).toBeVisible();
+    }
+
+    const rca = page.locator("#investigation");
+    await expect(rca).toBeVisible();
+    await expect(rca.getByRole("heading", { name: rcaCaseStudy.tagline })).toBeVisible();
+    for (const step of rcaCaseStudy.steps) {
+      await expect(rca.getByText(`Phase ${step.step} · ${step.phase}`)).toBeVisible();
+    }
   });
 
   test("role title types, then switches to another title from the list", async ({ page }) => {

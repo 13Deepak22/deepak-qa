@@ -2,7 +2,9 @@ import { LockKeyhole } from "lucide-react";
 import Link from "next/link";
 import { ExperienceLog } from "@/components/home/experience-log";
 import { HeadlineCycle } from "@/components/home/headline-cycle";
+import { ImpactMetrics } from "@/components/home/impact-metrics";
 import { PublicApps } from "@/components/home/public-apps";
+import { RcaCaseStudy } from "@/components/home/rca-case-study";
 import { ServicesSection } from "@/components/home/services";
 import { TestRun } from "@/components/home/test-run";
 import { profile, toolkit, unpublishedWork } from "@/data";
@@ -28,6 +30,13 @@ export default function HomePage() {
               Selected work
             </Link>
             <Link
+              href="/#investigation"
+              className="press border border-line bg-paper px-5 py-3 text-center text-sm text-ink hover:border-pass hover:text-pass min-[420px]:text-left"
+              data-cursor="Case study & RCA"
+            >
+              RCA case study
+            </Link>
+            <Link
               href="/#contact"
               className="press border border-pass px-5 py-3 text-center text-sm hover:bg-pass-fill hover:text-on-band min-[420px]:text-left"
               data-cursor="Tell me what's shipping"
@@ -40,6 +49,8 @@ export default function HomePage() {
           <TestRun />
         </div>
       </section>
+
+      <ImpactMetrics />
 
       <ServicesSection />
 
@@ -134,6 +145,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <RcaCaseStudy />
     </main>
   );
 }

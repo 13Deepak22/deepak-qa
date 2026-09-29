@@ -24,8 +24,12 @@ export function siteDescription() {
 export const siteKeywords = [
   "Deepak Gupta",
   ...roleNames,
+  "SDET",
+  "Software Development Engineer in Test",
+  "Lead QA Engineer",
   "QA engineer India",
   "QA engineer Noida",
+  "Fintech QA Specialist",
   "fintech testing",
   "manual testing",
   "test automation",
@@ -33,10 +37,20 @@ export const siteKeywords = [
   "Selenium",
   "Appium",
   "Playwright",
+  "TypeScript automation",
   "API testing",
   "Postman",
   "JMeter",
   "UPI testing",
+  "Payment gateway testing",
+  "Idempotency testing",
+  "Concurrency testing",
+  "LMS testing",
+  "LOS testing",
+  "eKYC verification",
+  "Agile QA",
+  "Page Object Model",
+  "CI/CD testing",
 ];
 
 export function personJsonLd() {

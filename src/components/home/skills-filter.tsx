@@ -8,11 +8,15 @@ export function SkillsFilter() {
   const [selectedGroup, setSelectedGroup] = useState<string>("All");
   const [query, setQuery] = useState<string>("");
 
+  const totalSkillsCount = useMemo(() => {
+    return toolkit.reduce((acc, g) => acc + g.items.length, 0);
+  }, []);
+
   const groups = useMemo(() => {
-    return [{ label: "All", count: toolkit.reduce((acc, g) => acc + g.items.length, 0) }].concat(
+    return [{ label: "All", count: totalSkillsCount }].concat(
       toolkit.map((g) => ({ label: g.label, count: g.items.length }))
     );
-  }, []);
+  }, [totalSkillsCount]);
 
   const filteredGroups = useMemo(() => {
     return toolkit
@@ -64,7 +68,7 @@ export function SkillsFilter() {
         {/* Live Search Input */}
         <div className="relative w-full sm:w-64">
           <label htmlFor="skill-search" className="sr-only">
-            Search 92 skills
+            Search {totalSkillsCount} skills
           </label>
           <div className="relative flex items-center">
             <Search className="pointer-events-none absolute left-3 size-3.5 text-muted" aria-hidden="true" />
@@ -93,7 +97,7 @@ export function SkillsFilter() {
       {/* Query status notification */}
       {query ? (
         <p className="mt-3 font-mono text-[0.68rem] tracking-[0.14em] text-muted uppercase">
-          Showing {totalVisible} of 92 skills matching &ldquo;{query}&rdquo;
+          Showing {totalVisible} of {totalSkillsCount} skills matching &ldquo;{query}&rdquo;
         </p>
       ) : null}
 

@@ -80,11 +80,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 03 / Experience */}
+      {/* 03 / Defect Investigation & Root Cause Analysis (RCA) - 3rd place */}
+      <RcaCaseStudy />
+
+      {/* 04 / Experience */}
       <section id="experience" className="scroll-mt-20 border-t border-line bg-card">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-            <span className="text-pass">03</span> / Experience
+            <span className="text-pass">04</span> / Experience
           </p>
           <h2 className="mt-3 max-w-2xl font-serif text-4xl tracking-tight text-balance sm:text-5xl">
             Where I have worked.
@@ -92,9 +95,6 @@ export default function HomePage() {
           <ExperienceLog />
         </div>
       </section>
-
-      {/* 04 / Defect Investigation & Root Cause Analysis (RCA) - 4th place */}
-      <RcaCaseStudy />
 
       {/* 05 / Projects (15+ Apps & Portals Tested) - 5th place (last before contact) */}
       <section id="work" className="scroll-mt-20 border-t border-line">

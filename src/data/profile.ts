@@ -65,6 +65,7 @@ export const nav = [
   { href: "/about", label: "About Me", hint: "Meet the tester" },
   { href: "/#practice", label: "What I do", hint: "How a release gets cleared" },
   { href: "/#skills", label: "What I know", hint: "Open the toolkit" },
+  { href: "/#investigation", label: "RCA", hint: "Defect investigation & race condition" },
   {
     href: "/#experience",
     label: "Experience",

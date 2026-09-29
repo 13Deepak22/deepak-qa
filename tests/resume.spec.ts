@@ -45,14 +45,40 @@ test.describe("resume", () => {
     expectNoBirthDate(await page.locator("body").innerText());
   });
 
-  test("download opens the print dialog", async ({ page }) => {
-    await page.evaluate(() => {
-      window.print = () => {
-        document.body.dataset.printed = "true";
-      };
+  test("offers the resume as PDF, Word, and JPG", async ({ page }) => {
+    const options = page.getByRole("list", { name: "Download resume" }).getByRole("link");
+    await expect(options).toHaveText(["PDF", "Word", "JPG"]);
+    for (const { label, ext } of [
+      { label: "PDF", ext: "pdf" },
+      { label: "Word", ext: "docx" },
+      { label: "JPG", ext: "jpg" },
+    ]) {
+      const [download] = await Promise.all([
+        page.waitForEvent("download"),
+        page.getByRole("link", { name: `Download resume as ${label}` }).click(),
+      ]);
+      expect(download.suggestedFilename()).toBe(`deepak-gupta-resume.${ext}`);
+    }
+  });
+
+  for (const { format, type, magic } of [
+    { format: "pdf", type: "application/pdf", magic: "%PDF" },
+    { format: "docx", type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", magic: "PK" },
+    { format: "jpg", type: "image/jpeg", magic: "\xff\xd8\xff" },
+  ]) {
+    test(`${format} download is a real ${format.toUpperCase()} file`, async ({ request }) => {
+      const response = await request.get(`/resume/download/${format}`);
+      expect(response.status()).toBe(200);
+      expect(response.headers()["content-type"]).toBe(type);
+      expect(response.headers()["content-disposition"]).toBe(`attachment; filename="deepak-gupta-resume.${format}"`);
+      const body = await response.body();
+      expect(body.subarray(0, magic.length).toString("latin1")).toBe(magic);
+      expect(body.length).toBeGreaterThan(5_000);
     });
-    await page.getByRole("button", { name: "Download PDF" }).click();
-    await expect(page.locator("body")).toHaveAttribute("data-printed", "true");
+  }
+
+  test("unknown download formats return 404", async ({ request }) => {
+    expect((await request.get("/resume/download/exe")).status()).toBe(404);
   });
 
   test("print layout keeps only the resume", async ({ page }) => {
@@ -60,7 +86,7 @@ test.describe("resume", () => {
     await expect(page.getByRole("article", { name: `Resume of ${profile.name}` })).toBeVisible();
     await expect(page.getByRole("banner")).toBeHidden();
     await expect(page.getByRole("contentinfo")).toBeHidden();
-    await expect(page.getByRole("button", { name: "Download PDF" })).toBeHidden();
+    await expect(page.getByRole("list", { name: "Download resume" })).toBeHidden();
     await expect(page.locator("body")).toHaveCSS("background-color", "rgb(255, 255, 255)");
     const spacing = await page
       .locator(".resume-section h2")

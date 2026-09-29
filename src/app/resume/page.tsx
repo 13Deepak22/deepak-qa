@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
-import { PrintButton } from "@/components/resume/print-button";
+import { DownloadOptions } from "@/components/resume/download-options";
 import { education, experience, profile, publicApps, resume, toolkit } from "@/data";
 import { experienceLabel } from "@/lib/career";
 import { siteTitleSuffix } from "@/lib/site";
@@ -48,11 +48,11 @@ export default function ResumePage() {
               <span className="text-pass">CV</span> / Resume
             </p>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-ink-soft">
-              One column, plain text, and standard headings, so applicant tracking systems read it cleanly. Save it as a
-              PDF to attach it to an application.
+              One column, plain text, and standard headings, so applicant tracking systems read it cleanly. Download it
+              as a PDF or Word file for an application, or as a JPG to share.
             </p>
           </div>
-          <PrintButton />
+          <DownloadOptions />
         </div>
 
         <article

@@ -31,7 +31,7 @@ src/
     layout/            Header, footer, contact panel, theme toggle, cursor, back to top
     home/              Headline, release gate, practice icons, experience log, public apps
     about/             Chapter scrollspy and section marks
-    resume/            Download (print to PDF) button
+    resume/            PDF, Word, and JPG download links
     not-found/         Route check card
     ui/                Shared pieces: logo mark, in-view trigger
   data/                Site copy, split by page; import everything from "@/data"
@@ -57,7 +57,7 @@ Phone, email, LinkedIn, and headlines live in `src/data/profile.ts`. Homepage se
 
 Years of experience ("3+", "more than three") are counted from the career start date in `src/lib/career.ts`. Pages rebuild daily, so the number goes up on each anniversary without a redeploy.
 
-The resume at `/resume` prints to a text-based PDF for applicant tracking systems. It has no photo and no date of birth.
+The resume at `/resume` downloads as a text-based PDF, a Word file, or a JPG from `/resume/download/{pdf,docx,jpg}`. All three are built from the same data as the page (`src/lib/resume-document.ts`) and refresh daily. It has no photo and no date of birth.
 
 ## Contact form
 

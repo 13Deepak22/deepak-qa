@@ -1,12 +1,12 @@
 "use client";
 
-import { Check, Flame, Layers, Search, Sparkles, X, Zap } from "lucide-react";
+import { Check, Layers, Search, Sparkles, X } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import { toolkit } from "@/data";
 
 // High-impact skills featured for 2026 recruiter highlights
 const featuredKeywords: Record<string, string> = {
-  "Playwright": "End-to-End CI/CD",
+  "Playwright": "End-to-End Automation",
   "Appium": "Android & iOS POM",
   "Postman": "REST & Gateway API",
   "Selenium WebDriver": "Java + TestNG",
@@ -18,19 +18,10 @@ const featuredKeywords: Record<string, string> = {
   "AI & GenAI": "2026 Edge Testing",
 };
 
-const presets = [
-  { label: "All Skills", query: "", category: "All" },
-  { label: "🔥 2026 Core Stack", query: "core", category: "All" },
-  { label: "🤖 Automation & Code", query: "", category: "Automation" },
-  { label: "💳 Fintech & UPI", query: "", category: "Fintech" },
-  { label: "⚡ API & Tools", query: "", category: "Tools" },
-];
-
 export function SkillsSection() {
   const searchInputId = useId();
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [activePreset, setActivePreset] = useState<string>("All Skills");
 
   const totalSkillsCount = useMemo(() => {
     return toolkit.reduce((acc, g) => acc + g.items.length, 0);
@@ -44,7 +35,6 @@ export function SkillsSection() {
 
   const filteredGroups = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    const isCoreFilter = activePreset === "🔥 2026 Core Stack" && !searchQuery.trim();
 
     return toolkit
       .map((group) => {
@@ -54,9 +44,7 @@ export function SkillsSection() {
 
         let items = group.items;
 
-        if (isCoreFilter) {
-          items = items.filter((item) => item in featuredKeywords);
-        } else if (q) {
+        if (q) {
           items = items.filter((item) => {
             const matchesName = item.toLowerCase().includes(q);
             const matchesBadge = featuredKeywords[item]?.toLowerCase().includes(q);
@@ -73,65 +61,61 @@ export function SkillsSection() {
         };
       })
       .filter((group): group is NonNullable<typeof group> => group !== null);
-  }, [activeCategory, searchQuery, activePreset]);
+  }, [activeCategory, searchQuery]);
 
   const totalVisibleCount = useMemo(() => {
     return filteredGroups.reduce((acc, g) => acc + g.items.length, 0);
   }, [filteredGroups]);
 
-  const handleSelectPreset = (preset: typeof presets[0]) => {
-    setActivePreset(preset.label);
-    setActiveCategory(preset.category);
-    if (preset.label === "🔥 2026 Core Stack") {
-      setSearchQuery("");
-    } else {
-      setSearchQuery(preset.query);
-    }
-  };
-
   const handleCategoryClick = (cat: string) => {
     setActiveCategory(cat);
-    setActivePreset(cat === "All" ? "All Skills" : cat);
   };
 
   const clearFilters = () => {
     setActiveCategory("All");
     setSearchQuery("");
-    setActivePreset("All Skills");
   };
 
   return (
     <div className="mt-10 min-w-0">
-      {/* Seamless Toolbar - Aligned edge-to-edge with the 6xl grid */}
+      {/* Category Tabs & Live Search Toolbar */}
       <div className="border-y border-line py-5 min-w-0">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between min-w-0">
-          {/* Quick preset chips */}
-          <div className="flex flex-wrap items-center gap-2 min-w-0">
-            <span className="font-mono text-[0.68rem] tracking-[0.14em] text-muted uppercase">
-              Filter by:
-            </span>
-            {presets.map((preset) => {
-              const isSelected = activePreset === preset.label;
+          {/* Category Tabs */}
+          <div className="flex flex-wrap items-center gap-1.5 min-w-0" role="tablist" aria-label="Skill categories">
+            {categories.map((cat) => {
+              const isSelected = activeCategory === cat.label && !searchQuery;
               return (
                 <button
-                  key={preset.label}
+                  key={cat.label}
                   type="button"
-                  onClick={() => handleSelectPreset(preset)}
-                  className={`press inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-[0.72rem] tracking-[0.08em] transition-all ${
+                  role="tab"
+                  aria-selected={isSelected}
+                  onClick={() => handleCategoryClick(cat.label)}
+                  className={`press inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-[0.72rem] tracking-[0.08em] uppercase transition-all ${
                     isSelected
                       ? "bg-ink font-medium text-paper shadow-xs"
-                      : "border border-line bg-paper text-ink hover:border-pass hover:text-pass"
+                      : "border border-line bg-paper text-muted hover:border-pass hover:text-ink"
                   }`}
                 >
-                  {preset.label.includes("🔥") ? (
-                    <Flame className="size-3 text-amber-500" />
-                  ) : preset.label.includes("🤖") ? (
-                    <Zap className="size-3 text-pass" />
-                  ) : null}
-                  <span>{preset.label}</span>
+                  <span>{cat.label}</span>
+                  <span className={`text-[0.62rem] ${isSelected ? "text-paper/80" : "text-muted"}`}>
+                    {cat.count}
+                  </span>
                 </button>
               );
             })}
+
+            {(activeCategory !== "All" || searchQuery) ? (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="press ml-2 inline-flex items-center gap-1 font-mono text-[0.68rem] tracking-[0.1em] text-muted hover:text-pass uppercase"
+              >
+                <X className="size-3" />
+                Reset
+              </button>
+            ) : null}
           </div>
 
           {/* Live Search input */}
@@ -145,20 +129,14 @@ export function SkillsSection() {
                 id={searchInputId}
                 type="text"
                 value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setActivePreset("Custom Search");
-                }}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search skill (e.g. Playwright, UPI)..."
                 className="w-full border border-line bg-paper py-2 pr-8 pl-8 font-mono text-xs text-ink placeholder:text-muted transition-colors focus:border-pass focus:outline-none"
               />
               {searchQuery ? (
                 <button
                   type="button"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setActivePreset("All Skills");
-                  }}
+                  onClick={() => setSearchQuery("")}
                   aria-label="Clear search"
                   className="absolute right-2.5 text-muted hover:text-ink"
                 >
@@ -168,51 +146,14 @@ export function SkillsSection() {
             </div>
           </div>
         </div>
-
-        {/* Category Pills Bar */}
-        <div className="mt-4 flex flex-wrap items-center gap-1.5 border-t border-line/60 pt-4 min-w-0" role="tablist" aria-label="Skill categories">
-          {categories.map((cat) => {
-            const isSelected = activeCategory === cat.label && !searchQuery;
-            return (
-              <button
-                key={cat.label}
-                type="button"
-                role="tab"
-                aria-selected={isSelected}
-                onClick={() => handleCategoryClick(cat.label)}
-                className={`press inline-flex items-center gap-1.5 px-2.5 py-1 font-mono text-[0.68rem] tracking-[0.1em] uppercase transition-all ${
-                  isSelected
-                    ? "bg-ink font-medium text-paper shadow-xs"
-                    : "border border-line bg-paper text-muted hover:border-pass hover:text-ink"
-                }`}
-              >
-                <span>{cat.label}</span>
-                <span className={`text-[0.6rem] ${isSelected ? "text-paper/80" : "text-muted"}`}>
-                  {cat.count}
-                </span>
-              </button>
-            );
-          })}
-
-          {(activeCategory !== "All" || searchQuery) ? (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="press ml-auto inline-flex items-center gap-1 font-mono text-[0.65rem] tracking-[0.1em] text-muted hover:text-pass uppercase"
-            >
-              <X className="size-3" />
-              Reset filters
-            </button>
-          ) : null}
-        </div>
       </div>
 
       {/* Search results banner */}
-      {(searchQuery || activePreset !== "All Skills") ? (
+      {(searchQuery || activeCategory !== "All") ? (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 font-mono text-[0.68rem] tracking-[0.12em] text-muted uppercase">
           <p>
             Showing <span className="font-semibold text-ink">{totalVisibleCount}</span> of {totalSkillsCount} skills
-            {searchQuery ? ` matching "${searchQuery}"` : ` in ${activePreset}`}
+            {searchQuery ? ` matching "${searchQuery}"` : ` in ${activeCategory}`}
           </p>
           <button
             type="button"
@@ -293,7 +234,7 @@ export function SkillsSection() {
               Verified Production Competence · Zero Theoretical Claims
             </p>
             <p className="text-xs text-ink-soft">
-              Every skill listed above has been deployed across 15+ live apps, lending portals, or CI pipelines.
+              Every skill listed above has been deployed across 15+ live apps, lending portals, or production release gates.
             </p>
           </div>
         </div>

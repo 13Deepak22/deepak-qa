@@ -14,11 +14,7 @@ export const releaseGate = {
   gate: "ready for review",
 };
 
-export type ToolLogo = "playwright" | "selenium" | "appium" | "postman" | "jmeter" | "jira" | "trello" | "razorpay";
-
-export type DomainIcon = "upi" | "gateway" | "ekyc";
-
-export type SupportMark = { label: string } & ({ logo: ToolLogo } | { icon: DomainIcon });
+export type ToolLogo = "playwright" | "selenium" | "appium" | "postman" | "jmeter" | "jira" | "trello";
 
 export type TestingTypeIcon = "functional" | "exploratory" | "ux";
 
@@ -83,27 +79,17 @@ export const services = {
       key: "defects",
       title: "Defect management",
       body: "Critical bugs leave with a root cause. Jira and Trello hold the retest.",
-      marksLabel: "Tracked in",
-      marks: [
-        { label: "Jira", logo: "jira" },
-        { label: "Trello", logo: "trello" },
-      ],
+      logos: ["jira", "trello"],
       points: ["Bug reporting", "Bug tracking", "Root cause analysis", "Retest", "Test reports"],
     },
     {
       key: "fintech",
       title: "Fintech domain",
       body: "Payment and lending journeys, checked against the partners they depend on.",
-      marksLabel: "Integrations tested",
-      marks: [
-        { label: "UPI", icon: "upi" },
-        { label: "Payment gateways", icon: "gateway" },
-        { label: "Razorpay", logo: "razorpay" },
-        { label: "eKYC", icon: "ekyc" },
-      ],
+      logos: [],
       points: ["UPI", "NPCI", "Razorpay", "Cashfree", "PayU", "eKYC", "DigiLocker", "eSign", "LOS", "LMS"],
     },
-  ] satisfies { key: string; title: string; body: string; marksLabel: string; marks: SupportMark[]; points: string[] }[],
+  ] satisfies { key: string; title: string; body: string; logos: ToolLogo[]; points: string[] }[],
 };
 
 /**

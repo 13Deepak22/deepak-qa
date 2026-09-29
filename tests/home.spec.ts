@@ -58,7 +58,7 @@ test.describe("home", () => {
       await expect(servicesSection.getByRole("heading", { name: tool.name, exact: true })).toBeVisible();
       await expect(servicesSection.getByText(tool.use)).toBeVisible();
     }
-    await expect(servicesSection.locator("li.tool-card .tool-tile svg")).toHaveCount(services.tools.length + 3);
+    await expect(servicesSection.locator("li.tool-card .tool-tile svg")).toHaveCount(services.tools.length + 2);
     await expect(servicesSection.getByRole("heading", { name: "Testing types I cover" })).toHaveCount(0);
     for (const type of services.types) {
       await expect(servicesSection.locator(".marquee-track li", { hasText: type }).first()).toBeVisible();
@@ -66,10 +66,6 @@ test.describe("home", () => {
     const defects = servicesSection.locator("li", { has: page.getByRole("heading", { name: "Defect management" }) });
     await expect(defects.getByText("Jira", { exact: true })).toBeVisible();
     await expect(defects.getByText("Trello", { exact: true })).toBeVisible();
-    const integrations = servicesSection.getByRole("list", { name: "Integrations tested" });
-    for (const label of ["UPI", "Payment gateways", "Razorpay", "eKYC"]) {
-      await expect(integrations.getByText(label, { exact: true })).toBeVisible();
-    }
     await expect(page.getByRole("heading", { name: "A bug worth fixing." })).toHaveCount(0);
     for (const group of toolkit) {
       await expect(page.locator("#skills").getByRole("heading", { name: group.label, exact: true })).toBeVisible();

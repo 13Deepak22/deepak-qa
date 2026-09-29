@@ -1,16 +1,7 @@
-import {
-  Check,
-  Compass,
-  CreditCard,
-  ListChecks,
-  type LucideIcon,
-  MousePointerClick,
-  QrCode,
-  ScanFace,
-} from "lucide-react";
+import { Check, Compass, ListChecks, type LucideIcon, MousePointerClick } from "lucide-react";
 import { PracticeIcon } from "@/components/home/practice-icon";
 import { ToolLogo } from "@/components/home/tool-logo";
-import { type DomainIcon, type TestingTypeIcon, type ToolLogo as ToolLogoName, services } from "@/data";
+import { type TestingTypeIcon, type ToolLogo as ToolLogoName, services } from "@/data";
 
 const logoSize: Record<ToolLogoName, { large: string; small: string }> = {
   playwright: { large: "w-10", small: "w-8" },
@@ -20,19 +11,12 @@ const logoSize: Record<ToolLogoName, { large: string; small: string }> = {
   jmeter: { large: "w-12", small: "w-9" },
   jira: { large: "h-7 w-7", small: "h-5 w-5" },
   trello: { large: "h-7 w-7", small: "h-5 w-5" },
-  razorpay: { large: "h-7 w-7", small: "h-5 w-5" },
 };
 
 const typeIcons: Record<TestingTypeIcon, LucideIcon> = {
   functional: ListChecks,
   exploratory: Compass,
   ux: MousePointerClick,
-};
-
-const domainIcons: Record<DomainIcon, LucideIcon> = {
-  upi: QrCode,
-  gateway: CreditCard,
-  ekyc: ScanFace,
 };
 
 const automationStack: ToolLogoName[] = ["playwright", "selenium", "appium"];
@@ -46,14 +30,6 @@ function LogoTile({ name, small = false }: { name: ToolLogoName; small?: boolean
       }`}
     >
       <ToolLogo name={name} className={logoSize[name][small ? "small" : "large"]} />
-    </span>
-  );
-}
-
-function IconTile({ icon: Icon }: { icon: LucideIcon }) {
-  return (
-    <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center border border-black/10 bg-[#fbfaf6] text-[#146c43]">
-      <Icon aria-hidden="true" className="h-5 w-5" strokeWidth={1.75} />
     </span>
   );
 }
@@ -135,12 +111,17 @@ export function ServicesSection() {
                         <span className="text-sm">{logoName(name)}</span>
                       </li>
                     ))
-                  : service.highlights.map((item) => (
-                      <li key={item.label} className="flex items-center gap-2.5">
-                        <IconTile icon={typeIcons[item.icon]} />
-                        <span className="text-sm">{item.label}</span>
-                      </li>
-                    ))}
+                  : service.highlights.map((item) => {
+                      const Icon = typeIcons[item.icon];
+                      return (
+                        <li key={item.label} className="flex items-center gap-2.5">
+                          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center border border-black/10 bg-[#fbfaf6] text-[#146c43]">
+                            <Icon aria-hidden="true" className="h-5 w-5" strokeWidth={1.75} />
+                          </span>
+                          <span className="text-sm">{item.label}</span>
+                        </li>
+                      );
+                    })}
               </ul>
               <ul className="mt-auto flex flex-wrap gap-2 pt-7" aria-label={`${service.title} coverage`}>
                 {service.points.map((point) => (
@@ -185,14 +166,16 @@ export function ServicesSection() {
                 <h3 className="font-serif text-2xl tracking-tight">{item.title}</h3>
               </div>
               <p className="mt-3 text-sm leading-relaxed text-ink-soft">{item.body}</p>
-              <ul className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3" aria-label={item.marksLabel}>
-                {item.marks.map((mark) => (
-                  <li key={mark.label} className="flex items-center gap-2.5">
-                    {"logo" in mark ? <LogoTile name={mark.logo} small /> : <IconTile icon={domainIcons[mark.icon]} />}
-                    <span className="text-sm font-medium text-ink">{mark.label}</span>
-                  </li>
-                ))}
-              </ul>
+              {item.logos.length ? (
+                <ul className="mt-4 flex flex-wrap items-center gap-4" aria-label="Tracked in">
+                  {item.logos.map((name) => (
+                    <li key={name} className="flex items-center gap-2.5">
+                      <LogoTile name={name} small />
+                      <span className="text-sm font-medium text-ink">{logoName(name)}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
               <ul className="mt-auto flex flex-wrap gap-2 pt-5" aria-label={`${item.title} keywords`}>
                 {item.points.map((point) => (
                   <li key={point} className="border border-line px-2.5 py-1.5 font-mono text-[0.72rem] leading-none text-ink-soft">

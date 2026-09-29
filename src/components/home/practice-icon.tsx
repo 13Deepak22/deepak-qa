@@ -1,20 +1,10 @@
-import {
-  Bug,
-  Gauge,
-  IndianRupee,
-  ListChecks,
-  Webhook,
-  Workflow,
-  type LucideIcon,
-} from "lucide-react";
+import { Bug, IndianRupee, ListChecks, Workflow, type LucideIcon } from "lucide-react";
 
 const icons: Record<string, LucideIcon> = {
-  Functional: ListChecks,
-  API: Webhook,
-  Automation: Workflow,
-  Load: Gauge,
-  Defects: Bug,
-  Fintech: IndianRupee,
+  manual: ListChecks,
+  automation: Workflow,
+  defects: Bug,
+  fintech: IndianRupee,
 };
 
 export function PracticeIcon({ name }: { name: string }) {

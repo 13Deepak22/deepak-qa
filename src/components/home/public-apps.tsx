@@ -56,20 +56,48 @@ function playHeight(panel: HTMLDivElement, next: "open" | "close") {
   panel.addEventListener("transitionend", finish);
 }
 
+/** While a panel above collapses, scroll with it so the row that was tapped stays under the pointer. */
+function holdInPlace(row: HTMLElement, top: number) {
+  const until = performance.now() + (prefersReducedMotion() ? 0 : 600);
+  let cancelled = false;
+  const cancel = () => {
+    cancelled = true;
+  };
+  window.addEventListener("wheel", cancel, { once: true, passive: true });
+  window.addEventListener("touchmove", cancel, { once: true, passive: true });
+
+  const step = () => {
+    if (cancelled) return;
+    const drift = row.getBoundingClientRect().top - top;
+    if (Math.abs(drift) >= 1) window.scrollBy({ top: drift, behavior: "instant" });
+    if (performance.now() < until) requestAnimationFrame(step);
+    else {
+      window.removeEventListener("wheel", cancel);
+      window.removeEventListener("touchmove", cancel);
+    }
+  };
+  step();
+}
+
 export function PublicApps() {
   const [openTitle, setOpenTitle] = useState<string | null>(null);
 
   function toggle(title: string, panel: HTMLDivElement) {
     const opening = openTitle !== title;
+    const row = panel.parentElement;
+    const top = row?.getBoundingClientRect().top ?? 0;
+    let closingAbove = false;
 
     document.querySelectorAll<HTMLDivElement>(".work-panel").forEach((other) => {
       if (other === panel) return;
       if (other.getBoundingClientRect().height === 0) return;
+      if (other.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING) closingAbove = true;
       playHeight(other, "close");
     });
 
     playHeight(panel, opening ? "open" : "close");
     setOpenTitle(opening ? title : null);
+    if (row && closingAbove) holdInPlace(row, top);
   }
 
   return (
@@ -129,28 +157,15 @@ export function PublicApps() {
               </span>
             </button>
             <div className="work-panel">
-              <div className="grid gap-6 pb-8 sm:pb-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-10 lg:pr-1 lg:pl-[5.25rem]">
-                <div className="min-w-0">
-                  <p className="font-serif text-xl leading-snug tracking-tight text-ink text-pretty sm:text-2xl">
+              <div className="grid gap-6 pb-8 sm:pb-10 lg:grid-cols-[3.25rem_minmax(15rem,20rem)_minmax(0,1fr)_1.25rem] lg:gap-x-8 lg:px-1">
+                <div className="min-w-0 lg:col-start-2">
+                  <p className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase">My role</p>
+                  <p className="mt-2 font-serif text-xl leading-snug tracking-tight text-ink text-pretty sm:text-2xl lg:text-xl">
                     {app.detail}
                   </p>
-                  <p className="mt-6 font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase">About the app</p>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-soft">{app.product}</p>
-                  <dl className="mt-5 grid grid-cols-3 divide-x divide-line border border-line">
-                    {app.facts.map((fact) => (
-                      <div key={fact.label} className="flex min-w-0 flex-col-reverse gap-1 px-3 py-3 sm:px-4 sm:py-4">
-                        <dt className="font-mono text-[0.6rem] leading-snug tracking-[0.12em] text-muted uppercase">
-                          {fact.label}
-                        </dt>
-                        <dd className="font-serif text-base leading-tight tracking-tight break-words text-ink sm:text-xl">
-                          {fact.value}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
                 </div>
 
-                <div className="work-report min-w-0 self-start border border-line bg-card">
+                <div className="work-report min-w-0 self-start border border-line bg-card lg:col-span-2 lg:col-start-3">
                   <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-line px-4 py-3 font-mono text-[0.68rem] tracking-[0.14em] uppercase">
                     <span className="whitespace-nowrap text-muted">
                       suite · {app.title.toLowerCase().replace(/\s+/g, "-")}

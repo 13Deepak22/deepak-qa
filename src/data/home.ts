@@ -14,92 +14,154 @@ export const releaseGate = {
   gate: "ready for review",
 };
 
-export const practices = [
-  {
-    title: "Functional",
-    body: "Smoke, sanity, and regression on the journey a release can break.",
-  },
-  {
-    title: "API",
-    body: "Postman coverage for payment partners, eKYC, admin, and the services a screen hides.",
-  },
-  {
-    title: "Automation",
-    body: "Appium, Selenium, and Playwright across Android, iOS, and web.",
-  },
-  {
-    title: "Load",
-    body: "JMeter on the paths that cannot fall over when traffic shows up.",
-  },
-  {
-    title: "Defects",
-    body: "Critical bugs leave with a root cause. Jira and Trello hold the retest.",
-  },
-  {
-    title: "Fintech",
-    body: "UPI, payment gateways, eKYC, cards, LOS, and LMS.",
-  },
-];
+export type ToolLogo = "playwright" | "selenium" | "appium" | "postman" | "jmeter";
 
+export const services = {
+  lede: "Manual and automation testing for mobile, web, and API releases, run with the tools engineering teams already trust.",
+  featured: [
+    {
+      key: "manual",
+      title: "Manual testing",
+      tagline: "The judgement a script cannot replace.",
+      body: "Functional, smoke, sanity, and regression on the journeys a release can break, with exploratory and compatibility passes before sign-off.",
+      points: ["Test cases", "Exploratory", "Regression", "Smoke & sanity", "Compatibility", "Retest"],
+    },
+    {
+      key: "automation",
+      title: "Automation testing",
+      tagline: "The path that ships again, scripted.",
+      body: "Suites in Java and JavaScript with the Page Object Model, across Android, iOS, and web. Automation cut manual effort by 50%.",
+      points: ["Java", "JavaScript", "TestNG", "Page Object Model", "UiAutomator2", "XCUITest"],
+    },
+  ],
+  tools: [
+    { name: "Playwright", logo: "playwright", category: "Web automation", use: "End-to-end web suites in JavaScript, across browsers." },
+    { name: "Selenium", logo: "selenium", category: "Web automation", use: "UI suites in Java with TestNG and the Page Object Model." },
+    { name: "Appium", logo: "appium", category: "Mobile automation", use: "Android and iOS flows with UiAutomator2 and XCUITest." },
+    { name: "Postman", logo: "postman", category: "API testing", use: "Collections for payment partners, eKYC, and admin services." },
+    { name: "JMeter", logo: "jmeter", category: "Performance", use: "Load and stress tests on the paths that cannot fall over." },
+  ] satisfies { name: string; logo: ToolLogo; category: string; use: string }[],
+  support: [
+    { key: "defects", title: "Defect management", body: "Critical bugs leave with a root cause. Jira and Trello hold the retest." },
+    { key: "fintech", title: "Fintech domain", body: "UPI, payment gateways, eKYC, cards, LOS, and LMS." },
+  ],
+};
+
+/**
+ * Skills in the exact phrases applicant tracking systems match on. The homepage,
+ * the resume page, and the PDF, Word, and JPG downloads all read this list.
+ * Every item is backed by the resume; nothing here is aspirational.
+ */
 export const toolkit = [
   {
     label: "Testing",
     items: [
-      "Functional",
-      "Regression",
-      "Smoke",
-      "Sanity",
-      "Integration",
-      "End-to-end",
-      "API",
-      "Load",
-      "Performance",
-      "Stress",
+      "Manual Testing",
+      "Automation Testing",
+      "Functional Testing",
+      "Regression Testing",
+      "Smoke Testing",
+      "Sanity Testing",
+      "Integration Testing",
+      "End-to-End Testing",
+      "API Testing",
+      "GUI Testing",
+      "Exploratory Testing",
+      "Ad-hoc Testing",
+      "Compatibility Testing",
+      "Cross-browser Testing",
+      "Cross-platform Testing",
+      "Cross-version Testing",
+      "Mobile App Testing",
+      "Web Testing",
+      "Load Testing",
+      "Performance Testing",
+      "Stress Testing",
+      "Retesting",
     ],
   },
   {
-    label: "Manual",
-    items: ["GUI", "Exploratory", "Ad-hoc", "Test cases", "Compatibility", "Retest"],
+    label: "QA Process",
+    items: [
+      "SDLC",
+      "STLC",
+      "Test Case Design",
+      "Test Case Documentation",
+      "Test Execution",
+      "Test Coverage",
+      "Test Reports",
+      "Bug Reporting",
+      "Bug Tracking",
+      "Root Cause Analysis (RCA)",
+      "Release Testing",
+      "Deployment Validation",
+      "Business Rules Validation",
+      "Data Validation",
+      "QA Documentation",
+    ],
   },
   {
     label: "Automation",
     items: [
-      "Selenium",
+      "Selenium WebDriver",
       "Appium",
       "Playwright",
       "Java",
       "JavaScript",
       "TestNG",
-      "Page Object Model",
+      "Page Object Model (POM)",
       "UiAutomator2",
       "XCUITest",
-      "Cross-browser",
-      "Cross-platform",
+      "Android",
+      "iOS",
     ],
   },
   {
     label: "Tools",
-    items: ["Jira", "Trello", "Postman", "JMeter", "GitHub", "Maven"],
+    items: ["Jira", "Trello", "Postman", "JMeter", "Git", "GitHub", "Maven"],
   },
   {
-    label: "Exposure",
-    items: ["RBI audit support", "DR/DC", "VAPT", "Server migration"],
+    label: "Fintech",
+    items: [
+      "UPI",
+      "NPCI Compliance",
+      "Payment Gateway Testing",
+      "Razorpay",
+      "Cashfree",
+      "PayU",
+      "eKYC",
+      "DigiLocker",
+      "Face Verification",
+      "Penny Drop",
+      "eSign",
+      "Bank Aggregator",
+      "PPI Wallet",
+      "Prepaid Cards",
+      "LOS",
+      "LMS",
+      "LCS",
+    ],
   },
   {
     label: "Domain",
     items: [
       "FinTech",
       "Banking",
+      "Lending",
       "E-commerce",
       "Travel",
       "Forex",
+      "B2B",
+      "B2C",
       "HR & Attendance",
       "Task management",
       "Social",
       "AI & GenAI",
-      "LOS",
-      "LMS",
     ],
+  },
+  {
+    label: "Exposure",
+    items: ["RBI audit support", "DR/DC", "VAPT", "Server migration"],
   },
 ];
 
@@ -107,8 +169,8 @@ export const unpublishedWork =
   "Beyond these public apps, I have tested internal applications, websites, and admin portals. That work is covered by confidentiality, so it is not listed here.";
 
 /**
- * `product` and `facts` come from each app's public store listing or official site.
- * `tested` and `coverage` describe only Deepak's own test scope, taken from the resume.
+ * Only Deepak's own work: `tested` and `coverage` describe his test scope, taken from the resume.
+ * No store marketing copy; `link` is there as proof that the app is public.
  */
 export type PublicApp = {
   index: string;
@@ -119,8 +181,6 @@ export type PublicApp = {
   detail: string;
   platforms: string[];
   link: { label: string; href: string };
-  product: string;
-  facts: { value: string; label: string }[];
   tested: string[];
   coverage: string[];
 };
@@ -135,20 +195,14 @@ export const publicApps: PublicApp[] = [
       "UPI went through NPCI approval and compliance, with automation covering UI and functional flows.",
     detail:
       "Manual and automated testing for a PPI wallet, virtual and physical cards, and UPI.",
-    platforms: ["Android", "iOS"],
+    platforms: ["Android", "iOS", "Admin portal"],
     link: { label: "Google Play", href: "https://play.google.com/store/apps/details?id=com.infominez.paulpay" },
-    product:
-      "RuPay prepaid card app from Paul Merchants Finance: card registration, reloads, bill payments, recharges, transaction history, and UPI.",
-    facts: [
-      { value: "RuPay", label: "Prepaid card network" },
-      { value: "Full KYC", label: "Required for UPI" },
-      { value: "NPCI", label: "UPI approval" },
-    ],
     tested: [
       "UPI through NPCI approval and compliance",
       "PPI wallet with virtual and physical cards",
       "Card reloads by debit card, credit card, net banking, and wallet",
       "Bill payments, recharges, and transaction history",
+      "Admin portal kept in step with the app",
       "UI and functional automation",
     ],
     coverage: ["Manual", "Automation", "Compliance"],
@@ -162,19 +216,13 @@ export const publicApps: PublicApp[] = [
       "Loan, LMS, and collection flows are validated before release, including the partner integrations the journey depends on.",
     detail:
       "Loan application and customer journeys, including payments, DigiLocker eKYC, face verification, bank aggregation, penny drop, and eSign.",
-    platforms: ["Mobile", "Web"],
+    platforms: ["Mobile", "Web", "Admin portal"],
     link: { label: "credme.in", href: "https://credme.in/" },
-    product:
-      "Personal and micro loans from an RBI-registered NBFC, fully digital from eligibility check to disbursal, with no branch visit.",
-    facts: [
-      { value: "₹5K–₹1.5L", label: "Loan amount" },
-      { value: "15–365 days", label: "Tenure" },
-      { value: "100% digital", label: "Apply, verify, track" },
-    ],
     tested: [
       "DigiLocker eKYC, face verification, bank aggregator, penny drop, and eSign",
       "Payments through PayU, Cashfree, and Razorpay",
       "LMS credit, sanction, disbursal, audit, and accounts",
+      "Admin portal kept in step with the customer journey",
       "AI calling bots for sanction and collection",
       "Partner integrations checked before every release",
     ],
@@ -190,13 +238,6 @@ export const publicApps: PublicApp[] = [
     detail: "Gold loan interest payments through Razorpay, before the product was acquired by L&T.",
     platforms: ["Android"],
     link: { label: "Google Play", href: "https://play.google.com/store/apps/details?id=com.paulmerchants.gold" },
-    product:
-      "Gold loan app from Paul Merchants Finance: dues, repayment schedules, payments made, and remaining amounts in one view.",
-    facts: [
-      { value: "Razorpay", label: "Interest payments" },
-      { value: "Gold loans", label: "Dues and schedules" },
-      { value: "L&T", label: "Acquired the product" },
-    ],
     tested: [
       "Gold loan interest payments through Razorpay",
       "Automated payment flows, kept in the suite through the acquisition",
@@ -213,13 +254,6 @@ export const publicApps: PublicApp[] = [
     detail: "Gift card issuance, redemption, and transactions, with UI and functional automation across platforms.",
     platforms: ["Android", "iOS"],
     link: { label: "Google Play", href: "https://play.google.com/store/apps/details?id=com.pml.gifty" },
-    product:
-      "RuPay prepaid gift card app: send money as a virtual or physical card with a personal message, spendable online and in stores.",
-    facts: [
-      { value: "₹10,000", label: "Maximum load" },
-      { value: "Virtual + physical", label: "Card formats" },
-      { value: "RuPay PPI", label: "Card type" },
-    ],
     tested: [
       "Issuance of virtual and physical gift cards",
       "Redemption and card transactions",
@@ -237,13 +271,6 @@ export const publicApps: PublicApp[] = [
       "Digital gold and silver transactions, plus prepaid card issuance, checked against the financial rules those products have to meet.",
     platforms: ["Android", "iOS"],
     link: { label: "Google Play", href: "https://play.google.com/store/apps/details?id=com.mayaa" },
-    product:
-      "Family money app: buy and sell 24K digital gold and 99.9% pure silver from ₹10, stored in a digital locker.",
-    facts: [
-      { value: "₹10", label: "Minimum buy" },
-      { value: "24K · 99.9%", label: "Gold and silver purity" },
-      { value: "Buy + sell", label: "Anytime in the app" },
-    ],
     tested: [
       "Digital gold and silver buy and sell",
       "Prepaid card issuance, before the card was retired",
@@ -260,13 +287,6 @@ export const publicApps: PublicApp[] = [
     detail: "Employee attendance, punch in and out, leave, reimbursement, and the HR workflows those records sit on.",
     platforms: ["Android", "iOS", "Admin portal"],
     link: { label: "Google Play", href: "https://play.google.com/store/apps/details?id=com.presenza" },
-    product:
-      "Employee attendance app: punch in and out, work sessions, breaks, leave approvals, and attendance reports, with OTP login.",
-    facts: [
-      { value: "OTP", label: "Secure login" },
-      { value: "Punch in/out", label: "Sessions and breaks" },
-      { value: "App + portal", label: "Employee and admin" },
-    ],
     tested: [
       "Punch in and out, work sessions, and breaks",
       "Leave requests and approval status",
@@ -284,20 +304,14 @@ export const publicApps: PublicApp[] = [
       "Buy, sell, and send-money-abroad journeys were checked against live, city-wise exchange rates.",
     detail:
       "Forex buy and sell, outward remittance, and forex card flows on the web, priced from live city-wise rates.",
-    platforms: ["Web"],
+    platforms: ["Web", "Admin portal"],
     link: { label: "pmlforexlive.com", href: "https://pmlforexlive.com/" },
-    product:
-      "Paul Merchants' online currency exchange: buy and sell foreign currency, send money abroad, and manage forex cards at live rates.",
-    facts: [
-      { value: "AD-II", label: "RBI forex licence" },
-      { value: "15 cities", label: "City-wise live rates" },
-      { value: "Buy · sell · send", label: "Forex services" },
-    ],
     tested: [
       "Buy and sell forex orders at live, city-wise rates",
       "Outward remittance to send money abroad",
       "Forex card balance check and rate alerts",
       "Login, registration, call-back, and better-rate requests",
+      "Admin portal kept in step with the customer website",
     ],
     coverage: ["Manual", "Web"],
   },

@@ -2,15 +2,10 @@ import { LockKeyhole } from "lucide-react";
 import Link from "next/link";
 import { ExperienceLog } from "@/components/home/experience-log";
 import { HeadlineCycle } from "@/components/home/headline-cycle";
-import { PracticeIcon } from "@/components/home/practice-icon";
 import { PublicApps } from "@/components/home/public-apps";
+import { Services } from "@/components/home/services";
 import { TestRun } from "@/components/home/test-run";
-import {
-  unpublishedWork,
-  practices,
-  profile,
-  toolkit,
-} from "@/data";
+import { profile, services, toolkit, unpublishedWork } from "@/data";
 
 export default function HomePage() {
   return (
@@ -48,39 +43,37 @@ export default function HomePage() {
 
       <section id="practice" className="scroll-mt-20 border-t border-line bg-paper-deep">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
-          <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-            <span className="text-pass">01</span> / Testing services
-          </p>
-          <h2 className="mt-3 max-w-2xl font-serif text-4xl tracking-tight text-balance sm:text-5xl">
-            How a release earns the right to ship.
-          </h2>
-          <ol className="mt-12 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3">
-            {practices.map((item, index) => (
-              <li key={item.title} className="bg-paper px-5 py-6 sm:px-6 sm:py-8">
-                <div className="flex items-center gap-3">
-                  <PracticeIcon name={item.title} />
-                  <p className="font-mono text-[0.72rem] tracking-[0.16em] text-pass">
-                    {String(index + 1).padStart(2, "0")}
-                  </p>
-                </div>
-                <h3 className="practice-title mt-4 font-serif text-2xl tracking-tight sm:mt-5 sm:text-3xl">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-ink-soft sm:mt-4">{item.body}</p>
-              </li>
-            ))}
-          </ol>
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end lg:gap-12">
+            <div>
+              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
+                <span className="text-pass">01</span> / Testing services
+              </p>
+              <h2 className="mt-3 max-w-2xl font-serif text-4xl tracking-tight text-balance sm:text-5xl">
+                How a release earns the right to ship.
+              </h2>
+            </div>
+            <p className="leading-relaxed text-ink-soft">{services.lede}</p>
+          </div>
+          <Services />
         </div>
       </section>
 
       <section id="skills" className="scroll-mt-20 border-t border-line">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
-          <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-            <span className="text-pass">02</span> / Skills
-          </p>
-          <h2 className="mt-3 font-serif text-4xl tracking-tight text-balance sm:text-5xl">
-            Tools I reach for.
-          </h2>
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end lg:gap-12">
+            <div>
+              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
+                <span className="text-pass">02</span> / Skills
+              </p>
+              <h2 className="mt-3 font-serif text-4xl tracking-tight text-balance sm:text-5xl">
+                Skills, tools, and domains.
+              </h2>
+            </div>
+            <p className="leading-relaxed text-ink-soft">
+              {toolkit.reduce((total, group) => total + group.items.length, 0)} skills across testing, QA process,
+              automation, and fintech, drawn from live releases.
+            </p>
+          </div>
           <ul className="mt-12 border-t border-line">
             {toolkit.map((group) => (
               <li

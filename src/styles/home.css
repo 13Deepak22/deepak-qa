@@ -125,11 +125,6 @@
     animation-delay: 280ms;
   }
 
-  .practice-icon.lucide-webhook path {
-    stroke-dasharray: 16 6;
-    animation: icon-flow 2.6s linear infinite;
-  }
-
   .practice-icon.lucide-workflow path {
     stroke-dasharray: 5 4;
     animation: icon-flow 1.6s linear infinite;
@@ -139,12 +134,6 @@
     transform-box: fill-box;
     transform-origin: center;
     animation: icon-node 1.8s var(--ease) infinite alternate;
-  }
-
-  .practice-icon.lucide-gauge path:first-child {
-    transform-box: view-box;
-    transform-origin: 12px 14px;
-    animation: icon-needle 2.2s var(--ease) infinite alternate;
   }
 
   .practice-icon.lucide-bug path:nth-child(3),
@@ -184,11 +173,6 @@
   to { transform: scale(1); }
 }
 
-@keyframes icon-needle {
-  from { transform: rotate(-26deg); }
-  to { transform: rotate(16deg); }
-}
-
 @keyframes icon-antenna {
   from { transform: rotate(-16deg); }
   to { transform: rotate(16deg); }
@@ -212,6 +196,34 @@
   width: 1.75rem;
   height: 2px;
   background: var(--pass);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tool-card,
+  .service-card {
+    transition:
+      transform 320ms var(--ease),
+      border-color 320ms var(--ease),
+      box-shadow 320ms var(--ease);
+  }
+
+  .tool-card .tool-tile {
+    transition: transform 320ms var(--ease);
+  }
+
+  .tool-card:hover,
+  .service-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 36px -28px rgba(28, 25, 21, 0.55);
+  }
+
+  .tool-card:hover {
+    border-color: var(--pass);
+  }
+
+  .tool-card:hover .tool-tile {
+    transform: scale(1.06);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

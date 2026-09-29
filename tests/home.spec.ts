@@ -2,11 +2,11 @@ import { expect, test } from "@playwright/test";
 import {
   education,
   experience,
-  practices,
   profile,
   publicApps,
   releaseGate,
   roleTitles,
+  services,
   toolkit,
   unpublishedWork,
 } from "../src/data";
@@ -50,9 +50,15 @@ test.describe("home", () => {
       await expect(page.getByText(app.detail)).toBeHidden();
     }
 
-    for (const practice of practices) {
-      await expect(page.locator("#practice").getByRole("heading", { name: practice.title })).toBeVisible();
+    const servicesSection = page.locator("#practice");
+    for (const service of [...services.featured, ...services.support]) {
+      await expect(servicesSection.getByRole("heading", { name: service.title })).toBeVisible();
     }
+    for (const tool of services.tools) {
+      await expect(servicesSection.getByRole("heading", { name: tool.name, exact: true })).toBeVisible();
+      await expect(servicesSection.getByText(tool.use)).toBeVisible();
+    }
+    await expect(servicesSection.locator(".tool-card svg")).toHaveCount(services.tools.length);
     await expect(page.getByRole("heading", { name: "A bug worth fixing." })).toHaveCount(0);
     for (const group of toolkit) {
       await expect(page.locator("#skills").getByRole("heading", { name: group.label, exact: true })).toBeVisible();
@@ -112,10 +118,11 @@ test.describe("home", () => {
     await expect(page.locator("#content")).toBeFocused();
   });
 
-  test("footer repeats the name and email", async ({ page }) => {
+  test("footer carries the email and a copyright line, not a second header", async ({ page }) => {
     const footer = page.getByRole("contentinfo");
-    await expect(footer).toContainText(profile.name);
-    await expect(footer).toContainText(profile.role);
+    await expect(footer).toContainText(`© ${new Date().getFullYear()} ${profile.name}`);
+    await expect(footer.getByRole("navigation")).toHaveCount(0);
+    await expect(footer.getByRole("link", { name: profile.name })).toHaveCount(0);
     await expect(footer.getByRole("link", { name: profile.email })).toHaveAttribute(
       "href",
       `mailto:${profile.email}`,
@@ -137,14 +144,56 @@ test.describe("public apps", () => {
     }
   });
 
-  test("an open app shows the product facts, the test scope, and its store link", async ({ page }) => {
+  test("an open panel lines up with the row columns on desktop", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/#work");
+    const item = page.locator(".work-app").first();
+    await item.locator(".work-toggle").click();
+    const x = await item.evaluate((root) => {
+      const left = (selector: string) => Math.round(root.querySelector(selector)!.getBoundingClientRect().left);
+      const right = (selector: string) => Math.round(root.querySelector(selector)!.getBoundingClientRect().right);
+      return {
+        icon: left(".work-icon"),
+        role: left(".work-panel p"),
+        outcome: left(".work-toggle > span:nth-child(3)"),
+        report: left(".work-report"),
+        chevronRight: right(".work-chevron"),
+        reportRight: right(".work-report"),
+      };
+    });
+    expect(x.role).toBe(x.icon);
+    expect(x.report).toBe(x.outcome);
+    expect(x.reportRight).toBe(x.chevronRight);
+  });
+
+  test("opening a lower app keeps its row in place while the one above closes", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 780 });
+    await page.goto("/#work");
+    await page.waitForFunction(() => {
+      const target = document.getElementById("work")!.getBoundingClientRect().top;
+      return Math.abs(target) < 100;
+    });
+    await page.locator(".work-app").first().locator(".work-toggle").click();
+    await page.waitForTimeout(700);
+    const second = page.locator(".work-app").nth(1);
+    await second.scrollIntoViewIfNeeded();
+    const before = await second.evaluate((row) => row.getBoundingClientRect().top);
+    await second.locator(".work-toggle").click();
+    await page.waitForTimeout(700);
+    const after = await second.evaluate((row) => row.getBoundingClientRect().top);
+    expect(Math.abs(after - before)).toBeLessThan(4);
+  });
+
+  test("an open app shows only my role, the test scope, and its store link", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/#work");
+    await expect(page.locator("#work")).not.toContainText("About the app");
     for (const app of publicApps) {
       const item = page.locator(".work-app").filter({ has: appRow(page, app) });
       await appRow(page, app).click();
-      await expect(item.getByText(app.product)).toBeVisible();
-      for (const fact of app.facts) await expect(item.getByText(fact.value, { exact: true })).toBeVisible();
+      await expect(item.getByText("My role", { exact: true })).toBeVisible();
+      await expect(item.locator("dl")).toHaveCount(0);
       await expect(item.getByText(`${app.tested.length} checks · pass`)).toBeVisible();
       for (const check of app.tested) await expect(item.getByText(check, { exact: true })).toBeVisible();
       const link = item.getByRole("link", { name: new RegExp(app.link.label) });

@@ -63,7 +63,7 @@ export function RcaCaseStudy() {
 
         {/* 4-Step Interactive Timeline */}
         <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start">
-          <div className="space-y-3">
+          <div className="min-w-0 space-y-3">
             <h3 className="font-mono text-[0.72rem] tracking-[0.16em] text-pass uppercase">
               Investigation breakdown (select a phase)
             </h3>
@@ -87,7 +87,7 @@ export function RcaCaseStudy() {
                       </span>
                       <span className={`inline-flex items-center px-2 py-0.5 font-mono text-[0.62rem] border ${
                         index === 2
-                          ? "border-amber-600/30 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                          ? "border-amber-600/30 bg-amber-500/10 text-amber-900 dark:text-amber-400"
                           : index === 3
                           ? "border-pass/30 bg-pass-fill/10 text-pass"
                           : "border-line text-muted"
@@ -134,11 +134,11 @@ export function RcaCaseStudy() {
           </div>
 
           {/* Interactive Concurrency Gate Terminal */}
-          <div className="rounded-none border border-line bg-band p-5 text-on-band sm:p-6 shadow-md">
+          <div className="min-w-0 rounded-none border border-line bg-band p-5 text-on-band band sm:p-6 shadow-md">
             <div className="flex items-center justify-between border-b border-on-band/15 pb-4">
-              <div className="flex items-center gap-2.5">
+              <div className="flex min-w-0 items-center gap-2.5">
                 <Terminal className="h-4 w-4 text-pass" />
-                <span className="font-mono text-xs tracking-wider uppercase text-on-band/80">
+                <span className="min-w-0 font-mono text-xs tracking-wider uppercase text-on-band/80">
                   concurrency.idempotency.spec.ts
                 </span>
               </div>
@@ -146,7 +146,7 @@ export function RcaCaseStudy() {
                 type="button"
                 onClick={rerunSimulation}
                 disabled={isSimulating}
-                className="inline-flex items-center gap-1.5 border border-on-band/20 px-2.5 py-1 font-mono text-[0.68rem] text-on-band/80 hover:border-pass hover:text-pass disabled:opacity-50"
+                className="inline-flex shrink-0 items-center gap-1.5 border border-on-band/20 px-2.5 py-1 font-mono text-[0.68rem] text-on-band/80 hover:border-pass hover:text-pass disabled:opacity-50"
               >
                 <RefreshCw className={`h-3 w-3 ${isSimulating ? "animate-spin" : ""}`} />
                 <span>{isSimulating ? "simulating..." : "re-test race"}</span>
@@ -159,7 +159,7 @@ export function RcaCaseStudy() {
               </p>
               {simulatedLogs.map((log, i) => (
                 <div key={i} className="flex items-start gap-2">
-                  <span className="text-on-band/40 shrink-0">{log.timestamp}</span>
+                  <span className="text-on-band/60 shrink-0">{log.timestamp}</span>
                   <span className={`px-1 text-[0.62rem] border shrink-0 ${
                     log.status === "warn"
                       ? "border-amber-400/40 text-amber-300"

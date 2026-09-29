@@ -6,7 +6,6 @@ import { ImpactMetrics } from "@/components/home/impact-metrics";
 import { PublicApps } from "@/components/home/public-apps";
 import { RcaCaseStudy } from "@/components/home/rca-case-study";
 import { ServicesSection } from "@/components/home/services";
-import { SkillsFilter } from "@/components/home/skills-filter";
 import { TestRun } from "@/components/home/test-run";
 import { profile, toolkit, unpublishedWork } from "@/data";
 
@@ -71,7 +70,33 @@ export default function HomePage() {
               automation, and fintech, drawn from live releases.
             </p>
           </div>
-          <SkillsFilter />
+          <ul className="mt-12 border-t border-line">
+            {toolkit.map((group) => (
+              <li
+                key={group.label}
+                className="grid gap-4 border-b border-line py-6 sm:py-7 md:grid-cols-[12rem_minmax(0,1fr)] md:items-start md:gap-8 lg:px-1"
+              >
+                <div>
+                  <h3 className="practice-title font-mono text-[0.72rem] tracking-[0.16em] text-pass uppercase">
+                    {group.label}
+                  </h3>
+                  {group.label === "Exposure" ? (
+                    <p className="mt-4 max-w-[12rem] text-xs leading-snug text-muted">Followed those efforts. Did not run the tests.</p>
+                  ) : null}
+                </div>
+                <ul className="flex flex-wrap gap-2">
+                  {group.items.map((item) => (
+                    <li
+                      key={item}
+                      className="skill-chip border border-line px-2.5 py-1.5 font-mono text-[0.8125rem] leading-none"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

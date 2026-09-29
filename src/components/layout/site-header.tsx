@@ -137,7 +137,7 @@ export function SiteHeader() {
           className="mobile-nav border-t border-line lg:hidden"
         >
           <div className="min-h-0 overflow-hidden">
-            <div className="mx-auto w-full max-w-6xl px-4 pt-2 pb-6 sm:px-6">
+            <div className="mx-auto w-full max-w-6xl px-4 pt-1 pb-4 sm:px-6">
               <ul className="flex flex-col">
                 {nav.map((item, index) => {
                   const current = item.href === pathname;
@@ -146,7 +146,7 @@ export function SiteHeader() {
                       <Link
                         href={item.href}
                         aria-current={current ? "page" : undefined}
-                        className={`link-line group flex min-h-14 items-center gap-4 border-b border-line py-2 hover:border-pass hover:text-pass ${
+                        className={`link-line group flex min-h-11 items-center gap-3 border-b border-line py-1.5 hover:border-pass hover:text-pass ${
                           current ? "text-pass" : "text-ink"
                         }`}
                         data-cursor={item.hint}
@@ -158,7 +158,7 @@ export function SiteHeader() {
                         >
                           {String(index + 1).padStart(2, "0")}
                         </span>
-                        <span className="font-serif text-2xl tracking-tight">{item.label}</span>
+                        <span className="font-serif text-lg tracking-tight">{item.label}</span>
                         <ArrowRight
                           aria-hidden="true"
                           className="ml-auto h-4 w-4 shrink-0 text-muted transition-transform group-hover:translate-x-1 group-hover:text-pass"
@@ -168,10 +168,10 @@ export function SiteHeader() {
                   );
                 })}
               </ul>
-              <div className="mobile-nav-item mt-6" style={{ "--i": nav.length } as CSSProperties}>
+              <div className="mobile-nav-item mt-4" style={{ "--i": nav.length } as CSSProperties}>
                 <Link
                   href="/#contact"
-                  className="press flex min-h-12 items-center justify-between border border-pass px-4 text-ink hover:bg-pass-fill hover:text-on-band"
+                  className="press flex min-h-11 items-center justify-between border border-pass px-4 text-ink hover:bg-pass-fill hover:text-on-band"
                   data-cursor="Got a release? Let's talk"
                   onClick={closeMenu}
                 >

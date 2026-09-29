@@ -20,7 +20,7 @@ export interface RcaLogEntry {
 }
 
 export const rcaCaseStudy = {
-  sectionIndex: "05",
+  sectionIndex: "04",
   title: "Defect investigation: Double-debit race condition.",
   tagline: "The concurrency bug that never reached production.",
   domain: "CredMe · Lending LMS & Payment Gateway",
@@ -117,7 +117,7 @@ export const rcaCaseStudy = {
 
 export const impactMetrics = [
   { value: "3+", label: "Years in QA", aside: "Fintech & mobile releases" },
-  { value: "7", label: "Public apps", aside: "Shipped on Play Store & Web" },
-  { value: "50%", label: "Manual effort cut", aside: "Automated regression suites" },
-  { value: "0", label: "Critical financial leaks", aside: "Zero P0 defects to production" },
+  { value: "15+", label: "Products Tested", aside: "7 public apps · 8+ confidential portals" },
+  { value: "100+", label: "Automated Checks", aside: "Playwright, Appium & Postman" },
+  { value: "100%", label: "Release Sign-Off", aside: "Evidence before production deploy" },
 ];

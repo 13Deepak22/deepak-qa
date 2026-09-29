@@ -72,6 +72,6 @@ export const nav = [
       return `Two teams, ${experienceLabel()} years`;
     },
   },
-  { href: "/#work", label: "Work", hint: "Seven public apps" },
+  { href: "/#work", label: "Work", hint: "15+ apps & portals" },
   { href: "/resume", label: "Resume", hint: "Plain resume, ATS-ready" },
 ];

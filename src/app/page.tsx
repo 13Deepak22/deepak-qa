@@ -6,12 +6,16 @@ import { ImpactMetrics } from "@/components/home/impact-metrics";
 import { PublicApps } from "@/components/home/public-apps";
 import { RcaCaseStudy } from "@/components/home/rca-case-study";
 import { ServicesSection } from "@/components/home/services";
+import { SkillsSection } from "@/components/home/skills-section";
 import { TestRun } from "@/components/home/test-run";
 import { profile, toolkit, unpublishedWork } from "@/data";
 
 export default function HomePage() {
+  const totalSkills = toolkit.reduce((total, group) => total + group.items.length, 0);
+
   return (
     <main id="content" tabIndex={-1} className="outline-none">
+      {/* Hero & Live Release Gate */}
       <section className="mx-auto grid max-w-6xl gap-10 px-4 pt-12 pb-14 sm:px-6 sm:pt-14 sm:pb-16 md:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.9fr)] md:items-start md:gap-x-8 lg:gap-x-14 lg:pt-20 lg:pb-24">
         <div className="min-w-0">
           <HeadlineCycle />
@@ -50,10 +54,13 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Metrics Bar: 15+ Products Tested, 100+ Automated Checks */}
       <ImpactMetrics />
 
+      {/* 01 / Testing Services */}
       <ServicesSection />
 
+      {/* 02 / Skills & Toolkit - Interactive, searchable, vibrant for 2026 */}
       <section id="skills" className="scroll-mt-20 border-t border-line">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end lg:gap-12">
@@ -66,40 +73,14 @@ export default function HomePage() {
               </h2>
             </div>
             <p className="leading-relaxed text-ink-soft">
-              {toolkit.reduce((total, group) => total + group.items.length, 0)} skills across testing, QA process,
-              automation, and fintech, drawn from live releases.
+              {totalSkills} skills across testing, QA process, automation, and fintech, drawn from live releases. Filter by category or search in real-time.
             </p>
           </div>
-          <ul className="mt-12 border-t border-line">
-            {toolkit.map((group) => (
-              <li
-                key={group.label}
-                className="grid gap-4 border-b border-line py-6 sm:py-7 md:grid-cols-[12rem_minmax(0,1fr)] md:items-start md:gap-8 lg:px-1"
-              >
-                <div>
-                  <h3 className="practice-title font-mono text-[0.72rem] tracking-[0.16em] text-pass uppercase">
-                    {group.label}
-                  </h3>
-                  {group.label === "Exposure" ? (
-                    <p className="mt-4 max-w-[12rem] text-xs leading-snug text-muted">Followed those efforts. Did not run the tests.</p>
-                  ) : null}
-                </div>
-                <ul className="flex flex-wrap gap-2">
-                  {group.items.map((item) => (
-                    <li
-                      key={item}
-                      className="skill-chip border border-line px-2.5 py-1.5 font-mono text-[0.8125rem] leading-none"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
+          <SkillsSection />
         </div>
       </section>
 
+      {/* 03 / Experience */}
       <section id="experience" className="scroll-mt-20 border-t border-line bg-card">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
@@ -112,17 +93,24 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 04 / Defect Investigation & Root Cause Analysis (RCA) - 4th place */}
+      <RcaCaseStudy />
+
+      {/* 05 / Projects (15+ Apps & Portals Tested) - 5th place (last before contact) */}
       <section id="work" className="scroll-mt-20 border-t border-line">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-                <span className="text-pass">04</span> / Projects
+                <span className="text-pass">05</span> / Projects
               </p>
               <h2 className="mt-3 font-serif text-4xl tracking-tight text-balance sm:text-5xl">
                 Public apps.
               </h2>
             </div>
+            <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
+              <span className="font-medium text-ink">15+ products &amp; systems tested</span> across fintech, lending, and enterprise workflows. 7 public consumer applications listed below; 8+ confidential portals protected under NDA.
+            </p>
           </div>
           <div className="mt-10 border-t border-line">
             <PublicApps />
@@ -134,19 +122,36 @@ export default function HomePage() {
                 <LockKeyhole className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={1.5} />
               </span>
               <div className="min-w-0">
-                <p className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase">
-                  Internal and confidential
-                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase">
+                    Internal and confidential
+                  </p>
+                  <span className="border border-line bg-paper px-2 py-0.5 font-mono text-[0.65rem] text-muted uppercase">
+                    8+ Enterprise Portals
+                  </span>
+                </div>
                 <p className="mt-2 max-w-3xl font-serif text-lg leading-snug tracking-tight text-ink-soft sm:text-xl">
                   {unpublishedWork}
                 </p>
+                <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted">
+                  <span className="border border-line/60 bg-paper/50 px-2 py-1 font-mono text-[0.68rem]">
+                    🔒 Loan Management System (LMS)
+                  </span>
+                  <span className="border border-line/60 bg-paper/50 px-2 py-1 font-mono text-[0.68rem]">
+                    🔒 Loan Origination System (LOS)
+                  </span>
+                  <span className="border border-line/60 bg-paper/50 px-2 py-1 font-mono text-[0.68rem]">
+                    🔒 Merchant Settlement Portal
+                  </span>
+                  <span className="border border-line/60 bg-paper/50 px-2 py-1 font-mono text-[0.68rem]">
+                    🔒 Partner Banking APIs
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-
-      <RcaCaseStudy />
     </main>
   );
 }

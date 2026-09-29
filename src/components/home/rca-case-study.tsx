@@ -63,7 +63,7 @@ export function RcaCaseStudy() {
 
         {/* 4-Step Interactive Timeline */}
         <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start">
-          <div className="min-w-0 space-y-3">
+          <div className="space-y-3 min-w-0">
             <h3 className="font-mono text-[0.72rem] tracking-[0.16em] text-pass uppercase">
               Investigation breakdown (select a phase)
             </h3>
@@ -75,21 +75,21 @@ export function RcaCaseStudy() {
                     key={item.step}
                     type="button"
                     onClick={() => setActiveStep(index)}
-                    className={`tool-card group flex flex-col items-start p-5 text-left border transition-all ${
+                    className={`tool-card group flex min-w-0 w-full flex-col items-start p-4 text-left border transition-all sm:p-5 ${
                       isActive
                         ? "border-pass bg-paper shadow-sm ring-1 ring-pass/40"
                         : "border-line bg-paper/60 hover:border-pass/60 hover:bg-paper"
                     }`}
                   >
-                    <div className="flex w-full items-center justify-between gap-2">
-                      <span className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">
+                    <div className="flex w-full flex-wrap items-center justify-between gap-1.5">
+                      <span className="font-mono text-[0.68rem] tracking-[0.14em] text-pass uppercase">
                         Phase {item.step} · {item.phase}
                       </span>
-                      <span className={`inline-flex items-center px-2 py-0.5 font-mono text-[0.62rem] border ${
+                      <span className={`inline-flex items-center px-2 py-0.5 font-mono text-[0.62rem] border shrink-0 ${
                         index === 2
-                          ? "border-amber-600/30 bg-amber-500/10 text-amber-900 dark:text-amber-400"
+                          ? "border-amber-700/40 bg-amber-500/10 text-amber-900 dark:text-amber-300"
                           : index === 3
-                          ? "border-pass/30 bg-pass-fill/10 text-pass"
+                          ? "border-pass/40 bg-pass-fill/10 text-ink dark:text-pass"
                           : "border-line text-muted"
                       }`}>
                         {item.badge}
@@ -107,7 +107,7 @@ export function RcaCaseStudy() {
             </div>
 
             {/* Active Step Deep Dive Card */}
-            <div className="mt-6 border border-line bg-paper p-6 sm:p-7">
+            <div className="mt-6 min-w-0 border border-line bg-paper p-4 sm:p-7">
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center border border-pass-fill bg-band text-pass">
                   {activeStep === 2 ? (
@@ -118,7 +118,7 @@ export function RcaCaseStudy() {
                     <ShieldAlert className="h-4 w-4 text-pass" />
                   )}
                 </span>
-                <div>
+                <div className="min-w-0">
                   <span className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase block">
                     Detailed finding · Phase {currentStep.step}
                   </span>
@@ -134,11 +134,11 @@ export function RcaCaseStudy() {
           </div>
 
           {/* Interactive Concurrency Gate Terminal */}
-          <div className="min-w-0 rounded-none border border-line bg-band p-5 text-on-band band sm:p-6 shadow-md">
-            <div className="flex items-center justify-between border-b border-on-band/15 pb-4">
-              <div className="flex min-w-0 items-center gap-2.5">
-                <Terminal className="h-4 w-4 text-pass" />
-                <span className="min-w-0 font-mono text-xs tracking-wider uppercase text-on-band/80">
+          <div className="band min-w-0 rounded-none border border-line bg-band p-4 text-on-band sm:p-6 shadow-md overflow-hidden">
+            <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-on-band/15 pb-4">
+              <div className="flex min-w-0 items-center gap-2">
+                <Terminal className="h-4 w-4 shrink-0 text-pass" />
+                <span className="truncate font-mono text-[0.72rem] tracking-wider uppercase text-on-band/80">
                   concurrency.idempotency.spec.ts
                 </span>
               </div>
@@ -154,12 +154,12 @@ export function RcaCaseStudy() {
             </div>
 
             <div className="mt-4 min-h-[15rem] font-mono text-[0.72rem] leading-relaxed space-y-2.5 overflow-x-auto">
-              <p className="text-on-band/50">
+              <p className="text-on-band/75">
                 # Simulating parallel webhook delivery during client auto-retry:
               </p>
               {simulatedLogs.map((log, i) => (
                 <div key={i} className="flex items-start gap-2">
-                  <span className="text-on-band/60 shrink-0">{log.timestamp}</span>
+                  <span className="text-on-band/75 shrink-0">{log.timestamp}</span>
                   <span className={`px-1 text-[0.62rem] border shrink-0 ${
                     log.status === "warn"
                       ? "border-amber-400/40 text-amber-300"

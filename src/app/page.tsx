@@ -3,9 +3,9 @@ import Link from "next/link";
 import { ExperienceLog } from "@/components/home/experience-log";
 import { HeadlineCycle } from "@/components/home/headline-cycle";
 import { PublicApps } from "@/components/home/public-apps";
-import { Services } from "@/components/home/services";
+import { ServicesSection } from "@/components/home/services";
 import { TestRun } from "@/components/home/test-run";
-import { profile, services, toolkit, unpublishedWork } from "@/data";
+import { profile, toolkit, unpublishedWork } from "@/data";
 
 export default function HomePage() {
   return (
@@ -41,22 +41,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="practice" className="scroll-mt-20 border-t border-line bg-paper-deep">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end lg:gap-12">
-            <div>
-              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-                <span className="text-pass">01</span> / Testing services
-              </p>
-              <h2 className="mt-3 max-w-2xl font-serif text-4xl tracking-tight text-balance sm:text-5xl">
-                How a release earns the right to ship.
-              </h2>
-            </div>
-            <p className="leading-relaxed text-ink-soft">{services.lede}</p>
-          </div>
-          <Services />
-        </div>
-      </section>
+      <ServicesSection />
 
       <section id="skills" className="scroll-mt-20 border-t border-line">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">

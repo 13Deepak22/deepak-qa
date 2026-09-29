@@ -198,6 +198,52 @@
   background: var(--pass);
 }
 
+.marquee-track {
+  display: flex;
+}
+
+.marquee-track > ul {
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-inline: auto;
+  max-width: 72rem;
+}
+
+.marquee-track > ul + ul {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .service-marquee {
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+
+  .marquee-track {
+    width: max-content;
+    animation: marquee 70s linear infinite;
+  }
+
+  .marquee-track > ul {
+    flex-wrap: nowrap;
+    max-width: none;
+    margin-inline: 0;
+  }
+
+  .marquee-track > ul + ul {
+    display: flex;
+  }
+
+  .service-marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .tool-card,
   .service-card {

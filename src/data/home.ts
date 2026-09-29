@@ -14,7 +14,13 @@ export const releaseGate = {
   gate: "ready for review",
 };
 
-export type ToolLogo = "playwright" | "selenium" | "appium" | "postman" | "jmeter";
+export type ToolLogo = "playwright" | "selenium" | "appium" | "postman" | "jmeter" | "jira" | "trello" | "razorpay";
+
+export type DomainIcon = "upi" | "gateway" | "ekyc";
+
+export type SupportMark = { label: string } & ({ logo: ToolLogo } | { icon: DomainIcon });
+
+export type TestingTypeIcon = "functional" | "exploratory" | "ux";
 
 export const services = {
   lede: "Manual and automation testing for mobile, web, and API releases, run with the tools engineering teams already trust.",
@@ -23,16 +29,47 @@ export const services = {
       key: "manual",
       title: "Manual testing",
       tagline: "The judgement a script cannot replace.",
-      body: "Functional, smoke, sanity, and regression on the journeys a release can break, with exploratory and compatibility passes before sign-off.",
-      points: ["Test cases", "Exploratory", "Regression", "Smoke & sanity", "Compatibility", "Retest"],
+      body: "Functional, UI, and UX checks on the journeys a release can break, with exploratory, regression, and compatibility passes before sign-off.",
+      highlights: [
+        { label: "Test cases", icon: "functional" },
+        { label: "Exploratory", icon: "exploratory" },
+        { label: "UI & UX", icon: "ux" },
+      ],
+      points: ["Test case design", "Test scenarios", "Regression", "Smoke & sanity", "Compatibility", "Bug reports with RCA"],
     },
     {
       key: "automation",
       title: "Automation testing",
       tagline: "The path that ships again, scripted.",
       body: "Suites in Java and JavaScript with the Page Object Model, across Android, iOS, and web. Automation cut manual effort by 50%.",
+      highlights: [],
       points: ["Java", "JavaScript", "TestNG", "Page Object Model", "UiAutomator2", "XCUITest"],
     },
+  ] satisfies {
+    key: string;
+    title: string;
+    tagline: string;
+    body: string;
+    highlights: { label: string; icon: TestingTypeIcon }[];
+    points: string[];
+  }[],
+  types: [
+    "Functional Testing",
+    "UI Testing",
+    "UX & Usability Testing",
+    "Regression Testing",
+    "Smoke & Sanity Testing",
+    "Exploratory Testing",
+    "Integration Testing",
+    "End-to-End Testing",
+    "API Testing",
+    "Mobile App Testing",
+    "Cross-browser Testing",
+    "Compatibility Testing",
+    "Performance & Load Testing",
+    "Negative Testing",
+    "Payment & UPI Testing",
+    "Retesting & Bug Verification",
   ],
   tools: [
     { name: "Playwright", logo: "playwright", category: "Web automation", use: "End-to-end web suites in JavaScript, across browsers." },
@@ -42,9 +79,31 @@ export const services = {
     { name: "JMeter", logo: "jmeter", category: "Performance", use: "Load and stress tests on the paths that cannot fall over." },
   ] satisfies { name: string; logo: ToolLogo; category: string; use: string }[],
   support: [
-    { key: "defects", title: "Defect management", body: "Critical bugs leave with a root cause. Jira and Trello hold the retest." },
-    { key: "fintech", title: "Fintech domain", body: "UPI, payment gateways, eKYC, cards, LOS, and LMS." },
-  ],
+    {
+      key: "defects",
+      title: "Defect management",
+      body: "Critical bugs leave with a root cause. Jira and Trello hold the retest.",
+      marksLabel: "Tracked in",
+      marks: [
+        { label: "Jira", logo: "jira" },
+        { label: "Trello", logo: "trello" },
+      ],
+      points: ["Bug reporting", "Bug tracking", "Root cause analysis", "Retest", "Test reports"],
+    },
+    {
+      key: "fintech",
+      title: "Fintech domain",
+      body: "Payment and lending journeys, checked against the partners they depend on.",
+      marksLabel: "Integrations tested",
+      marks: [
+        { label: "UPI", icon: "upi" },
+        { label: "Payment gateways", icon: "gateway" },
+        { label: "Razorpay", logo: "razorpay" },
+        { label: "eKYC", icon: "ekyc" },
+      ],
+      points: ["UPI", "NPCI", "Razorpay", "Cashfree", "PayU", "eKYC", "DigiLocker", "eSign", "LOS", "LMS"],
+    },
+  ] satisfies { key: string; title: string; body: string; marksLabel: string; marks: SupportMark[]; points: string[] }[],
 };
 
 /**
@@ -65,7 +124,11 @@ export const toolkit = [
       "Integration Testing",
       "End-to-End Testing",
       "API Testing",
+      "UI Testing",
+      "UX Testing",
+      "Usability Testing",
       "GUI Testing",
+      "Negative Testing",
       "Exploratory Testing",
       "Ad-hoc Testing",
       "Compatibility Testing",

@@ -48,7 +48,6 @@ export function SkillsSection() {
 
     return toolkit
       .map((group) => {
-        // If a specific category is chosen and it's not "All"
         if (activeCategory !== "All" && group.label !== activeCategory) {
           return null;
         }
@@ -103,8 +102,8 @@ export function SkillsSection() {
 
   return (
     <div className="mt-10 min-w-0">
-      {/* Recruiter interactive control bar */}
-      <div className="border border-line bg-card p-4 sm:p-6 min-w-0">
+      {/* Seamless Toolbar - Aligned edge-to-edge with the 6xl grid */}
+      <div className="border-y border-line py-5 min-w-0">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between min-w-0">
           {/* Quick preset chips */}
           <div className="flex flex-wrap items-center gap-2 min-w-0">
@@ -120,7 +119,7 @@ export function SkillsSection() {
                   onClick={() => handleSelectPreset(preset)}
                   className={`press inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-[0.72rem] tracking-[0.08em] transition-all ${
                     isSelected
-                      ? "bg-ink font-medium text-paper"
+                      ? "bg-ink font-medium text-paper shadow-xs"
                       : "border border-line bg-paper text-ink hover:border-pass hover:text-pass"
                   }`}
                 >
@@ -171,7 +170,7 @@ export function SkillsSection() {
         </div>
 
         {/* Category Pills Bar */}
-        <div className="mt-4 flex flex-wrap items-center gap-1.5 border-t border-line/60 pt-4" role="tablist" aria-label="Skill categories">
+        <div className="mt-4 flex flex-wrap items-center gap-1.5 border-t border-line/60 pt-4 min-w-0" role="tablist" aria-label="Skill categories">
           {categories.map((cat) => {
             const isSelected = activeCategory === cat.label && !searchQuery;
             return (
@@ -183,7 +182,7 @@ export function SkillsSection() {
                 onClick={() => handleCategoryClick(cat.label)}
                 className={`press inline-flex items-center gap-1.5 px-2.5 py-1 font-mono text-[0.68rem] tracking-[0.1em] uppercase transition-all ${
                   isSelected
-                    ? "bg-ink font-medium text-paper"
+                    ? "bg-ink font-medium text-paper shadow-xs"
                     : "border border-line bg-paper text-muted hover:border-pass hover:text-ink"
                 }`}
               >
@@ -225,12 +224,12 @@ export function SkillsSection() {
         </div>
       ) : null}
 
-      {/* Skills Groups List - Guaranteed headings & items present for tests */}
-      <ul className="mt-6 border-t border-line min-w-0">
+      {/* Skills Groups List - Aligned to exact 12rem left column */}
+      <ul className="divide-y divide-line min-w-0">
         {filteredGroups.map((group) => (
           <li
             key={group.label}
-            className="grid gap-4 border-b border-line py-6 sm:py-7 md:grid-cols-[13rem_minmax(0,1fr)] md:items-start md:gap-8 lg:px-1 min-w-0"
+            className="grid gap-4 py-6 sm:py-7 md:grid-cols-[12rem_minmax(0,1fr)] md:items-start md:gap-8 lg:px-1 min-w-0"
           >
             <div className="min-w-0">
               <div className="flex items-center gap-2">
@@ -242,16 +241,16 @@ export function SkillsSection() {
                 </span>
               </div>
               {group.label === "Exposure" ? (
-                <p className="mt-2 max-w-[13rem] text-xs leading-snug text-muted">
+                <p className="mt-2 max-w-[12rem] text-xs leading-snug text-muted">
                   Followed those efforts. Did not run the tests.
                 </p>
               ) : group.label === "Automation" ? (
-                <p className="mt-2 max-w-[13rem] text-xs leading-snug text-muted">
+                <p className="mt-2 max-w-[12rem] text-xs leading-snug text-muted">
                   Scripted POM suites across Android, iOS, and Web.
                 </p>
               ) : group.label === "Fintech" ? (
-                <p className="mt-2 max-w-[13rem] text-xs leading-snug text-muted">
-                  NPCI compliance, payment gateways & money flows.
+                <p className="mt-2 max-w-[12rem] text-xs leading-snug text-muted">
+                  NPCI compliance, payment gateways &amp; money flows.
                 </p>
               ) : null}
             </div>
@@ -284,7 +283,7 @@ export function SkillsSection() {
       </ul>
 
       {/* Recruiter Confidence Banner */}
-      <div className="mt-8 flex flex-col gap-3 border border-line bg-card p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5 min-w-0">
+      <div className="mt-10 flex flex-col gap-3 border border-line bg-card p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5 min-w-0">
         <div className="flex items-center gap-3 min-w-0">
           <span className="inline-flex size-8 shrink-0 items-center justify-center border border-line bg-paper text-ink">
             <Sparkles className="size-4 text-pass" />

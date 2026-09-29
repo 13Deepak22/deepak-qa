@@ -457,4 +457,67 @@
     transform: none;
     transition-delay: calc(160ms + var(--i, 0) * 70ms);
   }
+
+  /* RCA & Skills Animation Enhancements */
+  @keyframes rca-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes terminal-line {
+    from {
+      opacity: 0;
+      transform: translateX(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .rca-deepdive-animate {
+    animation: rca-fade-in 300ms var(--ease) both;
+  }
+
+  .terminal-log-animate {
+    animation: terminal-line 240ms var(--ease) both;
+  }
+
+  .skill-chip {
+    transition:
+      transform 200ms var(--ease),
+      border-color 200ms var(--ease),
+      background-color 200ms var(--ease),
+      box-shadow 200ms var(--ease);
+  }
+
+  .skill-chip:hover {
+    transform: translateY(-2px);
+    border-color: var(--pass);
+    box-shadow: 0 6px 16px -6px rgba(28, 25, 21, 0.15);
+  }
+
+  .rca-step-card {
+    transition:
+      transform 240ms var(--ease),
+      border-color 240ms var(--ease),
+      background-color 240ms var(--ease),
+      box-shadow 240ms var(--ease);
+  }
+
+  .rca-step-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -14px rgba(28, 25, 21, 0.3);
+  }
+
+  .rca-step-card[data-active="true"] {
+    border-color: var(--pass);
+    box-shadow: 0 4px 14px -6px rgba(20, 108, 67, 0.25);
+  }
 }

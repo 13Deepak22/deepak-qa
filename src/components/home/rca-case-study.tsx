@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, ShieldAlert, Terminal, RefreshCw, AlertTriangle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, RefreshCw, ShieldAlert, Terminal } from "lucide-react";
 import { useState } from "react";
 import { rcaCaseStudy } from "@/data";
 
@@ -29,16 +29,16 @@ export function RcaCaseStudy() {
   return (
     <section id="investigation" className="scroll-mt-20 border-t border-line bg-paper-deep">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
-        {/* Section Heading */}
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,22rem)] lg:items-end lg:gap-12">
+        {/* Section Heading - Exact standard grid alignment with other sections */}
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end lg:gap-12">
           <div>
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-              <span className="text-pass">{rcaCaseStudy.sectionIndex}</span> / Defect Investigation & RCA
+              <span className="text-pass">{rcaCaseStudy.sectionIndex}</span> / Defect Investigation &amp; RCA
             </p>
-            <h2 className="mt-3 font-serif text-3xl tracking-tight text-balance sm:text-4xl lg:text-5xl">
+            <h2 className="mt-3 font-serif text-4xl tracking-tight text-balance sm:text-5xl">
               {rcaCaseStudy.tagline}
             </h2>
-            <p className="mt-3 text-lg font-serif italic text-pass">
+            <p className="mt-3 font-serif text-lg text-pass italic">
               {rcaCaseStudy.domain} · {rcaCaseStudy.severity}
             </p>
           </div>
@@ -47,8 +47,8 @@ export function RcaCaseStudy() {
           </p>
         </div>
 
-        {/* Quick Badges */}
-        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 border-y border-line py-5">
+        {/* Quick Metrics Bar */}
+        <div className="mt-10 grid grid-cols-2 gap-4 border-y border-line py-5 sm:grid-cols-4">
           {rcaCaseStudy.metrics.map((metric) => (
             <div key={metric.label} className="min-w-0">
               <span className="font-mono text-[0.65rem] tracking-[0.14em] text-muted uppercase block">
@@ -61,53 +61,74 @@ export function RcaCaseStudy() {
           ))}
         </div>
 
-        {/* 4-Step Interactive Timeline */}
-        <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start">
-          <div className="space-y-3 min-w-0">
-            <h3 className="font-mono text-[0.72rem] tracking-[0.16em] text-pass uppercase">
-              Investigation breakdown (select a phase)
-            </h3>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {rcaCaseStudy.steps.map((item, index) => {
-                const isActive = activeStep === index;
-                return (
-                  <button
-                    key={item.step}
-                    type="button"
-                    onClick={() => setActiveStep(index)}
-                    className={`tool-card group flex min-w-0 w-full flex-col items-start p-4 text-left border transition-all sm:p-5 ${
-                      isActive
-                        ? "border-pass bg-paper shadow-sm ring-1 ring-pass/40"
-                        : "border-line bg-paper/60 hover:border-pass/60 hover:bg-paper"
-                    }`}
-                  >
-                    <div className="flex w-full flex-wrap items-center justify-between gap-1.5">
-                      <span className="font-mono text-[0.68rem] tracking-[0.14em] text-pass uppercase">
-                        Phase {item.step} · {item.phase}
-                      </span>
-                      <span className={`inline-flex items-center px-2 py-0.5 font-mono text-[0.62rem] border shrink-0 ${
-                        index === 2
-                          ? "border-amber-700/40 bg-amber-500/10 text-amber-900 dark:text-amber-300"
-                          : index === 3
-                          ? "border-pass/40 bg-pass-fill/10 text-ink dark:text-pass"
-                          : "border-line text-muted"
-                      }`}>
-                        {item.badge}
-                      </span>
-                    </div>
-                    <h4 className="mt-3 font-serif text-lg leading-snug tracking-tight text-ink group-hover:text-pass">
-                      {item.title}
-                    </h4>
-                    <p className="mt-2 text-xs leading-relaxed text-ink-soft line-clamp-2">
-                      {item.summary}
-                    </p>
-                  </button>
-                );
-              })}
+        {/* Main 2-Column Balanced Grid (50 / 50 Stretch) */}
+        <div className="mt-12 grid gap-8 lg:grid-cols-2 lg:items-stretch">
+          {/* Left Column: 4-Step Cards + Deep Dive */}
+          <div className="flex flex-col justify-between gap-6 min-w-0">
+            <div className="space-y-3 min-w-0">
+              <div className="flex items-center justify-between">
+                <h3 className="font-mono text-[0.72rem] tracking-[0.16em] text-pass uppercase">
+                  Investigation breakdown
+                </h3>
+                <span className="font-mono text-[0.62rem] tracking-wider text-muted uppercase">
+                  Click phase to inspect
+                </span>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {rcaCaseStudy.steps.map((item, index) => {
+                  const isActive = activeStep === index;
+                  return (
+                    <button
+                      key={item.step}
+                      type="button"
+                      data-active={isActive}
+                      onClick={() => setActiveStep(index)}
+                      className={`rca-step-card group relative flex min-w-0 w-full flex-col items-start p-4 text-left border sm:p-5 ${
+                        isActive
+                          ? "border-pass bg-paper shadow-xs ring-1 ring-pass/40"
+                          : "border-line bg-paper/60 hover:border-pass/60 hover:bg-paper"
+                      }`}
+                    >
+                      {isActive && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute top-0 right-0 left-0 h-0.5 bg-pass"
+                        />
+                      )}
+                      <div className="flex w-full flex-wrap items-center justify-between gap-1.5">
+                        <span className={`font-mono text-[0.68rem] tracking-[0.14em] uppercase ${
+                          isActive ? "text-pass font-semibold" : "text-muted group-hover:text-pass"
+                        }`}>
+                          Phase {item.step} · {item.phase}
+                        </span>
+                        <span className={`inline-flex items-center px-2 py-0.5 font-mono text-[0.62rem] border shrink-0 ${
+                          index === 2
+                            ? "border-amber-700/40 bg-amber-500/10 text-amber-900 dark:text-amber-300"
+                            : index === 3
+                            ? "border-pass/40 bg-pass-fill/10 text-ink dark:text-pass font-medium"
+                            : "border-line text-muted"
+                        }`}>
+                          {item.badge}
+                        </span>
+                      </div>
+                      <h4 className="mt-3 font-serif text-lg leading-snug tracking-tight text-ink group-hover:text-pass">
+                        {item.title}
+                      </h4>
+                      <p className="mt-2 text-xs leading-relaxed text-ink-soft line-clamp-2">
+                        {item.summary}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Active Step Deep Dive Card */}
-            <div className="mt-6 min-w-0 border border-line bg-paper p-4 sm:p-7">
+            {/* Active Step Deep Dive Card with smooth animation */}
+            <div
+              key={activeStep}
+              className="rca-deepdive-animate min-w-0 border border-line bg-paper p-5 sm:p-6"
+            >
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center border border-pass-fill bg-band text-pass">
                   {activeStep === 2 ? (
@@ -133,51 +154,57 @@ export function RcaCaseStudy() {
             </div>
           </div>
 
-          {/* Interactive Concurrency Gate Terminal */}
-          <div className="band min-w-0 rounded-none border border-line bg-band p-4 text-on-band sm:p-6 shadow-md overflow-hidden">
-            <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-on-band/15 pb-4">
-              <div className="flex min-w-0 items-center gap-2">
-                <Terminal className="h-4 w-4 shrink-0 text-pass" />
-                <span className="truncate font-mono text-[0.72rem] tracking-wider uppercase text-on-band/80">
-                  concurrency.idempotency.spec.ts
-                </span>
+          {/* Right Column: Live Concurrency Gate Terminal (Equal Height) */}
+          <div className="band min-w-0 h-full flex flex-col justify-between rounded-none border border-line bg-band p-5 text-on-band sm:p-6 shadow-md overflow-hidden">
+            <div>
+              <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-on-band/15 pb-4">
+                <div className="flex min-w-0 items-center gap-2">
+                  <Terminal className="h-4 w-4 shrink-0 text-pass" />
+                  <span className="truncate font-mono text-[0.72rem] tracking-wider uppercase text-on-band/80">
+                    concurrency.idempotency.spec.ts
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={rerunSimulation}
+                  disabled={isSimulating}
+                  className="press inline-flex shrink-0 items-center gap-1.5 border border-on-band/20 px-3 py-1 font-mono text-[0.68rem] text-on-band hover:border-pass hover:text-pass disabled:opacity-50"
+                >
+                  <RefreshCw className={`h-3 w-3 ${isSimulating ? "animate-spin text-pass" : ""}`} />
+                  <span>{isSimulating ? "simulating..." : "re-test race"}</span>
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={rerunSimulation}
-                disabled={isSimulating}
-                className="inline-flex shrink-0 items-center gap-1.5 border border-on-band/20 px-2.5 py-1 font-mono text-[0.68rem] text-on-band/80 hover:border-pass hover:text-pass disabled:opacity-50"
-              >
-                <RefreshCw className={`h-3 w-3 ${isSimulating ? "animate-spin" : ""}`} />
-                <span>{isSimulating ? "simulating..." : "re-test race"}</span>
-              </button>
-            </div>
 
-            <div className="mt-4 min-h-[15rem] font-mono text-[0.72rem] leading-relaxed space-y-2.5 overflow-x-auto">
-              <p className="text-on-band/75">
-                # Simulating parallel webhook delivery during client auto-retry:
-              </p>
-              {simulatedLogs.map((log, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <span className="text-on-band/75 shrink-0">{log.timestamp}</span>
-                  <span className={`px-1 text-[0.62rem] border shrink-0 ${
-                    log.status === "warn"
-                      ? "border-amber-400/40 text-amber-300"
-                      : "border-pass/40 text-pass"
-                  }`}>
-                    {log.source}
-                  </span>
-                  <span className={log.status === "warn" ? "text-amber-200/90" : "text-on-band/90"}>
-                    {log.event}
-                  </span>
-                </div>
-              ))}
-              {simulatedLogs.length === rcaCaseStudy.terminalLogs.length && (
-                <div className="mt-4 pt-3 border-t border-on-band/15 text-pass font-medium flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 shrink-0" />
-                  <span>Gate passed: release cleared with atomic idempotency enforcement.</span>
-                </div>
-              )}
+              <div className="mt-4 min-h-[16rem] font-mono text-[0.72rem] leading-relaxed space-y-2.5 overflow-x-auto">
+                <p className="text-on-band/75">
+                  # Simulating parallel webhook delivery during client auto-retry:
+                </p>
+                {simulatedLogs.map((log, i) => (
+                  <div
+                    key={`${i}-${log.timestamp}`}
+                    className="terminal-log-animate flex items-start gap-2"
+                    style={{ animationDelay: `${i * 35}ms` }}
+                  >
+                    <span className="text-on-band/75 shrink-0">{log.timestamp}</span>
+                    <span className={`px-1 text-[0.62rem] border shrink-0 ${
+                      log.status === "warn"
+                        ? "border-amber-400/40 text-amber-300"
+                        : "border-pass/40 text-pass"
+                    }`}>
+                      {log.source}
+                    </span>
+                    <span className={log.status === "warn" ? "text-amber-200/90" : "text-on-band/90"}>
+                      {log.event}
+                    </span>
+                  </div>
+                ))}
+                {simulatedLogs.length === rcaCaseStudy.terminalLogs.length && (
+                  <div className="rca-deepdive-animate mt-4 pt-3 border-t border-on-band/15 text-pass font-medium flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 shrink-0" />
+                    <span>Gate passed: release cleared with atomic idempotency enforcement.</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="mt-6 border-t border-on-band/15 pt-4">

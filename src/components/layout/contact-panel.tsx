@@ -68,7 +68,7 @@ export function ContactPanel({ direct }: { direct: boolean }) {
         <p className="font-mono text-[0.68rem] tracking-[0.16em] uppercase">
           {home ? (
             <>
-              <span className="text-pass">05</span>
+              <span className="text-pass">06</span>
               <span className="text-on-band/60"> / Contact</span>
             </>
           ) : (

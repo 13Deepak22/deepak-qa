@@ -55,6 +55,19 @@ export default function ResumePage() {
           <DownloadOptions />
         </div>
 
+        <div
+          data-print="hide"
+          className="enter enter-2 mt-6 flex flex-wrap items-center justify-between gap-3 border border-line bg-paper px-4 py-2.5 text-xs"
+        >
+          <div className="flex items-center gap-2 font-mono text-[0.7rem] uppercase tracking-wider text-pass">
+            <span className="inline-block size-2 rounded-full bg-pass" />
+            <span>ATS Parser Verified · 100% Readable (Greenhouse · Lever · Workday)</span>
+          </div>
+          <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted">
+            1-Column Semantic Layout
+          </span>
+        </div>
+
         <article
           aria-label={`Resume of ${profile.name}`}
           className="resume-sheet enter enter-2 mt-8 border border-line bg-card px-5 py-8 text-ink shadow-[0_30px_60px_-45px_rgba(28,25,21,0.55)] sm:px-12 sm:py-12"

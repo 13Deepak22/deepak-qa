@@ -1,10 +1,6 @@
 import {
   ArrowRight,
-  Building2,
-  Calendar,
   FileText,
-  LockKeyhole,
-  Smartphone,
   User,
 } from "lucide-react";
 import Link from "next/link";
@@ -12,9 +8,10 @@ import { HeadlineCycle } from "@/components/home/headline-cycle";
 import { ImpactMetrics } from "@/components/home/impact-metrics";
 import { InteractiveExperiencePreview } from "@/components/home/interactive-experience-preview";
 import { InteractiveQASandbox } from "@/components/home/interactive-qa-sandbox";
+import { InteractiveServices } from "@/components/home/interactive-services";
 import { InteractiveWorkPreview } from "@/components/home/interactive-work-preview";
+import { ReleaseGatekeeper } from "@/components/home/release-gatekeeper";
 import { ScopeEstimator } from "@/components/home/scope-estimator";
-import { ServicesSection } from "@/components/home/services";
 import { SkillsSection } from "@/components/home/skills-section";
 import { TestRun } from "@/components/home/test-run";
 import { profile } from "@/data";
@@ -74,19 +71,22 @@ export default function HomePage() {
       {/* Metrics Bar: 15+ Products Tested, 100+ Automated Checks */}
       <ImpactMetrics />
 
-      {/* 01 / Interactive QA Test Workbench (Real-time assertion runner & defect simulator) */}
+      {/* 01 / Live QA Test Workbench (Interactive Assertion Runner & Defect Simulator) */}
       <InteractiveQASandbox />
 
-      {/* 02 / Testing Services (Core services on homepage, full toolkit on /services) */}
-      <ServicesSection />
+      {/* 02 / Interactive Testing Services (Explore Methodology, Sample Assertions & Code) */}
+      <InteractiveServices />
 
-      {/* 03 / Interactive Work Showcase (Clickable app explorer with test journeys) */}
+      {/* 03 / Interactive Release Gatekeeper (Ship or Halt? Decision Simulator) */}
+      <ReleaseGatekeeper />
+
+      {/* 04 / Interactive Applications Showcase (Explore 15+ Products, Journeys & Edge Cases) */}
       <InteractiveWorkPreview />
 
-      {/* 04 / Interactive Experience Spotlight (Role switcher with impact filters) */}
+      {/* 05 / Interactive Career Spotlight (Role Switcher with Impact Dimensions) */}
       <InteractiveExperiencePreview />
 
-      {/* 05 / Interactive Skills Directory (Live search & category filters) */}
+      {/* 06 / Technical Stack & Live ATS Query Engine */}
       <section className="scroll-mt-20 border-t border-line bg-paper">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end mb-10">
@@ -103,7 +103,7 @@ export default function HomePage() {
               className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
               data-cursor="Complete skills page"
             >
-              <span>View full skills page &rarr;</span>
+              <span>View full skills directory &rarr;</span>
             </Link>
           </div>
 
@@ -111,10 +111,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 06 / Interactive Quality Planner & Scope Estimator */}
+      {/* 07 / Interactive Quality Planner & Scope Estimator */}
       <ScopeEstimator />
 
-      {/* 07 / About Deepak & ATS Resume */}
+      {/* 08 / Meet the Tester & ATS Resume Downloads */}
       <section className="scroll-mt-20 border-t border-line bg-paper-deep">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <div className="grid gap-6 md:grid-cols-2">

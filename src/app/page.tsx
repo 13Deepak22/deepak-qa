@@ -1,5 +1,4 @@
 import {
-  ArrowRight,
   ArrowUpRight,
   FileText,
   User,
@@ -13,7 +12,6 @@ import { InteractiveServices } from "@/components/home/interactive-services";
 import { InteractiveWorkPreview } from "@/components/home/interactive-work-preview";
 import { ReleaseGatekeeper } from "@/components/home/release-gatekeeper";
 import { ScopeEstimator } from "@/components/home/scope-estimator";
-import { SkillsSection } from "@/components/home/skills-section";
 import { TestRun } from "@/components/home/test-run";
 import { profile } from "@/data";
 import { experienceLabel } from "@/lib/career";
@@ -62,6 +60,15 @@ export default function HomePage() {
               <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
             </Link>
             <Link
+              href="/skills"
+              data-testid="hero-skills-link"
+              className="press inline-flex items-center justify-center gap-1.5 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
+              data-cursor="97+ verified skills"
+            >
+              <span>Skills directory</span>
+              <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+            </Link>
+            <Link
               href="/#contact"
               data-testid="hero-contact-link"
               className="press inline-flex items-center justify-center border border-pass bg-pass-fill text-on-band px-4 py-2.5 font-mono text-xs uppercase tracking-wider hover:bg-pass transition-colors"
@@ -94,37 +101,10 @@ export default function HomePage() {
       {/* 05 / Interactive Career Spotlight (Role Switcher with Impact Dimensions) */}
       <InteractiveExperiencePreview />
 
-      {/* 06 / Technical Stack & Live ATS Query Engine */}
-      <section className="scroll-mt-20 border-t border-line bg-paper">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end mb-10">
-            <div>
-              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-                <span className="text-pass">Technical Directory</span> / Core Competencies
-              </p>
-              <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
-                97+ Verified testing skills &amp; ATS keywords.
-              </h2>
-            </div>
-            <Link
-              href="/skills"
-              data-testid="skills-redirect-cta"
-              className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
-              data-cursor="Complete skills page"
-            >
-              <span>View full skills directory</span>
-              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-            </Link>
-          </div>
-
-          <SkillsSection />
-        </div>
-      </section>
-
-      {/* 07 / Interactive Quality Planner & Scope Estimator */}
+      {/* 06 / Interactive Quality Planner & Scope Estimator */}
       <ScopeEstimator />
 
-      {/* 08 / Meet the Tester & ATS Resume Downloads */}
+      {/* 07 / Meet the Tester & ATS Resume Downloads */}
       <section className="scroll-mt-20 border-t border-line bg-paper-deep">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <div className="grid gap-6 md:grid-cols-2">

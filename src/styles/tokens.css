@@ -16,7 +16,22 @@
   --ease-enter: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-exit: cubic-bezier(0.65, 0, 0.35, 1);
   --headline-enter: 920ms;
-  --headline-exit: 920ms;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --paper: #efeae1;
+  --paper-deep: #e5dece;
+  --ink: #1c1915;
+  --ink-soft: #3a342c;
+  --muted: #5c554c;
+  --line: #d3cbbd;
+  --pass: #125f3b;
+  --pass-fill: #146c43;
+  --band: #1c1915;
+  --on-band: #efeae1;
+  --card: #f7f4ee;
+  --header-shadow: 0 10px 30px -24px rgba(28, 25, 21, 0.45);
 }
 
 @media (prefers-color-scheme: dark) {

@@ -1,5 +1,6 @@
 import {
   ArrowRight,
+  ArrowUpRight,
   FileText,
   User,
 } from "lucide-react";
@@ -35,31 +36,38 @@ export default function HomePage() {
           <div className="enter enter-5 mt-8 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:flex-wrap">
             <Link
               href="/work"
-              className="press bg-ink px-5 py-3 text-center text-sm text-paper hover:bg-ink-soft min-[420px]:text-left"
+              data-testid="hero-work-link"
+              className="press inline-flex items-center justify-center gap-1.5 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
               data-cursor="15+ apps & portals"
             >
-              Selected work
+              <span>Selected work</span>
+              <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
             </Link>
             <Link
               href="/services"
-              className="press border border-line bg-paper px-5 py-3 text-center text-sm text-ink hover:border-pass hover:text-pass min-[420px]:text-left"
+              data-testid="hero-services-link"
+              className="press inline-flex items-center justify-center gap-1.5 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
               data-cursor="Services & methodology"
             >
-              Testing services
+              <span>Testing services</span>
+              <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
             </Link>
             <Link
               href="/experience"
-              className="press border border-line bg-paper px-5 py-3 text-center text-sm text-ink hover:border-pass hover:text-pass min-[420px]:text-left"
+              data-testid="hero-experience-link"
+              className="press inline-flex items-center justify-center gap-1.5 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
               data-cursor={`${years} years experience`}
             >
-              Experience timeline
+              <span>Experience timeline</span>
+              <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
             </Link>
             <Link
               href="/#contact"
-              className="press border border-pass px-5 py-3 text-center text-sm hover:bg-pass-fill hover:text-on-band min-[420px]:text-left"
+              data-testid="hero-contact-link"
+              className="press inline-flex items-center justify-center border border-pass bg-pass-fill text-on-band px-4 py-2.5 font-mono text-xs uppercase tracking-wider hover:bg-pass transition-colors"
               data-cursor="Tell me what's shipping"
             >
-              Start a conversation
+              <span>Start a conversation</span>
             </Link>
           </div>
         </div>
@@ -94,16 +102,18 @@ export default function HomePage() {
               <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
                 <span className="text-pass">Technical Directory</span> / Core Competencies
               </p>
-              <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink">
+              <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
                 97+ Verified testing skills &amp; ATS keywords.
               </h2>
             </div>
             <Link
               href="/skills"
+              data-testid="skills-redirect-cta"
               className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
               data-cursor="Complete skills page"
             >
-              <span>View full skills directory &rarr;</span>
+              <span>View full skills directory</span>
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </div>
 
@@ -135,10 +145,12 @@ export default function HomePage() {
               <div className="mt-auto pt-6">
                 <Link
                   href="/about"
+                  data-testid="about-redirect-cta"
                   className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2 text-xs font-mono uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
                   data-cursor="Read Deepak's story"
                 >
-                  <span>Read full bio &rarr;</span>
+                  <span>Read full bio</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                 </Link>
               </div>
             </div>
@@ -160,10 +172,12 @@ export default function HomePage() {
               <div className="mt-auto pt-6">
                 <Link
                   href="/resume"
+                  data-testid="resume-redirect-cta"
                   className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2 text-xs font-mono uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
                   data-cursor="Download resume"
                 >
-                  <span>View &amp; download resume &rarr;</span>
+                  <span>View &amp; download resume</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                 </Link>
               </div>
             </div>

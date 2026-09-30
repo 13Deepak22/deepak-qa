@@ -84,7 +84,7 @@ export function SiteHeader() {
         <Link
           href="/"
           className="flex min-w-0 items-center gap-3 text-ink"
-          data-cursor="Reset to the start"
+          data-cursor="Return to homepage"
           onClick={closeMenu}
         >
           <Mark className="h-8 w-8 shrink-0" />

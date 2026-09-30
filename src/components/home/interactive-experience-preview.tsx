@@ -8,8 +8,8 @@ import {
   Calendar,
   CheckCircle2,
   ChevronRight,
-  Sparkles,
   TrendingUp,
+  ArrowUpRight,
 } from "lucide-react";
 import Link from "next/link";
 import { experience } from "@/data";
@@ -80,7 +80,7 @@ export function InteractiveExperiencePreview() {
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Career Spotlight</span> / Verified Track Record
             </p>
-            <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink">
+            <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
               Where I have delivered impact.
             </h2>
           </div>
@@ -245,10 +245,12 @@ export function InteractiveExperiencePreview() {
 
             <Link
               href="/experience"
+              data-testid="experience-redirect-cta"
               className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
               data-cursor="Complete career history"
             >
-              <span>View complete experience &rarr;</span>
+              <span>View complete experience</span>
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </div>
         </div>

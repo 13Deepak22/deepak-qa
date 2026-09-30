@@ -7,15 +7,21 @@ const LIGHT = "#efeae1";
 const DARK = "#1c1915";
 
 function chosenTheme(): "light" | "dark" | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const stored = window.localStorage.getItem("theme");
+    if (stored === "light" || stored === "dark") return stored;
+  } catch {}
   const value = document.documentElement.getAttribute("data-theme");
   return value === "light" || value === "dark" ? value : null;
 }
 
 function systemTheme(): "light" | "dark" {
+  if (typeof window === "undefined") return "light";
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-function resolvedTheme() {
+function resolvedTheme(): "light" | "dark" {
   return chosenTheme() ?? systemTheme();
 }
 
@@ -33,20 +39,31 @@ export function ThemeToggle() {
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const sync = () => {
-      const theme = resolvedTheme();
-      setLabel(theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
-      const chosen = chosenTheme();
-      if (chosen) paintThemeColor(chosen);
+      const active = resolvedTheme();
+      document.documentElement.setAttribute("data-theme", active);
+      document.documentElement.style.colorScheme = active;
+      setLabel(active === "dark" ? "Switch to light mode" : "Switch to dark mode");
+      paintThemeColor(active);
     };
+
     sync();
     media.addEventListener("change", sync);
-    return () => media.removeEventListener("change", sync);
+    window.addEventListener("storage", sync);
+
+    return () => {
+      media.removeEventListener("change", sync);
+      window.removeEventListener("storage", sync);
+    };
   }, []);
 
   function toggle() {
-    const next = resolvedTheme() === "dark" ? "light" : "dark";
+    const current = resolvedTheme();
+    const next = current === "dark" ? "light" : "dark";
+    try {
+      window.localStorage.setItem("theme", next);
+    } catch {}
     document.documentElement.setAttribute("data-theme", next);
-    localStorage.setItem("theme", next);
+    document.documentElement.style.colorScheme = next;
     paintThemeColor(next);
     setLabel(next === "dark" ? "Switch to light mode" : "Switch to dark mode");
   }
@@ -56,6 +73,7 @@ export function ThemeToggle() {
       type="button"
       className="theme-toggle press fixed top-[1.625rem] right-5 z-50 h-9 w-9 text-ink-soft hover:text-pass"
       aria-label={label}
+      data-testid="theme-toggle-button"
       data-cursor={
         label === "Switch to light mode" ? "Lights on" : label === "Switch to dark mode" ? "Lights off" : "Flip the lights"
       }

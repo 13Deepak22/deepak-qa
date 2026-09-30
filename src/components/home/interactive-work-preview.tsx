@@ -11,6 +11,7 @@ import {
   Shield,
   Smartphone,
   Sparkles,
+  ArrowUpRight,
 } from "lucide-react";
 import Link from "next/link";
 import { publicApps, unpublishedWork } from "@/data";
@@ -166,7 +167,7 @@ export function InteractiveWorkPreview() {
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Interactive Showcase</span> / Products &amp; Portals
             </p>
-            <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink">
+            <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
               15+ Products tested in the wild.
             </h2>
           </div>
@@ -357,9 +358,12 @@ export function InteractiveWorkPreview() {
                 </span>
                 <Link
                   href="/work"
+                  data-testid="work-redirect-cta"
+                  data-cursor="Inspect all projects"
                   className="press inline-flex items-center gap-1.5 border border-pass bg-card px-4 py-2 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
                 >
-                  <span>Explore full 15+ apps &rarr;</span>
+                  <span>Explore full 15+ apps</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                 </Link>
               </div>
             </div>

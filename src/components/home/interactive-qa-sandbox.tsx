@@ -185,7 +185,7 @@ export function InteractiveQASandbox() {
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Interactive Workbench</span> / Live Quality Engine
             </p>
-            <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink">
+            <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
               Simulate live fintech release assertions.
             </h2>
           </div>

@@ -16,6 +16,7 @@ import {
   Smartphone,
   Terminal,
   Zap,
+  ArrowUpRight,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -165,7 +166,7 @@ export function InteractiveServices() {
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Testing Services</span> / Core Capabilities
             </p>
-            <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink">
+            <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
               How a release earns the right to ship.
             </h2>
           </div>
@@ -302,15 +303,18 @@ export function InteractiveServices() {
                 </p>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-line/60 flex items-center justify-between text-xs">
+              <div className="mt-6 pt-4 border-t border-line/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <span className="font-mono text-[0.68rem] text-muted">
-                  Full service engagement models
+                  Full service engagement models &amp; deliverables
                 </span>
                 <Link
                   href="/services"
-                  className="font-mono text-xs uppercase tracking-wider text-pass flex items-center gap-1 hover:underline"
+                  data-testid="services-redirect-cta"
+                  data-cursor="Complete testing services"
+                  className="press inline-flex items-center gap-1.5 border border-pass bg-card px-4 py-2 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
                 >
-                  <span>Explore full services page &rarr;</span>
+                  <span>Explore full services page</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                 </Link>
               </div>
             </div>

@@ -5,7 +5,6 @@ import {
   Activity,
   AlertCircle,
   ArrowRight,
-  ArrowUpRight,
   CheckCircle2,
   Clock,
   Code2,
@@ -205,6 +204,8 @@ export function InteractiveQASandbox() {
                 <button
                   key={sc.id}
                   type="button"
+                  data-testid={`sandbox-scenario-${sc.id}`}
+                  data-cursor={`Select ${sc.name} simulation`}
                   onClick={() => {
                     setSelectedId(sc.id);
                     handleReset();
@@ -239,6 +240,8 @@ export function InteractiveQASandbox() {
               {/* Network Throttling Toggle */}
               <button
                 type="button"
+                data-testid="sandbox-toggle-throttle"
+                data-cursor={isThrottled ? "Switch to 5G low-latency mode (20ms)" : "Simulate 3G packet drop & latency jitter (1600ms)"}
                 onClick={() => setIsThrottled(!isThrottled)}
                 className={`flex items-center gap-1.5 border px-3 py-1 text-xs font-mono transition-colors ${
                   isThrottled
@@ -254,6 +257,8 @@ export function InteractiveQASandbox() {
               {activeScenario.id === "upi-intent" && (
                 <button
                   type="button"
+                  data-testid="sandbox-toggle-idempotency"
+                  data-cursor={hasIdempotency ? "Omit idempotency header to simulate race condition" : "Enable idempotency key to prevent double debit"}
                   onClick={() => setHasIdempotency(!hasIdempotency)}
                   className={`flex items-center gap-1.5 border px-3 py-1 text-xs font-mono transition-colors ${
                     hasIdempotency
@@ -271,6 +276,8 @@ export function InteractiveQASandbox() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
+                data-testid="sandbox-btn-reset"
+                data-cursor="Reset test workbench pipeline"
                 onClick={handleReset}
                 disabled={isRunning}
                 className="flex items-center gap-1 border border-line bg-card px-3 py-1.5 font-mono text-xs text-muted hover:text-ink disabled:opacity-50"
@@ -282,6 +289,8 @@ export function InteractiveQASandbox() {
 
               <button
                 type="button"
+                data-testid="sandbox-btn-run"
+                data-cursor="Execute live step-by-step verification pipeline"
                 onClick={handleRunSimulation}
                 disabled={isRunning}
                 className="flex items-center gap-2 border border-pass bg-pass text-paper px-4 py-1.5 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass/90 transition-colors disabled:opacity-60 shadow-sm"
@@ -398,6 +407,8 @@ export function InteractiveQASandbox() {
                 <div className="flex gap-2">
                   <button
                     type="button"
+                    data-testid="sandbox-tab-logs"
+                    data-cursor="View live step-by-step console logs & assertions"
                     onClick={() => setActiveTab("logs")}
                     className={`font-mono text-[0.7rem] uppercase tracking-wider px-2.5 py-1 transition-colors ${
                       activeTab === "logs"
@@ -409,6 +420,8 @@ export function InteractiveQASandbox() {
                   </button>
                   <button
                     type="button"
+                    data-testid="sandbox-tab-payload"
+                    data-cursor="Inspect raw JSON request payload & idempotency keys"
                     onClick={() => setActiveTab("payload")}
                     className={`font-mono text-[0.7rem] uppercase tracking-wider px-2.5 py-1 transition-colors ${
                       activeTab === "payload"
@@ -420,6 +433,8 @@ export function InteractiveQASandbox() {
                   </button>
                   <button
                     type="button"
+                    data-testid="sandbox-tab-matrix"
+                    data-cursor="Inspect edge case assertions & target test matrix"
                     onClick={() => setActiveTab("matrix")}
                     className={`font-mono text-[0.7rem] uppercase tracking-wider px-2.5 py-1 transition-colors ${
                       activeTab === "matrix"
@@ -511,14 +526,14 @@ export function InteractiveQASandbox() {
               </div>
 
               {/* Bottom Quick Link */}
-              <div className="mt-4 pt-3 border-t border-line/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between text-xs">
                 <span className="font-mono text-[0.68rem] text-muted">Automated in Playwright &amp; Postman</span>
                 <Link
                   href="/services"
-                  className="press inline-flex items-center gap-1.5 border border-pass bg-pass text-paper px-3 py-1.5 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass/90 transition-all duration-200 hover:-translate-y-0.5 shadow-xs"
+                  className="font-mono text-xs uppercase tracking-wider text-pass flex items-center gap-1 hover:underline"
                 >
                   <span>Explore testing services</span>
-                  <ArrowUpRight className="h-3.5 w-3.5" />
+                  <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
             </div>

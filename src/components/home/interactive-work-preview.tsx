@@ -184,6 +184,8 @@ export function InteractiveWorkPreview() {
               <button
                 key={app.id}
                 type="button"
+                data-testid={`work-tab-${app.id}`}
+                data-cursor={`Inspect ${app.name} (${app.domain}) verification scope & test journeys`}
                 onClick={() => {
                   setActiveAppId(app.id);
                   setActiveJourneyIndex(0);
@@ -206,6 +208,8 @@ export function InteractiveWorkPreview() {
           {/* Confidential Portals Tab */}
           <Link
             href="/work"
+            data-testid="work-tab-nda"
+            data-cursor="Inspect 8+ confidential banking & lending enterprise portals"
             className="flex shrink-0 items-center gap-2.5 border border-pass/50 bg-pass-fill/10 px-4 py-3 text-left hover:bg-pass hover:text-paper text-pass transition-all duration-200"
           >
             <LockKeyhole className="h-4 w-4" />
@@ -258,6 +262,8 @@ export function InteractiveWorkPreview() {
                     <button
                       key={j.title}
                       type="button"
+                      data-testid={`journey-item-${idx}`}
+                      data-cursor={`Inspect test strategy & execution for ${j.title}`}
                       onClick={() => setActiveJourneyIndex(idx)}
                       className={`w-full text-left p-3.5 border transition-all flex items-start justify-between gap-3 ${
                         isCurrent
@@ -355,14 +361,13 @@ export function InteractiveWorkPreview() {
               {/* Redirect CTA Banner */}
               <div className="mt-6 pt-4 border-t border-line/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <span className="font-mono text-[0.7rem] text-muted">
-                  Inspect all 7 public consumer apps &amp; 8+ enterprise banking portals
+                  Want to inspect all 7 apps &amp; 8+ enterprise portals?
                 </span>
                 <Link
                   href="/work"
-                  className="press inline-flex items-center gap-1.5 border border-pass bg-pass text-paper px-4 py-2 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass/90 transition-all duration-200 hover:-translate-y-0.5 shadow-xs shrink-0"
+                  className="press inline-flex items-center gap-1.5 border border-pass bg-card px-4 py-2 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
                 >
-                  <span>Explore full 15+ apps &amp; portals</span>
-                  <ArrowUpRight className="h-4 w-4" />
+                  <span>Explore full 15+ apps &rarr;</span>
                 </Link>
               </div>
             </div>

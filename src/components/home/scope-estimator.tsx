@@ -123,6 +123,8 @@ export function ScopeEstimator() {
               <button
                 key={p.id}
                 type="button"
+                data-testid={`scope-plan-${p.id}`}
+                data-cursor={`Select ${p.title} architecture for test coverage estimate`}
                 onClick={() => setSelectedPlanId(p.id)}
                 className={`p-4 border text-left transition-all flex flex-col justify-between ${
                   isSelected
@@ -254,6 +256,8 @@ export function ScopeEstimator() {
 
                 <Link
                   href="/#contact"
+                  data-testid="scope-btn-contact"
+                  data-cursor="Start a quality assurance consultation with Deepak"
                   className="press inline-flex items-center gap-2 border border-pass bg-pass text-paper px-4 py-2 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass/90 transition-colors shrink-0 shadow-sm"
                 >
                   <Send className="h-3.5 w-3.5" />

@@ -169,6 +169,8 @@ export function ReleaseGatekeeper() {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
+                data-testid="gatekeeper-preset-all-green"
+                data-cursor="Set all release criteria to healthy pass (Ship to production)"
                 onClick={resetAllGreen}
                 className="px-3 py-1.5 border border-line bg-card text-xs font-mono text-muted hover:text-ink transition-colors flex items-center gap-1"
               >
@@ -177,6 +179,8 @@ export function ReleaseGatekeeper() {
               </button>
               <button
                 type="button"
+                data-testid="gatekeeper-preset-simulate-failure"
+                data-cursor="Simulate critical bug injection and deployment halt"
                 onClick={simulateFailure}
                 className="px-3 py-1.5 border border-line bg-card text-xs font-mono text-muted hover:text-ink transition-colors flex items-center gap-1"
               >
@@ -201,6 +205,8 @@ export function ReleaseGatekeeper() {
                     <button
                       key={rule.id}
                       type="button"
+                      data-testid={`gatekeeper-toggle-${rule.id}`}
+                      data-cursor={`Toggle ${rule.name}: ${isHealthy ? 'Currently passing' : 'Currently blocking'}`}
                       onClick={() => toggleGate(rule.id)}
                       className={`w-full text-left p-4 border transition-all flex items-start justify-between gap-3 ${
                         isHealthy

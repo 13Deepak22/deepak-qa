@@ -3,7 +3,6 @@
 import { useState } from "react";
 import {
   ArrowRight,
-  ArrowUpRight,
   Briefcase,
   Building2,
   Calendar,
@@ -100,6 +99,8 @@ export function InteractiveExperiencePreview() {
               <button
                 key={role.org}
                 type="button"
+                data-testid={`exp-org-${idx}`}
+                data-cursor={`Inspect ${role.org} (${role.title}) release achievements`}
                 onClick={() => {
                   setSelectedOrgIndex(idx);
                   setActiveFilter("all");
@@ -161,6 +162,8 @@ export function InteractiveExperiencePreview() {
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
+                data-testid="exp-filter-all"
+                data-cursor="Show all verified career achievements"
                 onClick={() => setActiveFilter("all")}
                 className={`px-3 py-1 font-mono text-xs transition-colors border ${
                   activeFilter === "all"
@@ -172,6 +175,8 @@ export function InteractiveExperiencePreview() {
               </button>
               <button
                 type="button"
+                data-testid="exp-filter-gates"
+                data-cursor="Filter by zero-defect production release sign-offs"
                 onClick={() => setActiveFilter("gates")}
                 className={`px-3 py-1 font-mono text-xs transition-colors border ${
                   activeFilter === "gates"
@@ -183,6 +188,8 @@ export function InteractiveExperiencePreview() {
               </button>
               <button
                 type="button"
+                data-testid="exp-filter-automation"
+                data-cursor="Filter by Playwright, Appium & API automation suites"
                 onClick={() => setActiveFilter("automation")}
                 className={`px-3 py-1 font-mono text-xs transition-colors border ${
                   activeFilter === "automation"
@@ -194,6 +201,8 @@ export function InteractiveExperiencePreview() {
               </button>
               <button
                 type="button"
+                data-testid="exp-filter-fintech"
+                data-cursor="Filter by fintech payment gateway & lending integrity"
                 onClick={() => setActiveFilter("fintech")}
                 className={`px-3 py-1 font-mono text-xs transition-colors border ${
                   activeFilter === "fintech"
@@ -236,11 +245,10 @@ export function InteractiveExperiencePreview() {
 
             <Link
               href="/experience"
-              className="press inline-flex items-center gap-1.5 border border-pass bg-pass text-paper px-4 py-2 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass/90 transition-all duration-200 hover:-translate-y-0.5 shadow-xs shrink-0"
+              className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
               data-cursor="Complete career history"
             >
-              <span>View complete experience timeline</span>
-              <ArrowUpRight className="h-4 w-4" />
+              <span>View complete experience &rarr;</span>
             </Link>
           </div>
         </div>

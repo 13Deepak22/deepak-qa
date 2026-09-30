@@ -3,7 +3,6 @@
 import { useState } from "react";
 import {
   ArrowRight,
-  ArrowUpRight,
   CheckCircle2,
   Code2,
   Compass,
@@ -183,6 +182,8 @@ export function InteractiveServices() {
               <button
                 key={s.id}
                 type="button"
+                data-testid={`service-tab-${s.id}`}
+                data-cursor={`Inspect ${s.name} testing strategy & sample assertions`}
                 onClick={() => setActiveServiceId(s.id)}
                 className={`p-3.5 sm:p-4 border text-left transition-all flex flex-col justify-between ${
                   isSelected
@@ -303,16 +304,15 @@ export function InteractiveServices() {
                 </p>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-line/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="mt-6 pt-4 border-t border-line/60 flex items-center justify-between text-xs">
                 <span className="font-mono text-[0.68rem] text-muted">
-                  Full service engagement models &amp; RCA case study
+                  Full service engagement models
                 </span>
                 <Link
                   href="/services"
-                  className="press inline-flex items-center gap-1.5 border border-pass bg-pass text-paper px-4 py-2 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass/90 transition-all duration-200 hover:-translate-y-0.5 shadow-xs"
+                  className="font-mono text-xs uppercase tracking-wider text-pass flex items-center gap-1 hover:underline"
                 >
-                  <span>Explore full testing services</span>
-                  <ArrowUpRight className="h-4 w-4" />
+                  <span>Explore full services page &rarr;</span>
                 </Link>
               </div>
             </div>

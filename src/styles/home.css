@@ -48,20 +48,28 @@
 }
 
 @keyframes headline-in {
-  from {
-    transform: translateY(118%);
+  0% {
+    opacity: 0;
+    transform: translateY(22px);
+    filter: blur(4px);
   }
-  to {
+  100% {
+    opacity: 1;
     transform: translateY(0%);
+    filter: blur(0px);
   }
 }
 
 @keyframes headline-out {
-  from {
+  0% {
+    opacity: 1;
     transform: translateY(0%);
+    filter: blur(0px);
   }
-  to {
-    transform: translateY(-118%);
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+    filter: blur(4px);
   }
 }
 

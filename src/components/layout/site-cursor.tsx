@@ -6,8 +6,8 @@ const INTERACTIVE = "a, button, summary, [role='button']";
 const FIELD = "input, textarea, select, [contenteditable='true']";
 const DOT = 6;
 const PAD = 6;
-const MORPH_MS = 420;
-const TRAIL_MS = 320;
+const MORPH_MS = 240;
+const TRAIL_MS = 260;
 const TRAIL_MAX = 48;
 const GAIT_HOLD_MS = 140;
 const EDGE = 8;
@@ -131,7 +131,7 @@ export function SiteCursor() {
       const dt = lastTime ? Math.min((now - lastTime) / 1000, 0.05) : 1 / 60;
       lastTime = now;
 
-      const track = follow(14, dt);
+      const track = follow(18, dt);
       vel.x += ((pos.x - last.x) / dt - vel.x) * track;
       vel.y += ((pos.y - last.y) / dt - vel.y) * track;
       last.x = pos.x;

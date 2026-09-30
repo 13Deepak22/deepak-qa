@@ -50,6 +50,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-sans);
+  transition: background-color 280ms var(--ease), color 280ms var(--ease);
 }
 
 ::selection {

@@ -151,7 +151,7 @@ export function ScopeEstimator() {
         </div>
 
         {/* Selected Plan Strategy Board */}
-        <div className="mt-4 border border-line bg-paper shadow-sm">
+        <div key={plan.id} className="mt-4 border border-line bg-paper shadow-sm content-fade">
           {/* Top Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-line bg-paper-deep p-5 sm:px-6">
             <div>

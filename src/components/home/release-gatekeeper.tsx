@@ -265,7 +265,7 @@ export function ReleaseGatekeeper() {
                 </div>
 
                 {isApproved ? (
-                  <div className="space-y-4">
+                  <div key="approved" className="space-y-4 content-fade">
                     <div className="border border-pass/30 bg-paper p-4">
                       <div className="flex items-start gap-2.5">
                         <ShieldCheck className="h-5 w-5 text-pass shrink-0 mt-0.5" />
@@ -299,7 +299,7 @@ export function ReleaseGatekeeper() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div key="halted" className="space-y-4 content-fade">
                     <div className="border border-red-500/40 bg-red-500/10 p-4">
                       <div className="flex items-start gap-2.5">
                         <ShieldAlert className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />

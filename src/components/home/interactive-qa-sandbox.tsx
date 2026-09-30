@@ -449,7 +449,7 @@ export function InteractiveQASandbox() {
               </div>
 
               {/* Tab Contents */}
-              <div className="flex-1 font-mono text-[0.75rem] leading-relaxed overflow-x-auto min-h-[220px]">
+              <div key={activeTab} className="flex-1 font-mono text-[0.75rem] leading-relaxed overflow-x-auto min-h-[220px] content-fade">
                 {activeTab === "logs" && (
                   <div className="space-y-1.5 text-ink-soft">
                     <p className="text-muted">

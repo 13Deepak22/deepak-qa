@@ -216,7 +216,7 @@ export function InteractiveExperiencePreview() {
           </div>
 
           {/* Highlights List */}
-          <div className="p-6 sm:p-8 space-y-4">
+          <div key={`${currentRole.org}-${activeFilter}`} className="p-6 sm:p-8 space-y-4 content-fade">
             {filteredHighlights.map((highlight, i) => (
               <div
                 key={i}

@@ -211,7 +211,7 @@ export function InteractiveServices() {
         </div>
 
         {/* Selected Service Detail Panel */}
-        <div className="mt-4 border border-line bg-paper shadow-sm">
+        <div key={service.id} className="mt-4 border border-line bg-paper shadow-sm content-fade">
           {/* Header */}
           <div className="border-b border-line bg-paper-deep p-6 sm:px-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

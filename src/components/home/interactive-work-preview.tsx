@@ -2,17 +2,16 @@
 
 import { useState } from "react";
 import {
-  ArrowUpRight,
+  ArrowRight,
   CheckCircle2,
-  Coins,
-  CreditCard,
-  Globe2,
+  ChevronRight,
+  ExternalLink,
+  Layers,
   LockKeyhole,
-  ShieldCheck,
+  Shield,
   Smartphone,
-  Terminal,
-  Wallet,
-  Zap,
+  Sparkles,
+  ArrowUpRight,
 } from "lucide-react";
 import Link from "next/link";
 import { publicApps, unpublishedWork } from "@/data";
@@ -32,13 +31,6 @@ interface InteractiveAppDetail {
   }[];
   edgeCaseFound: string;
 }
-
-const APP_ICONS: Record<string, React.ElementType> = {
-  paulpay: Wallet,
-  mayaa: CreditCard,
-  forex: Globe2,
-  credme: Coins,
-};
 
 const APPS_DATA: InteractiveAppDetail[] = [
   {
@@ -165,76 +157,47 @@ export function InteractiveWorkPreview() {
 
   const selectedApp = APPS_DATA.find((a) => a.id === activeAppId) || APPS_DATA[0];
   const activeJourney = selectedApp.journeys[activeJourneyIndex] || selectedApp.journeys[0];
-  const SelectedAppIcon = APP_ICONS[selectedApp.id] || Smartphone;
 
   return (
     <section id="work" className="scroll-mt-20 border-t border-line bg-card">
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
         {/* Header */}
-        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Interactive Showcase</span> / Products &amp; Portals
             </p>
-            <h2 className="mt-2 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
+            <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
               15+ Products tested in the wild.
             </h2>
           </div>
-          <p className="max-w-md text-xs sm:text-sm leading-relaxed text-ink-soft sm:text-right">
-            Click across consumer applications and banking engines to inspect live QA test coverage and defect prevention.
+          <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
+            Click across consumer applications and back-office banking engines to inspect Deepak&apos;s real-world test coverage and defect prevention.
           </p>
         </div>
 
-        {/* Interactive App Selector Tabs - Modern Elevated Grid */}
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+        {/* Interactive App Selector Tabs */}
+        <div className="mt-10 flex gap-2 overflow-x-auto pb-2">
           {APPS_DATA.map((app) => {
             const isSelected = app.id === selectedApp.id;
-            const AppIcon = APP_ICONS[app.id] || Smartphone;
-
             return (
               <button
                 key={app.id}
                 type="button"
-                data-testid={`app-tab-${app.id}`}
                 onClick={() => {
                   setActiveAppId(app.id);
                   setActiveJourneyIndex(0);
                 }}
-                className={`group relative flex flex-col justify-between border p-3 text-left transition-all duration-200 ${
+                className={`flex shrink-0 items-center gap-2.5 border px-4 py-3 text-left transition-colors ${
                   isSelected
-                    ? "border-pass bg-paper shadow-xs ring-1 ring-pass/40"
-                    : "border-line bg-paper/60 hover:border-pass/50 hover:bg-paper"
+                    ? "border-pass bg-paper text-pass shadow-sm font-medium"
+                    : "border-line bg-paper/60 text-ink-soft hover:border-line/80 hover:bg-paper hover:text-ink"
                 }`}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <span
-                    className={`inline-flex h-8 w-8 items-center justify-center border transition-colors ${
-                      isSelected
-                        ? "border-pass bg-pass-fill/15 text-pass"
-                        : "border-line bg-paper text-muted group-hover:text-ink"
-                    }`}
-                  >
-                    <AppIcon className="h-4 w-4" />
-                  </span>
-                  {isSelected ? (
-                    <span className="flex items-center gap-1 font-mono text-[0.6rem] text-pass font-medium uppercase tracking-wider">
-                      <span className="h-1.5 w-1.5 rounded-full bg-pass animate-pulse" />
-                      Active
-                    </span>
-                  ) : (
-                    <span className="font-mono text-[0.6rem] text-muted uppercase tracking-wider group-hover:text-ink">
-                      Inspect
-                    </span>
-                  )}
-                </div>
-
-                <div className="mt-2.5">
-                  <span className="block font-serif text-sm sm:text-base font-bold text-ink leading-tight">
-                    {app.name}
-                  </span>
-                  <span className="block font-mono text-[0.62rem] text-muted truncate mt-0.5">
-                    {app.domain}
-                  </span>
+                <Smartphone className={`h-4 w-4 ${isSelected ? "text-pass" : "text-muted"}`} />
+                <div>
+                  <span className="block text-xs font-serif font-bold text-ink">{app.name}</span>
+                  <span className="block font-mono text-[0.65rem] text-muted">{app.domain}</span>
                 </div>
               </button>
             );
@@ -243,73 +206,51 @@ export function InteractiveWorkPreview() {
           {/* Confidential Portals Tab */}
           <Link
             href="/work"
-            data-testid="app-tab-portals"
-            data-cursor="Inspect 8+ enterprise banking portals"
-            className="group relative flex flex-col justify-between border border-dashed border-line bg-paper/30 p-3 text-left hover:border-pass hover:bg-paper/70 transition-all duration-200"
+            className="flex shrink-0 items-center gap-2.5 border border-dashed border-line bg-paper/30 px-4 py-3 text-left hover:border-pass transition-colors text-muted hover:text-ink"
           >
-            <div className="flex items-start justify-between gap-2">
-              <span className="inline-flex h-8 w-8 items-center justify-center border border-dashed border-line bg-paper text-muted group-hover:text-pass group-hover:border-pass transition-colors">
-                <LockKeyhole className="h-4 w-4" />
-              </span>
-              <ArrowUpRight className="h-3.5 w-3.5 text-muted group-hover:text-pass transition-colors" />
-            </div>
-            <div className="mt-2.5">
-              <span className="block font-serif text-sm sm:text-base font-bold text-ink leading-tight">
-                8+ Portals
-              </span>
-              <span className="block font-mono text-[0.62rem] text-muted truncate mt-0.5">
-                LOS, LMS &amp; APIs
-              </span>
+            <LockKeyhole className="h-4 w-4 text-pass" />
+            <div>
+              <span className="block text-xs font-serif font-bold text-ink">8+ Enterprise Portals</span>
+              <span className="block font-mono text-[0.65rem] text-muted">LOS, LMS &amp; Banking APIs</span>
             </div>
           </Link>
         </div>
 
         {/* Active App Interactive Inspector Panel */}
-        <div key={selectedApp.id} className="mt-3 border border-line bg-paper shadow-xs content-fade">
+        <div key={selectedApp.id} className="mt-4 border border-line bg-paper shadow-sm content-fade">
           {/* Top Info Banner */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line bg-paper-deep p-3.5 sm:px-4">
-            <div className="flex items-center gap-3">
-              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center border border-pass/30 bg-pass-fill/15 text-pass">
-                <SelectedAppIcon className="h-4 w-4" />
-              </span>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-serif text-lg sm:text-xl text-ink font-bold">{selectedApp.name}</h3>
-                  <span className="font-mono text-[0.62rem] tracking-wider uppercase border border-pass/30 bg-pass-fill/10 text-pass px-1.5 py-0.5">
-                    {selectedApp.domain}
-                  </span>
-                </div>
-                <p className="text-[0.72rem] text-ink-soft mt-0.5">{selectedApp.tagline}</p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-line bg-paper-deep p-5 sm:px-6">
+            <div>
+              <div className="flex items-center gap-3">
+                <h3 className="font-serif text-2xl text-ink font-semibold">{selectedApp.name}</h3>
+                <span className="font-mono text-[0.68rem] tracking-wider uppercase border border-pass/30 bg-pass-fill/10 text-pass px-2 py-0.5">
+                  {selectedApp.domain}
+                </span>
               </div>
+              <p className="mt-1 text-sm text-ink-soft">{selectedApp.tagline}</p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-1.5 font-mono text-[0.68rem]">
+            <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
               {selectedApp.platforms.map((p) => (
-                <span key={p} className="border border-line bg-paper px-2 py-0.5 text-muted">
+                <span key={p} className="border border-line bg-paper px-2.5 py-1 text-muted">
                   {p}
                 </span>
               ))}
-              <span className="inline-flex items-center gap-1.5 border border-pass/40 bg-pass-fill/10 px-2 py-0.5 text-pass font-medium">
-                <span className="h-1.5 w-1.5 rounded-full bg-pass animate-pulse" />
+              <span className="border border-pass/40 bg-card px-2.5 py-1 text-pass font-medium">
                 {selectedApp.stats}
               </span>
             </div>
           </div>
 
           {/* Body: Journey Selector & Live Inspection View */}
-          <div className="grid lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-line">
+          <div className="grid lg:grid-cols-[1.1fr_1.1fr] divide-y lg:divide-y-0 lg:divide-x divide-line">
             {/* Left: Test Journeys List */}
-            <div className="p-3.5 sm:p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[0.65rem] tracking-[0.14em] text-muted uppercase block">
-                  Critical Test Paths (Select to Inspect)
-                </span>
-                <span className="font-mono text-[0.6rem] text-pass uppercase">
-                  {selectedApp.journeys.length} Scenarios
-                </span>
-              </div>
+            <div className="p-5 sm:p-6 space-y-4">
+              <span className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase block">
+                Select a Test Journey to Inspect Coverage
+              </span>
 
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {selectedApp.journeys.map((j, idx) => {
                   const isCurrent = idx === activeJourneyIndex;
                   return (
@@ -317,33 +258,29 @@ export function InteractiveWorkPreview() {
                       key={j.title}
                       type="button"
                       onClick={() => setActiveJourneyIndex(idx)}
-                      className={`w-full text-left p-2.5 sm:p-3 border transition-all flex items-start justify-between gap-2.5 ${
+                      className={`w-full text-left p-3.5 border transition-all flex items-start justify-between gap-3 ${
                         isCurrent
-                          ? "border-pass bg-card shadow-xs ring-1 ring-pass/40"
-                          : "border-line bg-paper hover:bg-card/60"
+                          ? "border-pass bg-card shadow-sm ring-1 ring-pass/30"
+                          : "border-line bg-paper hover:bg-card/70"
                       }`}
                     >
-                      <div className="min-w-0 flex-1">
+                      <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <span
-                            className={`font-mono text-[0.68rem] font-bold ${
+                          <CheckCircle2
+                            className={`h-4 w-4 shrink-0 ${
                               isCurrent ? "text-pass" : "text-muted"
                             }`}
-                          >
-                            0{idx + 1}.
-                          </span>
-                          <p className="font-sans text-xs font-semibold text-ink leading-tight truncate">
-                            {j.title}
-                          </p>
+                          />
+                          <p className="font-sans text-xs font-semibold text-ink">{j.title}</p>
                         </div>
-                        <p className="mt-1 text-[0.72rem] text-ink-soft line-clamp-1">{j.tactic}</p>
+                        <p className="mt-1.5 text-xs text-ink-soft line-clamp-1">{j.tactic}</p>
                       </div>
 
                       <div className="text-right shrink-0">
-                        <span className="font-mono text-[0.65rem] text-pass block font-semibold">
+                        <span className="font-mono text-[0.68rem] text-pass block font-medium">
                           {j.passStatus}
                         </span>
-                        <span className="font-mono text-[0.6rem] text-muted block mt-0.5">
+                        <span className="font-mono text-[0.62rem] text-muted block mt-0.5">
                           {j.tool}
                         </span>
                       </div>
@@ -353,14 +290,14 @@ export function InteractiveWorkPreview() {
               </div>
 
               {/* Edge Case Callout */}
-              <div className="mt-2.5 border border-pass/30 bg-card p-2.5">
+              <div className="mt-4 border border-line bg-paper-deep p-3.5">
                 <div className="flex items-start gap-2">
-                  <ShieldCheck className="h-4 w-4 text-pass shrink-0 mt-0.5" />
+                  <Shield className="h-4 w-4 text-pass shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-mono text-[0.62rem] uppercase tracking-wider text-pass font-semibold block">
-                      Critical Production Defect Prevented:
+                    <span className="font-mono text-[0.65rem] uppercase tracking-wider text-pass font-semibold block">
+                      Critical Edge Case Prevented:
                     </span>
-                    <p className="mt-0.5 text-xs text-ink leading-relaxed font-sans">
+                    <p className="mt-1 text-xs text-ink-soft leading-relaxed">
                       {selectedApp.edgeCaseFound}
                     </p>
                   </div>
@@ -369,48 +306,45 @@ export function InteractiveWorkPreview() {
             </div>
 
             {/* Right: Deep Dive into Active Journey */}
-            <div className="p-3.5 sm:p-4 flex flex-col justify-between bg-card/30">
+            <div className="p-5 sm:p-6 flex flex-col justify-between bg-card/40">
               <div>
-                <div className="flex items-center justify-between border-b border-line pb-2.5 mb-3">
-                  <span className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-pass font-medium flex items-center gap-1.5">
-                    <Terminal className="h-3 w-3" />
-                    Validation Protocol Console
+                <div className="flex items-center justify-between border-b border-line pb-3 mb-4">
+                  <span className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-pass font-medium">
+                    Journey Details &amp; Validation Protocol
                   </span>
-                  <span className="font-mono text-[0.62rem] text-muted">
+                  <span className="font-mono text-[0.68rem] text-muted">
                     Engineered by Deepak Gupta
                   </span>
                 </div>
 
-                <h4 className="font-serif text-base sm:text-lg text-ink font-bold">{activeJourney.title}</h4>
+                <h4 className="font-serif text-xl text-ink font-semibold">{activeJourney.title}</h4>
 
-                <div className="mt-3 space-y-2.5">
-                  <div className="border border-line bg-paper p-2.5">
-                    <span className="font-mono text-[0.6rem] uppercase tracking-wider text-muted block">
-                      Testing Strategy &amp; Assertions:
+                <div className="mt-4 space-y-3">
+                  <div className="border border-line bg-paper p-3">
+                    <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block">
+                      Testing Strategy &amp; Execution:
                     </span>
                     <p className="mt-1 text-xs leading-relaxed text-ink font-sans">
                       {activeJourney.tactic}
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="border border-line bg-paper p-2.5">
-                      <span className="font-mono text-[0.6rem] uppercase tracking-wider text-muted block">
-                        Primary Toolkit:
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="border border-line bg-paper p-3">
+                      <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block">
+                        Primary Tools:
                       </span>
-                      <p className="mt-1 font-mono text-xs text-pass font-semibold flex items-center gap-1">
-                        <Zap className="h-3 w-3 shrink-0" />
-                        <span>{activeJourney.tool}</span>
+                      <p className="mt-1 font-mono text-xs text-pass font-semibold">
+                        {activeJourney.tool}
                       </p>
                     </div>
 
-                    <div className="border border-line bg-paper p-2.5">
-                      <span className="font-mono text-[0.6rem] uppercase tracking-wider text-muted block">
+                    <div className="border border-line bg-paper p-3">
+                      <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block">
                         Verified Outcome:
                       </span>
-                      <p className="mt-1 font-mono text-xs text-ink font-semibold flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3 text-pass shrink-0" />
-                        <span>{activeJourney.passStatus}</span>
+                      <p className="mt-1 font-mono text-xs text-ink font-semibold">
+                        {activeJourney.passStatus}
                       </p>
                     </div>
                   </div>
@@ -418,15 +352,15 @@ export function InteractiveWorkPreview() {
               </div>
 
               {/* Redirect CTA Banner */}
-              <div className="mt-4 pt-2.5 border-t border-line/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                <span className="font-mono text-[0.68rem] text-muted">
-                  Want to inspect all 7 consumer apps &amp; 8+ enterprise portals?
+              <div className="mt-6 pt-4 border-t border-line/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <span className="font-mono text-[0.7rem] text-muted">
+                  Want to inspect all 7 apps &amp; 8+ enterprise portals?
                 </span>
                 <Link
                   href="/work"
                   data-testid="work-redirect-cta"
                   data-cursor="Inspect all projects"
-                  className="press inline-flex items-center gap-1.5 border border-pass bg-card px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0 shadow-xs"
+                  className="press inline-flex items-center gap-1.5 border border-pass bg-card px-4 py-2 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
                 >
                   <span>Explore full 15+ apps</span>
                   <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />

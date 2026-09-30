@@ -1,4 +1,5 @@
-import { Check, Compass, ListChecks, type LucideIcon, MousePointerClick } from "lucide-react";
+import { ArrowRight, Check, Compass, ListChecks, type LucideIcon, MousePointerClick } from "lucide-react";
+import Link from "next/link";
 import { PracticeIcon } from "@/components/home/practice-icon";
 import { ToolLogo } from "@/components/home/tool-logo";
 import { type TestingTypeIcon, type ToolLogo as ToolLogoName, services } from "@/data";
@@ -66,22 +67,34 @@ function KeywordBand() {
   );
 }
 
-export function ServicesSection() {
+export interface ServicesSectionProps {
+  showToolkit?: boolean;
+  showHeader?: boolean;
+  id?: string;
+}
+
+export function ServicesSection({
+  showToolkit = false,
+  showHeader = true,
+  id = "practice",
+}: ServicesSectionProps) {
   return (
-    <section id="practice" className="scroll-mt-20 border-t border-line bg-paper-deep">
-      <div className="mx-auto max-w-6xl px-4 pt-16 pb-10 sm:px-6 sm:pt-20 lg:pt-28 lg:pb-12">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end lg:gap-12">
-          <div>
-            <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-              <span className="text-pass">01</span> / Testing services
-            </p>
-            <h2 className="mt-3 max-w-2xl font-serif text-4xl tracking-tight text-balance sm:text-5xl">
-              How a release earns the right to ship.
-            </h2>
+    <section id={id} className="scroll-mt-20 border-t border-line bg-paper-deep">
+      {showHeader && (
+        <div className="mx-auto max-w-6xl px-4 pt-16 pb-10 sm:px-6 sm:pt-20 lg:pt-28 lg:pb-12">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end lg:gap-12">
+            <div>
+              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
+                <span className="text-pass">01</span> / Testing services
+              </p>
+              <h2 className="mt-3 max-w-2xl font-serif text-4xl tracking-tight text-balance sm:text-5xl">
+                How a release earns the right to ship.
+              </h2>
+            </div>
+            <p className="leading-relaxed text-ink-soft">{services.lede}</p>
           </div>
-          <p className="leading-relaxed text-ink-soft">{services.lede}</p>
         </div>
-      </div>
+      )}
 
       <KeywordBand />
 
@@ -137,26 +150,28 @@ export function ServicesSection() {
           ))}
         </div>
 
-        <div className="mt-14">
-          <Label aside="Industry-standard tools, used on live fintech releases.">The toolkit behind it</Label>
-          <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            {services.tools.map((tool) => (
-              <li
-                key={tool.name}
-                className="tool-card flex items-start gap-4 border border-line bg-paper p-4 sm:p-5 sm:max-lg:last:col-span-2 lg:flex-col lg:gap-0"
-              >
-                <LogoTile name={tool.logo} />
-                <div className="min-w-0">
-                  <p className="font-mono text-[0.64rem] tracking-[0.14em] text-pass uppercase lg:mt-5">{tool.category}</p>
-                  <h4 className="mt-1 font-serif text-xl tracking-tight sm:text-2xl lg:mt-1.5">{tool.name}</h4>
-                  <p className="mt-1.5 text-sm leading-relaxed text-ink-soft lg:mt-2">{tool.use}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {showToolkit && (
+          <div className="mt-14">
+            <Label aside="Industry-standard tools, used on live fintech releases.">The toolkit behind it</Label>
+            <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              {services.tools.map((tool) => (
+                <li
+                  key={tool.name}
+                  className="tool-card flex items-start gap-4 border border-line bg-paper p-4 sm:p-5 sm:max-lg:last:col-span-2 lg:flex-col lg:gap-0"
+                >
+                  <LogoTile name={tool.logo} />
+                  <div className="min-w-0">
+                    <p className="font-mono text-[0.64rem] tracking-[0.14em] text-pass uppercase lg:mt-5">{tool.category}</p>
+                    <h4 className="mt-1 font-serif text-xl tracking-tight sm:text-2xl lg:mt-1.5">{tool.name}</h4>
+                    <p className="mt-1.5 text-sm leading-relaxed text-ink-soft lg:mt-2">{tool.use}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
-        <ul className="mt-3 grid gap-3 md:grid-cols-2">
+        <ul className={`${showToolkit ? "mt-3" : "mt-8"} grid gap-3 md:grid-cols-2`}>
           {services.support.map((item) => (
             <li key={item.key} className="tool-card flex flex-col border border-line bg-paper p-5 sm:p-6">
               <div className="flex items-center gap-4">
@@ -186,6 +201,23 @@ export function ServicesSection() {
             </li>
           ))}
         </ul>
+
+        {!showToolkit && (
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border border-line bg-card p-5 sm:p-6">
+            <div>
+              <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">Full QA Deliverables &amp; Tool Stack</p>
+              <p className="mt-1 text-sm text-ink-soft">Explore the complete testing toolkit, methodology phases, and quality guarantees.</p>
+            </div>
+            <Link
+              href="/services"
+              className="press inline-flex shrink-0 items-center gap-2 border border-pass bg-paper px-4 py-2.5 font-mono text-xs tracking-wider uppercase text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
+              data-cursor="Dedicated services page"
+            >
+              <span>View full services &amp; toolkit</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

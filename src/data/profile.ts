@@ -63,7 +63,7 @@ export const headlines = [
 
 export const nav = [
   { href: "/about", label: "About Me", hint: "Meet the tester" },
-  { href: "/#practice", label: "What I do", hint: "How a release gets cleared" },
+  { href: "/services", label: "Services", hint: "Testing services & methodology" },
   { href: "/skills", label: "Skills", hint: "Full toolkit & ATS keywords" },
   { href: "/rca", label: "RCA", hint: "Defect investigation & race condition" },
   {

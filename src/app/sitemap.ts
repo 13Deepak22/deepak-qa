@@ -21,6 +21,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     },
     {
+      url: `${base}/services`,
+      lastModified: updated,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
       url: `${base}/rca`,
       lastModified: updated,
       changeFrequency: "monthly",

@@ -64,15 +64,15 @@ export const headlines = [
 export const nav = [
   { href: "/about", label: "About Me", hint: "Meet the tester" },
   { href: "/services", label: "Services", hint: "Testing services & methodology" },
-  { href: "/skills", label: "Skills", hint: "Full toolkit & ATS keywords" },
-  { href: "/rca", label: "RCA", hint: "Defect investigation & race condition" },
   {
-    href: "/#experience",
+    href: "/experience",
     label: "Experience",
     get hint() {
       return `Two teams, ${experienceLabel()} years`;
     },
   },
-  { href: "/#work", label: "Work", hint: "15+ apps & portals" },
+  { href: "/work", label: "Work", hint: "15+ apps & portals" },
+  { href: "/skills", label: "Skills", hint: "Full toolkit & ATS keywords" },
+  { href: "/rca", label: "RCA", hint: "Defect investigation & race condition" },
   { href: "/resume", label: "Resume", hint: "Plain resume, ATS-ready" },
 ];

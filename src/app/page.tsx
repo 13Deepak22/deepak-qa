@@ -10,14 +10,18 @@ import {
 import Link from "next/link";
 import { HeadlineCycle } from "@/components/home/headline-cycle";
 import { ImpactMetrics } from "@/components/home/impact-metrics";
+import { InteractiveExperiencePreview } from "@/components/home/interactive-experience-preview";
+import { InteractiveQASandbox } from "@/components/home/interactive-qa-sandbox";
+import { InteractiveWorkPreview } from "@/components/home/interactive-work-preview";
+import { ScopeEstimator } from "@/components/home/scope-estimator";
 import { ServicesSection } from "@/components/home/services";
+import { SkillsSection } from "@/components/home/skills-section";
 import { TestRun } from "@/components/home/test-run";
-import { experience, profile, publicApps } from "@/data";
+import { profile } from "@/data";
 import { experienceLabel } from "@/lib/career";
 
 export default function HomePage() {
   const years = experienceLabel();
-  const featuredApps = publicApps.slice(0, 3); // PaulPay, Mayaa Money, PML Forex Live
 
   return (
     <main id="content" tabIndex={-1} className="outline-none">
@@ -47,11 +51,11 @@ export default function HomePage() {
               Testing services
             </Link>
             <Link
-              href="/rca"
+              href="/experience"
               className="press border border-line bg-paper px-5 py-3 text-center text-sm text-ink hover:border-pass hover:text-pass min-[420px]:text-left"
-              data-cursor="Case study & RCA"
+              data-cursor={`${years} years experience`}
             >
-              RCA case study
+              Experience timeline
             </Link>
             <Link
               href="/#contact"
@@ -70,270 +74,47 @@ export default function HomePage() {
       {/* Metrics Bar: 15+ Products Tested, 100+ Automated Checks */}
       <ImpactMetrics />
 
-      {/* 01 / Testing Services (Core services on homepage, full toolkit on /services) */}
+      {/* 01 / Interactive QA Test Workbench (Real-time assertion runner & defect simulator) */}
+      <InteractiveQASandbox />
+
+      {/* 02 / Testing Services (Core services on homepage, full toolkit on /services) */}
       <ServicesSection />
 
-      {/* 02 / Experience (Glimpse + Redirect Button to /experience) */}
-      <section id="experience" className="scroll-mt-20 border-t border-line bg-card">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <div>
-              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-                <span className="text-pass">02</span> / Professional Experience
-              </p>
-              <h2 className="mt-3 font-serif text-4xl tracking-tight text-balance sm:text-5xl text-ink">
-                Where I have worked.
-              </h2>
-            </div>
-            <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
-              {years} years across two fintech teams. Guarding payment gateways, loan engines, and high-frequency release cycles.
-            </p>
-          </div>
+      {/* 03 / Interactive Work Showcase (Clickable app explorer with test journeys) */}
+      <InteractiveWorkPreview />
 
-          <div className="mt-10 grid gap-5 md:grid-cols-2">
-            {experience.map((role) => {
-              const isCurrent = role.period.includes("Present");
-              return (
-                <div
-                  key={role.org}
-                  className="flex flex-col border border-line bg-paper p-6 sm:p-7 hover:border-pass transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center border border-line bg-card text-pass">
-                        <Building2 className="h-5 w-5" />
-                      </span>
-                      <div>
-                        <h3 className="font-serif text-2xl tracking-tight text-ink">{role.org}</h3>
-                        <p className="font-mono text-xs text-pass tracking-wider uppercase mt-0.5">{role.title}</p>
-                      </div>
-                    </div>
-                    {isCurrent && (
-                      <span className="border border-pass/30 bg-pass-fill/10 text-pass px-2 py-0.5 font-mono text-[0.65rem] uppercase tracking-wider">
-                        Current
-                      </span>
-                    )}
-                  </div>
+      {/* 04 / Interactive Experience Spotlight (Role switcher with impact filters) */}
+      <InteractiveExperiencePreview />
 
-                  <p className="mt-4 text-xs font-mono text-muted flex items-center gap-1.5">
-                    <Calendar className="h-3.5 w-3.5" />
-                    <span>{role.period}</span>
-                  </p>
-
-                  <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-                    {role.points[0]}
-                  </p>
-
-                  <div className="mt-auto pt-6 border-t border-line/60 flex items-center justify-between">
-                    <span className="font-mono text-[0.7rem] text-muted">
-                      {role.points.length} verified impact areas
-                    </span>
-                    <Link
-                      href="/experience"
-                      className="font-mono text-xs uppercase tracking-wider text-pass flex items-center gap-1 hover:underline"
-                    >
-                      <span>Role details</span>
-                      <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Experience Redirect Banner */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border border-line bg-paper p-5 sm:p-6">
-            <div>
-              <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">Full Career Timeline &amp; History</p>
-              <p className="mt-1 text-sm text-ink-soft">Inspect the interactive timeline rail, day-to-day release duties, and team accomplishments.</p>
-            </div>
-            <Link
-              href="/experience"
-              className="press inline-flex shrink-0 items-center gap-2 border border-pass bg-card px-4 py-2.5 font-mono text-xs tracking-wider uppercase text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
-              data-cursor="Career timeline"
-            >
-              <span>View complete experience →</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 03 / Selected Work (Glimpse + Redirect Button to /work) */}
-      <section id="work" className="scroll-mt-20 border-t border-line bg-paper-deep">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <div>
-              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-                <span className="text-pass">03</span> / Selected Work
-              </p>
-              <h2 className="mt-3 font-serif text-4xl tracking-tight text-balance sm:text-5xl text-ink">
-                15+ Products &amp; systems tested.
-              </h2>
-            </div>
-            <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
-              7 consumer applications across UPI, prepaid cards, and lending + 8 confidential enterprise systems.
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {featuredApps.map((app) => (
-              <div
-                key={app.title}
-                className="flex flex-col border border-line bg-paper p-5 sm:p-6 hover:border-pass transition-colors"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="inline-flex h-10 w-10 items-center justify-center border border-line bg-card text-pass">
-                    <Smartphone className="h-5 w-5" />
-                  </span>
-                  <span className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase">
-                    App {app.index}
-                  </span>
-                </div>
-                <h3 className="mt-4 font-serif text-xl tracking-tight text-ink">{app.title}</h3>
-                <p className="mt-1 font-mono text-[0.68rem] text-pass uppercase tracking-wider">{app.domain}</p>
-                <p className="mt-3 text-xs leading-relaxed text-ink-soft">{app.detail}</p>
-                <div className="mt-auto pt-5 border-t border-line/60 flex items-center justify-between text-xs">
-                  <span className="font-mono text-[0.7rem] text-muted">{app.platforms.join(", ")}</span>
-                  <Link
-                    href="/work"
-                    className="font-mono text-xs uppercase tracking-wider text-pass flex items-center gap-1 hover:underline"
-                  >
-                    <span>Inspect</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </Link>
-                </div>
-              </div>
-            ))}
-
-            {/* Confidential Portals Preview Card */}
-            <div className="flex flex-col border border-line bg-card p-5 sm:p-6">
-              <div className="flex items-center justify-between">
-                <span className="inline-flex h-10 w-10 items-center justify-center border border-line bg-paper text-pass">
-                  <LockKeyhole className="h-5 w-5" />
-                </span>
-                <span className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">
-                  Under NDA
-                </span>
-              </div>
-              <h3 className="mt-4 font-serif text-xl tracking-tight text-ink">8+ Enterprise Portals</h3>
-              <p className="mt-1 font-mono text-[0.68rem] text-muted uppercase tracking-wider">Internal Systems</p>
-              <p className="mt-3 text-xs leading-relaxed text-ink-soft">
-                Loan Origination (LOS), Loan Management (LMS), Merchant Settlement Portals, and Partner Banking APIs.
-              </p>
-              <div className="mt-auto pt-5 border-t border-line/60">
-                <Link
-                  href="/work"
-                  className="font-mono text-xs uppercase tracking-wider text-pass flex items-center gap-1 hover:underline"
-                >
-                  <span>View portal scope</span>
-                  <ArrowRight className="h-3 w-3" />
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Work Redirect Banner */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border border-line bg-paper p-5 sm:p-6">
-            <div>
-              <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">Complete Applications Directory</p>
-              <p className="mt-1 text-sm text-ink-soft">Inspect all 7 public consumer applications, test coverage journeys, and back-office banking portals.</p>
-            </div>
-            <Link
-              href="/work"
-              className="press inline-flex shrink-0 items-center gap-2 border border-pass bg-card px-4 py-2.5 font-mono text-xs tracking-wider uppercase text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
-              data-cursor="All 15+ apps"
-            >
-              <span>View all 15+ apps &amp; portals →</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 04 / Defect Investigation & RCA (Glimpse + Redirect Button to /rca) */}
-      <section className="scroll-mt-20 border-t border-line bg-card">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <div>
-              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-                <span className="text-pass">04</span> / Defect Investigation &amp; RCA
-              </p>
-              <h2 className="mt-3 font-serif text-4xl tracking-tight text-balance sm:text-5xl text-ink">
-                Defect RCA: Double-debit race condition.
-              </h2>
-            </div>
-            <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
-              Live case study from CredMe LMS: Isolating intermittent double repayments triggered under 3G network latency jitter.
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-5 lg:grid-cols-3">
-            <div className="border border-line bg-paper p-6">
-              <span className="font-mono text-[0.65rem] tracking-[0.16em] text-pass uppercase">01 · Root Cause</span>
-              <h3 className="mt-2 font-serif text-xl text-ink">Missing Idempotency Key</h3>
-              <p className="mt-2 text-xs leading-relaxed text-ink-soft">
-                The mobile client generated a fresh transaction ID upon payment retry instead of persisting the idempotency token across network reconnects.
-              </p>
-            </div>
-            <div className="border border-line bg-paper p-6">
-              <span className="font-mono text-[0.65rem] tracking-[0.16em] text-pass uppercase">02 · Verification</span>
-              <h3 className="mt-2 font-serif text-xl text-ink">Charles Proxy Throttling</h3>
-              <p className="mt-2 text-xs leading-relaxed text-ink-soft">
-                Injected 1,800ms latency jitter with a 15% packet drop profile. Successfully reproduced the duplicate debit on build v2.4.1.
-              </p>
-            </div>
-            <div className="border border-line bg-paper p-6">
-              <span className="font-mono text-[0.65rem] tracking-[0.16em] text-pass uppercase">03 · Solution &amp; Fix</span>
-              <h3 className="mt-2 font-serif text-xl text-ink">Redis Lock &amp; Client Token</h3>
-              <p className="mt-2 text-xs leading-relaxed text-ink-soft">
-                Engineered a client-side idempotency cache and a 120-second distributed Redis lock on the backend payment settlement route.
-              </p>
-            </div>
-          </div>
-
-          {/* RCA Redirect Banner */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border border-line bg-paper p-5 sm:p-6">
-            <div>
-              <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">Interactive Defect Investigation</p>
-              <p className="mt-1 text-sm text-ink-soft">Run the interactive test simulator across all 4 defect phases and view real-time log outputs.</p>
-            </div>
-            <Link
-              href="/rca"
-              className="press inline-flex shrink-0 items-center gap-2 border border-pass bg-card px-4 py-2.5 font-mono text-xs tracking-wider uppercase text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
-              data-cursor="Open RCA case study"
-            >
-              <span>Explore RCA case study →</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 05 / Technical Skills Directory (Glimpse + Redirect Button to /skills) */}
+      {/* 05 / Interactive Skills Directory (Live search & category filters) */}
       <section className="scroll-mt-20 border-t border-line bg-paper">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 border border-line bg-card p-6 sm:p-8">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end mb-10">
             <div>
-              <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">
-                Complete Technical Toolkit
+              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
+                <span className="text-pass">Technical Directory</span> / Core Competencies
               </p>
-              <h3 className="mt-1 font-serif text-2xl sm:text-3xl text-ink">
+              <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink">
                 97+ Verified testing skills &amp; ATS keywords.
-              </h3>
-              <p className="mt-1 text-sm text-ink-soft max-w-xl">
-                Browse categorized testing competencies across Web Automation (Playwright, Selenium), Mobile (Appium), API (Postman), Performance (JMeter), and Fintech Gateways.
-              </p>
+              </h2>
             </div>
             <Link
               href="/skills"
-              className="press inline-flex shrink-0 items-center gap-2 border border-pass bg-paper px-5 py-3 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
-              data-cursor="97+ skills & ATS keywords"
+              className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
+              data-cursor="Complete skills page"
             >
-              <span>Explore full skills directory →</span>
+              <span>View full skills page &rarr;</span>
             </Link>
           </div>
+
+          <SkillsSection />
         </div>
       </section>
 
-      {/* 06 / About Deepak & ATS Resume (Glimpse + Redirect Buttons) */}
+      {/* 06 / Interactive Quality Planner & Scope Estimator */}
+      <ScopeEstimator />
+
+      {/* 07 / About Deepak & ATS Resume */}
       <section className="scroll-mt-20 border-t border-line bg-paper-deep">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <div className="grid gap-6 md:grid-cols-2">
@@ -349,7 +130,7 @@ export default function HomePage() {
                 </div>
               </div>
               <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-                Learn about Deepak&apos;s testing philosophy, day-to-day release standards, and how he approaches manual exploration vs. automated regression.
+                Learn about Deepak&apos;s testing philosophy, day-to-day release standards, and how he balances manual exploratory discovery with automated regression suites.
               </p>
               <div className="mt-auto pt-6">
                 <Link
@@ -357,7 +138,7 @@ export default function HomePage() {
                   className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2 text-xs font-mono uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
                   data-cursor="Read Deepak's story"
                 >
-                  <span>Read full bio →</span>
+                  <span>Read full bio &rarr;</span>
                 </Link>
               </div>
             </div>
@@ -382,7 +163,7 @@ export default function HomePage() {
                   className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2 text-xs font-mono uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
                   data-cursor="Download resume"
                 >
-                  <span>View &amp; download resume →</span>
+                  <span>View &amp; download resume &rarr;</span>
                 </Link>
               </div>
             </div>

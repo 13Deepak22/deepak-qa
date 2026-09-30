@@ -88,24 +88,24 @@ export function InteractiveServices() {
 
   return (
     <section id="services" className="scroll-mt-20 border-t border-line bg-paper-deep">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
         {/* Section Header */}
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div>
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Testing Services</span> / Core Capabilities
             </p>
-            <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
+            <h2 className="mt-2 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
               How releases earn the right to ship.
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
+          <p className="max-w-md text-xs sm:text-sm leading-relaxed text-ink-soft sm:text-right">
             Four core testing disciplines engineered for zero defect escapes. Select a capability to inspect key methods.
           </p>
         </div>
 
         {/* 4 Minimal Tabs */}
-        <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-2.5">
           {SERVICES_DATA.map((s) => {
             const isSelected = s.id === service.id;
             const TabIcon = s.icon;

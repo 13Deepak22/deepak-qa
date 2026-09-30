@@ -103,21 +103,6 @@ export default function HomePage() {
       {/* 06 / Meet the Tester & ATS Resume Downloads */}
       <section className="scroll-mt-20 border-t border-line bg-paper-deep">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
-          {/* Section Header */}
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end mb-10">
-            <div>
-              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-                <span className="text-pass">Profile &amp; Credentials</span> / About &amp; Verification
-              </p>
-              <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
-                Meet the Tester &amp; Access Credentials.
-              </h2>
-            </div>
-            <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
-              Explore Deepak&apos;s testing philosophy, day-to-day release standards, and download ATS-compliant resumes.
-            </p>
-          </div>
-
           <div className="grid gap-6 md:grid-cols-2">
             {/* About Card */}
             <div className="flex flex-col border border-line bg-paper p-6 sm:p-8">

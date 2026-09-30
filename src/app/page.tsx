@@ -6,7 +6,6 @@ import {
 import Link from "next/link";
 import { HeadlineCycle } from "@/components/home/headline-cycle";
 import { ImpactMetrics } from "@/components/home/impact-metrics";
-import { InteractiveExperiencePreview } from "@/components/home/interactive-experience-preview";
 import { InteractiveQASandbox } from "@/components/home/interactive-qa-sandbox";
 import { InteractiveServices } from "@/components/home/interactive-services";
 import { InteractiveWorkPreview } from "@/components/home/interactive-work-preview";
@@ -98,13 +97,10 @@ export default function HomePage() {
       {/* 04 / Interactive Applications Showcase (Explore 15+ Products, Journeys & Edge Cases) */}
       <InteractiveWorkPreview />
 
-      {/* 05 / Interactive Career Spotlight (Role Switcher with Impact Dimensions) */}
-      <InteractiveExperiencePreview />
-
-      {/* 06 / Interactive Quality Planner & Scope Estimator */}
+      {/* 05 / Interactive Quality Planner & Scope Estimator */}
       <ScopeEstimator />
 
-      {/* 07 / Meet the Tester & ATS Resume Downloads */}
+      {/* 06 / Meet the Tester & ATS Resume Downloads */}
       <section className="scroll-mt-20 border-t border-line bg-paper-deep">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <div className="grid gap-6 md:grid-cols-2">

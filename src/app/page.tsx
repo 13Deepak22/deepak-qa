@@ -4,7 +4,6 @@ import { ExperienceLog } from "@/components/home/experience-log";
 import { HeadlineCycle } from "@/components/home/headline-cycle";
 import { ImpactMetrics } from "@/components/home/impact-metrics";
 import { PublicApps } from "@/components/home/public-apps";
-import { RcaCaseStudy } from "@/components/home/rca-case-study";
 import { ServicesSection } from "@/components/home/services";
 import { TestRun } from "@/components/home/test-run";
 import { profile, unpublishedWork } from "@/data";
@@ -31,7 +30,7 @@ export default function HomePage() {
               Selected work
             </Link>
             <Link
-              href="/#investigation"
+              href="/rca"
               className="press border border-line bg-paper px-5 py-3 text-center text-sm text-ink hover:border-pass hover:text-pass min-[420px]:text-left"
               data-cursor="Case study & RCA"
             >
@@ -57,14 +56,11 @@ export default function HomePage() {
       {/* 01 / Testing Services */}
       <ServicesSection />
 
-      {/* 02 / Defect Investigation & Root Cause Analysis (RCA) */}
-      <RcaCaseStudy />
-
-      {/* 03 / Experience */}
+      {/* 02 / Experience */}
       <section id="experience" className="scroll-mt-20 border-t border-line bg-card">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-            <span className="text-pass">03</span> / Experience
+            <span className="text-pass">02</span> / Experience
           </p>
           <h2 className="mt-3 max-w-2xl font-serif text-4xl tracking-tight text-balance sm:text-5xl">
             Where I have worked.
@@ -73,13 +69,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 04 / Projects (15+ Apps & Portals Tested) */}
+      {/* 03 / Projects (15+ Apps & Portals Tested) */}
       <section id="work" className="scroll-mt-20 border-t border-line">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-                <span className="text-pass">04</span> / Projects
+                <span className="text-pass">03</span> / Projects
               </p>
               <h2 className="mt-3 font-serif text-4xl tracking-tight text-balance sm:text-5xl">
                 Public apps.

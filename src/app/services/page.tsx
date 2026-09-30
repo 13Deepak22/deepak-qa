@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   Activity,
-  ArrowLeft,
   ArrowRight,
   CheckCircle2,
   FileSpreadsheet,
@@ -99,17 +98,9 @@ export default function ServicesPage() {
   return (
     <main id="content" tabIndex={-1} className="outline-none">
       <div className="mx-auto max-w-6xl px-4 pt-10 sm:px-6 sm:pt-14 lg:pt-16">
-        {/* Back navigation & Eyebrow */}
-        <div className="enter enter-1 flex flex-col gap-4">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 font-mono text-xs tracking-wider text-muted hover:text-pass uppercase transition-colors"
-          >
-            <ArrowLeft className="size-3.5" />
-            <span>Back to portfolio</span>
-          </Link>
-
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,22rem)] lg:items-end lg:gap-12 mt-2">
+        {/* Eyebrow & Header */}
+        <div className="enter enter-1">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,22rem)] lg:items-end lg:gap-12">
             <div>
               <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
                 <span className="text-pass">01</span> / Testing Services &amp; Quality Engineering

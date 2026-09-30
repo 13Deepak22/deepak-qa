@@ -3,7 +3,6 @@
 import { useState } from "react";
 import {
   ArrowRight,
-  ArrowUpRight,
   CheckCircle2,
   ChevronRight,
   ExternalLink,
@@ -184,8 +183,6 @@ export function InteractiveWorkPreview() {
               <button
                 key={app.id}
                 type="button"
-                data-testid={`work-tab-${app.id}`}
-                data-cursor={`Inspect ${app.name} (${app.domain}) verification scope & test journeys`}
                 onClick={() => {
                   setActiveAppId(app.id);
                   setActiveJourneyIndex(0);
@@ -208,16 +205,13 @@ export function InteractiveWorkPreview() {
           {/* Confidential Portals Tab */}
           <Link
             href="/work"
-            data-testid="work-tab-nda"
-            data-cursor="Inspect 8+ confidential banking & lending enterprise portals"
-            className="flex shrink-0 items-center gap-2.5 border border-pass/50 bg-pass-fill/10 px-4 py-3 text-left hover:bg-pass hover:text-paper text-pass transition-all duration-200"
+            className="flex shrink-0 items-center gap-2.5 border border-dashed border-line bg-paper/30 px-4 py-3 text-left hover:border-pass transition-colors text-muted hover:text-ink"
           >
-            <LockKeyhole className="h-4 w-4" />
+            <LockKeyhole className="h-4 w-4 text-pass" />
             <div>
-              <span className="block text-xs font-serif font-bold">8+ Enterprise Portals</span>
-              <span className="block font-mono text-[0.65rem] opacity-80">LOS, LMS &amp; Banking APIs</span>
+              <span className="block text-xs font-serif font-bold text-ink">8+ Enterprise Portals</span>
+              <span className="block font-mono text-[0.65rem] text-muted">LOS, LMS &amp; Banking APIs</span>
             </div>
-            <ArrowUpRight className="h-3.5 w-3.5 ml-1 opacity-80" />
           </Link>
         </div>
 
@@ -262,8 +256,6 @@ export function InteractiveWorkPreview() {
                     <button
                       key={j.title}
                       type="button"
-                      data-testid={`journey-item-${idx}`}
-                      data-cursor={`Inspect test strategy & execution for ${j.title}`}
                       onClick={() => setActiveJourneyIndex(idx)}
                       className={`w-full text-left p-3.5 border transition-all flex items-start justify-between gap-3 ${
                         isCurrent

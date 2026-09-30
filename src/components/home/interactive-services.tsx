@@ -158,34 +158,32 @@ export function InteractiveServices() {
 
   return (
     <section id="services" className="scroll-mt-20 border-t border-line bg-paper-deep">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
         {/* Section Header */}
-        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Testing Services</span> / Core Capabilities
             </p>
-            <h2 className="mt-2 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
+            <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink">
               How a release earns the right to ship.
             </h2>
           </div>
-          <p className="max-w-md text-xs sm:text-sm leading-relaxed text-ink-soft sm:text-right">
+          <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
             Click through Deepak&apos;s testing disciplines to inspect his real-world methodology, sample assertions, and deliverables.
           </p>
         </div>
 
         {/* Interactive Services Tab Bar */}
-        <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-3">
           {SERVICES_DATA.map((s) => {
             const isSelected = s.id === service.id;
             return (
               <button
                 key={s.id}
                 type="button"
-                data-testid={`service-tab-${s.id}`}
-                data-cursor={`Inspect ${s.name} testing strategy & sample assertions`}
                 onClick={() => setActiveServiceId(s.id)}
-                className={`p-3.5 sm:p-4 border text-left transition-all flex flex-col justify-between ${
+                className={`p-4 border text-left transition-all flex flex-col justify-between ${
                   isSelected
                     ? "border-pass bg-paper text-pass shadow-sm ring-1 ring-pass/40"
                     : "border-line bg-paper/60 text-ink-soft hover:bg-paper hover:text-ink"
@@ -195,12 +193,12 @@ export function InteractiveServices() {
                   <span className="block font-mono text-[0.62rem] uppercase tracking-wider text-muted mb-1">
                     {s.badge}
                   </span>
-                  <span className="block font-serif text-sm sm:text-base font-bold text-ink">
+                  <span className="block font-serif text-base sm:text-lg font-bold text-ink">
                     {s.name}
                   </span>
                 </div>
                 <span
-                  className={`mt-3 font-mono text-[0.68rem] uppercase tracking-wider ${
+                  className={`mt-4 font-mono text-[0.68rem] uppercase tracking-wider ${
                     isSelected ? "text-pass font-semibold" : "text-muted"
                   }`}
                 >
@@ -214,11 +212,11 @@ export function InteractiveServices() {
         {/* Selected Service Detail Panel */}
         <div className="mt-4 border border-line bg-paper shadow-sm">
           {/* Header */}
-          <div className="border-b border-line bg-paper-deep p-5 sm:px-7">
+          <div className="border-b border-line bg-paper-deep p-6 sm:px-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-3">
-                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-ink">
+                  <h3 className="font-serif text-2xl sm:text-3xl font-bold text-ink">
                     {service.name}
                   </h3>
                   <span className="border border-pass/40 bg-pass-fill/10 text-pass px-2 py-0.5 font-mono text-[0.68rem] uppercase tracking-wider">

@@ -1,4 +1,4 @@
-import { LockKeyhole } from "lucide-react";
+import { ArrowRight, LockKeyhole } from "lucide-react";
 import Link from "next/link";
 import { ExperienceLog } from "@/components/home/experience-log";
 import { HeadlineCycle } from "@/components/home/headline-cycle";
@@ -72,9 +72,20 @@ export default function HomePage() {
                 Skills, tools, and domains.
               </h2>
             </div>
-            <p className="leading-relaxed text-ink-soft">
-              {totalSkills} skills across testing, QA process, automation, and fintech, drawn from live releases. Filter by category or search in real-time.
-            </p>
+            <div className="flex flex-col gap-3">
+              <p className="leading-relaxed text-ink-soft">
+                {totalSkills} verified QA competencies across web, mobile, API, and lending infrastructure.
+              </p>
+              <div>
+                <Link
+                  href="/skills"
+                  className="press inline-flex items-center gap-1.5 font-mono text-xs text-pass hover:underline"
+                >
+                  <span>Open dedicated skills page ({totalSkills}+ skills)</span>
+                  <ArrowRight className="size-3" />
+                </Link>
+              </div>
+            </div>
           </div>
           <SkillsSection />
         </div>

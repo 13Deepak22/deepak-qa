@@ -14,6 +14,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
       images: [`${base}/portrait.png`],
     },
+    {
+      url: `${base}/skills`,
+      lastModified: updated,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
     { url: `${base}/resume`, lastModified: updated, changeFrequency: "monthly", priority: 0.9 },
   ];
 }

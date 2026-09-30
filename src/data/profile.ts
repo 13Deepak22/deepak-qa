@@ -62,6 +62,7 @@ export const headlines = [
 ];
 
 export const nav = [
+  { href: "/", label: "Home", hint: "Overview & live workbench" },
   { href: "/about", label: "About Me", hint: "Meet the tester" },
   { href: "/services", label: "Services", hint: "Testing services & methodology" },
   {
@@ -73,6 +74,5 @@ export const nav = [
   },
   { href: "/work", label: "Work", hint: "15+ apps & portals" },
   { href: "/skills", label: "Skills", hint: "Full toolkit & ATS keywords" },
-  { href: "/rca", label: "RCA", hint: "Defect investigation & race condition" },
   { href: "/resume", label: "Resume", hint: "Plain resume, ATS-ready" },
 ];

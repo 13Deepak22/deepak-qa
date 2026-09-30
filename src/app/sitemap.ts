@@ -38,12 +38,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.85,
     },
-    {
-      url: `${base}/rca`,
-      lastModified: updated,
-      changeFrequency: "monthly",
-      priority: 0.85,
-    },
     { url: `${base}/resume`, lastModified: updated, changeFrequency: "monthly", priority: 0.9 },
   ];
 }

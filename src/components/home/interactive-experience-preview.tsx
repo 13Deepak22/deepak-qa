@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   ArrowRight,
+  ArrowUpRight,
   Briefcase,
   Building2,
   Calendar,
@@ -235,10 +236,11 @@ export function InteractiveExperiencePreview() {
 
             <Link
               href="/experience"
-              className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
+              className="press inline-flex items-center gap-1.5 border border-pass bg-pass text-paper px-4 py-2 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass/90 transition-all duration-200 hover:-translate-y-0.5 shadow-xs shrink-0"
               data-cursor="Complete career history"
             >
-              <span>View complete experience &rarr;</span>
+              <span>View complete experience timeline</span>
+              <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

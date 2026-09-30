@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   ArrowRight,
+  ArrowUpRight,
   CheckCircle2,
   Code2,
   Compass,
@@ -158,24 +159,24 @@ export function InteractiveServices() {
 
   return (
     <section id="services" className="scroll-mt-20 border-t border-line bg-paper-deep">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         {/* Section Header */}
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div>
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Testing Services</span> / Core Capabilities
             </p>
-            <h2 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink">
+            <h2 className="mt-2 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
               How a release earns the right to ship.
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
+          <p className="max-w-md text-xs sm:text-sm leading-relaxed text-ink-soft sm:text-right">
             Click through Deepak&apos;s testing disciplines to inspect his real-world methodology, sample assertions, and deliverables.
           </p>
         </div>
 
         {/* Interactive Services Tab Bar */}
-        <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-3">
           {SERVICES_DATA.map((s) => {
             const isSelected = s.id === service.id;
             return (
@@ -183,7 +184,7 @@ export function InteractiveServices() {
                 key={s.id}
                 type="button"
                 onClick={() => setActiveServiceId(s.id)}
-                className={`p-4 border text-left transition-all flex flex-col justify-between ${
+                className={`p-3.5 sm:p-4 border text-left transition-all flex flex-col justify-between ${
                   isSelected
                     ? "border-pass bg-paper text-pass shadow-sm ring-1 ring-pass/40"
                     : "border-line bg-paper/60 text-ink-soft hover:bg-paper hover:text-ink"
@@ -193,12 +194,12 @@ export function InteractiveServices() {
                   <span className="block font-mono text-[0.62rem] uppercase tracking-wider text-muted mb-1">
                     {s.badge}
                   </span>
-                  <span className="block font-serif text-base sm:text-lg font-bold text-ink">
+                  <span className="block font-serif text-sm sm:text-base font-bold text-ink">
                     {s.name}
                   </span>
                 </div>
                 <span
-                  className={`mt-4 font-mono text-[0.68rem] uppercase tracking-wider ${
+                  className={`mt-3 font-mono text-[0.68rem] uppercase tracking-wider ${
                     isSelected ? "text-pass font-semibold" : "text-muted"
                   }`}
                 >
@@ -212,11 +213,11 @@ export function InteractiveServices() {
         {/* Selected Service Detail Panel */}
         <div className="mt-4 border border-line bg-paper shadow-sm">
           {/* Header */}
-          <div className="border-b border-line bg-paper-deep p-6 sm:px-8">
+          <div className="border-b border-line bg-paper-deep p-5 sm:px-7">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-3">
-                  <h3 className="font-serif text-2xl sm:text-3xl font-bold text-ink">
+                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-ink">
                     {service.name}
                   </h3>
                   <span className="border border-pass/40 bg-pass-fill/10 text-pass px-2 py-0.5 font-mono text-[0.68rem] uppercase tracking-wider">
@@ -302,15 +303,16 @@ export function InteractiveServices() {
                 </p>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-line/60 flex items-center justify-between text-xs">
+              <div className="mt-6 pt-4 border-t border-line/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <span className="font-mono text-[0.68rem] text-muted">
-                  Full service engagement models
+                  Full service engagement models &amp; RCA case study
                 </span>
                 <Link
                   href="/services"
-                  className="font-mono text-xs uppercase tracking-wider text-pass flex items-center gap-1 hover:underline"
+                  className="press inline-flex items-center gap-1.5 border border-pass bg-pass text-paper px-4 py-2 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass/90 transition-all duration-200 hover:-translate-y-0.5 shadow-xs"
                 >
-                  <span>Explore full services page &rarr;</span>
+                  <span>Explore full testing services</span>
+                  <ArrowUpRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>

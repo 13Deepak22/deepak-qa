@@ -94,17 +94,22 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-4 lg:flex xl:gap-7" aria-label="Primary">
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="nav-link text-sm text-ink-soft hover:text-pass"
-              data-cursor={item.hint}
-            >
-              {item.label}
-            </Link>
-          ))}
+        <nav className="hidden items-center gap-3 lg:flex xl:gap-6" aria-label="Primary">
+          {nav.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`nav-link text-sm transition-colors ${
+                  isActive ? "text-pass font-semibold" : "text-ink-soft hover:text-pass"
+                }`}
+                data-cursor={item.hint}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">

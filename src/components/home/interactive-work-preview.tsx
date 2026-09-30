@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   ArrowRight,
+  ArrowUpRight,
   CheckCircle2,
   ChevronRight,
   ExternalLink,
@@ -205,13 +206,14 @@ export function InteractiveWorkPreview() {
           {/* Confidential Portals Tab */}
           <Link
             href="/work"
-            className="flex shrink-0 items-center gap-2.5 border border-dashed border-line bg-paper/30 px-4 py-3 text-left hover:border-pass transition-colors text-muted hover:text-ink"
+            className="flex shrink-0 items-center gap-2.5 border border-pass/50 bg-pass-fill/10 px-4 py-3 text-left hover:bg-pass hover:text-paper text-pass transition-all duration-200"
           >
-            <LockKeyhole className="h-4 w-4 text-pass" />
+            <LockKeyhole className="h-4 w-4" />
             <div>
-              <span className="block text-xs font-serif font-bold text-ink">8+ Enterprise Portals</span>
-              <span className="block font-mono text-[0.65rem] text-muted">LOS, LMS &amp; Banking APIs</span>
+              <span className="block text-xs font-serif font-bold">8+ Enterprise Portals</span>
+              <span className="block font-mono text-[0.65rem] opacity-80">LOS, LMS &amp; Banking APIs</span>
             </div>
+            <ArrowUpRight className="h-3.5 w-3.5 ml-1 opacity-80" />
           </Link>
         </div>
 
@@ -353,13 +355,14 @@ export function InteractiveWorkPreview() {
               {/* Redirect CTA Banner */}
               <div className="mt-6 pt-4 border-t border-line/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <span className="font-mono text-[0.7rem] text-muted">
-                  Want to inspect all 7 apps &amp; 8+ enterprise portals?
+                  Inspect all 7 public consumer apps &amp; 8+ enterprise banking portals
                 </span>
                 <Link
                   href="/work"
-                  className="press inline-flex items-center gap-1.5 border border-pass bg-card px-4 py-2 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
+                  className="press inline-flex items-center gap-1.5 border border-pass bg-pass text-paper px-4 py-2 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass/90 transition-all duration-200 hover:-translate-y-0.5 shadow-xs shrink-0"
                 >
-                  <span>Explore full 15+ apps &rarr;</span>
+                  <span>Explore full 15+ apps &amp; portals</span>
+                  <ArrowUpRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>

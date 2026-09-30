@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   Smartphone,
 } from "lucide-react";
+import { RcaCaseStudy } from "@/components/home/rca-case-study";
 import { ServicesSection } from "@/components/home/services";
 import { services } from "@/data";
 import { siteTitleSuffix } from "@/lib/site";
@@ -272,6 +273,11 @@ export default function ServicesPage() {
         </div>
       </section>
 
+      {/* Defect Investigation & Root Cause Analysis (RCA Case Study) */}
+      <section id="rca" className="scroll-mt-20 border-t border-line">
+        <RcaCaseStudy />
+      </section>
+
       {/* Navigation CTA Bar */}
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24 border-t border-line">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-paper border border-line p-6 sm:p-8">
@@ -280,32 +286,32 @@ export default function ServicesPage() {
               Next in Portfolio
             </p>
             <h3 className="mt-1 font-serif text-2xl sm:text-3xl text-ink">
-              Ready to see the tools, code &amp; investigations?
+              Ready to see the tools, code &amp; experience?
             </h3>
             <p className="mt-1 text-sm text-ink-soft">
-              Explore the full technical skills list, read a live defect investigation, or reach out directly.
+              Explore the full technical skills list, career timeline, or reach out directly.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/skills"
-              className="press inline-flex items-center gap-2 border border-line bg-card px-4 py-2.5 text-xs font-mono uppercase tracking-wider text-ink hover:border-pass hover:text-pass transition-colors"
+              className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2.5 text-xs font-mono uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
               data-cursor="ATS keywords & stack"
             >
               <span>Skills &amp; Toolkit</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
             <Link
-              href="/rca"
-              className="press inline-flex items-center gap-2 border border-line bg-card px-4 py-2.5 text-xs font-mono uppercase tracking-wider text-ink hover:border-pass hover:text-pass transition-colors"
-              data-cursor="Race condition investigation"
+              href="/experience"
+              className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2.5 text-xs font-mono uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
+              data-cursor="Career timeline"
             >
-              <span>RCA Case Study</span>
+              <span>Experience</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
             <Link
               href="/#contact"
-              className="press inline-flex items-center gap-2 border border-pass bg-paper px-4 py-2.5 text-xs font-mono uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
+              className="press inline-flex items-center gap-2 border border-pass bg-pass text-paper px-4 py-2.5 text-xs font-mono uppercase tracking-wider hover:bg-pass/90 transition-colors"
               data-cursor="Start a conversation"
             >
               <span>Contact Deepak</span>

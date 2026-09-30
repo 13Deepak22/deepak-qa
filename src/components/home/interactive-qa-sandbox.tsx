@@ -5,6 +5,7 @@ import {
   Activity,
   AlertCircle,
   ArrowRight,
+  ArrowUpRight,
   CheckCircle2,
   Clock,
   Code2,
@@ -510,14 +511,14 @@ export function InteractiveQASandbox() {
               </div>
 
               {/* Bottom Quick Link */}
-              <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between text-xs">
+              <div className="mt-4 pt-3 border-t border-line/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <span className="font-mono text-[0.68rem] text-muted">Automated in Playwright &amp; Postman</span>
                 <Link
                   href="/services"
-                  className="font-mono text-xs uppercase tracking-wider text-pass flex items-center gap-1 hover:underline"
+                  className="press inline-flex items-center gap-1.5 border border-pass bg-pass text-paper px-3 py-1.5 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass/90 transition-all duration-200 hover:-translate-y-0.5 shadow-xs"
                 >
                   <span>Explore testing services</span>
-                  <ArrowRight className="h-3 w-3" />
+                  <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </div>

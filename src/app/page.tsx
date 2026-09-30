@@ -1,4 +1,4 @@
-import { ArrowRight, LockKeyhole } from "lucide-react";
+import { LockKeyhole } from "lucide-react";
 import Link from "next/link";
 import { ExperienceLog } from "@/components/home/experience-log";
 import { HeadlineCycle } from "@/components/home/headline-cycle";
@@ -6,13 +6,10 @@ import { ImpactMetrics } from "@/components/home/impact-metrics";
 import { PublicApps } from "@/components/home/public-apps";
 import { RcaCaseStudy } from "@/components/home/rca-case-study";
 import { ServicesSection } from "@/components/home/services";
-import { SkillsSection } from "@/components/home/skills-section";
 import { TestRun } from "@/components/home/test-run";
-import { profile, toolkit, unpublishedWork } from "@/data";
+import { profile, unpublishedWork } from "@/data";
 
 export default function HomePage() {
-  const totalSkills = toolkit.reduce((total, group) => total + group.items.length, 0);
-
   return (
     <main id="content" tabIndex={-1} className="outline-none">
       {/* Hero & Live Release Gate */}
@@ -60,45 +57,14 @@ export default function HomePage() {
       {/* 01 / Testing Services */}
       <ServicesSection />
 
-      {/* 02 / Skills & Toolkit - Interactive, searchable, vibrant for 2026 */}
-      <section id="skills" className="scroll-mt-20 border-t border-line">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end lg:gap-12">
-            <div>
-              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-                <span className="text-pass">02</span> / Skills
-              </p>
-              <h2 className="mt-3 font-serif text-4xl tracking-tight text-balance sm:text-5xl">
-                Skills, tools, and domains.
-              </h2>
-            </div>
-            <div className="flex flex-col gap-3">
-              <p className="leading-relaxed text-ink-soft">
-                {totalSkills} verified QA competencies across web, mobile, API, and lending infrastructure.
-              </p>
-              <div>
-                <Link
-                  href="/skills"
-                  className="press inline-flex items-center gap-1.5 font-mono text-xs text-pass hover:underline"
-                >
-                  <span>Open dedicated skills page ({totalSkills}+ skills)</span>
-                  <ArrowRight className="size-3" />
-                </Link>
-              </div>
-            </div>
-          </div>
-          <SkillsSection />
-        </div>
-      </section>
-
-      {/* 03 / Defect Investigation & Root Cause Analysis (RCA) - 3rd place */}
+      {/* 02 / Defect Investigation & Root Cause Analysis (RCA) */}
       <RcaCaseStudy />
 
-      {/* 04 / Experience */}
+      {/* 03 / Experience */}
       <section id="experience" className="scroll-mt-20 border-t border-line bg-card">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-            <span className="text-pass">04</span> / Experience
+            <span className="text-pass">03</span> / Experience
           </p>
           <h2 className="mt-3 max-w-2xl font-serif text-4xl tracking-tight text-balance sm:text-5xl">
             Where I have worked.
@@ -107,13 +73,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 05 / Projects (15+ Apps & Portals Tested) - 5th place (last before contact) */}
+      {/* 04 / Projects (15+ Apps & Portals Tested) */}
       <section id="work" className="scroll-mt-20 border-t border-line">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-                <span className="text-pass">05</span> / Projects
+                <span className="text-pass">04</span> / Projects
               </p>
               <h2 className="mt-3 font-serif text-4xl tracking-tight text-balance sm:text-5xl">
                 Public apps.

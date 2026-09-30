@@ -24,7 +24,7 @@ export interface RcaStep {
 }
 
 export const rcaCaseStudy = {
-  sectionIndex: "03",
+  sectionIndex: "02",
   title: "Defect investigation: Double-debit race condition.",
   tagline: "The concurrency bug that never reached production.",
   domain: "CredMe · Lending LMS & Payment Gateway",

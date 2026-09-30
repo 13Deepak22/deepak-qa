@@ -73,24 +73,24 @@ export function InteractiveExperiencePreview() {
 
   return (
     <section id="experience" className="scroll-mt-20 border-t border-line bg-paper">
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
         {/* Header */}
-        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Career Spotlight</span> / Verified Track Record
             </p>
-            <h2 className="mt-2 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
+            <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
               Where I have delivered impact.
             </h2>
           </div>
-          <p className="max-w-md text-xs sm:text-sm leading-relaxed text-ink-soft sm:text-right">
-            {years} years across two fintech teams. Click an organization to inspect verified release ownership.
+          <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
+            {years} years across two fintech teams. Click between organizations and filter impact areas to inspect Deepak&apos;s day-to-day release ownership.
           </p>
         </div>
 
         {/* Organization Switcher Tabs */}
-        <div className="mt-6 grid sm:grid-cols-2 gap-3">
+        <div className="mt-10 grid sm:grid-cols-2 gap-4">
           {experience.map((role, idx) => {
             const isSelected = idx === selectedOrgIndex;
             const isCurrent = role.period.includes("Present");
@@ -105,41 +105,41 @@ export function InteractiveExperiencePreview() {
                   setSelectedOrgIndex(idx);
                   setActiveFilter("all");
                 }}
-                className={`text-left border p-3.5 sm:p-4 transition-all flex flex-col justify-between ${
+                className={`text-left border p-5 sm:p-6 transition-all flex flex-col justify-between ${
                   isSelected
-                    ? "border-pass bg-card shadow-xs ring-1 ring-pass/40"
+                    ? "border-pass bg-card shadow-sm ring-1 ring-pass/40"
                     : "border-line bg-paper hover:bg-card/50"
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-3">
                     <span
-                      className={`inline-flex h-8 w-8 shrink-0 items-center justify-center border ${
+                      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center border ${
                         isSelected
                           ? "border-pass bg-pass-fill/15 text-pass"
                           : "border-line bg-paper text-muted"
                       }`}
                     >
-                      <Building2 className="h-4 w-4" />
+                      <Building2 className="h-5 w-5" />
                     </span>
                     <div>
-                      <h3 className="font-serif text-base sm:text-lg font-bold text-ink">{role.org}</h3>
-                      <p className="font-mono text-[0.7rem] text-pass uppercase tracking-wider">
+                      <h3 className="font-serif text-xl sm:text-2xl font-bold text-ink">{role.org}</h3>
+                      <p className="font-mono text-xs text-pass uppercase tracking-wider mt-0.5">
                         {role.title}
                       </p>
                     </div>
                   </div>
 
                   {isCurrent && (
-                    <span className="border border-pass/40 bg-pass-fill/10 text-pass px-1.5 py-0.5 font-mono text-[0.6rem] uppercase tracking-wider">
+                    <span className="border border-pass/40 bg-pass-fill/10 text-pass px-2 py-0.5 font-mono text-[0.65rem] uppercase tracking-wider">
                       Current
                     </span>
                   )}
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-line/60 flex items-center justify-between text-[0.72rem] text-muted font-mono">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
+                <div className="mt-4 pt-4 border-t border-line/60 flex items-center justify-between text-xs text-muted font-mono">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5" />
                     <span>{role.period}</span>
                   </span>
                   <span className="text-pass">
@@ -152,79 +152,79 @@ export function InteractiveExperiencePreview() {
         </div>
 
         {/* Selected Role Interactive Details Panel */}
-        <div className="mt-3 border border-line bg-card shadow-xs">
+        <div className="mt-4 border border-line bg-card shadow-sm">
           {/* Category Filter Pills */}
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-paper p-3 sm:px-4">
-            <span className="font-mono text-[0.65rem] tracking-[0.14em] text-muted uppercase">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-paper p-4 sm:px-6">
+            <span className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase">
               Filter Verified Impact:
             </span>
 
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 data-testid="exp-filter-all"
                 data-cursor="Show all verified career achievements"
                 onClick={() => setActiveFilter("all")}
-                className={`px-2.5 py-1 font-mono text-[0.7rem] transition-colors border ${
+                className={`px-3 py-1 font-mono text-xs transition-colors border ${
                   activeFilter === "all"
                     ? "border-pass bg-pass text-paper font-medium"
                     : "border-line bg-card text-muted hover:text-ink"
                 }`}
               >
-                All ({allHighlights.length})
+                All Impact ({allHighlights.length})
               </button>
               <button
                 type="button"
                 data-testid="exp-filter-gates"
                 data-cursor="Filter by zero-defect production release sign-offs"
                 onClick={() => setActiveFilter("gates")}
-                className={`px-2.5 py-1 font-mono text-[0.7rem] transition-colors border ${
+                className={`px-3 py-1 font-mono text-xs transition-colors border ${
                   activeFilter === "gates"
                     ? "border-pass bg-pass text-paper font-medium"
                     : "border-line bg-card text-muted hover:text-ink"
                 }`}
               >
-                Release Gates &amp; Zero Defect
+                Release Gates &amp; Defect Zero
               </button>
               <button
                 type="button"
                 data-testid="exp-filter-automation"
                 data-cursor="Filter by Playwright, Appium & API automation suites"
                 onClick={() => setActiveFilter("automation")}
-                className={`px-2.5 py-1 font-mono text-[0.7rem] transition-colors border ${
+                className={`px-3 py-1 font-mono text-xs transition-colors border ${
                   activeFilter === "automation"
                     ? "border-pass bg-pass text-paper font-medium"
                     : "border-line bg-card text-muted hover:text-ink"
                 }`}
               >
-                Automation &amp; API
+                Automation &amp; API Suites
               </button>
               <button
                 type="button"
                 data-testid="exp-filter-fintech"
                 data-cursor="Filter by fintech payment gateway & lending integrity"
                 onClick={() => setActiveFilter("fintech")}
-                className={`px-2.5 py-1 font-mono text-[0.7rem] transition-colors border ${
+                className={`px-3 py-1 font-mono text-xs transition-colors border ${
                   activeFilter === "fintech"
                     ? "border-pass bg-pass text-paper font-medium"
                     : "border-line bg-card text-muted hover:text-ink"
                 }`}
               >
-                Fintech &amp; Payments
+                Fintech &amp; Payment Security
               </button>
             </div>
           </div>
 
           {/* Highlights List */}
-          <div key={`${currentRole.org}-${activeFilter}`} className="p-3.5 sm:p-4 space-y-2 content-fade">
-            {filteredHighlights.slice(0, 3).map((highlight, i) => (
+          <div key={`${currentRole.org}-${activeFilter}`} className="p-6 sm:p-8 space-y-4 content-fade">
+            {filteredHighlights.map((highlight, i) => (
               <div
                 key={i}
-                className="flex items-start gap-2.5 border border-line bg-paper p-2.5 sm:p-3 hover:border-pass/60 transition-colors"
+                className="flex items-start gap-3.5 border border-line bg-paper p-4 hover:border-pass/60 transition-colors"
               >
-                <CheckCircle2 className="h-4 w-4 text-pass shrink-0 mt-0.5" />
+                <CheckCircle2 className="h-5 w-5 text-pass shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
-                  <p className="font-sans text-xs sm:text-sm leading-relaxed text-ink">
+                  <p className="font-sans text-sm sm:text-base leading-relaxed text-ink">
                     {highlight.text}
                   </p>
                 </div>
@@ -233,12 +233,12 @@ export function InteractiveExperiencePreview() {
           </div>
 
           {/* Bottom Redirect Banner */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-line bg-paper p-3 sm:px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-line bg-paper p-5 sm:px-6">
             <div>
               <p className="font-mono text-xs text-ink font-semibold">
                 Explore the complete interactive career timeline
               </p>
-              <p className="text-[0.72rem] text-ink-soft mt-0.5">
+              <p className="text-xs text-ink-soft mt-0.5">
                 Inspect company-by-company metrics, complete responsibility logs, and team impact.
               </p>
             </div>
@@ -246,7 +246,7 @@ export function InteractiveExperiencePreview() {
             <Link
               href="/experience"
               data-testid="experience-redirect-cta"
-              className="press inline-flex items-center gap-1.5 border border-pass bg-card px-3.5 py-2 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
+              className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
               data-cursor="Complete career history"
             >
               <span>View complete experience</span>

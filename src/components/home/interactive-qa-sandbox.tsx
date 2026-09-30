@@ -178,24 +178,24 @@ export function InteractiveQASandbox() {
 
   return (
     <section className="scroll-mt-20 border-t border-line bg-paper-deep">
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
         {/* Section Header */}
-        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Interactive Workbench</span> / Live Quality Engine
             </p>
-            <h2 className="mt-2 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
+            <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
               Simulate live fintech release assertions.
             </h2>
           </div>
-          <p className="max-w-md text-xs sm:text-sm leading-relaxed text-ink-soft sm:text-right">
+          <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
             Test the real-world validation rules, edge cases, and network throttling Deepak engineers to protect production systems.
           </p>
         </div>
 
         {/* Workbench Container */}
-        <div className="mt-5 border border-line bg-paper shadow-xs">
+        <div className="mt-10 border border-line bg-paper shadow-sm">
           {/* Top Scenario Selector Tabs */}
           <div className="flex border-b border-line overflow-x-auto bg-card">
             {SCENARIOS.map((sc) => {
@@ -210,7 +210,7 @@ export function InteractiveQASandbox() {
                     setSelectedId(sc.id);
                     handleReset();
                   }}
-                  className={`flex shrink-0 items-center gap-2 px-3.5 py-2.5 text-xs font-mono transition-colors border-r border-line text-left ${
+                  className={`flex shrink-0 items-center gap-2.5 px-4 py-3.5 text-xs font-mono transition-colors border-r border-line text-left ${
                     isSelected
                       ? "bg-paper text-pass border-b-2 border-b-pass font-medium"
                       : "text-ink-soft hover:bg-paper/60 hover:text-ink"
@@ -313,8 +313,8 @@ export function InteractiveQASandbox() {
           {/* Workbench Body: Steps & Output Terminal */}
           <div className="grid lg:grid-cols-[1.1fr_0.9fr] divide-y lg:divide-y-0 lg:divide-x divide-line">
             {/* Left: Execution Pipeline Steps */}
-            <div className="p-3.5 sm:p-4">
-              <div className="flex items-center justify-between mb-3">
+            <div className="p-5 sm:p-6">
+              <div className="flex items-center justify-between mb-4">
                 <span className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase">
                   Assertion Pipeline ({completedStepIndex + 1}/{activeScenario.steps.length} Passed)
                 </span>
@@ -324,7 +324,7 @@ export function InteractiveQASandbox() {
                 </span>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {activeScenario.steps.map((step, idx) => {
                   const isDone = completedStepIndex >= idx;
                   const isCurrent = isRunning && completedStepIndex === idx - 1;
@@ -332,7 +332,7 @@ export function InteractiveQASandbox() {
                   return (
                     <div
                       key={step.name}
-                      className={`flex items-start gap-2.5 border p-2.5 transition-colors ${
+                      className={`flex items-start gap-3 border p-3 transition-colors ${
                         isDone
                           ? "border-pass/40 bg-pass-fill/5"
                           : isCurrent
@@ -369,14 +369,14 @@ export function InteractiveQASandbox() {
 
               {/* Final Result Banner */}
               {testResult === "success" && (
-                <div className="mt-3 border border-pass/40 bg-pass-fill/10 p-3">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-pass shrink-0 mt-0.5" />
+                <div className="mt-5 border border-pass/40 bg-pass-fill/10 p-4">
+                  <div className="flex items-start gap-2.5">
+                    <CheckCircle2 className="h-5 w-5 text-pass shrink-0 mt-0.5" />
                     <div>
                       <p className="font-mono text-xs uppercase tracking-wider text-pass font-semibold">
                         Release Gate Passed — All Assertions Verified
                       </p>
-                      <p className="mt-0.5 text-xs text-ink-soft leading-relaxed">
+                      <p className="mt-1 text-xs text-ink-soft leading-relaxed">
                         {activeScenario.expectedSuccess}
                       </p>
                     </div>
@@ -385,14 +385,14 @@ export function InteractiveQASandbox() {
               )}
 
               {testResult === "defect" && (
-                <div className="mt-3 border border-red-500/40 bg-red-500/10 p-3">
-                  <div className="flex items-start gap-2">
-                    <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                <div className="mt-5 border border-red-500/40 bg-red-500/10 p-4">
+                  <div className="flex items-start gap-2.5">
+                    <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                     <div>
                       <p className="font-mono text-xs uppercase tracking-wider text-red-600 dark:text-red-400 font-semibold">
                         Defect Flagged — Potential Financial Leak Prevented
                       </p>
-                      <p className="mt-0.5 text-xs text-ink-soft leading-relaxed">
+                      <p className="mt-1 text-xs text-ink-soft leading-relaxed">
                         {activeScenario.defectWarning}
                       </p>
                     </div>
@@ -402,7 +402,7 @@ export function InteractiveQASandbox() {
             </div>
 
             {/* Right: Live Telemetry & Inspector Tabs */}
-            <div className="flex flex-col bg-card/60 p-3.5 sm:p-4">
+            <div className="flex flex-col bg-card/60 p-5 sm:p-6">
               <div className="flex items-center justify-between border-b border-line pb-3 mb-4">
                 <div className="flex gap-2">
                   <button

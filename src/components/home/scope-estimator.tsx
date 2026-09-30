@@ -99,24 +99,24 @@ export function ScopeEstimator() {
 
   return (
     <section className="scroll-mt-20 border-t border-line bg-card">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
         {/* Header */}
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div>
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Interactive Quality Planner</span> / Strategic Assessment
             </p>
-            <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
+            <h2 className="mt-2 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
               What are you shipping next?
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
-            Select your product architecture to preview Deepak&apos;s tailored test strategy, critical risk checklist, and recommended automation stack.
+          <p className="max-w-md text-xs sm:text-sm leading-relaxed text-ink-soft sm:text-right">
+            Select your product architecture to preview Deepak&apos;s tailored test strategy, critical risk checklist, and recommended stack.
           </p>
         </div>
 
         {/* Product Type Selector Tabs */}
-        <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-2.5">
           {PLANS.map((p) => {
             const isSelected = p.id === plan.id;
             return (
@@ -126,24 +126,24 @@ export function ScopeEstimator() {
                 data-testid={`scope-plan-${p.id}`}
                 data-cursor={`Select ${p.title} architecture for test coverage estimate`}
                 onClick={() => setSelectedPlanId(p.id)}
-                className={`p-4 border text-left transition-all flex flex-col justify-between ${
+                className={`p-3 border text-left transition-all flex flex-col justify-between ${
                   isSelected
-                    ? "border-pass bg-paper text-pass shadow-sm ring-1 ring-pass/40"
+                    ? "border-pass bg-paper text-pass shadow-xs ring-1 ring-pass/40"
                     : "border-line bg-paper/60 text-ink-soft hover:bg-paper hover:text-ink"
                 }`}
               >
                 <div>
-                  <span className="block font-mono text-[0.62rem] uppercase tracking-wider text-muted mb-1">
+                  <span className="block font-mono text-[0.6rem] uppercase tracking-wider text-muted mb-0.5">
                     {p.badge}
                   </span>
-                  <span className="block font-serif text-base font-bold text-ink">{p.title}</span>
+                  <span className="block font-serif text-sm sm:text-base font-bold text-ink">{p.title}</span>
                 </div>
                 <span
-                  className={`mt-4 font-mono text-[0.68rem] uppercase tracking-wider ${
+                  className={`mt-2.5 font-mono text-[0.65rem] uppercase tracking-wider ${
                     isSelected ? "text-pass font-semibold" : "text-muted"
                   }`}
                 >
-                  {isSelected ? "● Strategy Active" : "Select Architecture"}
+                  {isSelected ? "● Strategy Active" : "Select"}
                 </span>
               </button>
             );
@@ -151,23 +151,23 @@ export function ScopeEstimator() {
         </div>
 
         {/* Selected Plan Strategy Board */}
-        <div key={plan.id} className="mt-4 border border-line bg-paper shadow-sm content-fade">
+        <div key={plan.id} className="mt-3 border border-line bg-paper shadow-xs content-fade">
           {/* Top Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-line bg-paper-deep p-5 sm:px-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line bg-paper-deep p-3.5 sm:px-4">
             <div>
-              <div className="flex items-center gap-2.5">
-                <h3 className="font-serif text-2xl text-ink font-bold">{plan.title}</h3>
-                <span className="border border-pass/40 bg-pass-fill/10 text-pass px-2 py-0.5 font-mono text-[0.65rem] uppercase tracking-wider">
-                  Deepak&apos;s Blueprint
+              <div className="flex items-center gap-2">
+                <h3 className="font-serif text-lg sm:text-xl text-ink font-bold">{plan.title}</h3>
+                <span className="border border-pass/40 bg-pass-fill/10 text-pass px-1.5 py-0.5 font-mono text-[0.6rem] uppercase tracking-wider">
+                  Blueprint
                 </span>
               </div>
-              <p className="text-xs text-ink-soft mt-1">{plan.subtitle}</p>
+              <p className="text-[0.72rem] text-ink-soft mt-0.5">{plan.subtitle}</p>
             </div>
 
             {/* Coverage Split Bar */}
             <div className="flex items-center gap-3">
-              <div className="text-right">
-                <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block">
+              <div className="sm:text-right">
+                <span className="font-mono text-[0.6rem] uppercase tracking-wider text-muted block">
                   Target Coverage Split
                 </span>
                 <span className="font-mono text-xs text-ink font-semibold">
@@ -178,20 +178,20 @@ export function ScopeEstimator() {
           </div>
 
           {/* Strategy Details Body */}
-          <div className="grid lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-line p-6 gap-6 lg:gap-0">
+          <div className="grid lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-line p-3.5 sm:p-4 gap-4 lg:gap-5">
             {/* Left: Critical Risk Checklist */}
-            <div className="lg:pr-6 space-y-4">
-              <div className="flex items-center gap-2">
-                <ShieldAlert className="h-4 w-4 text-red-600 dark:text-red-400" />
-                <h4 className="font-serif text-lg font-bold text-ink">
+            <div className="lg:pr-4 space-y-2.5">
+              <div className="flex items-center gap-1.5">
+                <ShieldAlert className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
+                <h4 className="font-serif text-sm sm:text-base font-bold text-ink">
                   High-Risk Failure Points Guarded
                 </h4>
               </div>
 
-              <div className="space-y-2.5">
-                {plan.criticalRisks.map((risk, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 border border-line bg-card/60 p-3">
-                    <span className="font-mono text-xs text-red-500 font-bold shrink-0 mt-0.5">
+              <div className="space-y-1.5">
+                {plan.criticalRisks.slice(0, 3).map((risk, idx) => (
+                  <div key={idx} className="flex items-start gap-2 border border-line bg-card/60 p-2">
+                    <span className="font-mono text-[0.7rem] text-red-500 font-bold shrink-0 mt-0.5">
                       0{idx + 1}.
                     </span>
                     <p className="font-sans text-xs text-ink leading-relaxed">{risk}</p>
@@ -201,25 +201,25 @@ export function ScopeEstimator() {
             </div>
 
             {/* Right: Recommended Stack & Deliverables */}
-            <div className="lg:pl-6 space-y-5 pt-6 lg:pt-0 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <Zap className="h-4 w-4 text-pass" />
-                  <h4 className="font-serif text-lg font-bold text-ink">
+            <div className="lg:pl-4 space-y-3 pt-3 lg:pt-0 flex flex-col justify-between">
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-1.5">
+                  <Zap className="h-3.5 w-3.5 text-pass" />
+                  <h4 className="font-serif text-sm sm:text-base font-bold text-ink">
                     Engineered Toolkit &amp; Deliverables
                   </h4>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="border border-line bg-card/60 p-3.5">
-                    <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block">
-                      Core Automation &amp; Test Stack:
+                <div className="grid sm:grid-cols-2 gap-2">
+                  <div className="border border-line bg-card/60 p-2.5">
+                    <span className="font-mono text-[0.6rem] uppercase tracking-wider text-muted block">
+                      Core Stack:
                     </span>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
+                    <div className="mt-1.5 flex flex-wrap gap-1">
                       {plan.recommendedToolkit.map((tool) => (
                         <span
                           key={tool}
-                          className="border border-pass/30 bg-paper px-2.5 py-1 font-mono text-xs text-pass font-medium"
+                          className="border border-pass/30 bg-paper px-2 py-0.5 font-mono text-[0.68rem] text-pass font-medium"
                         >
                           {tool}
                         </span>
@@ -227,14 +227,14 @@ export function ScopeEstimator() {
                     </div>
                   </div>
 
-                  <div className="border border-line bg-card/60 p-3.5">
-                    <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block">
-                      Release Sign-Off Artifacts:
+                  <div className="border border-line bg-card/60 p-2.5">
+                    <span className="font-mono text-[0.6rem] uppercase tracking-wider text-muted block">
+                      Sign-Off Deliverables:
                     </span>
-                    <div className="mt-2 space-y-1">
+                    <div className="mt-1.5 space-y-0.5">
                       {plan.deliverables.map((del) => (
-                        <p key={del} className="text-xs text-ink flex items-center gap-1.5 font-sans">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0" />
+                        <p key={del} className="text-[0.72rem] text-ink flex items-center gap-1.5 font-sans">
+                          <CheckCircle2 className="h-3 w-3 text-pass shrink-0" />
                           <span>{del}</span>
                         </p>
                       ))}
@@ -244,12 +244,12 @@ export function ScopeEstimator() {
               </div>
 
               {/* Consultation Call to Action */}
-              <div className="pt-4 border-t border-line/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="pt-2.5 border-t border-line/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                 <div>
-                  <span className="font-mono text-[0.68rem] text-pass font-semibold block uppercase">
+                  <span className="font-mono text-[0.65rem] text-pass font-semibold block uppercase">
                     Ready to harden your release?
                   </span>
-                  <p className="text-xs text-ink-soft">
+                  <p className="text-[0.72rem] text-ink-soft">
                     Deepak provides full QA lifecycle ownership from test strategy to final production sign-off.
                   </p>
                 </div>
@@ -258,9 +258,9 @@ export function ScopeEstimator() {
                   href="/#contact"
                   data-testid="scope-btn-contact"
                   data-cursor="Start a quality assurance consultation with Deepak"
-                  className="press inline-flex items-center gap-2 border border-pass bg-pass text-paper px-4 py-2 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass/90 transition-colors shrink-0 shadow-sm"
+                  className="press inline-flex items-center gap-1.5 border border-pass bg-card px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider font-semibold text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0 shadow-xs"
                 >
-                  <Send className="h-3.5 w-3.5" />
+                  <Send className="h-3 w-3" />
                   <span>Start a conversation</span>
                 </Link>
               </div>

@@ -160,24 +160,24 @@ export function InteractiveWorkPreview() {
 
   return (
     <section id="work" className="scroll-mt-20 border-t border-line bg-card">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
         {/* Header */}
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div>
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Interactive Showcase</span> / Products &amp; Portals
             </p>
-            <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
+            <h2 className="mt-2 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
               15+ Products tested in the wild.
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
-            Click across consumer applications and back-office banking engines to inspect Deepak&apos;s real-world test coverage and defect prevention.
+          <p className="max-w-md text-xs sm:text-sm leading-relaxed text-ink-soft sm:text-right">
+            Click across applications and banking engines to inspect test coverage and defect prevention.
           </p>
         </div>
 
         {/* Interactive App Selector Tabs */}
-        <div className="mt-10 flex gap-2 overflow-x-auto pb-2">
+        <div className="mt-5 flex gap-2 overflow-x-auto pb-1.5">
           {APPS_DATA.map((app) => {
             const isSelected = app.id === selectedApp.id;
             return (
@@ -188,16 +188,16 @@ export function InteractiveWorkPreview() {
                   setActiveAppId(app.id);
                   setActiveJourneyIndex(0);
                 }}
-                className={`flex shrink-0 items-center gap-2.5 border px-4 py-3 text-left transition-colors ${
+                className={`flex shrink-0 items-center gap-2 border px-3 py-2 text-left transition-colors ${
                   isSelected
-                    ? "border-pass bg-paper text-pass shadow-sm font-medium"
+                    ? "border-pass bg-paper text-pass shadow-xs font-medium"
                     : "border-line bg-paper/60 text-ink-soft hover:border-line/80 hover:bg-paper hover:text-ink"
                 }`}
               >
-                <Smartphone className={`h-4 w-4 ${isSelected ? "text-pass" : "text-muted"}`} />
+                <Smartphone className={`h-3.5 w-3.5 ${isSelected ? "text-pass" : "text-muted"}`} />
                 <div>
                   <span className="block text-xs font-serif font-bold text-ink">{app.name}</span>
-                  <span className="block font-mono text-[0.65rem] text-muted">{app.domain}</span>
+                  <span className="block font-mono text-[0.62rem] text-muted">{app.domain}</span>
                 </div>
               </button>
             );
@@ -206,28 +206,28 @@ export function InteractiveWorkPreview() {
           {/* Confidential Portals Tab */}
           <Link
             href="/work"
-            className="flex shrink-0 items-center gap-2.5 border border-dashed border-line bg-paper/30 px-4 py-3 text-left hover:border-pass transition-colors text-muted hover:text-ink"
+            className="flex shrink-0 items-center gap-2 border border-dashed border-line bg-paper/30 px-3 py-2 text-left hover:border-pass transition-colors text-muted hover:text-ink"
           >
-            <LockKeyhole className="h-4 w-4 text-pass" />
+            <LockKeyhole className="h-3.5 w-3.5 text-pass" />
             <div>
               <span className="block text-xs font-serif font-bold text-ink">8+ Enterprise Portals</span>
-              <span className="block font-mono text-[0.65rem] text-muted">LOS, LMS &amp; Banking APIs</span>
+              <span className="block font-mono text-[0.62rem] text-muted">LOS, LMS &amp; APIs</span>
             </div>
           </Link>
         </div>
 
         {/* Active App Interactive Inspector Panel */}
-        <div key={selectedApp.id} className="mt-4 border border-line bg-paper shadow-sm content-fade">
+        <div key={selectedApp.id} className="mt-3 border border-line bg-paper shadow-xs content-fade">
           {/* Top Info Banner */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-line bg-paper-deep p-5 sm:px-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line bg-paper-deep p-3.5 sm:px-5">
             <div>
-              <div className="flex items-center gap-3">
-                <h3 className="font-serif text-2xl text-ink font-semibold">{selectedApp.name}</h3>
-                <span className="font-mono text-[0.68rem] tracking-wider uppercase border border-pass/30 bg-pass-fill/10 text-pass px-2 py-0.5">
+              <div className="flex items-center gap-2.5">
+                <h3 className="font-serif text-lg sm:text-xl text-ink font-semibold">{selectedApp.name}</h3>
+                <span className="font-mono text-[0.65rem] tracking-wider uppercase border border-pass/30 bg-pass-fill/10 text-pass px-2 py-0.5">
                   {selectedApp.domain}
                 </span>
               </div>
-              <p className="mt-1 text-sm text-ink-soft">{selectedApp.tagline}</p>
+              <p className="mt-0.5 text-xs text-ink-soft">{selectedApp.tagline}</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 font-mono text-xs">

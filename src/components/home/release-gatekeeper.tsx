@@ -102,50 +102,50 @@ export function ReleaseGatekeeper() {
 
   return (
     <section className="scroll-mt-20 border-t border-line bg-paper">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
         {/* Header */}
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div>
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Interactive Decision Gate</span> / Release Philosophy
             </p>
-            <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
+            <h2 className="mt-2 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
               The Release Gatekeeper: Ship or Halt?
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
-            Toggle Deepak&apos;s real-world release criteria below to see how his rigorous quality gate safeguards production deployments.
+          <p className="max-w-md text-xs sm:text-sm leading-relaxed text-ink-soft sm:text-right">
+            Toggle Deepak&apos;s real-world release criteria below to see how his quality gate safeguards production deployments.
           </p>
         </div>
 
         {/* Gatekeeper Interactive Board */}
-        <div className="mt-10 border border-line bg-paper shadow-sm">
+        <div className="mt-5 border border-line bg-paper shadow-xs">
           {/* Top Status Banner */}
           <div
-            className={`p-6 sm:px-8 border-b transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+            className={`p-3.5 sm:px-5 border-b transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
               isApproved
                 ? "bg-pass-fill/15 border-pass/40 text-ink"
                 : "bg-red-500/10 border-red-500/30 text-ink"
             }`}
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <span
-                className={`inline-flex h-14 w-14 shrink-0 items-center justify-center border ${
+                className={`inline-flex h-10 w-10 shrink-0 items-center justify-center border ${
                   isApproved
                     ? "border-pass bg-card text-pass"
                     : "border-red-500 bg-card text-red-600 dark:text-red-400"
                 }`}
               >
                 {isApproved ? (
-                  <Unlock className="h-7 w-7" />
+                  <Unlock className="h-5 w-5" />
                 ) : (
-                  <Lock className="h-7 w-7" />
+                  <Lock className="h-5 w-5" />
                 )}
               </span>
               <div>
                 <div className="flex items-center gap-2">
                   <span
-                    className={`font-mono text-[0.7rem] uppercase tracking-wider px-2 py-0.5 font-bold ${
+                    className={`font-mono text-[0.65rem] uppercase tracking-wider px-2 py-0.5 font-bold ${
                       isApproved
                         ? "bg-pass text-paper"
                         : "bg-red-600 text-paper"
@@ -157,7 +157,7 @@ export function ReleaseGatekeeper() {
                     {passedCount}/4 Checks Green
                   </span>
                 </div>
-                <h3 className="mt-1 font-serif text-2xl sm:text-3xl font-bold">
+                <h3 className="mt-0.5 font-serif text-lg sm:text-xl font-bold">
                   {isApproved
                     ? "Production Deployment Approved"
                     : "Deployment Halted — Critical Failures Detected"}
@@ -193,12 +193,12 @@ export function ReleaseGatekeeper() {
           {/* Interactive Toggle Grid */}
           <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-line">
             {/* Left: 4 Interactive Switches */}
-            <div className="p-6 space-y-4">
-              <span className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase block">
+            <div className="p-3.5 sm:p-4 space-y-2">
+              <span className="font-mono text-[0.65rem] tracking-[0.16em] text-muted uppercase block">
                 Click Any Check to Toggle Its State:
               </span>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {GATE_RULES.map((rule) => {
                   const isHealthy = gateStates[rule.id];
                   return (
@@ -208,7 +208,7 @@ export function ReleaseGatekeeper() {
                       data-testid={`gatekeeper-toggle-${rule.id}`}
                       data-cursor={`Toggle ${rule.name}: ${isHealthy ? 'Currently passing' : 'Currently blocking'}`}
                       onClick={() => toggleGate(rule.id)}
-                      className={`w-full text-left p-4 border transition-all flex items-start justify-between gap-3 ${
+                      className={`w-full text-left p-2.5 sm:p-3 border transition-all flex items-start justify-between gap-2.5 ${
                         isHealthy
                           ? "border-pass/40 bg-pass-fill/5 hover:border-pass"
                           : "border-red-500/50 bg-red-500/5 hover:border-red-500"
@@ -217,7 +217,7 @@ export function ReleaseGatekeeper() {
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`inline-block h-2.5 w-2.5 rounded-full ${
+                            className={`inline-block h-2 w-2 rounded-full ${
                               isHealthy ? "bg-pass animate-pulse" : "bg-red-500"
                             }`}
                           />
@@ -225,11 +225,8 @@ export function ReleaseGatekeeper() {
                             {rule.name}
                           </p>
                         </div>
-                        <p className="mt-1 text-xs text-ink-soft">
-                          {rule.description}
-                        </p>
                         <p
-                          className={`mt-2 font-mono text-[0.72rem] font-semibold ${
+                          className={`mt-1 font-mono text-[0.7rem] font-semibold ${
                             isHealthy ? "text-pass" : "text-red-600 dark:text-red-400"
                           }`}
                         >
@@ -239,7 +236,7 @@ export function ReleaseGatekeeper() {
 
                       <div className="shrink-0 text-right">
                         <span
-                          className={`inline-block font-mono text-[0.65rem] uppercase tracking-wider px-2 py-1 border ${
+                          className={`inline-block font-mono text-[0.62rem] uppercase tracking-wider px-2 py-0.5 border ${
                             isHealthy
                               ? "border-pass/30 bg-card text-pass"
                               : "border-red-500/30 bg-card text-red-600 dark:text-red-400"
@@ -255,73 +252,69 @@ export function ReleaseGatekeeper() {
             </div>
 
             {/* Right: Live Gate Decision Log */}
-            <div className="p-6 flex flex-col justify-between bg-card/40">
+            <div className="p-3.5 sm:p-4 flex flex-col justify-between bg-card/40">
               <div>
-                <div className="flex items-center justify-between border-b border-line pb-3 mb-4">
-                  <span className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted">
+                <div className="flex items-center justify-between border-b border-line pb-2 mb-2.5">
+                  <span className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-muted">
                     Gatekeeper Audit Log
                   </span>
-                  <span className="font-mono text-xs text-pass">Real-time Gate Evaluation</span>
+                  <span className="font-mono text-xs text-pass">Real-time Evaluation</span>
                 </div>
 
                 {isApproved ? (
-                  <div key="approved" className="space-y-4 content-fade">
-                    <div className="border border-pass/30 bg-paper p-4">
-                      <div className="flex items-start gap-2.5">
-                        <ShieldCheck className="h-5 w-5 text-pass shrink-0 mt-0.5" />
+                  <div key="approved" className="space-y-2.5 content-fade">
+                    <div className="border border-pass/30 bg-paper p-3">
+                      <div className="flex items-start gap-2">
+                        <ShieldCheck className="h-4 w-4 text-pass shrink-0 mt-0.5" />
                         <div>
                           <p className="font-mono text-xs uppercase tracking-wider text-pass font-bold">
                             Zero-Defect Sign-off Ready
                           </p>
-                          <p className="mt-1.5 text-xs text-ink-soft leading-relaxed">
-                            All 4 quality gates satisfy Deepak&apos;s rigorous release requirements. Zero P0/P1 defects, 100% automated regression passed, API SLA verified within limits, and distributed idempotency active.
+                          <p className="mt-1 text-xs text-ink-soft leading-relaxed">
+                            All 4 quality gates satisfy Deepak&apos;s release requirements. Zero P0/P1 defects, 100% regression passed, SLA verified, idempotency active.
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="border border-line bg-paper p-4 space-y-2 text-xs">
-                      <span className="font-mono text-[0.68rem] uppercase tracking-wider text-muted block">
-                        Production Gate Artifacts Generated:
+                    <div className="border border-line bg-paper p-2.5 space-y-1 text-xs">
+                      <span className="font-mono text-[0.62rem] uppercase tracking-wider text-muted block mb-1">
+                        Artifacts Generated:
                       </span>
-                      <p className="text-ink flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-pass" />
-                        <span>Signed Test Summary Report (TSR) &amp; Execution Matrix</span>
+                      <p className="text-ink flex items-center gap-1.5 text-[0.72rem]">
+                        <CheckCircle2 className="h-3 w-3 text-pass" />
+                        <span>Signed TSR &amp; Execution Matrix</span>
                       </p>
-                      <p className="text-ink flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-pass" />
-                        <span>Automated Regression Run Artifacts (Playwright HTML report)</span>
-                      </p>
-                      <p className="text-ink flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-pass" />
-                        <span>Payment Reconciliation &amp; Webhook Audit Log</span>
+                      <p className="text-ink flex items-center gap-1.5 text-[0.72rem]">
+                        <CheckCircle2 className="h-3 w-3 text-pass" />
+                        <span>Automated Regression Run Artifacts (Playwright)</span>
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <div key="halted" className="space-y-4 content-fade">
-                    <div className="border border-red-500/40 bg-red-500/10 p-4">
-                      <div className="flex items-start gap-2.5">
-                        <ShieldAlert className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                  <div key="halted" className="space-y-2.5 content-fade">
+                    <div className="border border-red-500/40 bg-red-500/10 p-3">
+                      <div className="flex items-start gap-2">
+                        <ShieldAlert className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                         <div>
                           <p className="font-mono text-xs uppercase tracking-wider text-red-600 dark:text-red-400 font-bold">
                             Deployment Blocked by QA Gatekeeper
                           </p>
-                          <p className="mt-1.5 text-xs text-ink-soft leading-relaxed">
-                            {failedRules.length} critical gate condition(s) breached. Release cannot be certified until blockers are triaged and re-tested.
+                          <p className="mt-1 text-xs text-ink-soft leading-relaxed">
+                            {failedRules.length} critical gate condition(s) breached. Release cannot be certified until blockers are triaged.
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="border border-line bg-paper p-4 space-y-2 text-xs">
-                      <span className="font-mono text-[0.68rem] uppercase tracking-wider text-muted block">
-                        Deepak&apos;s Active Triage Protocol:
+                    <div className="border border-line bg-paper p-2.5 space-y-1 text-xs">
+                      <span className="font-mono text-[0.62rem] uppercase tracking-wider text-muted block mb-1">
+                        Active Blockers:
                       </span>
                       {failedRules.map((r) => (
-                        <div key={r.id} className="border-l-2 border-red-500 pl-2 py-0.5">
-                          <p className="font-bold text-ink">{r.name}:</p>
-                          <p className="text-ink-soft text-[0.72rem]">{r.impactOnFailure}</p>
+                        <div key={r.id} className="border-l-2 border-red-500 pl-1.5 py-0.5">
+                          <p className="font-bold text-ink text-[0.72rem]">{r.name}:</p>
+                          <p className="text-ink-soft text-[0.68rem] truncate">{r.impactOnFailure}</p>
                         </div>
                       ))}
                     </div>

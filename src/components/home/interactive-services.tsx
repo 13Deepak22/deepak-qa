@@ -159,51 +159,43 @@ export function InteractiveServices() {
 
   return (
     <section id="services" className="scroll-mt-20 border-t border-line bg-paper-deep">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
         {/* Section Header */}
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div>
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">Testing Services</span> / Core Capabilities
             </p>
-            <h2 className="mt-3 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
+            <h2 className="mt-2 font-serif text-2xl sm:text-3xl tracking-tight text-ink">
               How a release earns the right to ship.
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
-            Click through Deepak&apos;s testing disciplines to inspect his real-world methodology, sample assertions, and deliverables.
+          <p className="max-w-md text-xs sm:text-sm leading-relaxed text-ink-soft sm:text-right">
+            4 Core quality disciplines engineered for zero-defect production releases.
           </p>
         </div>
 
-        {/* Interactive Services Tab Bar */}
-        <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {/* Compact Tab Selector */}
+        <div className="mt-5 grid grid-cols-2 lg:grid-cols-4 gap-2">
           {SERVICES_DATA.map((s) => {
             const isSelected = s.id === service.id;
             return (
               <button
                 key={s.id}
                 type="button"
+                data-testid={`service-tab-${s.id}`}
                 onClick={() => setActiveServiceId(s.id)}
-                className={`p-4 border text-left transition-all flex flex-col justify-between ${
+                className={`px-3 py-2 border text-left transition-all ${
                   isSelected
-                    ? "border-pass bg-paper text-pass shadow-sm ring-1 ring-pass/40"
+                    ? "border-pass bg-paper text-pass shadow-xs ring-1 ring-pass/40"
                     : "border-line bg-paper/60 text-ink-soft hover:bg-paper hover:text-ink"
                 }`}
               >
-                <div>
-                  <span className="block font-mono text-[0.62rem] uppercase tracking-wider text-muted mb-1">
-                    {s.badge}
-                  </span>
-                  <span className="block font-serif text-base sm:text-lg font-bold text-ink">
-                    {s.name}
-                  </span>
-                </div>
-                <span
-                  className={`mt-4 font-mono text-[0.68rem] uppercase tracking-wider ${
-                    isSelected ? "text-pass font-semibold" : "text-muted"
-                  }`}
-                >
-                  {isSelected ? "● Active Inspection" : "Inspect Methodology"}
+                <span className="block font-mono text-[0.6rem] uppercase tracking-wider text-muted">
+                  {s.badge}
+                </span>
+                <span className="block font-serif text-sm font-bold text-ink truncate mt-0.5">
+                  {s.name}
                 </span>
               </button>
             );
@@ -211,52 +203,32 @@ export function InteractiveServices() {
         </div>
 
         {/* Selected Service Detail Panel */}
-        <div key={service.id} className="mt-4 border border-line bg-paper shadow-sm content-fade">
-          {/* Header */}
-          <div className="border-b border-line bg-paper-deep p-6 sm:px-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div key={service.id} className="mt-3 border border-line bg-paper shadow-xs content-fade">
+          <div className="grid md:grid-cols-[1.1fr_0.9fr] divide-y md:divide-y-0 md:divide-x divide-line">
+            {/* Left: Summary + Key Highlights + Tools */}
+            <div className="p-4 sm:p-5 flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-3">
-                  <h3 className="font-serif text-2xl sm:text-3xl font-bold text-ink">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-serif text-lg sm:text-xl font-bold text-ink">
                     {service.name}
                   </h3>
-                  <span className="border border-pass/40 bg-pass-fill/10 text-pass px-2 py-0.5 font-mono text-[0.68rem] uppercase tracking-wider">
+                  <span className="border border-pass/40 bg-pass-fill/10 text-pass px-2 py-0.5 font-mono text-[0.62rem] uppercase tracking-wider shrink-0">
                     {service.badge}
                   </span>
                 </div>
-                <p className="mt-2 text-sm sm:text-base font-serif italic text-pass">
+                <p className="mt-1 text-xs font-serif italic text-pass">
                   {service.tagline}
                 </p>
-              </div>
+                <p className="mt-2 text-xs leading-relaxed text-ink-soft">
+                  {service.description}
+                </p>
 
-              {/* Tools Pills */}
-              <div className="flex flex-wrap gap-1.5 font-mono text-xs">
-                {service.tools.map((t) => (
-                  <span key={t} className="border border-line bg-paper px-2.5 py-1 text-muted">
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <p className="mt-4 text-sm leading-relaxed text-ink-soft max-w-4xl">
-              {service.description}
-            </p>
-          </div>
-
-          {/* Body: Key Practices + Live Sample Assertion Code */}
-          <div className="grid lg:grid-cols-[1.05fr_0.95fr] divide-y lg:divide-y-0 lg:divide-x divide-line">
-            {/* Left: Practices & Deliverables */}
-            <div className="p-6 sm:p-8 space-y-6">
-              <div>
-                <span className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase block mb-3">
-                  Key Verification Practices
-                </span>
-                <div className="space-y-3">
-                  {service.keyPractices.map((practice, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-4 w-4 text-pass shrink-0 mt-0.5" />
-                      <p className="font-sans text-xs sm:text-sm text-ink leading-relaxed">
+                {/* Key Practices (concise 3 items) */}
+                <div className="mt-3 space-y-1.5 border-t border-line/60 pt-3">
+                  {service.keyPractices.slice(0, 3).map((practice, idx) => (
+                    <div key={idx} className="flex items-start gap-2">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0 mt-0.5" />
+                      <p className="font-sans text-xs text-ink leading-snug">
                         {practice}
                       </p>
                     </div>
@@ -264,56 +236,49 @@ export function InteractiveServices() {
                 </div>
               </div>
 
-              <div className="border-t border-line/60 pt-5">
-                <span className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase block mb-3">
-                  Signed Deliverables Provided
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {service.deliverables.map((del) => (
-                    <span
-                      key={del}
-                      className="border border-pass/30 bg-card px-3 py-1 font-mono text-xs text-pass font-medium"
-                    >
-                      {del}
-                    </span>
-                  ))}
-                </div>
+              {/* Tools pills */}
+              <div className="mt-4 pt-3 border-t border-line/60 flex flex-wrap items-center gap-1.5">
+                <span className="font-mono text-[0.62rem] uppercase tracking-wider text-muted mr-1">Tools:</span>
+                {service.tools.slice(0, 4).map((t) => (
+                  <span key={t} className="border border-line bg-card px-2 py-0.5 font-mono text-[0.68rem] text-muted">
+                    {t}
+                  </span>
+                ))}
               </div>
             </div>
 
-            {/* Right: Real Sample Assertion / Bug Report Box */}
-            <div className="p-6 sm:p-8 flex flex-col justify-between bg-card/60">
+            {/* Right: Real-World Artifact + Redirect CTA */}
+            <div className="p-4 sm:p-5 flex flex-col justify-between bg-card/50">
               <div>
-                <div className="flex items-center justify-between border-b border-line pb-3 mb-4">
-                  <span className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-pass font-semibold flex items-center gap-1.5">
-                    <Code2 className="h-3.5 w-3.5" />
-                    <span>Real-World QA Artifact</span>
+                <div className="flex items-center justify-between border-b border-line pb-2 mb-2.5">
+                  <span className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-pass font-semibold flex items-center gap-1">
+                    <Code2 className="h-3 w-3" />
+                    <span>Real QA Artifact</span>
                   </span>
-                  <span className="font-mono text-[0.65rem] text-muted uppercase">
+                  <span className="font-mono text-[0.62rem] text-muted uppercase">
                     {service.sampleAssertion.language}
                   </span>
                 </div>
 
-                <div className="border border-line bg-paper p-4 font-mono text-[0.72rem] leading-relaxed overflow-x-auto text-ink-soft">
-                  <pre className="whitespace-pre-wrap">{service.sampleAssertion.code}</pre>
+                <div className="border border-line bg-paper p-3 font-mono text-[0.68rem] leading-relaxed max-h-[140px] overflow-hidden text-ink-soft">
+                  <pre className="whitespace-pre-wrap">{service.sampleAssertion.code.slice(0, 220)}…</pre>
                 </div>
-
-                <p className="mt-2.5 text-xs text-muted italic">
+                <p className="mt-1.5 text-[0.7rem] text-muted italic">
                   {service.sampleAssertion.caption}
                 </p>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-line/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                <span className="font-mono text-[0.68rem] text-muted">
-                  Full service engagement models &amp; deliverables
+              <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between gap-2">
+                <span className="font-mono text-[0.65rem] text-muted">
+                  Full methodology &amp; SLAs
                 </span>
                 <Link
                   href="/services"
                   data-testid="services-redirect-cta"
                   data-cursor="Complete testing services"
-                  className="press inline-flex items-center gap-1.5 border border-pass bg-card px-4 py-2 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
+                  className="press inline-flex items-center gap-1 border border-pass bg-card px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0"
                 >
-                  <span>Explore full services page</span>
+                  <span>Explore full services</span>
                   <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                 </Link>
               </div>

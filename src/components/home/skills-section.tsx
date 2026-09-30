@@ -18,9 +18,13 @@ const featuredKeywords: Record<string, string> = {
   "AI & GenAI": "2026 Edge Testing",
 };
 
-export function SkillsSection() {
+interface SkillsSectionProps {
+  compact?: boolean;
+}
+
+export function SkillsSection({ compact = false }: SkillsSectionProps) {
   const searchInputId = useId();
-  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [activeCategory, setActiveCategory] = useState<string>(compact ? "Automation" : "All");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const totalSkillsCount = useMemo(() => {
@@ -28,10 +32,13 @@ export function SkillsSection() {
   }, []);
 
   const categories = useMemo(() => {
+    if (compact) {
+      return toolkit.map((g) => ({ label: g.label, count: g.items.length }));
+    }
     return [{ label: "All", count: totalSkillsCount }].concat(
       toolkit.map((g) => ({ label: g.label, count: g.items.length }))
     );
-  }, [totalSkillsCount]);
+  }, [compact, totalSkillsCount]);
 
   const filteredGroups = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
@@ -77,10 +84,10 @@ export function SkillsSection() {
   };
 
   return (
-    <div className="mt-10 min-w-0">
+    <div className={`${compact ? "mt-4" : "mt-10"} min-w-0`}>
       {/* Category Tabs & Live Search Toolbar */}
-      <div className="border-y border-line py-5 min-w-0">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between min-w-0">
+      <div className={`border-y border-line ${compact ? "py-2.5 sm:py-3" : "py-5"} min-w-0`}>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between min-w-0">
           {/* Category Tabs */}
           <div className="flex flex-wrap items-center gap-1.5 min-w-0" role="tablist" aria-label="Skill categories">
             {categories.map((cat) => {
@@ -92,7 +99,9 @@ export function SkillsSection() {
                   role="tab"
                   aria-selected={isSelected}
                   onClick={() => handleCategoryClick(cat.label)}
-                  className={`press inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-[0.72rem] tracking-[0.08em] uppercase transition-all ${
+                  className={`press inline-flex items-center gap-1.5 font-mono tracking-[0.08em] uppercase transition-all ${
+                    compact ? "px-2.5 py-1 text-[0.68rem]" : "px-3 py-1.5 text-[0.72rem]"
+                  } ${
                     isSelected
                       ? "bg-ink font-medium text-paper shadow-xs"
                       : "border border-line bg-paper text-muted hover:border-pass hover:text-ink"
@@ -110,7 +119,7 @@ export function SkillsSection() {
               <button
                 type="button"
                 onClick={clearFilters}
-                className="press ml-2 inline-flex items-center gap-1 font-mono text-[0.68rem] tracking-[0.1em] text-muted hover:text-pass uppercase"
+                className="press ml-2 inline-flex items-center gap-1 font-mono text-[0.65rem] tracking-[0.1em] text-muted hover:text-pass uppercase"
               >
                 <X className="size-3" />
                 Reset
@@ -119,7 +128,7 @@ export function SkillsSection() {
           </div>
 
           {/* Live Search input */}
-          <div className="relative w-full lg:w-72 min-w-0">
+          <div className="relative w-full lg:w-64 min-w-0">
             <label htmlFor={searchInputId} className="sr-only">
               Search {totalSkillsCount} verified skills
             </label>
@@ -131,7 +140,7 @@ export function SkillsSection() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search skill (e.g. Playwright, UPI)..."
-                className="w-full border border-line bg-paper py-2 pr-8 pl-8 font-mono text-xs text-ink placeholder:text-muted transition-colors focus:border-pass focus:outline-none"
+                className="w-full border border-line bg-paper py-1.5 pr-8 pl-8 font-mono text-xs text-ink placeholder:text-muted transition-colors focus:border-pass focus:outline-none"
               />
               {searchQuery ? (
                 <button
@@ -150,7 +159,7 @@ export function SkillsSection() {
 
       {/* Search results banner */}
       {(searchQuery || activeCategory !== "All") ? (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 font-mono text-[0.68rem] tracking-[0.12em] text-muted uppercase">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 font-mono text-[0.65rem] tracking-[0.12em] text-muted uppercase">
           <p>
             Showing <span className="font-semibold text-ink">{totalVisibleCount}</span> of {totalSkillsCount} skills
             {searchQuery ? ` matching "${searchQuery}"` : ` in ${activeCategory}`}
@@ -170,7 +179,9 @@ export function SkillsSection() {
         {filteredGroups.map((group) => (
           <li
             key={group.label}
-            className="grid gap-4 py-6 sm:py-7 md:grid-cols-[12rem_minmax(0,1fr)] md:items-start md:gap-8 lg:px-1 min-w-0"
+            className={`grid gap-3 ${
+              compact ? "py-3 sm:py-3.5" : "py-6 sm:py-7"
+            } md:grid-cols-[10rem_minmax(0,1fr)] md:items-start md:gap-6 lg:px-1 min-w-0`}
           >
             <div className="min-w-0">
               <div className="flex items-center gap-2">
@@ -182,27 +193,29 @@ export function SkillsSection() {
                 </span>
               </div>
               {group.label === "Exposure" ? (
-                <p className="mt-2 max-w-[12rem] text-xs leading-snug text-muted">
-                  Followed those efforts. Did not run the tests.
+                <p className="mt-1 max-w-[10rem] text-[0.7rem] leading-snug text-muted">
+                  Followed those efforts.
                 </p>
               ) : group.label === "Automation" ? (
-                <p className="mt-2 max-w-[12rem] text-xs leading-snug text-muted">
-                  Scripted POM suites across Android, iOS, and Web.
+                <p className="mt-1 max-w-[10rem] text-[0.7rem] leading-snug text-muted">
+                  Scripted POM suites across Android, iOS &amp; Web.
                 </p>
               ) : group.label === "Fintech" ? (
-                <p className="mt-2 max-w-[12rem] text-xs leading-snug text-muted">
-                  NPCI compliance, payment gateways &amp; money flows.
+                <p className="mt-1 max-w-[10rem] text-[0.7rem] leading-snug text-muted">
+                  NPCI compliance &amp; payment gateways.
                 </p>
               ) : null}
             </div>
 
-            <ul className="flex flex-wrap gap-2 min-w-0">
+            <ul className="flex flex-wrap gap-1.5 min-w-0">
               {group.items.map((item) => {
                 const badge = featuredKeywords[item];
                 return (
                   <li
                     key={item}
-                    className={`skill-chip group relative inline-flex items-center gap-1.5 border px-3 py-1.5 font-mono text-[0.8125rem] leading-none transition-all ${
+                    className={`skill-chip group relative inline-flex items-center gap-1.5 border ${
+                      compact ? "px-2.5 py-1 text-xs" : "px-3 py-1.5 text-[0.8125rem]"
+                    } font-mono leading-none transition-all ${
                       badge
                         ? "border-pass/60 bg-paper text-ink hover:border-pass"
                         : "border-line bg-paper text-ink hover:border-pass hover:text-pass"
@@ -210,7 +223,7 @@ export function SkillsSection() {
                   >
                     <span>{item}</span>
                     {badge ? (
-                      <span className="inline-flex items-center gap-0.5 rounded-xs bg-ink px-1.5 py-0.5 text-[0.58rem] tracking-tight text-paper uppercase">
+                      <span className="inline-flex items-center gap-0.5 rounded-xs bg-ink px-1.5 py-0.5 text-[0.55rem] tracking-tight text-paper uppercase">
                         <Check className="size-2 text-paper" strokeWidth={3} />
                         {badge}
                       </span>
@@ -224,23 +237,23 @@ export function SkillsSection() {
       </ul>
 
       {/* Recruiter Confidence Banner */}
-      <div className="mt-10 flex flex-col gap-3 border border-line bg-card p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5 min-w-0">
-        <div className="flex items-center gap-3 min-w-0">
-          <span className="inline-flex size-8 shrink-0 items-center justify-center border border-line bg-paper text-ink">
-            <Sparkles className="size-4 text-pass" />
+      <div className={`${compact ? "mt-4 p-3 sm:p-3.5" : "mt-10 p-4 sm:p-5"} flex flex-col gap-2.5 border border-line bg-card sm:flex-row sm:items-center sm:justify-between min-w-0`}>
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span className="inline-flex size-7 shrink-0 items-center justify-center border border-line bg-paper text-ink">
+            <Sparkles className="size-3.5 text-pass" />
           </span>
           <div className="min-w-0">
-            <p className="font-serif text-sm font-medium text-ink">
+            <p className="font-serif text-xs sm:text-sm font-medium text-ink">
               Verified Production Competence · Zero Theoretical Claims
             </p>
-            <p className="text-xs text-ink-soft">
-              Every skill listed above has been deployed across 15+ live apps, lending portals, or production release gates.
+            <p className="text-[0.7rem] text-ink-soft">
+              Every skill tested across 15+ live apps, lending portals, or production release gates.
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2 font-mono text-[0.68rem] tracking-[0.1em] text-muted uppercase">
-          <Layers className="size-3.5 text-pass" />
-          <span>90+ ATS Keywords · 100% Audit Ready</span>
+        <div className="flex flex-wrap items-center gap-1.5 font-mono text-[0.65rem] tracking-[0.1em] text-muted uppercase">
+          <Layers className="size-3 text-pass" />
+          <span>90+ ATS Keywords · Audit Ready</span>
         </div>
       </div>
     </div>

@@ -24,6 +24,22 @@
   animation: content-fade 320ms var(--ease) both;
 }
 
+@keyframes page-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: page-enter 280ms var(--ease) both;
+  will-change: opacity, transform;
+}
+
 .nav-link {
   position: relative;
 }
@@ -138,7 +154,8 @@
   .about-mark-icon,
   .about-mark-rule,
   .practice-icon path,
-  .practice-icon rect {
+  .practice-icon rect,
+  .page-transition {
     animation: none;
     stroke-dashoffset: 0;
   }

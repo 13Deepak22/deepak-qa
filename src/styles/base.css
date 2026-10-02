@@ -58,6 +58,60 @@ body {
   color: var(--paper);
 }
 
+/* Custom Editorial Fintech Scrollbars */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) var(--paper-deep);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--paper-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 9999px;
+  border: 2px solid var(--paper-deep);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--pass);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--pass-fill);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--paper-deep);
+}
+
+/* Dark code terminals and pre overflow containers */
+pre::-webkit-scrollbar-track,
+.bg-band::-webkit-scrollbar-track,
+.bg-band ::-webkit-scrollbar-track {
+  background: rgba(12, 11, 10, 0.85);
+}
+
+pre::-webkit-scrollbar-thumb,
+.bg-band::-webkit-scrollbar-thumb,
+.bg-band ::-webkit-scrollbar-thumb {
+  background: #3f382f;
+  border: 2px solid rgba(12, 11, 10, 0.85);
+  border-radius: 9999px;
+}
+
+pre::-webkit-scrollbar-thumb:hover,
+.bg-band::-webkit-scrollbar-thumb:hover,
+.bg-band ::-webkit-scrollbar-thumb:hover {
+  background: var(--pass);
+}
+
 :focus-visible {
   outline: 2px solid var(--pass);
   outline-offset: 3px;

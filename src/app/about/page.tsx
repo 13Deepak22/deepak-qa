@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { AboutChapters } from "@/components/about/about-chapters";
 import { AboutMarks } from "@/components/about/about-marks";
+import { InteractiveQaPrinciples } from "@/components/about/interactive-qa-principles";
 import { InView } from "@/components/ui/in-view";
 import { about, aboutChapters, profile } from "@/data";
 import { profilePageJsonLd, siteTitleSuffix } from "@/lib/site";
@@ -222,6 +223,14 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* Interactive Testing Creed & Operating Principles */}
+      <section className="border-t border-line bg-paper-deep py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <InteractiveQaPrinciples />
+        </div>
+      </section>
+
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     </main>
   );

@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowRight,
-  LockKeyhole,
-  Smartphone,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { PublicApps } from "@/components/home/public-apps";
-import { publicApps, unpublishedWork } from "@/data";
+import { InteractiveEnterprisePortals } from "@/components/work/interactive-enterprise-portals";
+import { publicApps } from "@/data";
 import { siteTitleSuffix } from "@/lib/site";
 
 export function generateMetadata(): Metadata {
@@ -39,33 +36,6 @@ export default function WorkPage() {
     { label: "Public Apps", value: `${publicApps.length}`, hint: "Consumer fintech & utility" },
     { label: "Enterprise Portals", value: "8+", hint: "Confidential under NDA" },
     { label: "Release Gate Sign-off", value: "100%", hint: "Zero critical escapes" },
-  ];
-
-  const confidentialPortals = [
-    {
-      title: "Loan Origination System (LOS)",
-      category: "Fintech Lending",
-      desc: "Multi-tiered applicant underwriting portal handling eKYC, credit bureau pulls, bank statement analysis, and automated risk scoring.",
-      checks: ["eKYC verification", "Penny drop validation", "Credit score tiering"],
-    },
-    {
-      title: "Loan Management System (LMS)",
-      category: "Fintech Core",
-      desc: "Disbursal engine, repayment scheduling, interest calculation matrices, overdue fee logic, and bank mandate management.",
-      checks: ["Disbursal ledger", "Double-debit prevention", "Auto-debit NACH"],
-    },
-    {
-      title: "Merchant Settlement Portal",
-      category: "Payments & Accounting",
-      desc: "High-volume transaction ledger reconciling gross settlements, MDR fee deductions, partner gateway split payments, and refunds.",
-      checks: ["Reconciliation audits", "Webhook retries", "Batch settlement runs"],
-    },
-    {
-      title: "Partner Banking APIs & Gateway",
-      category: "Integration Middleware",
-      desc: "Direct integration middleware connecting partner banks for IMPS, NEFT, and RTGS payment rails with strict idempotency guarantees.",
-      checks: ["Idempotency keys", "Timeout recovery", "Signature validation"],
-    },
   ];
 
   return (
@@ -119,58 +89,8 @@ export default function WorkPage() {
         </div>
       </section>
 
-      {/* Confidential & Enterprise Portals Section */}
-      <section className="border-t border-line bg-paper-deep py-16 sm:py-20 lg:py-24">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="flex items-start gap-4 border border-line bg-card p-6 sm:p-8">
-            <span
-              aria-hidden="true"
-              className="mt-1 inline-flex h-12 w-12 shrink-0 items-center justify-center border border-dashed border-line text-pass"
-            >
-              <LockKeyhole className="h-6 w-6" strokeWidth={1.5} />
-            </span>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">
-                  Internal and Confidential
-                </p>
-                <span className="border border-line bg-paper px-2 py-0.5 font-mono text-[0.65rem] text-muted uppercase">
-                  8+ Enterprise Portals
-                </span>
-              </div>
-              <h2 className="mt-2 font-serif text-2xl sm:text-3xl text-ink">
-                Enterprise &amp; Back-Office Systems
-              </h2>
-              <p className="mt-2 max-w-3xl font-serif text-lg leading-relaxed text-ink-soft">
-                {unpublishedWork}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {confidentialPortals.map((portal) => (
-              <div key={portal.title} className="flex flex-col border border-line bg-paper p-5 sm:p-6">
-                <span className="font-mono text-[0.65rem] tracking-[0.14em] text-pass uppercase">
-                  {portal.category}
-                </span>
-                <h3 className="mt-2 font-serif text-xl tracking-tight text-ink">{portal.title}</h3>
-                <p className="mt-2 text-xs leading-relaxed text-ink-soft">{portal.desc}</p>
-                <div className="mt-auto pt-4 border-t border-line/60">
-                  <p className="font-mono text-[0.65rem] text-muted uppercase tracking-wider mb-2">Verified Flows</p>
-                  <ul className="space-y-1">
-                    {portal.checks.map((chk) => (
-                      <li key={chk} className="font-mono text-[0.7rem] text-ink-soft flex items-center gap-1.5">
-                        <span className="h-1 w-1 rounded-full bg-pass shrink-0" />
-                        <span>{chk}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Confidential & Enterprise Portals Section with Interactive Architecture & Simulator */}
+      <InteractiveEnterprisePortals />
 
       {/* Navigation CTA Bar */}
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24 border-t border-line">

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { RcaCaseStudy } from "@/components/home/rca-case-study";
+import { InteractiveRaceTimeline } from "@/components/rca/interactive-race-timeline";
 import { profile } from "@/data";
 import { siteTitleSuffix } from "@/lib/site";
 
@@ -34,8 +35,12 @@ export default function RcaPage() {
       {/* The full RCA Investigation & Interactive Test Runner */}
       <RcaCaseStudy />
 
-      {/* Deep-dive Technical Summary & Call to Action */}
+      {/* Deep-dive Concurrency Timeline Simulator & Call to Action */}
       <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-20 lg:pb-28">
+        <div className="mb-12">
+          <InteractiveRaceTimeline />
+        </div>
+
         <div className="enter enter-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 border-t border-line pt-12">
           <div className="border border-line bg-card p-5">
             <span className="font-mono text-[0.65rem] tracking-[0.16em] text-pass uppercase block">

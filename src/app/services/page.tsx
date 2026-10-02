@@ -9,6 +9,8 @@ import {
   ShieldCheck,
   Smartphone,
 } from "lucide-react";
+import { InteractiveDeliverables } from "@/components/services/interactive-deliverables";
+import { MobileDeviceMatrix } from "@/components/services/mobile-device-matrix";
 import { ServicesSection } from "@/components/home/services";
 import { services } from "@/data";
 import { siteTitleSuffix } from "@/lib/site";
@@ -132,7 +134,7 @@ export default function ServicesPage() {
       {/* Main Services Section with Toolkit Enabled */}
       <ServicesSection showToolkit={true} showHeader={false} id="core-services" />
 
-      {/* QA Deliverables & Artefacts */}
+      {/* QA Deliverables & Artefacts (Interactive Documentation Inspector) */}
       <section className="border-t border-line bg-paper py-16 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -145,29 +147,11 @@ export default function ServicesPage() {
               </h2>
             </div>
             <p className="max-w-md text-sm leading-relaxed text-ink-soft">
-              Every QA engagement yields clear, auditable documentation that gives engineering leaders complete confidence.
+              Every QA engagement yields clear, auditable documentation that gives engineering leaders complete confidence. Select an artifact below to inspect live mock data.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {deliverables.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.num} className="flex flex-col border border-line bg-card p-5 sm:p-6">
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex h-10 w-10 items-center justify-center border border-line bg-paper text-pass">
-                      <Icon className="h-5 w-5" strokeWidth={1.75} />
-                    </span>
-                    <span className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase">
-                      {item.num}
-                    </span>
-                  </div>
-                  <h3 className="mt-5 font-serif text-xl tracking-tight text-ink">{item.title}</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-ink-soft">{item.body}</p>
-                </div>
-              );
-            })}
-          </div>
+          <InteractiveDeliverables />
         </div>
       </section>
 
@@ -206,60 +190,20 @@ export default function ServicesPage() {
 
       {/* Fintech & Mobile Domain Specialization */}
       <section className="border-t border-line bg-card py-16 sm:py-20 lg:py-24">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-            <div>
-              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-pass uppercase">
-                Domain Specialization
-              </p>
-              <h2 className="mt-2 font-serif text-3xl tracking-tight text-balance sm:text-4xl text-ink">
-                Fintech payments, lending, &amp; native mobile testing.
-              </h2>
-              <p className="mt-4 leading-relaxed text-ink-soft text-sm sm:text-base">
-                Testing financial software demands deep familiarity with regulatory compliance, bank partner gateways, and sensitive user data. I specialize in testing payment flows that cannot afford failure:
-              </p>
-              <ul className="mt-6 space-y-3 text-sm text-ink-soft">
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-pass mt-0.5" />
-                  <span><strong>UPI &amp; Gateway Integrations:</strong> Validation of intent flows, QR scanning, Razorpay, Cashfree, and PayU webhooks under network jitter.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-pass mt-0.5" />
-                  <span><strong>Loan Origination &amp; Management (LOS/LMS):</strong> Multi-step underwriting, repayment schedules, interest calculations, and bank mandates.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-pass mt-0.5" />
-                  <span><strong>eKYC &amp; Onboarding:</strong> DigiLocker Aadhaar paperless offline XML, PAN verification, and Aadhaar eSign consent flows.</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="border border-line bg-paper p-6 sm:p-8">
-              <div className="flex items-center gap-3">
-                <Smartphone className="h-6 w-6 text-pass" />
-                <h3 className="font-serif text-2xl tracking-tight text-ink">Mobile Device Coverage</h3>
-              </div>
-              <p className="mt-3 text-xs leading-relaxed text-ink-soft">
-                Native app tests executed across both Android and iOS real devices and emulators:
-              </p>
-              <div className="mt-5 grid grid-cols-2 gap-2 text-xs font-mono">
-                <div className="border border-line bg-card p-3">
-                  <p className="text-pass font-bold">Android Matrix</p>
-                  <p className="text-muted mt-1 text-[0.7rem]">OS 10 through 15</p>
-                  <p className="text-ink-soft mt-1 text-[0.7rem]">Samsung, Pixel, Xiaomi, OnePlus</p>
-                </div>
-                <div className="border border-line bg-card p-3">
-                  <p className="text-pass font-bold">iOS Matrix</p>
-                  <p className="text-muted mt-1 text-[0.7rem]">iOS 15 through 18</p>
-                  <p className="text-ink-soft mt-1 text-[0.7rem]">iPhone 11 through 16 Pro</p>
-                </div>
-              </div>
-              <div className="mt-4 border-t border-line pt-4 flex items-center justify-between text-xs text-muted">
-                <span>Frameworks</span>
-                <span className="font-mono text-ink">Appium · UiAutomator2 · XCUITest</span>
-              </div>
-            </div>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 space-y-10">
+          <div>
+            <p className="font-mono text-[0.72rem] tracking-[0.16em] text-pass uppercase">
+              Domain Specialization
+            </p>
+            <h2 className="mt-2 font-serif text-3xl tracking-tight text-balance sm:text-4xl text-ink">
+              Fintech payments, lending, &amp; native mobile testing.
+            </h2>
+            <p className="mt-3 leading-relaxed text-ink-soft text-sm sm:text-base max-w-3xl">
+              Testing financial software demands deep familiarity with regulatory compliance, bank partner gateways, and sensitive user data. I specialize in testing payment flows that cannot afford failure.
+            </p>
           </div>
+
+          <MobileDeviceMatrix />
         </div>
       </section>
 

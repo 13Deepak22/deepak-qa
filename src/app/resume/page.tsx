@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
+import { InteractiveAtsAnalyzer } from "@/components/resume/interactive-ats-analyzer";
 import { DownloadOptions } from "@/components/resume/download-options";
 import { education, experience, profile, publicApps, resume, toolkit } from "@/data";
 import { experienceLabel } from "@/lib/career";
@@ -54,6 +55,8 @@ export default function ResumePage() {
           </div>
           <DownloadOptions />
         </div>
+
+        <InteractiveAtsAnalyzer />
 
         <article
           aria-label={`Resume of ${profile.name}`}

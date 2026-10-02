@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Download, FileText, ShieldCheck } from "lucide-react";
 import { SkillsSection } from "@/components/home/skills-section";
+import { InteractiveJobMatcher } from "@/components/skills/interactive-job-matcher";
 import { profile, toolkit } from "@/data";
 import { siteTitleSuffix } from "@/lib/site";
 
@@ -76,6 +77,11 @@ export default function SkillsPage() {
         {/* Interactive Skills Explorer Component */}
         <div className="enter enter-3 mt-4">
           <SkillsSection />
+        </div>
+
+        {/* Recruiter Role Fit Analyzer & ATS Evidence Inspector */}
+        <div className="enter enter-4 mt-16 border-t border-line pt-12">
+          <InteractiveJobMatcher />
         </div>
 
         {/* ATS Keywords & Recruiter Reference Matrix */}

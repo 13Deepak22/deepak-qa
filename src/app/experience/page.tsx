@@ -7,6 +7,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { ExperienceLog } from "@/components/home/experience-log";
+import { InteractiveCareerMetrics } from "@/components/experience/interactive-career-metrics";
 import { experience } from "@/data";
 import { experienceLabel } from "@/lib/career";
 import { siteTitleSuffix } from "@/lib/site";
@@ -91,6 +92,13 @@ export default function ExperiencePage() {
           </div>
 
           <ExperienceLog />
+        </div>
+      </section>
+
+      {/* Interactive Career Metrics & Defect Hall of Fame */}
+      <section className="border-t border-line bg-paper py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <InteractiveCareerMetrics />
         </div>
       </section>
 

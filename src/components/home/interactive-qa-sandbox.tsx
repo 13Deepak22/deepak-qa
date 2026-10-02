@@ -8,6 +8,9 @@ import {
   CheckCircle2,
   Clock,
   Code2,
+  Fingerprint,
+  Globe,
+  Landmark,
   Play,
   RotateCcw,
   ShieldCheck,
@@ -124,6 +127,13 @@ const SCENARIOS: Scenario[] = [
   },
 ];
 
+const SCENARIO_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  "upi-intent": Zap,
+  "loan-disbursal": Landmark,
+  "forex-rate-lock": Globe,
+  "biometric-session": Fingerprint,
+};
+
 export function InteractiveQASandbox() {
   const [selectedId, setSelectedId] = useState<string>("upi-intent");
   const [isThrottled, setIsThrottled] = useState<boolean>(false);
@@ -196,10 +206,11 @@ export function InteractiveQASandbox() {
 
         {/* Workbench Container */}
         <div className="mt-10 border border-line bg-paper shadow-sm">
-          {/* Top Scenario Selector Tabs */}
-          <div className="flex border-b border-line overflow-x-auto bg-card">
-            {SCENARIOS.map((sc) => {
+          {/* Top Scenario Selector Tabs: Symmetrically divided 4 columns with upper green border highlight */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-b border-line bg-card">
+            {SCENARIOS.map((sc, index) => {
               const isSelected = sc.id === activeScenario.id;
+              const Icon = SCENARIO_ICONS[sc.id] || Activity;
               return (
                 <button
                   key={sc.id}
@@ -210,18 +221,55 @@ export function InteractiveQASandbox() {
                     setSelectedId(sc.id);
                     handleReset();
                   }}
-                  className={`flex shrink-0 items-center gap-2.5 px-4 py-3.5 text-xs font-mono transition-colors border-r border-line text-left ${
+                  className={`group relative flex w-full items-center gap-3 px-4 py-3.5 text-xs font-mono transition-colors text-left border-line ${
+                    index < 3 ? "lg:border-r" : "lg:border-r-0"
+                  } ${index % 2 === 0 ? "sm:border-r" : "sm:border-r-0"} ${
+                    index < 2 ? "sm:border-b" : "sm:border-b-0"
+                  } ${index < 3 ? "border-b sm:border-b-0" : "border-b-0"} ${
                     isSelected
-                      ? "bg-paper text-pass border-b-2 border-b-pass font-medium"
-                      : "text-ink-soft hover:bg-paper/60 hover:text-ink"
+                      ? "bg-paper text-pass font-medium"
+                      : "bg-card text-ink-soft hover:bg-paper/70 hover:text-ink"
                   }`}
                 >
-                  <Activity className={`h-3.5 w-3.5 ${isSelected ? "text-pass" : "text-muted"}`} />
-                  <div>
-                    <span className="block tracking-wider uppercase text-[0.65rem] text-muted">
+                  {/* Active Green Upper Border Highlight */}
+                  <span
+                    className={`absolute inset-x-0 -top-px h-[3px] transition-all duration-200 ${
+                      isSelected
+                        ? "bg-pass shadow-[0_1px_3px_rgba(18,95,59,0.35)] dark:shadow-[0_1px_4px_rgba(47,175,110,0.4)]"
+                        : "bg-transparent group-hover:bg-pass/30"
+                    }`}
+                    aria-hidden="true"
+                  />
+
+                  {/* Matching Scenario Icon Badge */}
+                  <div
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xs border transition-colors ${
+                      isSelected
+                        ? "border-pass/40 bg-pass/10 text-pass shadow-2xs"
+                        : "border-line/70 bg-paper/60 text-muted group-hover:border-line group-hover:text-ink"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </div>
+
+                  {/* Scenario Metadata */}
+                  <div className="min-w-0 flex-1">
+                    <span
+                      className={`block truncate tracking-wider uppercase text-[0.65rem] transition-colors ${
+                        isSelected ? "text-pass font-semibold" : "text-muted"
+                      }`}
+                    >
                       {sc.category}
                     </span>
-                    <span className="font-sans font-medium text-ink">{sc.name}</span>
+                    <span
+                      className={`block truncate font-sans text-xs transition-colors ${
+                        isSelected
+                          ? "font-semibold text-ink"
+                          : "font-medium text-ink-soft group-hover:text-ink"
+                      }`}
+                    >
+                      {sc.name}
+                    </span>
                   </div>
                 </button>
               );

@@ -269,9 +269,9 @@ export function ReleaseGatekeeper() {
               </div>
             </div>
 
-            {/* Right: Live Gate Decision Log (Balanced Height to Match Left Column) */}
+            {/* Right: Live Gate Decision Log */}
             <div className="p-5 sm:p-6 flex flex-col justify-between bg-card/40">
-              <div>
+              <div className="flex-1 flex flex-col">
                 <div className="flex items-center justify-between border-b border-line pb-3 mb-3.5">
                   <span className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted">
                     Gatekeeper Audit Log
@@ -280,7 +280,7 @@ export function ReleaseGatekeeper() {
                 </div>
 
                 {isApproved ? (
-                  <div key="approved" className="space-y-3">
+                  <div key="approved" className="flex-1 flex flex-col justify-between gap-3">
                     <div className="border border-pass/30 bg-paper p-3.5 rounded-xs">
                       <div className="flex items-start gap-2.5">
                         <ShieldCheck className="h-5 w-5 text-pass shrink-0 mt-0.5" />
@@ -288,33 +288,39 @@ export function ReleaseGatekeeper() {
                           <p className="font-mono text-xs uppercase tracking-wider text-pass font-bold">
                             Zero-Defect Sign-off Ready
                           </p>
-                          <p className="mt-1 text-xs text-ink-soft leading-relaxed line-clamp-2">
+                          <p className="mt-1 text-xs text-ink-soft leading-relaxed">
                             All 4 quality gates satisfy Deepak&apos;s release standards. 0 critical bugs, 100% automated regression passed, API SLA verified, and idempotency active.
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="border border-line bg-paper p-3.5 space-y-2 text-xs rounded-xs">
-                      <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block">
+                    <div className="border border-line bg-paper p-3.5 space-y-2 text-xs rounded-xs flex-1 flex flex-col justify-center">
+                      <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block mb-1">
                         Production Gate Artifacts Generated:
                       </span>
-                      <p className="text-ink flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0" />
-                        <span className="truncate">Signed Test Summary Report (TSR) &amp; Matrix</span>
-                      </p>
-                      <p className="text-ink flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0" />
-                        <span className="truncate">Automated Regression Artifacts (Playwright HTML)</span>
-                      </p>
-                      <p className="text-ink flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0" />
-                        <span className="truncate">Payment Reconciliation &amp; Webhook Audit Log</span>
-                      </p>
+                      <div className="space-y-2">
+                        <p className="text-ink flex items-center gap-2">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0" />
+                          <span className="truncate">Signed Test Summary Report (TSR) &amp; Matrix</span>
+                        </p>
+                        <p className="text-ink flex items-center gap-2">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0" />
+                          <span className="truncate">Automated Regression Artifacts (Playwright HTML)</span>
+                        </p>
+                        <p className="text-ink flex items-center gap-2">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0" />
+                          <span className="truncate">Payment Reconciliation &amp; Webhook Audit Log</span>
+                        </p>
+                        <p className="text-ink flex items-center gap-2">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0" />
+                          <span className="truncate">Redis Idempotency Distributed Lock Lease Verified</span>
+                        </p>
+                      </div>
                     </div>
                   </div>
                 ) : (
-                  <div key="halted" className="space-y-3">
+                  <div key="halted" className="flex-1 flex flex-col justify-between gap-3">
                     <div className="border border-red-500/40 bg-red-500/10 p-3.5 rounded-xs">
                       <div className="flex items-start gap-2.5">
                         <ShieldAlert className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
@@ -322,22 +328,27 @@ export function ReleaseGatekeeper() {
                           <p className="font-mono text-xs uppercase tracking-wider text-red-600 dark:text-red-400 font-bold">
                             Deployment Blocked by QA Gatekeeper
                           </p>
-                          <p className="mt-1 text-xs text-ink-soft leading-relaxed line-clamp-2">
+                          <p className="mt-1 text-xs text-ink-soft leading-relaxed">
                             {failedRules.length} critical gate condition(s) breached. Release cannot ship until blockers are triaged and re-tested.
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="border border-line bg-paper p-3.5 text-xs rounded-xs">
-                      <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block mb-1.5">
-                        Deepak&apos;s Active Triage Protocol ({failedRules.length} Blocking):
-                      </span>
-                      <div className="space-y-1.5 max-h-[105px] overflow-y-auto pr-1">
+                    <div className="border border-line bg-paper p-3.5 text-xs rounded-xs flex-1 flex flex-col">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block">
+                          Deepak&apos;s Active Triage Protocol ({failedRules.length} Blocking):
+                        </span>
+                        <span className="font-mono text-[0.6rem] uppercase tracking-wider text-red-600 dark:text-red-400 font-semibold">
+                          Action Required
+                        </span>
+                      </div>
+                      <div className="space-y-2 flex-1 flex flex-col justify-between">
                         {failedRules.map((r) => (
-                          <div key={r.id} className="border-l-2 border-red-500 pl-2 py-0.5">
-                            <p className="font-bold text-ink text-xs truncate">{r.name}</p>
-                            <p className="text-ink-soft text-[0.7rem] line-clamp-1">{r.impactOnFailure}</p>
+                          <div key={r.id} className="border-l-2 border-red-500 pl-2.5 py-0.5">
+                            <p className="font-bold text-ink text-xs truncate leading-snug">{r.name}</p>
+                            <p className="text-ink-soft text-[0.72rem] leading-tight line-clamp-1 mt-0.5">{r.impactOnFailure}</p>
                           </div>
                         ))}
                       </div>

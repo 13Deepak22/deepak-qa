@@ -1,14 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  Activity,
-  ArrowRight,
-  CheckCircle2,
-  FileSpreadsheet,
-  Layers,
-  ShieldCheck,
-  Smartphone,
-} from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { InteractiveDeliverables } from "@/components/services/interactive-deliverables";
 import { MobileDeviceMatrix } from "@/components/services/mobile-device-matrix";
 import { ServicesSection } from "@/components/home/services";
@@ -45,33 +37,6 @@ export default function ServicesPage() {
     { label: "Automated Checks", value: "10k+", hint: "Playwright & Appium regressions" },
     { label: "Effort Reduction", value: "50%", hint: "Manual sanity hours cut" },
     { label: "Critical Escapes", value: "0", hint: "On cleared production gates" },
-  ];
-
-  const deliverables = [
-    {
-      num: "01",
-      title: "Test Strategy & Plan",
-      icon: FileSpreadsheet,
-      body: "Comprehensive scope definition, device/browser coverage matrix, environmental topology, risk assessment, and clear entry/exit criteria for every milestone.",
-    },
-    {
-      num: "02",
-      title: "Traceability Matrix (RTM)",
-      icon: Layers,
-      body: "Bidirectional traceability linking PRD/FRD user stories and business rules directly to executed test cases and automated regression scripts.",
-    },
-    {
-      num: "03",
-      title: "Actionable Bug Reports & RCA",
-      icon: Activity,
-      body: "Structured Jira defect tickets with clear reproduction steps, network HAR files, request/response payloads, video captures, and root cause isolation.",
-    },
-    {
-      num: "04",
-      title: "Release Sign-off Certificate",
-      icon: ShieldCheck,
-      body: "Formal deployment authorization summarizing test pass rates, open risk waivers, performance benchmarks, and explicit go/no-go recommendations.",
-    },
   ];
 
   const phases = [

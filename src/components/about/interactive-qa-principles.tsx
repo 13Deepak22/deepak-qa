@@ -5,11 +5,8 @@ import {
   Brain,
   CheckCircle2,
   Compass,
-  FileCheck,
   ShieldCheck,
   Sparkles,
-  Workflow,
-  Zap,
 } from "lucide-react";
 
 interface Principle {

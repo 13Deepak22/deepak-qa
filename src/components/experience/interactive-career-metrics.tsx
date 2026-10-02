@@ -2,14 +2,8 @@
 
 import { useState } from "react";
 import {
-  AlertTriangle,
   Award,
   CheckCircle2,
-  Clock,
-  RotateCcw,
-  ShieldCheck,
-  TrendingUp,
-  Zap,
 } from "lucide-react";
 
 interface CareerHighlight {

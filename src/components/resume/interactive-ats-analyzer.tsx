@@ -3,12 +3,8 @@
 import { useState } from "react";
 import {
   Check,
-  CheckCircle2,
   Copy,
-  FileCheck,
-  FileText,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 
 export function InteractiveAtsAnalyzer() {

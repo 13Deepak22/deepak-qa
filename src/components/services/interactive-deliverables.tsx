@@ -4,9 +4,7 @@ import { useState } from "react";
 import {
   Activity,
   CheckCircle2,
-  ExternalLink,
   FileSpreadsheet,
-  FileText,
   Layers,
   ShieldCheck,
 } from "lucide-react";

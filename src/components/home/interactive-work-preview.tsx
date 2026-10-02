@@ -172,7 +172,7 @@ export function InteractiveWorkPreview() {
             </h2>
           </div>
           <p className="max-w-md text-sm leading-relaxed text-ink-soft sm:text-right">
-            Click across consumer applications and back-office banking engines to inspect Deepak&apos;s real-world test coverage and defect prevention.
+            Deepak has tested 15+ production systems across consumer fintech apps, youth banking cards, live forex rate tickers, and high-volume loan disbursal engines. Select any product below to inspect the actual test journeys, tools utilized, and high-impact edge cases caught before release.
           </p>
         </div>
 
@@ -203,16 +203,25 @@ export function InteractiveWorkPreview() {
             );
           })}
 
-          {/* Confidential Portals Tab */}
+          {/* Confidential Portals Redirect Button (Highlighted in Pass Green without open box) */}
           <Link
             href="/work"
-            className="flex shrink-0 items-center gap-2.5 border border-dashed border-line bg-paper/30 px-4 py-3 text-left hover:border-pass transition-colors text-muted hover:text-ink"
+            data-testid="showcase-redirect-portals"
+            data-cursor="Open full portfolio (8+ enterprise portals)"
+            className="group flex shrink-0 items-center gap-3 border-2 border-pass bg-pass text-on-band px-4 py-3 text-left shadow-sm transition-all hover:bg-pass-fill hover:shadow-md"
           >
-            <LockKeyhole className="h-4 w-4 text-pass" />
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-xs bg-white/20 text-on-band">
+              <LockKeyhole className="h-4 w-4 text-on-band" />
+            </span>
             <div>
-              <span className="block text-xs font-serif font-bold text-ink">8+ Enterprise Portals</span>
-              <span className="block font-mono text-[0.65rem] text-muted">LOS, LMS &amp; Banking APIs</span>
+              <span className="block font-serif text-xs font-bold text-on-band">
+                8+ Enterprise Portals
+              </span>
+              <span className="block font-mono text-[0.65rem] text-on-band/90">
+                LOS, LMS &amp; Banking APIs
+              </span>
             </div>
+            <ArrowUpRight className="ml-1 h-4 w-4 text-on-band transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
         </div>
 

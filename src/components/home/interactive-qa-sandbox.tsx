@@ -22,16 +22,36 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+interface ScenarioControl {
+  id: string;
+  label: string;
+  paramKey: string;
+  icon: "shield" | "fingerprint" | "globe" | "zap" | "alert";
+  onLabel: string;
+  offLabel: string;
+  defaultVal: boolean;
+  defectRiskDescription: string;
+}
+
 interface Scenario {
   id: string;
   name: string;
   category: string;
   endpoint: string;
   method: "POST" | "GET" | "PUT";
-  normalPayload: Record<string, unknown>;
-  steps: { name: string; durationMs: number }[];
+  generatePayload: (controls: Record<string, boolean>) => Record<string, unknown>;
+  steps: {
+    name: string;
+    durationMs: number;
+    assertionCheck: string;
+    failureReason?: string;
+  }[];
+  customControl?: ScenarioControl;
+  edgeCases: string[];
+  targetPlatforms: string[];
   expectedSuccess: string;
   defectWarning: string;
+  defectStepIndex: number;
 }
 
 const SCENARIOS: Scenario[] = [
@@ -41,22 +61,66 @@ const SCENARIOS: Scenario[] = [
     category: "Payment Gateway",
     endpoint: "/api/v1/payments/upi-intent",
     method: "POST",
-    normalPayload: {
-      txn_id: "TXN_998124_PL",
-      amount_inr: 2499.0,
-      vpa: "user@okhdfcbank",
-      idempotency_key: "idem_8f7b2c9e",
-      timeout_sec: 45,
+    generatePayload: (controls) => {
+      const randomTxn = Math.floor(100000 + Math.random() * 900000);
+      const randomAmt = (Math.floor(100 + Math.random() * 4900) + 0.99).toFixed(2);
+      return {
+        txn_id: `TXN_${randomTxn}_PL`,
+        amount_inr: parseFloat(randomAmt),
+        vpa: "user@okhdfcbank",
+        idempotency_key: controls["idempotency"] ? `idem_${Math.random().toString(36).substring(2, 10)}` : undefined,
+        timeout_sec: 45,
+        timestamp_epoch: Date.now(),
+      };
+    },
+    customControl: {
+      id: "idempotency",
+      label: "Idempotency",
+      paramKey: "idempotency_key",
+      icon: "shield",
+      onLabel: "Active (RFC-7231)",
+      offLabel: "Omitted (Defect Risk)",
+      defaultVal: true,
+      defectRiskDescription: "Warning: Missing Idempotency Key under network retry triggers race-condition double debit!",
     },
     steps: [
-      { name: "Validate VPA handle format & checksum", durationMs: 180 },
-      { name: "Acquire distributed Redis idempotency lock", durationMs: 240 },
-      { name: "Dispatch NPCI UPI Intent intent-switch payload", durationMs: 420 },
-      { name: "Intercept bank debit webhook & verify HMAC signature", durationMs: 310 },
-      { name: "Reconcile wallet balance & generate digital receipt", durationMs: 200 },
+      {
+        name: "Validate VPA handle format & checksum",
+        durationMs: 180,
+        assertionCheck: "Assert regex /^[\w.-]+@[\w.-]+$/ matched OK (12ms)",
+      },
+      {
+        name: "Acquire distributed Redis idempotency lock",
+        durationMs: 240,
+        assertionCheck: "Assert Redis SETNX lock held with 30s TTL lease",
+        failureReason: "AssertionError: Duplicate payment accepted without 409 lock on concurrent retry",
+      },
+      {
+        name: "Dispatch NPCI UPI Intent intent-switch payload",
+        durationMs: 420,
+        assertionCheck: "Assert NPCI switch handshake ACK status: 00 (SUCCESS)",
+      },
+      {
+        name: "Intercept bank debit webhook & verify HMAC signature",
+        durationMs: 310,
+        assertionCheck: "Assert SHA256 HMAC digest matches PSP security key",
+      },
+      {
+        name: "Reconcile wallet balance & generate digital receipt",
+        durationMs: 200,
+        assertionCheck: "Assert ledger double-entry debit/credit delta == 0.00 INR",
+      },
     ],
+    edgeCases: [
+      "Concurrent request race condition on same VPA within 150ms",
+      "NPCI switch response timeout boundary (45s threshold)",
+      "Bank webhook delivery out-of-order sequence resolution",
+      "Idempotent replay rejection with cached HTTP 200 payload",
+    ],
+    targetPlatforms: ["NPCI UPI 2.0 Gateway", "HDFC / ICICI PSP Switches", "Node.js / Redis Cluster"],
     expectedSuccess: "Payment verified with 0 duplicate debits. Webhook HMAC validated in 310ms.",
     defectWarning: "Warning: Missing Idempotency Key under network retry triggers race-condition double debit!",
+    defectStepIndex: 1, // Acquiring Redis lock fails if idempotency omitted
   },
   {
     id: "loan-disbursal",
@@ -64,22 +128,66 @@ const SCENARIOS: Scenario[] = [
     category: "Lending Engine (LOS)",
     endpoint: "/api/v2/lending/disburse-escrow",
     method: "POST",
-    normalPayload: {
-      loan_application_id: "LN_2026_8831",
-      sanctioned_amount: 50000,
-      cibil_score_cached: 742,
-      kyc_hash: "sha256_e3b0c44298fc",
-      penny_drop_status: "VERIFIED",
+    generatePayload: (controls) => {
+      const loanAppNum = Math.floor(1000 + Math.random() * 9000);
+      const cibil = Math.floor(720 + Math.random() * 80);
+      return {
+        loan_application_id: `LN_2026_${loanAppNum}`,
+        sanctioned_amount: 50000,
+        cibil_score_cached: cibil,
+        kyc_hash: `sha256_${Math.random().toString(36).substring(2, 14)}`,
+        penny_drop_status: controls["penny_drop"] ? "VERIFIED_98PCT" : "NAME_MISMATCH_74PCT",
+        timestamp_epoch: Date.now(),
+      };
+    },
+    customControl: {
+      id: "penny_drop",
+      label: "Penny Drop Match",
+      paramKey: "penny_drop_status",
+      icon: "zap",
+      onLabel: "Strict 98% Match",
+      offLabel: "74% Mismatch (Defect)",
+      defaultVal: true,
+      defectRiskDescription: "Caution: Name similarity score below 85% threshold must halt escrow transfer to prevent fraud!",
     },
     steps: [
-      { name: "Verify Pan-Aadhaar KYC checksum against NSDL", durationMs: 220 },
-      { name: "Re-query CIBIL Bureau score threshold (min 680)", durationMs: 380 },
-      { name: "Perform Penny-Drop beneficiary name matching (98%+ match)", durationMs: 290 },
-      { name: "Lock escrow account balance & generate NACH mandate", durationMs: 340 },
-      { name: "Release IMPS settlement fund & update LMS ledger", durationMs: 260 },
+      {
+        name: "Verify Pan-Aadhaar KYC checksum against NSDL",
+        durationMs: 220,
+        assertionCheck: "Assert NSDL API response: PAN ACTIVE & Aadhaar seeded",
+      },
+      {
+        name: "Re-query CIBIL Bureau score threshold (min 680)",
+        durationMs: 380,
+        assertionCheck: "Assert CIBIL score >= 680 threshold (Bureau query: 742)",
+      },
+      {
+        name: "Perform Penny-Drop beneficiary name matching (98%+ match)",
+        durationMs: 290,
+        assertionCheck: "Assert Levenshtein phonetic similarity >= 0.85 threshold",
+        failureReason: "AssertionError: Beneficiary bank name similarity 74.2% is below 85% escrow safety threshold",
+      },
+      {
+        name: "Lock escrow account balance & generate NACH mandate",
+        durationMs: 340,
+        assertionCheck: "Assert eNACH mandate registered with NPCI e-sign OK",
+      },
+      {
+        name: "Release IMPS settlement fund & update LMS ledger",
+        durationMs: 260,
+        assertionCheck: "Assert IMPS RRN settlement code 200 acknowledged",
+      },
     ],
-    expectedSuccess: "Loan disbursal approved. Penny-drop matched. LMS ledger synced in real-time.",
-    defectWarning: "Caution: Name mismatch below 85% threshold must halt fund transfer before escrow release.",
+    edgeCases: [
+      "Beneficiary bank account name phonetic distance mismatch (e.g., initial variations)",
+      "NSDL KYC verification gateway 503 fallback with exponential backoff",
+      "Escrow account concurrent fund reservation limits",
+      "NACH mandate e-sign token replay vulnerability protection",
+    ],
+    targetPlatforms: ["Lending Origination System (LOS)", "NSDL / UIDAI Gateway", "IMPS Escrow Engine"],
+    expectedSuccess: "Loan disbursal approved. Penny-drop matched at 98.4%. LMS ledger synced in real-time.",
+    defectWarning: "Fraud alert: Penny-drop name similarity below 85% threshold halted fund transfer before escrow release.",
+    defectStepIndex: 2, // Penny-drop step fails if match is off
   },
   {
     id: "forex-rate-lock",
@@ -87,23 +195,69 @@ const SCENARIOS: Scenario[] = [
     category: "Forex Multi-Currency",
     endpoint: "/api/v3/forex/lock-rate-card",
     method: "POST",
-    normalPayload: {
-      base_currency: "INR",
-      target_currency: "USD",
-      amount_usd: 1500,
-      locked_fx_rate: 86.42,
-      rbi_purpose_code: "S0305",
-      card_kit_number: "4111-XXXX-XXXX-9021",
+    generatePayload: (controls) => {
+      const baseRate = 86.42;
+      const rateJitter = (Math.random() * 0.08 - 0.04).toFixed(4);
+      const lockedRate = (baseRate + parseFloat(rateJitter)).toFixed(2);
+      return {
+        base_currency: "INR",
+        target_currency: "USD",
+        amount_usd: 1500,
+        locked_fx_rate: parseFloat(lockedRate),
+        rate_lock_ttl_sec: controls["rate_lock_ttl"] ? 180 : 0,
+        rbi_purpose_code: "S0305",
+        card_kit_number: "4111-XXXX-XXXX-9021",
+        timestamp_epoch: Date.now(),
+      };
+    },
+    customControl: {
+      id: "rate_lock_ttl",
+      label: "Rate Lock TTL",
+      paramKey: "rate_lock_ttl_sec",
+      icon: "globe",
+      onLabel: "180s Active Window",
+      offLabel: "Stale / Expired (0s)",
+      defaultVal: true,
+      defectRiskDescription: "Edge case: Stale rate lock beyond 180s window must be rejected with 409 Conflict to protect spread!",
     },
     steps: [
-      { name: "Verify live interbank FX rate volatility bounds (±0.05%)", durationMs: 160 },
-      { name: "Validate LRS limit (Liberalised Remittance Scheme) quota", durationMs: 300 },
-      { name: "Lock exchange rate for 180-second checkout window", durationMs: 210 },
-      { name: "Execute Visa/Mastercard multi-currency settlement", durationMs: 450 },
-      { name: "Dispatch SMS notification & update forex card balance", durationMs: 180 },
+      {
+        name: "Verify live interbank FX rate volatility bounds (±0.05%)",
+        durationMs: 160,
+        assertionCheck: "Assert FX feed heartbeat delta < 250ms & spread within bounds",
+      },
+      {
+        name: "Validate LRS limit (Liberalised Remittance Scheme) quota",
+        durationMs: 300,
+        assertionCheck: "Assert RBI LRS cumulative quota < $250,000 USD limit for PAN",
+      },
+      {
+        name: "Lock exchange rate for 180-second checkout window",
+        durationMs: 210,
+        assertionCheck: "Assert rate lock TTL timestamp <= now() + 180s",
+        failureReason: "AssertionError: Quote expired. Attempted settlement on stale FX rate (lock window lapsed)",
+      },
+      {
+        name: "Execute Visa/Mastercard multi-currency settlement",
+        durationMs: 450,
+        assertionCheck: "Assert Visa multi-currency settlement ISO-8583 message ACK",
+      },
+      {
+        name: "Dispatch SMS notification & update forex card balance",
+        durationMs: 180,
+        assertionCheck: "Assert card balance updated with encrypted card-kit hash",
+      },
     ],
-    expectedSuccess: "Rate held at 86.42 INR/USD for 180s. LRS annual limit checked successfully.",
-    defectWarning: "Edge case: Stale rate lock beyond 180s window must be rejected with 409 Conflict.",
+    edgeCases: [
+      "Forex market gap slippage during multi-currency conversion",
+      "Stale quote settlement attempt after 180s checkout countdown expires",
+      "RBI LRS annual ceiling breach on high-volume remittances",
+      "Offline card balance reconciliation sync after in-flight flight mode",
+    ],
+    targetPlatforms: ["Visa Direct / Mastercard Cross-Border", "RBI LRS Reporting Engine", "Forex Card Ledger"],
+    expectedSuccess: "Rate held at locked INR/USD quote for 180s. LRS annual limit checked successfully.",
+    defectWarning: "Edge case triggered: Stale rate lock beyond 180s window rejected with 409 Conflict.",
+    defectStepIndex: 2, // Rate lock TTL check fails if stale
   },
   {
     id: "biometric-session",
@@ -111,21 +265,66 @@ const SCENARIOS: Scenario[] = [
     category: "Mobile Security",
     endpoint: "/api/v1/auth/biometric-verify",
     method: "POST",
-    normalPayload: {
-      device_id: "android_sdk34_pixel8",
-      biometric_token: "bio_jwt_sec_9918",
-      app_state: "foreground",
-      jailbreak_root_check: "CLEAN",
+    generatePayload: (controls) => {
+      const devices = ["android_sdk34_pixel8", "samsung_s24_knox", "ios18_iphone16_pro"];
+      const randomDevice = devices[Math.floor(Math.random() * devices.length)];
+      return {
+        device_id: randomDevice,
+        biometric_token: `bio_jwt_${Math.random().toString(36).substring(2, 10)}`,
+        app_state: "foreground",
+        jailbreak_root_check: "CLEAN",
+        session_timeout_policy: controls["session_wipe"] ? "STRICT_15MIN_WIPE" : "PERSISTENT_CACHE_VULNERABLE",
+        timestamp_epoch: Date.now(),
+      };
+    },
+    customControl: {
+      id: "session_wipe",
+      label: "Memory Wipe Policy",
+      paramKey: "session_timeout_policy",
+      icon: "fingerprint",
+      onLabel: "Strict 15m Wipe",
+      offLabel: "Unmasked Leak (Defect)",
+      defaultVal: true,
+      defectRiskDescription: "Security flaw: Token remaining valid after background suspend violates RBI Master Direction guidelines!",
     },
     steps: [
-      { name: "Check hardware root / Magisk / jailbreak flags", durationMs: 140 },
-      { name: "Verify hardware keystore biometric signature", durationMs: 220 },
-      { name: "Generate short-lived 15-minute access token", durationMs: 180 },
-      { name: "Simulate background app suspend & memory wipe test", durationMs: 320 },
-      { name: "Assert sensitive wallet balances masked on resume", durationMs: 190 },
+      {
+        name: "Check hardware root / Magisk / jailbreak flags",
+        durationMs: 140,
+        assertionCheck: "Assert Google Play Integrity API / SafetyNet: MEETS_STRONG_INTEGRITY",
+      },
+      {
+        name: "Verify hardware keystore biometric signature",
+        durationMs: 220,
+        assertionCheck: "Assert Android StrongBox Keymaster ECDSA signature validated",
+      },
+      {
+        name: "Generate short-lived 15-minute access token",
+        durationMs: 180,
+        assertionCheck: "Assert JWT claims contain exp == now() + 900s & sub binding",
+      },
+      {
+        name: "Simulate background app suspend & memory wipe test",
+        durationMs: 320,
+        assertionCheck: "Assert secure memory buffer zeroed on onTrimMemory(TRIM_MEMORY_UI_HIDDEN)",
+        failureReason: "AssertionError: Sensitive account balances remained unmasked in RAM memory heap after app suspend",
+      },
+      {
+        name: "Assert sensitive wallet balances masked on resume",
+        durationMs: 190,
+        assertionCheck: "Assert resume screen displays masked strings (e.g., ₹••,•••.••)",
+      },
     ],
+    edgeCases: [
+      "Hardware-backed Android KeyStore / iOS Secure Enclave invalidation on new biometric enrollment",
+      "App process hibernation memory extraction via Frida / Xposed hooks",
+      "Zero PII leaks in screenshot previews in OS multi-tasking drawer",
+      "Biometric sensor hardware spoof detection fallback to PIN",
+    ],
+    targetPlatforms: ["Android 14+ (StrongBox Keymaster)", "iOS 17+ (Secure Enclave)", "React Native / Appium Mobile"],
     expectedSuccess: "Biometric token validated. Zero unmasked PII data leaked upon app resume.",
-    defectWarning: "Security flaw: Token remaining valid after 15-minute background suspend violates RBI guidelines.",
+    defectWarning: "Security flaw: Token persisted without memory wipe after background suspend violates RBI guidelines.",
+    defectStepIndex: 3, // Memory wipe step fails if policy is vulnerable
   },
 ];
 
@@ -139,43 +338,156 @@ const SCENARIO_ICONS: Record<string, React.ComponentType<{ className?: string }>
 export function InteractiveQASandbox() {
   const [selectedId, setSelectedId] = useState<string>("upi-intent");
   const [isThrottled, setIsThrottled] = useState<boolean>(false);
-  const [hasIdempotency, setHasIdempotency] = useState<boolean>(true);
+  const [scenarioControls, setScenarioControls] = useState<Record<string, Record<string, boolean>>>({
+    "upi-intent": { idempotency: true },
+    "loan-disbursal": { penny_drop: true },
+    "forex-rate-lock": { rate_lock_ttl: true },
+    "biometric-session": { session_wipe: true },
+  });
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [completedStepIndex, setCompletedStepIndex] = useState<number>(-1);
+  const [stepStatuses, setStepStatuses] = useState<Array<"pending" | "running" | "passed" | "failed" | "skipped">>([]);
   const [testResult, setTestResult] = useState<"idle" | "success" | "defect">("idle");
+  const [defectInfo, setDefectInfo] = useState<{ step: number; reason: string } | null>(null);
   const [activeTab, setActiveTab] = useState<"logs" | "payload" | "matrix">("logs");
+  const [payloadCache, setPayloadCache] = useState<Record<string, unknown>>({});
+  const [simulationLog, setSimulationLog] = useState<Array<{ type: "init" | "env" | "pass" | "fail" | "skip" | "info"; text: string; ms?: number }>>([]);
 
   const activeScenario = SCENARIOS.find((s) => s.id === selectedId) || SCENARIOS[0];
+  const currentControl = activeScenario.customControl;
+  const currentControlValue = currentControl
+    ? scenarioControls[activeScenario.id]?.[currentControl.id] ?? currentControl.defaultVal
+    : true;
+
+  // Initialize or re-generate payload when scenario or control changes
+  const updatePayload = (scenario = activeScenario, controls = scenarioControls) => {
+    const scControls = controls[scenario.id] || {};
+    const generated = scenario.generatePayload(scControls);
+    setPayloadCache(generated);
+    return generated;
+  };
+
+  const handleToggleControl = (controlId: string) => {
+    setScenarioControls((prev) => {
+      const current = prev[activeScenario.id] || {};
+      const updated = {
+        ...prev,
+        [activeScenario.id]: {
+          ...current,
+          [controlId]: !current[controlId],
+        },
+      };
+      // Regenerate payload with new control state
+      const newScControls = updated[activeScenario.id];
+      setPayloadCache(activeScenario.generatePayload(newScControls));
+      return updated;
+    });
+    handleReset();
+  };
 
   const handleRunSimulation = () => {
     if (isRunning) return;
 
+    // Fresh payload for this run
+    const activeControls = scenarioControls[activeScenario.id] || {};
+    const freshPayload = activeScenario.generatePayload(activeControls);
+    setPayloadCache(freshPayload);
+
     setIsRunning(true);
     setCompletedStepIndex(-1);
     setTestResult("idle");
+    setDefectInfo(null);
+    setStepStatuses(activeScenario.steps.map(() => "pending"));
+
+    const initialLogs: Array<{ type: "init" | "env" | "pass" | "fail" | "skip" | "info"; text: string; ms?: number }> = [
+      { type: "init", text: `Loaded test scenario: "${activeScenario.name}" [${activeScenario.category}]` },
+      {
+        type: "env",
+        text: `Target: ${activeScenario.targetPlatforms[0]} / Latency: ${isThrottled ? "3G Jitter (1600ms)" : "5G Direct (20ms)"}`,
+      },
+    ];
+    setSimulationLog(initialLogs);
 
     const multiplier = isThrottled ? 2.2 : 1;
     let currentStep = 0;
+    const shouldFail = currentControl ? !activeControls[currentControl.id] : false;
+    const failAtStep = shouldFail ? activeScenario.defectStepIndex : -1;
 
     const runNextStep = () => {
       if (currentStep < activeScenario.steps.length) {
+        // Mark current as running
+        setStepStatuses((prev) => {
+          const next = [...prev];
+          next[currentStep] = "running";
+          return next;
+        });
+
         const step = activeScenario.steps[currentStep];
-        const stepTime = step.durationMs * multiplier;
+        // Introduce small realistic jitter (+/- 15%)
+        const jitter = 0.85 + Math.random() * 0.3;
+        const stepTime = Math.round(step.durationMs * multiplier * jitter);
 
         setTimeout(() => {
-          setCompletedStepIndex(currentStep);
-          currentStep++;
-          runNextStep();
+          if (currentStep === failAtStep) {
+            // This step failed!
+            setStepStatuses((prev) => {
+              const next = [...prev];
+              next[currentStep] = "failed";
+              // Subsequent steps are skipped
+              for (let i = currentStep + 1; i < next.length; i++) {
+                next[i] = "skipped";
+              }
+              return next;
+            });
+            setCompletedStepIndex(currentStep);
+            setIsRunning(false);
+            setTestResult("defect");
+            const failureMsg = step.failureReason || activeScenario.defectWarning;
+            setDefectInfo({ step: currentStep + 1, reason: failureMsg });
+            setSimulationLog((prev) => [
+              ...prev,
+              {
+                type: "fail",
+                text: `step_${currentStep + 1}: ${step.name} -> FAIL (${stepTime}ms) - ${failureMsg}`,
+                ms: stepTime,
+              },
+              {
+                type: "skip",
+                text: `Remaining ${activeScenario.steps.length - currentStep - 1} assertions skipped due to release gate halt.`,
+              },
+            ]);
+          } else {
+            // Step passed!
+            setStepStatuses((prev) => {
+              const next = [...prev];
+              next[currentStep] = "passed";
+              return next;
+            });
+            setCompletedStepIndex(currentStep);
+            setSimulationLog((prev) => [
+              ...prev,
+              {
+                type: "pass",
+                text: `step_${currentStep + 1}: ${step.name} -> ${step.assertionCheck} (${stepTime}ms)`,
+                ms: stepTime,
+              },
+            ]);
+
+            currentStep++;
+            runNextStep();
+          }
         }, stepTime);
       } else {
-        // Finished all steps
+        // All steps successfully verified!
         setIsRunning(false);
-        // If scenario is UPI and idempotency was omitted, simulate defect detection!
-        if (activeScenario.id === "upi-intent" && !hasIdempotency) {
-          setTestResult("defect");
-        } else {
-          setTestResult("success");
-        }
+        setTestResult("success");
+        setSimulationLog((prev) => [
+          ...prev,
+          {
+            type: "info",
+            text: `SUITE_PASS: All ${activeScenario.steps.length} release gate assertions confirmed with 0 defects.`,
+          },
+        ]);
       }
     };
 
@@ -186,7 +498,20 @@ export function InteractiveQASandbox() {
     setIsRunning(false);
     setCompletedStepIndex(-1);
     setTestResult("idle");
+    setDefectInfo(null);
+    setStepStatuses([]);
+    setSimulationLog([]);
   };
+
+  const ControlIcon = currentControl?.icon === "shield"
+    ? ShieldCheck
+    : currentControl?.icon === "fingerprint"
+    ? Fingerprint
+    : currentControl?.icon === "globe"
+    ? Globe
+    : currentControl?.icon === "zap"
+    ? Zap
+    : AlertCircle;
 
   return (
     <section className="scroll-mt-20 border-t border-line bg-paper-deep">
@@ -221,6 +546,8 @@ export function InteractiveQASandbox() {
                   data-cursor={`Select ${sc.name} simulation`}
                   onClick={() => {
                     setSelectedId(sc.id);
+                    const currentScControls = scenarioControls[sc.id] || {};
+                    setPayloadCache(sc.generatePayload(currentScControls));
                     handleReset();
                   }}
                   className={`group relative flex w-full items-center gap-3 px-4 py-3.5 text-xs font-mono transition-colors text-left border-line ${
@@ -337,54 +664,54 @@ export function InteractiveQASandbox() {
                 </span>
               </button>
 
-              {/* Idempotency Key Switch (for UPI) */}
-              {activeScenario.id === "upi-intent" && (
+              {/* Dynamic Scenario-Specific Toggle Switch */}
+              {currentControl && (
                 <button
                   type="button"
                   role="switch"
-                  aria-checked={hasIdempotency}
-                  data-testid="sandbox-toggle-idempotency"
+                  aria-checked={currentControlValue}
+                  data-testid={`sandbox-toggle-${currentControl.id}`}
                   data-cursor={
-                    hasIdempotency
-                      ? "Omit idempotency header to simulate race condition"
-                      : "Enable idempotency key to prevent double debit"
+                    currentControlValue
+                      ? `Toggle off to simulate defect: ${currentControl.defectRiskDescription}`
+                      : `Enable strict validation to pass release gate`
                   }
-                  onClick={() => setHasIdempotency(!hasIdempotency)}
+                  onClick={() => handleToggleControl(currentControl.id)}
                   className={`press group flex items-center gap-2.5 border px-3 py-1.5 text-xs font-mono transition-all rounded-xs select-none shadow-2xs ${
-                    hasIdempotency
+                    currentControlValue
                       ? "border-pass/50 bg-pass/10 text-pass"
                       : "border-red-500/50 bg-red-500/10 text-red-600 dark:text-red-400"
                   }`}
-                  title="Toggle HTTP Idempotency-Key header"
+                  title={currentControl.defectRiskDescription}
                 >
                   <div className="flex items-center gap-1.5">
-                    <ShieldCheck
+                    <ControlIcon
                       className={`h-3.5 w-3.5 transition-colors ${
-                        hasIdempotency ? "text-pass" : "text-red-500"
+                        currentControlValue ? "text-pass" : "text-red-500"
                       }`}
                     />
                     <span className="text-[0.68rem] tracking-wider uppercase text-muted">
-                      Idempotency
+                      {currentControl.label}
                     </span>
                   </div>
 
                   {/* Hardware Toggle Track & Knob */}
                   <span
                     className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors duration-200 ease-in-out ${
-                      hasIdempotency ? "bg-pass" : "bg-red-500"
+                      currentControlValue ? "bg-pass" : "bg-red-500"
                     }`}
                     aria-hidden="true"
                   >
                     <span
                       className={`inline-block h-3 w-3 rounded-full bg-paper shadow-xs transition-transform duration-200 ease-in-out ${
-                        hasIdempotency ? "translate-x-3.5" : "translate-x-0.5"
+                        currentControlValue ? "translate-x-3.5" : "translate-x-0.5"
                       }`}
                     />
                   </span>
 
                   {/* State Label */}
                   <span className="font-semibold text-[0.72rem]">
-                    {hasIdempotency ? "Active (RFC-7231)" : "Omitted (Defect Risk)"}
+                    {currentControlValue ? currentControl.onLabel : currentControl.offLabel}
                   </span>
                 </button>
               )}
@@ -434,18 +761,21 @@ export function InteractiveQASandbox() {
             <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-4">
                 <span className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase">
-                  Assertion Pipeline ({completedStepIndex + 1}/{activeScenario.steps.length} Passed)
+                  Assertion Pipeline ({completedStepIndex + 1}/{activeScenario.steps.length} {testResult === "defect" ? "Halted" : "Passed"})
                 </span>
                 <span className="font-mono text-xs text-pass flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  {isThrottled ? "Throttled Mode" : "Real-time Mode"}
+                  {isThrottled ? "Throttled Mode (3G)" : "Real-time Mode (5G)"}
                 </span>
               </div>
 
               <div className="space-y-3">
                 {activeScenario.steps.map((step, idx) => {
-                  const isDone = completedStepIndex >= idx;
-                  const isCurrent = isRunning && completedStepIndex === idx - 1;
+                  const status = stepStatuses[idx] || "pending";
+                  const isDone = status === "passed";
+                  const isCurrent = status === "running";
+                  const isFailed = status === "failed";
+                  const isSkipped = status === "skipped";
 
                   return (
                     <div
@@ -453,6 +783,10 @@ export function InteractiveQASandbox() {
                       className={`flex items-start gap-3 border p-3 transition-colors ${
                         isDone
                           ? "border-pass/40 bg-pass-fill/5"
+                          : isFailed
+                          ? "border-red-500/50 bg-red-500/10 shadow-sm"
+                          : isSkipped
+                          ? "border-line/50 bg-card/20 opacity-50"
                           : isCurrent
                           ? "border-pass bg-card shadow-sm animate-pulse"
                           : "border-line bg-card/40 opacity-70"
@@ -461,6 +795,12 @@ export function InteractiveQASandbox() {
                       <span className="mt-0.5 inline-flex shrink-0">
                         {isDone ? (
                           <CheckCircle2 className="h-4 w-4 text-pass" />
+                        ) : isFailed ? (
+                          <AlertCircle className="h-4 w-4 text-red-500" />
+                        ) : isSkipped ? (
+                          <span className="inline-block h-4 w-4 rounded-full border border-line/60 bg-card text-center font-mono text-[0.55rem] leading-4 text-muted">
+                            —
+                          </span>
                         ) : isCurrent ? (
                           <Activity className="h-4 w-4 text-pass animate-spin" />
                         ) : (
@@ -472,13 +812,25 @@ export function InteractiveQASandbox() {
 
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
-                          <p className={`font-sans text-xs font-medium ${isDone ? "text-ink" : "text-ink-soft"}`}>
+                          <p className={`font-sans text-xs font-medium ${
+                            isDone ? "text-ink" : isFailed ? "text-red-600 dark:text-red-400 font-semibold" : isSkipped ? "text-muted" : "text-ink-soft"
+                          }`}>
                             {step.name}
                           </p>
                           <span className="font-mono text-[0.68rem] text-muted shrink-0">
                             {Math.round(step.durationMs * (isThrottled ? 2.2 : 1))}ms
                           </span>
                         </div>
+                        {isFailed && defectInfo && (
+                          <p className="mt-1 font-mono text-[0.68rem] text-red-600 dark:text-red-400">
+                            ↳ {defectInfo.reason}
+                          </p>
+                        )}
+                        {isDone && (
+                          <p className="mt-0.5 font-mono text-[0.65rem] text-muted truncate">
+                            ↳ {step.assertionCheck}
+                          </p>
+                        )}
                       </div>
                     </div>
                   );
@@ -542,7 +894,13 @@ export function InteractiveQASandbox() {
                     type="button"
                     data-testid="sandbox-tab-payload"
                     data-cursor="Inspect raw JSON request payload & idempotency keys"
-                    onClick={() => setActiveTab("payload")}
+                    onClick={() => {
+                      if (Object.keys(payloadCache).length === 0) {
+                        const currentScControls = scenarioControls[activeScenario.id] || {};
+                        setPayloadCache(activeScenario.generatePayload(currentScControls));
+                      }
+                      setActiveTab("payload");
+                    }}
                     className={`press flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-xs transition-all ${
                       activeTab === "payload"
                         ? "bg-card text-pass border border-pass/30 font-semibold shadow-xs"
@@ -568,7 +926,7 @@ export function InteractiveQASandbox() {
                   </button>
                 </div>
 
-                {/* Read-Only Status Telemetry Chip (Distinct hardware indicator, not a button) */}
+                {/* Read-Only Status Telemetry Chip */}
                 <div className="flex items-center gap-1.5">
                   <div
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border font-mono text-[0.68rem] tracking-wider transition-colors shadow-2xs select-none ${
@@ -616,39 +974,40 @@ export function InteractiveQASandbox() {
               <div key={activeTab} className="flex-1 font-mono text-[0.75rem] leading-relaxed overflow-x-auto min-h-[220px] content-fade">
                 {activeTab === "logs" && (
                   <div className="space-y-1.5 text-ink-soft">
-                    <p className="text-muted">
-                      [INIT] Loaded test scenario: &quot;{activeScenario.name}&quot;
-                    </p>
-                    <p className="text-muted">
-                      [ENV] Target: Staging-US-East / Latency Profile: {isThrottled ? "3G Jitter" : "Direct"}
-                    </p>
-                    {activeScenario.steps.map((step, idx) => {
-                      if (completedStepIndex < idx) return null;
-                      return (
-                        <p key={step.name} className="text-pass">
-                          [PASS] step_{idx + 1}: {step.name} ({step.durationMs}ms)
+                    {simulationLog.length === 0 ? (
+                      <div className="space-y-1.5 text-muted">
+                        <p>[INIT] Loaded test scenario: &quot;{activeScenario.name}&quot;</p>
+                        <p>[ENV] Target: {activeScenario.targetPlatforms[0]} / Latency: {isThrottled ? "3G Jitter" : "Direct 5G"}</p>
+                        <p className="italic pt-3">
+                          Press &quot;Run Verification Flow&quot; above to trigger live step-by-step test execution.
                         </p>
-                      );
-                    })}
-                    {isRunning && (
-                      <p className="text-ink animate-pulse">
-                        [RUN] Evaluating step_{completedStepIndex + 2} assertions...
-                      </p>
-                    )}
-                    {testResult === "success" && (
-                      <p className="text-pass font-semibold mt-2">
-                        [SUITE_PASS] Verification completed with zero defects.
-                      </p>
-                    )}
-                    {testResult === "defect" && (
-                      <p className="text-red-500 font-semibold mt-2">
-                        [DEFECT_DETECTED] Double-debit vulnerability captured!
-                      </p>
-                    )}
-                    {completedStepIndex === -1 && !isRunning && (
-                      <p className="text-muted italic pt-4">
-                        Press &quot;Run Verification Flow&quot; above to trigger live step-by-step test execution.
-                      </p>
+                      </div>
+                    ) : (
+                      <>
+                        {simulationLog.map((log, idx) => (
+                          <p
+                            key={idx}
+                            className={
+                              log.type === "pass"
+                                ? "text-pass"
+                                : log.type === "fail"
+                                ? "text-red-500 font-semibold"
+                                : log.type === "skip"
+                                ? "text-amber-600 dark:text-amber-400"
+                                : log.type === "info"
+                                ? "text-pass font-semibold mt-2"
+                                : "text-muted"
+                            }
+                          >
+                            [{log.type.toUpperCase()}] {log.text}
+                          </p>
+                        ))}
+                        {isRunning && (
+                          <p className="text-ink animate-pulse">
+                            [RUN] Evaluating step_{completedStepIndex + 2} assertions...
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
                 )}
@@ -656,12 +1015,9 @@ export function InteractiveQASandbox() {
                 {activeTab === "payload" && (
                   <pre className="text-xs text-ink-soft bg-paper p-3 border border-line overflow-auto">
                     {JSON.stringify(
-                      activeScenario.id === "upi-intent"
-                        ? {
-                            ...activeScenario.normalPayload,
-                            idempotency_key: hasIdempotency ? "idem_8f7b2c9e" : undefined,
-                          }
-                        : activeScenario.normalPayload,
+                      Object.keys(payloadCache).length > 0
+                        ? payloadCache
+                        : activeScenario.generatePayload(scenarioControls[activeScenario.id] || {}),
                       null,
                       2
                     )}
@@ -673,16 +1029,15 @@ export function InteractiveQASandbox() {
                     <div className="border border-line bg-paper p-2.5">
                       <span className="font-semibold text-ink">Edge Case Assertions:</span>
                       <ul className="list-disc list-inside mt-1 text-ink-soft text-[0.72rem] space-y-0.5">
-                        <li>Concurrent requests lock conflict handling</li>
-                        <li>Response timeout boundary (30s threshold)</li>
-                        <li>Malformed checksum validation</li>
-                        <li>Idempotent duplicate rejection</li>
+                        {activeScenario.edgeCases.map((ec, i) => (
+                          <li key={i}>{ec}</li>
+                        ))}
                       </ul>
                     </div>
                     <div className="border border-line bg-paper p-2.5">
-                      <span className="font-semibold text-ink">Target Platforms:</span>
+                      <span className="font-semibold text-ink">Target Platforms &amp; Gateways:</span>
                       <p className="text-ink-soft text-[0.72rem] mt-0.5">
-                        Android (APK/AAB), iOS (TestFlight), Backend Microservices (Docker/K8s)
+                        {activeScenario.targetPlatforms.join(" • ")}
                       </p>
                     </div>
                   </div>

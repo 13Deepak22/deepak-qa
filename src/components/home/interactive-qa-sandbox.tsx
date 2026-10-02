@@ -285,37 +285,105 @@ export function InteractiveQASandbox() {
                 <span className="text-muted">{activeScenario.endpoint}</span>
               </div>
 
-              {/* Network Throttling Toggle */}
+              {/* Network Throttling Switch */}
               <button
                 type="button"
+                role="switch"
+                aria-checked={isThrottled}
                 data-testid="sandbox-toggle-throttle"
-                data-cursor={isThrottled ? "Switch to 5G low-latency mode (20ms)" : "Simulate 3G packet drop & latency jitter (1600ms)"}
-                onClick={() => setIsThrottled(!isThrottled)}
-                className={`flex items-center gap-1.5 border px-3 py-1 text-xs font-mono transition-colors ${
+                data-cursor={
                   isThrottled
-                    ? "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium"
-                    : "border-line bg-card text-muted hover:text-ink"
+                    ? "Switch to 5G low-latency mode (20ms)"
+                    : "Simulate 3G packet drop & latency jitter (1600ms)"
+                }
+                onClick={() => setIsThrottled(!isThrottled)}
+                className={`press group flex items-center gap-2.5 border px-3 py-1.5 text-xs font-mono transition-all rounded-xs select-none shadow-2xs ${
+                  isThrottled
+                    ? "border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                    : "border-line bg-card text-ink-soft hover:border-line-deep hover:bg-paper"
                 }`}
+                title="Toggle network latency throttling simulation"
               >
-                <Wifi className="h-3.5 w-3.5" />
-                <span>{isThrottled ? "3G Latency Jitter (1600ms)" : "5G Normal (20ms)"}</span>
+                <div className="flex items-center gap-1.5">
+                  <Wifi
+                    className={`h-3.5 w-3.5 transition-colors ${
+                      isThrottled ? "text-amber-600 dark:text-amber-400" : "text-muted"
+                    }`}
+                  />
+                  <span className="text-[0.68rem] tracking-wider uppercase text-muted">
+                    Throttle
+                  </span>
+                </div>
+
+                {/* Hardware Toggle Track & Knob */}
+                <span
+                  className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors duration-200 ease-in-out ${
+                    isThrottled ? "bg-amber-500" : "bg-line"
+                  }`}
+                  aria-hidden="true"
+                >
+                  <span
+                    className={`inline-block h-3 w-3 rounded-full bg-paper shadow-xs transition-transform duration-200 ease-in-out ${
+                      isThrottled ? "translate-x-3.5" : "translate-x-0.5"
+                    }`}
+                  />
+                </span>
+
+                {/* State Label */}
+                <span className="font-semibold tabular-nums text-[0.72rem]">
+                  {isThrottled ? "3G Jitter (1600ms)" : "5G (20ms)"}
+                </span>
               </button>
 
-              {/* Idempotency Toggle (for UPI) */}
+              {/* Idempotency Key Switch (for UPI) */}
               {activeScenario.id === "upi-intent" && (
                 <button
                   type="button"
+                  role="switch"
+                  aria-checked={hasIdempotency}
                   data-testid="sandbox-toggle-idempotency"
-                  data-cursor={hasIdempotency ? "Omit idempotency header to simulate race condition" : "Enable idempotency key to prevent double debit"}
-                  onClick={() => setHasIdempotency(!hasIdempotency)}
-                  className={`flex items-center gap-1.5 border px-3 py-1 text-xs font-mono transition-colors ${
+                  data-cursor={
                     hasIdempotency
-                      ? "border-pass/40 bg-pass-fill/10 text-pass font-medium"
-                      : "border-red-500/40 bg-red-500/10 text-red-600 dark:text-red-400 font-medium"
+                      ? "Omit idempotency header to simulate race condition"
+                      : "Enable idempotency key to prevent double debit"
+                  }
+                  onClick={() => setHasIdempotency(!hasIdempotency)}
+                  className={`press group flex items-center gap-2.5 border px-3 py-1.5 text-xs font-mono transition-all rounded-xs select-none shadow-2xs ${
+                    hasIdempotency
+                      ? "border-pass/50 bg-pass/10 text-pass"
+                      : "border-red-500/50 bg-red-500/10 text-red-600 dark:text-red-400"
                   }`}
+                  title="Toggle HTTP Idempotency-Key header"
                 >
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                  <span>{hasIdempotency ? "Idempotency Key: Active" : "Idempotency Key: Omitted (Defect Risk)"}</span>
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck
+                      className={`h-3.5 w-3.5 transition-colors ${
+                        hasIdempotency ? "text-pass" : "text-red-500"
+                      }`}
+                    />
+                    <span className="text-[0.68rem] tracking-wider uppercase text-muted">
+                      Idempotency
+                    </span>
+                  </div>
+
+                  {/* Hardware Toggle Track & Knob */}
+                  <span
+                    className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors duration-200 ease-in-out ${
+                      hasIdempotency ? "bg-pass" : "bg-red-500"
+                    }`}
+                    aria-hidden="true"
+                  >
+                    <span
+                      className={`inline-block h-3 w-3 rounded-full bg-paper shadow-xs transition-transform duration-200 ease-in-out ${
+                        hasIdempotency ? "translate-x-3.5" : "translate-x-0.5"
+                      }`}
+                    />
+                  </span>
+
+                  {/* State Label */}
+                  <span className="font-semibold text-[0.72rem]">
+                    {hasIdempotency ? "Active (RFC-7231)" : "Omitted (Defect Risk)"}
+                  </span>
                 </button>
               )}
             </div>

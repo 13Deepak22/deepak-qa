@@ -40,7 +40,7 @@ export function generateMetadata(): Metadata {
 export default function ServicesPage() {
   const stats = [
     { label: "Products Tested", value: "15+", hint: "Fintech, portals & mobile apps" },
-    { label: "Automated Checks", value: "100+", hint: "Playwright & Appium regressions" },
+    { label: "Automated Checks", value: "10k+", hint: "Playwright & Appium regressions" },
     { label: "Effort Reduction", value: "50%", hint: "Manual sanity hours cut" },
     { label: "Critical Escapes", value: "0", hint: "On cleared production gates" },
   ];

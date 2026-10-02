@@ -256,6 +256,6 @@ export const rcaCaseStudy = {
 export const impactMetrics = [
   { value: "3+", label: "Years in QA", aside: "Fintech & mobile releases" },
   { value: "15+", label: "Products Tested", aside: "7 public apps · 8+ confidential portals" },
-  { value: "100+", label: "Automated Checks", aside: "Playwright, Appium & Postman" },
+  { value: "10k+", label: "Automated Checks", aside: "Playwright, Appium & Postman" },
   { value: "100%", label: "Release Sign-Off", aside: "Evidence before production deploy" },
 ];

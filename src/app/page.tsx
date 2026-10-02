@@ -82,7 +82,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Metrics Bar: 15+ Products Tested, 100+ Automated Checks */}
+      {/* Metrics Bar: 15+ Products Tested, 10k+ Automated Checks */}
       <ImpactMetrics />
 
       {/* 01 / Live QA Test Workbench (Interactive Assertion Runner & Defect Simulator) */}

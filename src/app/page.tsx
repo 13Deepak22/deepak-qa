@@ -30,47 +30,52 @@ export default function HomePage() {
           <p className="enter enter-4 mt-6 max-w-lg text-balance font-mono text-xs tracking-[0.1em] text-muted uppercase sm:tracking-[0.14em]">
             {profile.focus.join("  ·  ")}
           </p>
-          <div className="enter enter-5 mt-8 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:flex-wrap">
-            <Link
-              href="/work"
-              data-testid="hero-work-link"
-              className="press inline-flex items-center justify-center gap-1.5 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
-              data-cursor="15+ apps & portals"
-            >
-              <span>Selected work</span>
-              <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-            </Link>
-            <Link
-              href="/services"
-              data-testid="hero-services-link"
-              className="press inline-flex items-center justify-center gap-1.5 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
-              data-cursor="Services & methodology"
-            >
-              <span>Testing services</span>
-              <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-            </Link>
-            <Link
-              href="/experience"
-              data-testid="hero-experience-link"
-              className="press inline-flex items-center justify-center gap-1.5 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
-              data-cursor={`${years} years experience`}
-            >
-              <span>Experience timeline</span>
-              <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-            </Link>
-            <Link
-              href="/skills"
-              data-testid="hero-skills-link"
-              className="press inline-flex items-center justify-center gap-1.5 border border-pass bg-card px-4 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
-              data-cursor="97+ verified skills"
-            >
-              <span>Skills directory</span>
-              <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-            </Link>
+          <div className="enter enter-5 mt-8 max-w-lg space-y-2.5">
+            {/* Quick Navigation 2-Column Grid (Borders align symmetrically) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <Link
+                href="/work"
+                data-testid="hero-work-link"
+                className="press flex items-center justify-between border border-pass bg-card px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shadow-2xs"
+                data-cursor="15+ apps & portals"
+              >
+                <span>Selected work</span>
+                <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+              </Link>
+              <Link
+                href="/services"
+                data-testid="hero-services-link"
+                className="press flex items-center justify-between border border-pass bg-card px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shadow-2xs"
+                data-cursor="Services & methodology"
+              >
+                <span>Testing services</span>
+                <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+              </Link>
+              <Link
+                href="/skills"
+                data-testid="hero-skills-link"
+                className="press flex items-center justify-between border border-pass bg-card px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shadow-2xs"
+                data-cursor="97+ verified skills"
+              >
+                <span>Skills directory</span>
+                <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+              </Link>
+              <Link
+                href="/experience"
+                data-testid="hero-experience-link"
+                className="press flex items-center justify-between border border-pass bg-card px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shadow-2xs"
+                data-cursor={`${years} years experience`}
+              >
+                <span>Experience timeline</span>
+                <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+              </Link>
+            </div>
+
+            {/* Primary Action Button (Spans exact width of grid) */}
             <Link
               href="/#contact"
               data-testid="hero-contact-link"
-              className="press inline-flex items-center justify-center border border-pass bg-pass-fill text-on-band px-4 py-2.5 font-mono text-xs uppercase tracking-wider hover:bg-pass transition-colors"
+              className="press flex w-full items-center justify-center border-2 border-pass bg-pass text-on-band px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass-fill transition-colors shadow-xs"
               data-cursor="Tell me what's shipping"
             >
               <span>Start a conversation</span>

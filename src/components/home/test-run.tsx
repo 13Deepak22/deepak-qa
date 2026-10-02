@@ -27,264 +27,189 @@ export interface SimulatedCheck {
   errorMessage?: string;
   expectedDiff?: string;
   receivedDiff?: string;
-  payloadInfo?: string;
-  impactInfo?: string;
   skipReason?: string;
 }
 
-interface RunProfile {
-  name: string;
-  gateOnPass: string;
-  gateOnFail: string;
-  checks: SimulatedCheck[];
+interface TestDefinition {
+  file: string;
+  tag: string;
+  failTag?: string;
+  baseSeconds: number;
+  passAssertions: string[];
+  failError: string;
+  expectedDiff: string;
+  receivedDiff: string;
+  skipReason: string;
 }
 
-const SIMULATION_PROFILES: RunProfile[] = [
-  // Profile 0: All Pass (Clean Gate)
+// 5 core test definitions each with their own unique pass, fail, and skip reasons
+const TEST_DEFINITIONS: TestDefinition[] = [
   {
-    name: "Fintech Production Gate (All Pass)",
-    gateOnPass: releaseGate.gate, // "ready for review"
-    gateOnFail: "blocked · regressions caught",
-    checks: [
-      {
-        file: "paulpay/upi.spec.ts",
-        tag: "UPI 2.0",
-        targetSeconds: 1.1,
-        targetStatus: "pass",
-        msLabel: "1.1s",
-        assertions: [
-          "Validate VPA handle format & checksum regex (/^[\\w.-]+@[\\w.-]+$/)",
-          "Intercept NPCI UPI Intent deep-link dispatch in 180ms",
-          "Assert bank debit webhook HMAC-SHA256 signature matches",
-        ],
-      },
-      {
-        file: "credme/ekyc.spec.ts",
-        tag: "DigiLocker",
-        targetSeconds: 1.4,
-        targetStatus: "pass",
-        msLabel: "1.4s",
-        assertions: [
-          "Verify Aadhaar XML signature with UIDAI public cert",
-          "OCR facial confidence score: 99.4% (min threshold 90%)",
-          "Deduplicate PAN number across credit bureau database",
-        ],
-      },
-      {
-        file: "api/payments.spec.ts",
-        tag: "REST API",
-        targetSeconds: 0.6,
-        targetStatus: "pass",
-        msLabel: "0.6s",
-        assertions: [
-          "Assert RFC-7231 Idempotency-Key prevents duplicate debits",
-          "Validate distributed Redis lock TTL expires at exactly 30s",
-          "Confirm ledger credit & debit balance symmetry = 0.00 INR",
-        ],
-      },
-      {
-        file: "appium/cards.spec.ts",
-        tag: "Mobile",
-        targetSeconds: 2.0,
-        targetStatus: "pass",
-        msLabel: "2.0s",
-        assertions: [
-          "Render dynamic virtual card CVV with 60-second OTP blur",
-          "Assert Android biometric prompt resolves with enrolled fingerprint",
-          "Toggle instant card freeze switch and verify SQLite offline cache",
-        ],
-      },
-      {
-        file: "jmeter/load.spec.ts",
-        tag: "Stress Load",
-        targetSeconds: 3.2,
-        targetStatus: "pass",
-        msLabel: "3.2s",
-        assertions: [
-          "Sustain 500 concurrent threads against loan disbursal endpoint",
-          "p99 response time: 210ms (< 500ms strict SLA limit)",
-          "Zero 5xx server errors across 10,000 synthetic requests",
-        ],
-      },
+    file: "paulpay/upi.spec.ts",
+    tag: "UPI 2.0",
+    failTag: "PSP Gateway",
+    baseSeconds: 1.1,
+    passAssertions: [
+      "Validate VPA handle format & checksum regex (/^[\\w.-]+@[\\w.-]+$/)",
+      "Intercept NPCI UPI Intent deep-link dispatch in 180ms",
+      "Assert bank debit webhook HMAC-SHA256 signature matches",
     ],
+    failError: "AssertionError: NPCI Intent switch timeout (>1500ms on PSP handle)",
+    expectedDiff: "HTTP 200 OK (Intent deep-link switch confirmed)",
+    receivedDiff: "HTTP 504 Gateway Timeout from bank PSP switch",
+    skipReason: "Skipped: Bank PSP gateway staging sandbox rate-limited; synthetic stub active",
   },
-
-  // Profile 1: Critical Defect Injected (Double Debit Caught)
   {
-    name: "Defect Injection (Race Condition Caught)",
-    gateOnPass: "ready for review",
-    gateOnFail: "blocked · p0 defect caught",
-    checks: [
-      {
-        file: "paulpay/upi.spec.ts",
-        tag: "UPI 2.0",
-        targetSeconds: 1.1,
-        targetStatus: "pass",
-        msLabel: "1.1s",
-        assertions: [
-          "VPA checksum validated",
-          "Deep-link switch response: 200 OK",
-        ],
-      },
-      {
-        file: "credme/ekyc.spec.ts",
-        tag: "DigiLocker",
-        targetSeconds: 1.4,
-        targetStatus: "pass",
-        msLabel: "1.4s",
-        assertions: [
-          "Aadhaar XML signature matches UIDAI",
-          "PAN duplication lookup returns clean",
-        ],
-      },
-      {
-        file: "api/payments.spec.ts",
-        tag: "Race Condition",
-        targetSeconds: 0.9,
-        targetStatus: "fail",
-        msLabel: "0.9s",
-        errorMessage: "AssertionError: Concurrent duplicate payment processed without 409 lock",
-        expectedDiff: "HTTP 409 Conflict (Idempotency Key Locked in Redis)",
-        receivedDiff: "HTTP 200 OK (Duplicate transaction #TXN_998124_PL created)",
-        payloadInfo: '{ "idempotency_key": "idem_8f7b2c9e", "retry_count": 2 }',
-        impactInfo: "Financial leak prevented: ₹2,499.00 duplicate debit blocked before prod deployment.",
-        assertions: [
-          "Redis distributed lock acquired",
-          "Assert HTTP 409 Conflict on identical retry key",
-        ],
-      },
-      {
-        file: "appium/cards.spec.ts",
-        tag: "Mobile",
-        targetSeconds: 1.9,
-        targetStatus: "pass",
-        msLabel: "1.9s",
-        assertions: [
-          "Biometric auth verified",
-          "Card limit toggle confirmed",
-        ],
-      },
-      {
-        file: "jmeter/load.spec.ts",
-        tag: "Escrow Gate",
-        targetSeconds: 0.4,
-        targetStatus: "skip",
-        msLabel: "0.4s",
-        skipReason: "Blocked: Disbursal pipeline bypassed due to upstream idempotency failure in api/payments.spec.ts",
-        assertions: [
-          "Load verification halted to prevent dirty staging state",
-        ],
-      },
+    file: "credme/ekyc.spec.ts",
+    tag: "DigiLocker",
+    failTag: "OCR Liveness",
+    baseSeconds: 1.4,
+    passAssertions: [
+      "Verify Aadhaar XML signature with UIDAI public cert",
+      "OCR facial confidence score: 99.4% (min threshold 90%)",
+      "Deduplicate PAN number across credit bureau database",
     ],
+    failError: "AssertionError: Face OCR match score below 90% threshold (74.2% on glare photo)",
+    expectedDiff: "Confidence score >= 90.0% with valid facial liveness",
+    receivedDiff: "74.2% match (Liveness check flagged camera glare artifact)",
+    skipReason: "Skipped: UIDAI Aadhaar sandbox rate-limited; synthetic mock active to maintain suite SLA",
   },
-
-  // Profile 2: Sandbox Skip & Pass
   {
-    name: "Resilience Gate (Mocks & Skips)",
-    gateOnPass: "ready with exclusions",
-    gateOnFail: "blocked",
-    checks: [
-      {
-        file: "paulpay/upi.spec.ts",
-        tag: "UPI 2.0",
-        targetSeconds: 1.0,
-        targetStatus: "pass",
-        msLabel: "1.0s",
-        assertions: ["UPI intent deep-link dispatched in 165ms"],
-      },
-      {
-        file: "credme/ekyc.spec.ts",
-        tag: "DigiLocker",
-        targetSeconds: 0.5,
-        targetStatus: "skip",
-        msLabel: "0.5s",
-        skipReason: "DigiLocker staging sandbox rate-limited; synthetic mock bypassed to protect suite execution time.",
-        assertions: ["Staging sandbox offline - synthetic mock active"],
-      },
-      {
-        file: "api/payments.spec.ts",
-        tag: "REST API",
-        targetSeconds: 0.7,
-        targetStatus: "pass",
-        msLabel: "0.7s",
-        assertions: ["Idempotency validation passed"],
-      },
-      {
-        file: "appium/cards.spec.ts",
-        tag: "Mobile",
-        targetSeconds: 2.1,
-        targetStatus: "pass",
-        msLabel: "2.1s",
-        assertions: ["Android biometric prompt resolved"],
-      },
-      {
-        file: "jmeter/load.spec.ts",
-        tag: "Stress Load",
-        targetSeconds: 2.8,
-        targetStatus: "pass",
-        msLabel: "2.8s",
-        assertions: ["p99 response time: 240ms under 400 virtual users"],
-      },
+    file: "api/payments.spec.ts",
+    tag: "REST API",
+    failTag: "Race Condition",
+    baseSeconds: 0.6,
+    passAssertions: [
+      "Assert RFC-7231 Idempotency-Key prevents duplicate debits",
+      "Validate distributed Redis lock TTL expires at exactly 30s",
+      "Confirm ledger credit & debit balance symmetry = 0.00 INR",
     ],
+    failError: "AssertionError: Duplicate payment accepted without 409 lock on concurrent retry",
+    expectedDiff: "HTTP 409 Conflict (Redis Idempotency Key Locked)",
+    receivedDiff: "HTTP 200 OK (Duplicate transaction #TXN_998124 created)",
+    skipReason: "Skipped: Bank settlement webhook bypassed during non-prod release stage",
   },
-
-  // Profile 3: Mobile SLA Timeout Failure
   {
-    name: "Mobile Edge-Case Latency Defect",
-    gateOnPass: "ready for review",
-    gateOnFail: "blocked · latency defect caught",
-    checks: [
-      {
-        file: "paulpay/upi.spec.ts",
-        tag: "UPI 2.0",
-        targetSeconds: 1.2,
-        targetStatus: "pass",
-        msLabel: "1.2s",
-        assertions: ["Intent switch verified"],
-      },
-      {
-        file: "credme/ekyc.spec.ts",
-        tag: "DigiLocker",
-        targetSeconds: 1.3,
-        targetStatus: "pass",
-        msLabel: "1.3s",
-        assertions: ["OCR verification passed"],
-      },
-      {
-        file: "api/payments.spec.ts",
-        tag: "REST API",
-        targetSeconds: 0.6,
-        targetStatus: "pass",
-        msLabel: "0.6s",
-        assertions: ["Ledger zero-sum matched"],
-      },
-      {
-        file: "appium/cards.spec.ts",
-        tag: "Mobile App",
-        targetSeconds: 2.4,
-        targetStatus: "fail",
-        msLabel: "2.4s",
-        errorMessage: "AssertionError: CVV reveal transition exceeded 2000ms SLA limit",
-        expectedDiff: "CVV revealed within 2,000ms threshold",
-        receivedDiff: "2,540ms (Android main UI thread blocked by synchronous encryption cipher)",
-        payloadInfo: '{ "device": "Pixel 8", "os": "Android 14", "memory_pressure": "high" }',
-        impactInfo: "P1 UX Defect flagged: Users experience frozen screen during critical payment step.",
-        assertions: [
-          "Biometric auth confirmed",
-          "Assert CVV animation completed within 2000ms SLA",
-        ],
-      },
-      {
-        file: "jmeter/load.spec.ts",
-        tag: "Stress Load",
-        targetSeconds: 1.8,
-        targetStatus: "pass",
-        msLabel: "1.8s",
-        assertions: ["Load threshold passed"],
-      },
+    file: "appium/cards.spec.ts",
+    tag: "Mobile",
+    failTag: "Mobile SLA",
+    baseSeconds: 2.0,
+    passAssertions: [
+      "Render dynamic virtual card CVV with 60-second OTP blur",
+      "Assert Android biometric prompt resolves with enrolled fingerprint",
+      "Toggle instant card freeze switch and verify SQLite offline cache",
     ],
+    failError: "AssertionError: CVV reveal transition exceeded 2000ms SLA limit",
+    expectedDiff: "CVV revealed in < 2,000ms",
+    receivedDiff: "2,540ms (Android main UI thread blocked by synchronous encryption)",
+    skipReason: "Skipped: Android biometric hardware emulation bypassed on cloud device pool",
+  },
+  {
+    file: "jmeter/load.spec.ts",
+    tag: "Stress Load",
+    failTag: "Latency SLA",
+    baseSeconds: 3.2,
+    passAssertions: [
+      "Sustain 500 concurrent threads against loan disbursal endpoint",
+      "p99 response time: 210ms (< 500ms strict SLA limit)",
+      "Zero 5xx server errors across 10,000 synthetic requests",
+    ],
+    failError: "AssertionError: p99 latency SLA breached under 500 concurrent threads",
+    expectedDiff: "p99 response time < 500ms across 10,000 requests",
+    receivedDiff: "1,280ms p99 latency on loan disbursal endpoint",
+    skipReason: "Skipped: High-concurrency stress test bypassed during off-peak smoke run",
   },
 ];
+
+// Dynamic run generator: ensures 3 to 4 tests ALWAYS pass, while other 1-2 vary dynamically!
+function generateDynamicRun(isInitial = false): {
+  checks: SimulatedCheck[];
+  gateOnPass: string;
+  gateOnFail: string;
+} {
+  if (isInitial) {
+    return {
+      checks: TEST_DEFINITIONS.map((t) => ({
+        file: t.file,
+        tag: t.tag,
+        targetSeconds: t.baseSeconds,
+        targetStatus: "pass" as const,
+        msLabel: `${t.baseSeconds.toFixed(1)}s`,
+        assertions: t.passAssertions,
+      })),
+      gateOnPass: releaseGate.gate,
+      gateOnFail: "blocked · regressions caught",
+    };
+  }
+
+  // Guarantee: 3 to 4 tests ALWAYS pass! (occasionally 5 for full clean pass)
+  // Non-passing count is either 1 (most common ~60%), 2 (~25%), or 0 (~15%).
+  const rand = Math.random();
+  const nonPassCount = rand < 0.15 ? 0 : rand < 0.75 ? 1 : 2; // guarantees 3, 4, or 5 pass!
+
+  // Pick which tests will not pass completely randomly across all 5
+  const shuffledIndices = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5);
+  const nonPassIndices = new Set(shuffledIndices.slice(0, nonPassCount));
+
+  let hasFail = false;
+
+  const checks: SimulatedCheck[] = TEST_DEFINITIONS.map((def, idx) => {
+    // Dynamic realistic jitter on execution timer (± 0.2s)
+    const jitter = Math.round((Math.random() * 0.4 - 0.2) * 10) / 10;
+    const duration = Math.max(0.4, Math.round((def.baseSeconds + jitter) * 10) / 10);
+    const msLabel = `${duration.toFixed(1)}s`;
+
+    if (!nonPassIndices.has(idx)) {
+      // Guaranteed Pass
+      return {
+        file: def.file,
+        tag: def.tag,
+        targetSeconds: duration,
+        targetStatus: "pass",
+        msLabel,
+        assertions: def.passAssertions,
+      };
+    }
+
+    // This test dynamically either fails or skips
+    const isFail = Math.random() < 0.65 || !hasFail;
+    if (isFail) {
+      hasFail = true;
+      return {
+        file: def.file,
+        tag: def.failTag || def.tag,
+        targetSeconds: duration,
+        targetStatus: "fail",
+        msLabel,
+        errorMessage: def.failError,
+        expectedDiff: def.expectedDiff,
+        receivedDiff: def.receivedDiff,
+        assertions: [
+          def.passAssertions[0],
+          `✕ ${def.failError} [FAILED]`,
+        ],
+      };
+    } else {
+      const skipSecs = Math.round(Math.max(0.3, duration * 0.35) * 10) / 10;
+      return {
+        file: def.file,
+        tag: def.tag,
+        targetSeconds: skipSecs,
+        targetStatus: "skip",
+        msLabel: `${skipSecs.toFixed(1)}s`,
+        skipReason: def.skipReason,
+      };
+    }
+  });
+
+  const hasSkips = checks.some((c) => c.targetStatus === "skip");
+
+  return {
+    checks,
+    gateOnPass: hasSkips ? "ready with exclusions" : "ready for review",
+    gateOnFail: "blocked · defect caught",
+  };
+}
 
 const PLAYBACK_MS = 2800;
 
@@ -293,16 +218,18 @@ function clock(seconds: number) {
 }
 
 export function TestRun() {
-  const [profileIndex, setProfileIndex] = useState(0);
   const [runIteration, setRunIteration] = useState(0);
   const [simulatedTime, setSimulatedTime] = useState(0);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
-  const currentProfile = SIMULATION_PROFILES[profileIndex] ?? SIMULATION_PROFILES[0];
+  // Generate dynamic run on every rerun (initial run is clean all-pass)
+  const currentRun = useMemo(() => {
+    return generateDynamicRun(runIteration === 0);
+  }, [runIteration]);
 
   const durations = useMemo(() => {
-    return currentProfile.checks.map((c) => c.targetSeconds);
-  }, [currentProfile]);
+    return currentRun.checks.map((c) => c.targetSeconds);
+  }, [currentRun]);
 
   const totalSeconds = useMemo(() => {
     return durations.reduce((sum, v) => sum + v, 0);
@@ -330,7 +257,7 @@ export function TestRun() {
 
     frame = window.requestAnimationFrame(tick);
     return () => window.cancelAnimationFrame(frame);
-  }, [runIteration, totalSeconds, currentProfile]);
+  }, [runIteration, totalSeconds, currentRun]);
 
   // Compute live test states
   const { rows, passedCount, failedCount, skippedCount, isDone, suiteSeconds } = useMemo(() => {
@@ -339,7 +266,7 @@ export function TestRun() {
     let failed = 0;
     let skipped = 0;
 
-    const computedRows = currentProfile.checks.map((check, index) => {
+    const computedRows = currentRun.checks.map((check, index) => {
       const start = cursor;
       const length = durations[index];
       const end = start + length;
@@ -379,46 +306,35 @@ export function TestRun() {
       isDone: done,
       suiteSeconds: Math.min(simulatedTime, totalSeconds),
     };
-  }, [currentProfile, durations, simulatedTime, totalSeconds]);
+  }, [currentRun, durations, simulatedTime, totalSeconds]);
 
-
-
-  // Randomly cycle profile on Rerun
+  // Trigger dynamic rerun
   const handleRerun = () => {
     setSimulatedTime(0);
     setExpandedRow(null);
-
-    setProfileIndex((prev) => {
-      let nextIndex = Math.floor(Math.random() * SIMULATION_PROFILES.length);
-      if (nextIndex === prev) {
-        nextIndex = (prev + 1) % SIMULATION_PROFILES.length;
-      }
-      return nextIndex;
-    });
-
     setRunIteration((prev) => prev + 1);
   };
 
   const hasFailed = failedCount > 0;
-  const isDefaultProfile = profileIndex === 0;
+  const isDefaultInitial = runIteration === 0;
 
   // Gate verdict
   const gateVerdictText = isDone
     ? hasFailed
-      ? `gate · ${currentProfile.gateOnFail}`
-      : `gate · ${currentProfile.gateOnPass}`
+      ? `gate · ${currentRun.gateOnFail}`
+      : `gate · ${currentRun.gateOnPass}`
     : "gate · running";
 
   // Summary string
   const summaryText = isDone
-    ? isDefaultProfile && !hasFailed
+    ? isDefaultInitial && !hasFailed
       ? releaseGate.summary
       : `${passedCount} passed · ${failedCount} failed · ${clock(suiteSeconds)}`
     : `${passedCount} passed · ${failedCount} failed · ${clock(suiteSeconds)}`;
 
   return (
     <section
-      className="report-card max-w-full overflow-hidden transition-all duration-300"
+      className="report-card max-w-full"
       aria-label="Release gate output"
       data-testid="interactive-test-runner"
     >
@@ -427,12 +343,12 @@ export function TestRun() {
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <span
-              className={`inline-block h-2.5 w-2.5 rounded-full transition-colors duration-300 ${
+              className={`inline-block h-2 w-2 rounded-full ${
                 !isDone
                   ? "bg-amber-500 animate-ping"
                   : hasFailed
-                  ? "bg-red-600 ring-2 ring-red-400/40"
-                  : "bg-pass ring-2 ring-pass/30"
+                  ? "bg-red-600"
+                  : "bg-pass"
               }`}
               aria-hidden="true"
             />
@@ -444,8 +360,7 @@ export function TestRun() {
           {/* Rerun Button */}
           <button
             type="button"
-            className="press inline-flex shrink-0 items-center gap-1.5 border border-pass bg-card px-3 py-1.5 font-mono text-xs tracking-[0.12em] uppercase text-ink hover:bg-pass-fill hover:text-on-band transition-all shadow-xs"
-            data-cursor="Run dynamic simulation"
+            className="press inline-flex shrink-0 items-center gap-1.5 border border-pass bg-card px-3 py-1.5 font-mono text-xs tracking-[0.12em] uppercase text-ink hover:bg-pass-fill hover:text-on-band transition-colors shadow-xs"
             onClick={handleRerun}
           >
             <RotateCcw className={`h-3 w-3 ${!isDone ? "animate-spin" : ""}`} />
@@ -464,7 +379,7 @@ export function TestRun() {
             ) : hasFailed ? (
               <span className="inline-flex items-center gap-1 font-semibold text-red-600 dark:text-red-400">
                 <AlertCircle className="h-3 w-3 shrink-0" />
-                <span>1 Defect Caught</span>
+                <span>{failedCount} Defect Caught</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 text-pass font-medium">
@@ -488,8 +403,8 @@ export function TestRun() {
           return (
             <li
               key={check.file}
-              className={`py-2.5 font-mono text-[0.82rem] sm:text-sm transition-all duration-200 ${
-                isFailed ? "border-l-2 border-red-600 pl-3 bg-red-600/5 rounded-xs" : ""
+              className={`py-2 font-mono text-[0.82rem] sm:text-sm ${
+                isFailed ? "border-l-2 border-red-600 pl-2.5 bg-red-600/5 rounded-xs" : ""
               }`}
             >
               {/* Row Header */}
@@ -498,10 +413,10 @@ export function TestRun() {
                 onClick={() => setExpandedRow(isExpanded ? null : check.file)}
                 title="Click to toggle assertion details"
               >
-                <div className="flex min-w-0 items-center gap-2.5">
+                <div className="flex min-w-0 items-center gap-2">
                   {/* Status Indicator Badge */}
                   <span
-                    className={`inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-xs transition-colors ${
+                    className={`inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-xs ${
                       isPassed
                         ? "text-pass bg-pass/10"
                         : isFailed
@@ -538,22 +453,22 @@ export function TestRun() {
                 </div>
 
                 {/* Right: Elapsed Clock / Duration + Expand Indicator */}
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 items-center gap-1.5">
                   <span className="font-mono text-xs tabular-nums text-muted">
                     {isPassed || isFailed || isSkipped ? check.msLabel : clock(elapsedInTest)}
                   </span>
                   <ChevronDown
-                    className={`h-3.5 w-3.5 text-muted transition-transform duration-200 group-hover:text-ink ${
-                      isExpanded ? "rotate-180" : ""
+                    className={`h-3.5 w-3.5 text-muted transition-transform duration-150 ${
+                      isExpanded ? "rotate-180 text-ink" : ""
                     }`}
                   />
                 </div>
               </div>
 
               {/* Individual Progress Bar */}
-              <span className="mt-1.5 block h-0.5 w-full bg-line/60 overflow-hidden" aria-hidden="true">
+              <span className="mt-1 block h-0.5 w-full bg-line/60 overflow-hidden" aria-hidden="true">
                 <span
-                  className={`block h-full transition-all duration-100 ${
+                  className={`block h-full ${
                     isFailed
                       ? "bg-red-600"
                       : isSkipped
@@ -566,70 +481,47 @@ export function TestRun() {
 
               {/* Expandable Details Drawer */}
               {isExpanded && (
-                <div className="runner-drawer-animate mt-2.5">
-                  {/* FAILURE STATE: High-Precision Dark Terminal Box */}
+                <div className="runner-drawer-animate mt-2">
+                  {/* FAILURE STATE: Compact High-Precision Dark Terminal Box */}
                   {isFailed && (
-                    <div className="border border-ink bg-band text-on-band p-3.5 sm:p-4 shadow-md font-mono">
-                      {/* Window Bar */}
-                      <div className="flex items-center justify-between border-b border-white/15 pb-2.5 mb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="h-2 w-2 rounded-full bg-red-500" />
-                          <span className="h-2 w-2 rounded-full bg-amber-500" />
-                          <span className="h-2 w-2 rounded-full bg-pass" />
-                          <span className="ml-1 text-[0.7rem] uppercase tracking-wider text-white/80">
-                            terminal · assertion failure
-                          </span>
+                    <div className="border border-ink bg-band text-on-band p-2.5 sm:p-3 my-1 font-mono text-[0.72rem] leading-normal shadow-sm">
+                      {/* Compact Title Row */}
+                      <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-1.5 mb-2">
+                        <div className="flex items-center gap-1.5 text-red-400 font-semibold min-w-0 truncate">
+                          <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate">{check.errorMessage}</span>
                         </div>
-                        <span className="border border-red-500/50 bg-red-500/20 px-2 py-0.5 text-[0.65rem] font-bold text-red-400 uppercase tracking-wider">
-                          P0 Defect Caught
+                        <span className="shrink-0 font-mono text-[0.62rem] uppercase tracking-wider text-red-400 border border-red-500/40 bg-red-500/15 px-1.5 py-0.2">
+                          P0 Defect
                         </span>
                       </div>
 
-                      {/* Error Message */}
-                      <div className="flex items-start gap-2 text-xs font-semibold text-red-400">
-                        <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                        <span>{check.errorMessage}</span>
-                      </div>
-
-                      {/* Diff Comparison Block */}
-                      <div className="mt-2.5 space-y-1.5 rounded-xs bg-black/40 border border-white/10 p-2.5 text-[0.72rem] leading-relaxed">
+                      {/* Tight Diff Box */}
+                      <div className="rounded-xs bg-black/40 border border-white/10 px-2.5 py-1.5 space-y-0.5 text-[0.68rem]">
                         {check.expectedDiff && (
-                          <div className="flex items-start gap-2 text-emerald-400">
-                            <span className="font-bold select-none">[+] EXPECTED:</span>
+                          <div className="flex items-baseline gap-1.5 text-emerald-400">
+                            <span className="font-bold select-none text-[0.65rem] opacity-80">[+]</span>
+                            <span className="font-semibold text-white/70">Expected:</span>
                             <span>{check.expectedDiff}</span>
                           </div>
                         )}
                         {check.receivedDiff && (
-                          <div className="flex items-start gap-2 text-red-400 font-medium">
-                            <span className="font-bold select-none">[-] RECEIVED:</span>
+                          <div className="flex items-baseline gap-1.5 text-red-400">
+                            <span className="font-bold select-none text-[0.65rem] opacity-80">[-]</span>
+                            <span className="font-semibold text-white/70">Received:</span>
                             <span>{check.receivedDiff}</span>
-                          </div>
-                        )}
-                        {check.payloadInfo && (
-                          <div className="flex items-start gap-2 text-white/60 pt-1 border-t border-white/10">
-                            <span className="font-bold select-none">[#] PAYLOAD:</span>
-                            <span className="font-mono">{check.payloadInfo}</span>
                           </div>
                         )}
                       </div>
 
-                      {/* Business Impact Note */}
-                      {check.impactInfo && (
-                        <p className="mt-2 text-[0.7rem] text-on-band/80 leading-relaxed">
-                          <span className="text-amber-400 font-semibold">Quality Impact: </span>
-                          {check.impactInfo}
-                        </p>
-                      )}
-
-                      {/* RCA Footer CTA */}
-                      <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 border-t border-white/15 pt-2.5">
-                        <span className="text-[0.68rem] text-white/60">
-                          Jira #DEF-402 · Root Cause Investigation Available
+                      {/* Compact Footer: Smooth RCA link on the right without shifting */}
+                      <div className="mt-2 flex items-center justify-between gap-2 text-[0.68rem] pt-1.5 border-t border-white/10">
+                        <span className="text-white/60 truncate">
+                          Jira #DEF-402 · Defect isolated before production
                         </span>
                         <Link
                           href="/rca"
-                          className="press inline-flex items-center gap-1.5 border border-white/30 bg-white/10 px-2.5 py-1 text-[0.7rem] text-white hover:bg-pass hover:border-pass hover:text-on-band transition-all font-semibold"
-                          data-cursor="Inspect Deepak's Root Cause Analysis study"
+                          className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 hover:underline font-medium shrink-0 transition-colors"
                         >
                           <span>Inspect RCA Case Study</span>
                           <ArrowRight className="h-3 w-3" />
@@ -640,14 +532,14 @@ export function TestRun() {
 
                   {/* SKIPPED STATE: Amber Callout */}
                   {isSkipped && check.skipReason && (
-                    <div className="border border-amber-500/40 bg-amber-500/10 p-3 rounded-xs font-mono text-xs">
-                      <div className="flex items-start gap-2 text-amber-700 dark:text-amber-300 font-medium">
-                        <MinusCircle className="h-4 w-4 shrink-0 text-amber-500 mt-0.5" />
+                    <div className="border border-amber-500/40 bg-amber-500/10 p-2.5 rounded-xs font-mono text-xs">
+                      <div className="flex items-start gap-1.5 text-amber-700 dark:text-amber-300 font-medium">
+                        <MinusCircle className="h-3.5 w-3.5 shrink-0 text-amber-500 mt-0.5" />
                         <div>
-                          <p className="font-semibold uppercase text-[0.7rem] tracking-wider">
+                          <p className="font-semibold uppercase text-[0.68rem] tracking-wider">
                             Suite Bypass Notice:
                           </p>
-                          <p className="mt-0.5 text-[0.72rem] leading-relaxed text-ink-soft">
+                          <p className="mt-0.5 text-[0.7rem] leading-relaxed text-ink-soft">
                             {check.skipReason}
                           </p>
                         </div>
@@ -657,13 +549,13 @@ export function TestRun() {
 
                   {/* PASSED STATE: Green Check Verified Box */}
                   {isPassed && check.assertions && check.assertions.length > 0 && (
-                    <div className="border border-pass/30 bg-card p-3 rounded-xs font-mono text-xs">
-                      <p className="font-mono text-[0.68rem] uppercase tracking-wider text-muted mb-2">
+                    <div className="border border-pass/30 bg-card p-2.5 rounded-xs font-mono text-xs">
+                      <p className="font-mono text-[0.65rem] uppercase tracking-wider text-muted mb-1.5">
                         Assertions Verified:
                       </p>
-                      <ul className="space-y-1 text-[0.72rem] text-ink-soft">
+                      <ul className="space-y-0.5 text-[0.7rem] text-ink-soft">
                         {check.assertions.map((assertion, idx) => (
-                          <li key={idx} className="flex items-center gap-2">
+                          <li key={idx} className="flex items-center gap-1.5">
                             <span className="text-pass font-bold">✓</span>
                             <span>{assertion}</span>
                           </li>
@@ -688,7 +580,7 @@ export function TestRun() {
             </span>
 
             {failedCount > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-xs border border-red-600/50 bg-red-600/15 px-2 py-0.5 text-xs text-red-600 dark:text-red-400 font-semibold animate-pulse">
+              <span className="inline-flex items-center gap-1 rounded-xs border border-red-600/50 bg-red-600/15 px-2 py-0.5 text-xs text-red-600 dark:text-red-400 font-semibold">
                 <AlertCircle className="h-3 w-3" />
                 <span>{failedCount} failed</span>
               </span>
@@ -713,15 +605,15 @@ export function TestRun() {
 
         {/* Gate Verdict Banner */}
         <div
-          className={`mt-3 flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-xs border transition-all duration-300 ${
+          className={`mt-2.5 flex flex-wrap items-center justify-between gap-2.5 p-2.5 rounded-xs border transition-colors ${
             !isDone
               ? "border-line bg-paper/50 text-muted"
               : hasFailed
-              ? "border-2 border-red-600 bg-band text-on-band shadow-sm failure-pulse-ring"
+              ? "border-2 border-red-600 bg-band text-on-band shadow-sm"
               : "border border-pass/50 bg-pass/10 text-pass"
           }`}
         >
-          <div className="flex items-center gap-2.5 font-mono text-xs min-w-0">
+          <div className="flex items-center gap-2 font-mono text-xs min-w-0">
             {!isDone ? (
               <Clock className="h-4 w-4 animate-spin text-muted shrink-0" />
             ) : hasFailed ? (
@@ -743,7 +635,7 @@ export function TestRun() {
               hasFailed ? (
                 <Link
                   href="/rca"
-                  className="inline-flex items-center gap-1 font-mono text-[0.72rem] text-on-band hover:text-white underline underline-offset-2 transition-colors"
+                  className="inline-flex items-center gap-1 font-mono text-[0.7rem] text-emerald-400 hover:text-emerald-300 hover:underline transition-colors"
                 >
                   <span>Deployment Blocked · View RCA</span>
                   <ArrowRight className="h-3 w-3" />

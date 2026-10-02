@@ -335,23 +335,39 @@ export function ReleaseGatekeeper() {
                       </div>
                     </div>
 
-                    <div className="border border-line bg-paper p-3.5 text-xs rounded-xs flex-1 flex flex-col">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block">
-                          Deepak&apos;s Active Triage Protocol ({failedRules.length} Blocking):
-                        </span>
-                        <span className="font-mono text-[0.6rem] uppercase tracking-wider text-red-600 dark:text-red-400 font-semibold">
-                          Action Required
-                        </span>
+                    <div className="border border-line bg-paper p-3.5 text-xs rounded-xs flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block">
+                            Deepak&apos;s Active Triage Protocol ({failedRules.length} Blocking):
+                          </span>
+                          <span className="font-mono text-[0.6rem] uppercase tracking-wider text-red-600 dark:text-red-400 font-semibold">
+                            Action Required
+                          </span>
+                        </div>
+
+                        {/* Blocked Items */}
+                        <div className="space-y-2">
+                          {failedRules.map((r) => (
+                            <div key={r.id} className="border-l-2 border-red-500 pl-2.5 py-1 bg-red-500/5">
+                              <p className="font-bold text-ink text-xs truncate leading-snug">{r.name}</p>
+                              <p className="text-ink-soft text-[0.72rem] leading-normal line-clamp-2 mt-0.5">{r.impactOnFailure}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div className="space-y-2 flex-1 flex flex-col justify-between">
-                        {failedRules.map((r) => (
-                          <div key={r.id} className="border-l-2 border-red-500 pl-2.5 py-0.5">
-                            <p className="font-bold text-ink text-xs truncate leading-snug">{r.name}</p>
-                            <p className="text-ink-soft text-[0.72rem] leading-tight line-clamp-1 mt-0.5">{r.impactOnFailure}</p>
-                          </div>
-                        ))}
-                      </div>
+
+                      {/* Healthy / Non-blocking Context to fill space naturally when only 1-3 are failing */}
+                      {passedCount > 0 && (
+                        <div className="mt-3 pt-2.5 border-t border-line/60">
+                          <span className="font-mono text-[0.6rem] uppercase tracking-wider text-pass block mb-1">
+                            ✓ Passing Verification Criteria ({passedCount}/4):
+                          </span>
+                          <p className="font-sans text-[0.7rem] text-muted truncate">
+                            {GATE_RULES.filter((r) => gateStates[r.id]).map((r) => r.name).join(" • ")}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

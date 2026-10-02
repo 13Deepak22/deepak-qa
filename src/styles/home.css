@@ -528,4 +528,34 @@
     border-color: var(--pass);
     box-shadow: 0 4px 14px -6px rgba(20, 108, 67, 0.25);
   }
+
+  /* Test Runner Animations & Effects */
+  @keyframes failure-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.35);
+    }
+    50% {
+      box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.1);
+    }
+  }
+
+  @keyframes runner-drawer-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .runner-drawer-animate {
+    animation: runner-drawer-in 260ms var(--ease) both;
+  }
+
+  .failure-pulse-ring {
+    animation: failure-pulse 2s infinite ease-in-out;
+  }
 }
+

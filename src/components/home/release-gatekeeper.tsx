@@ -32,8 +32,8 @@ const GATE_RULES: GateRule[] = [
     name: "Zero Critical (P0/P1) Defects",
     description: "No blocker issues in core transaction or auth journeys.",
     category: "Defect Triage",
-    healthyState: "0 Open P0/P1 Bugs",
-    failingState: "1 Blocker Bug Detected in Payment Gateway",
+    healthyState: "0 Open P0/P1 Blockers",
+    failingState: "1 Open Blocker in Gateway",
     impactOnFailure: "Blocks deployment. Prevents revenue loss and broken user journeys.",
   },
   {
@@ -41,8 +41,8 @@ const GATE_RULES: GateRule[] = [
     name: "Automated Regression Coverage",
     description: "Full suite of Playwright & Appium end-to-end tests.",
     category: "Test Automation",
-    healthyState: "100% Suites Green (142/142 Passed)",
-    failingState: "2 Failing E2E Checks in KYC Flow",
+    healthyState: "100% Suites Green (142/142)",
+    failingState: "2 Failing E2E Checks in KYC",
     impactOnFailure: "Regression failure indicates unintended side-effects in new build.",
   },
   {
@@ -50,8 +50,8 @@ const GATE_RULES: GateRule[] = [
     name: "API Latency & 99th Percentile SLA",
     description: "Backend endpoints response time under concurrency.",
     category: "Performance SLA",
-    healthyState: "148ms p95 (Well under 300ms SLA)",
-    failingState: "1,840ms Latency Spike on /disburse",
+    healthyState: "148ms p95 (< 300ms SLA)",
+    failingState: "1,840ms Latency Spike on API",
     impactOnFailure: "High latency triggers mobile timeout exceptions and payment drops.",
   },
   {
@@ -59,8 +59,8 @@ const GATE_RULES: GateRule[] = [
     name: "Fintech Concurrency & Idempotency",
     description: "Redis distributed locks on payment debit endpoints.",
     category: "Financial Safety",
-    healthyState: "Idempotency Verified & Lock Active",
-    failingState: "Missing Idempotency Token on Retry",
+    healthyState: "Idempotency Lock Active",
+    failingState: "Missing Idempotency Token",
     impactOnFailure: "Catastrophic risk: Network retry will double-debit customer accounts.",
   },
 ];
@@ -157,10 +157,10 @@ export function ReleaseGatekeeper() {
                     {passedCount}/4 Checks Green
                   </span>
                 </div>
-                <h3 className="mt-1 font-serif text-2xl sm:text-3xl font-bold">
+                <h3 className="mt-1 font-serif text-xl sm:text-2xl font-bold tracking-tight truncate">
                   {isApproved
                     ? "Production Deployment Approved"
-                    : "Deployment Halted — Critical Failures Detected"}
+                    : "Deployment Halted — Blockers Caught"}
                 </h3>
               </div>
             </div>
@@ -172,7 +172,7 @@ export function ReleaseGatekeeper() {
                 data-testid="gatekeeper-preset-all-green"
                 data-cursor="Set all release criteria to healthy pass (Ship to production)"
                 onClick={resetAllGreen}
-                className="px-3 py-1.5 border border-line bg-card text-xs font-mono text-muted hover:text-ink transition-colors flex items-center gap-1"
+                className="px-3 py-1.5 border border-line bg-card text-xs font-mono text-muted hover:text-ink transition-colors flex items-center gap-1 active:scale-95"
               >
                 <CheckCircle2 className="h-3.5 w-3.5 text-pass" />
                 <span>All Green</span>
@@ -182,7 +182,7 @@ export function ReleaseGatekeeper() {
                 data-testid="gatekeeper-preset-simulate-failure"
                 data-cursor="Simulate critical bug injection and deployment halt"
                 onClick={simulateFailure}
-                className="px-3 py-1.5 border border-line bg-card text-xs font-mono text-muted hover:text-ink transition-colors flex items-center gap-1"
+                className="px-3 py-1.5 border border-line bg-card text-xs font-mono text-muted hover:text-ink transition-colors flex items-center gap-1 active:scale-95"
               >
                 <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
                 <span>Simulate Failure</span>
@@ -190,15 +190,15 @@ export function ReleaseGatekeeper() {
             </div>
           </div>
 
-          {/* Interactive Toggle Grid */}
-          <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-line">
-            {/* Left: 4 Interactive Switches */}
-            <div className="p-6 space-y-4">
+          {/* Interactive Toggle Grid: Balanced equal heights with zero layout shift */}
+          <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-line items-stretch">
+            {/* Left: 4 Interactive Switches (Fixed Invariant Box Height) */}
+            <div className="p-5 sm:p-6 space-y-3 flex flex-col justify-between">
               <span className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase block">
                 Click Any Check to Toggle Its State:
               </span>
 
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {GATE_RULES.map((rule) => {
                   const isHealthy = gateStates[rule.id];
                   return (
@@ -210,28 +210,28 @@ export function ReleaseGatekeeper() {
                       data-testid={`gatekeeper-toggle-${rule.id}`}
                       data-cursor={`Toggle ${rule.name}: ${isHealthy ? 'Currently passing' : 'Currently blocking'}`}
                       onClick={() => toggleGate(rule.id)}
-                      className={`press w-full text-left p-4 border transition-all flex items-start justify-between gap-3 select-none ${
+                      className={`w-full text-left p-3.5 border transition-colors duration-150 flex items-center justify-between gap-3 select-none active:scale-[0.99] rounded-xs ${
                         isHealthy
                           ? "border-pass/40 bg-pass-fill/5 hover:border-pass shadow-2xs"
                           : "border-red-500/50 bg-red-500/5 hover:border-red-500 shadow-2xs"
                       }`}
                     >
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`inline-block h-2.5 w-2.5 rounded-full ${
+                            className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${
                               isHealthy ? "bg-pass animate-pulse" : "bg-red-500"
                             }`}
                           />
-                          <p className="font-sans text-xs font-bold text-ink">
+                          <p className="font-sans text-xs font-bold text-ink truncate">
                             {rule.name}
                           </p>
                         </div>
-                        <p className="mt-1 text-xs text-ink-soft">
+                        <p className="mt-0.5 text-xs text-ink-soft truncate">
                           {rule.description}
                         </p>
                         <p
-                          className={`mt-2 font-mono text-[0.72rem] font-semibold ${
+                          className={`mt-1 font-mono text-[0.72rem] font-semibold truncate h-4 leading-4 flex items-center ${
                             isHealthy ? "text-pass" : "text-red-600 dark:text-red-400"
                           }`}
                         >
@@ -239,9 +239,9 @@ export function ReleaseGatekeeper() {
                         </p>
                       </div>
 
-                      <div className="shrink-0 flex items-center gap-2 pt-0.5">
+                      <div className="shrink-0 flex items-center gap-2">
                         <span
-                          className={`inline-block font-mono text-[0.62rem] uppercase tracking-wider px-2 py-0.5 border ${
+                          className={`inline-block font-mono text-[0.62rem] uppercase tracking-wider px-1.5 py-0.5 border ${
                             isHealthy
                               ? "border-pass/30 bg-card text-pass font-bold"
                               : "border-red-500/30 bg-card text-red-600 dark:text-red-400 font-bold"
@@ -269,10 +269,10 @@ export function ReleaseGatekeeper() {
               </div>
             </div>
 
-            {/* Right: Live Gate Decision Log */}
-            <div className="p-6 flex flex-col justify-between bg-card/40">
+            {/* Right: Live Gate Decision Log (Balanced Height to Match Left Column) */}
+            <div className="p-5 sm:p-6 flex flex-col justify-between bg-card/40">
               <div>
-                <div className="flex items-center justify-between border-b border-line pb-3 mb-4">
+                <div className="flex items-center justify-between border-b border-line pb-3 mb-3.5">
                   <span className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted">
                     Gatekeeper Audit Log
                   </span>
@@ -280,77 +280,79 @@ export function ReleaseGatekeeper() {
                 </div>
 
                 {isApproved ? (
-                  <div key="approved" className="space-y-4 content-fade">
-                    <div className="border border-pass/30 bg-paper p-4">
+                  <div key="approved" className="space-y-3">
+                    <div className="border border-pass/30 bg-paper p-3.5 rounded-xs">
                       <div className="flex items-start gap-2.5">
                         <ShieldCheck className="h-5 w-5 text-pass shrink-0 mt-0.5" />
                         <div>
                           <p className="font-mono text-xs uppercase tracking-wider text-pass font-bold">
                             Zero-Defect Sign-off Ready
                           </p>
-                          <p className="mt-1.5 text-xs text-ink-soft leading-relaxed">
-                            All 4 quality gates satisfy Deepak&apos;s rigorous release requirements. Zero P0/P1 defects, 100% automated regression passed, API SLA verified within limits, and distributed idempotency active.
+                          <p className="mt-1 text-xs text-ink-soft leading-relaxed line-clamp-2">
+                            All 4 quality gates satisfy Deepak&apos;s release standards. 0 critical bugs, 100% automated regression passed, API SLA verified, and idempotency active.
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="border border-line bg-paper p-4 space-y-2 text-xs">
-                      <span className="font-mono text-[0.68rem] uppercase tracking-wider text-muted block">
+                    <div className="border border-line bg-paper p-3.5 space-y-2 text-xs rounded-xs">
+                      <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block">
                         Production Gate Artifacts Generated:
                       </span>
                       <p className="text-ink flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-pass" />
-                        <span>Signed Test Summary Report (TSR) &amp; Execution Matrix</span>
+                        <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0" />
+                        <span className="truncate">Signed Test Summary Report (TSR) &amp; Matrix</span>
                       </p>
                       <p className="text-ink flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-pass" />
-                        <span>Automated Regression Run Artifacts (Playwright HTML report)</span>
+                        <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0" />
+                        <span className="truncate">Automated Regression Artifacts (Playwright HTML)</span>
                       </p>
                       <p className="text-ink flex items-center gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-pass" />
-                        <span>Payment Reconciliation &amp; Webhook Audit Log</span>
+                        <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0" />
+                        <span className="truncate">Payment Reconciliation &amp; Webhook Audit Log</span>
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <div key="halted" className="space-y-4 content-fade">
-                    <div className="border border-red-500/40 bg-red-500/10 p-4">
+                  <div key="halted" className="space-y-3">
+                    <div className="border border-red-500/40 bg-red-500/10 p-3.5 rounded-xs">
                       <div className="flex items-start gap-2.5">
                         <ShieldAlert className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                         <div>
                           <p className="font-mono text-xs uppercase tracking-wider text-red-600 dark:text-red-400 font-bold">
                             Deployment Blocked by QA Gatekeeper
                           </p>
-                          <p className="mt-1.5 text-xs text-ink-soft leading-relaxed">
-                            {failedRules.length} critical gate condition(s) breached. Release cannot be certified until blockers are triaged and re-tested.
+                          <p className="mt-1 text-xs text-ink-soft leading-relaxed line-clamp-2">
+                            {failedRules.length} critical gate condition(s) breached. Release cannot ship until blockers are triaged and re-tested.
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="border border-line bg-paper p-4 space-y-2 text-xs">
-                      <span className="font-mono text-[0.68rem] uppercase tracking-wider text-muted block">
-                        Deepak&apos;s Active Triage Protocol:
+                    <div className="border border-line bg-paper p-3.5 text-xs rounded-xs">
+                      <span className="font-mono text-[0.65rem] uppercase tracking-wider text-muted block mb-1.5">
+                        Deepak&apos;s Active Triage Protocol ({failedRules.length} Blocking):
                       </span>
-                      {failedRules.map((r) => (
-                        <div key={r.id} className="border-l-2 border-red-500 pl-2 py-0.5">
-                          <p className="font-bold text-ink">{r.name}:</p>
-                          <p className="text-ink-soft text-[0.72rem]">{r.impactOnFailure}</p>
-                        </div>
-                      ))}
+                      <div className="space-y-1.5 max-h-[105px] overflow-y-auto pr-1">
+                        {failedRules.map((r) => (
+                          <div key={r.id} className="border-l-2 border-red-500 pl-2 py-0.5">
+                            <p className="font-bold text-ink text-xs truncate">{r.name}</p>
+                            <p className="text-ink-soft text-[0.7rem] line-clamp-1">{r.impactOnFailure}</p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
               </div>
 
               {/* Bottom Authority Stamp */}
-              <div className="mt-6 pt-4 border-t border-line/60 flex items-center justify-between text-xs">
+              <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between text-xs">
                 <span className="font-mono text-[0.68rem] text-muted">
-                  Sign-off Authority: Deepak Gupta (Senior QA Engineer)
+                  Sign-off Authority: Deepak Gupta
                 </span>
                 <span className="font-mono text-[0.68rem] text-pass font-semibold">
-                  Zero Financial Leaks in Prod
+                  Zero Financial Leaks
                 </span>
               </div>
             </div>

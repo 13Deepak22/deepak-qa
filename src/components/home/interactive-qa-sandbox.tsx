@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
   Activity,
   AlertCircle,
@@ -353,19 +353,6 @@ export function InteractiveQASandbox() {
   const [payloadCache, setPayloadCache] = useState<Record<string, unknown>>({});
   const [simulationLog, setSimulationLog] = useState<Array<{ type: "init" | "env" | "pass" | "fail" | "skip" | "info"; text: string; ms?: number }>>([]);
 
-  const activeRunIdRef = useRef<number>(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const isRunningRef = useRef<boolean>(false);
-
-  useEffect(() => {
-    return () => {
-      activeRunIdRef.current++;
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
   const activeScenario = SCENARIOS.find((s) => s.id === selectedId) || SCENARIOS[0];
   const currentControl = activeScenario.customControl;
   const currentControlValue = currentControl
@@ -380,23 +367,7 @@ export function InteractiveQASandbox() {
     return generated;
   };
 
-  const handleReset = () => {
-    activeRunIdRef.current++;
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    isRunningRef.current = false;
-    setIsRunning(false);
-    setCompletedStepIndex(-1);
-    setTestResult("idle");
-    setDefectInfo(null);
-    setStepStatuses([]);
-    setSimulationLog([]);
-  };
-
   const handleToggleControl = (controlId: string) => {
-    handleReset();
     setScenarioControls((prev) => {
       const current = prev[activeScenario.id] || {};
       const updated = {
@@ -406,23 +377,16 @@ export function InteractiveQASandbox() {
           [controlId]: !current[controlId],
         },
       };
+      // Regenerate payload with new control state
       const newScControls = updated[activeScenario.id];
       setPayloadCache(activeScenario.generatePayload(newScControls));
       return updated;
     });
+    handleReset();
   };
 
   const handleRunSimulation = () => {
-    if (isRunningRef.current) return;
-    isRunningRef.current = true;
-
-    // Invalidate prior executions and cancel pending timers
-    activeRunIdRef.current++;
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    const currentRunId = activeRunIdRef.current;
+    if (isRunning) return;
 
     // Fresh payload for this run
     const activeControls = scenarioControls[activeScenario.id] || {};
@@ -450,68 +414,61 @@ export function InteractiveQASandbox() {
     const failAtStep = shouldFail ? activeScenario.defectStepIndex : -1;
 
     const runNextStep = () => {
-      if (activeRunIdRef.current !== currentRunId) return;
-
       if (currentStep < activeScenario.steps.length) {
-        const stepIdx = currentStep;
+        // Mark current as running
+        setStepStatuses((prev) => {
+          const next = [...prev];
+          next[currentStep] = "running";
+          return next;
+        });
 
-        // Mark current as running, with all preceding steps strictly passed
-        setStepStatuses(
-          activeScenario.steps.map((_, i) => {
-            if (i < stepIdx) return "passed";
-            if (i === stepIdx) return "running";
-            return "pending";
-          })
-        );
-
-        const step = activeScenario.steps[stepIdx];
+        const step = activeScenario.steps[currentStep];
+        // Introduce small realistic jitter (+/- 15%)
         const jitter = 0.85 + Math.random() * 0.3;
         const stepTime = Math.round(step.durationMs * multiplier * jitter);
 
-        timeoutRef.current = setTimeout(() => {
-          if (activeRunIdRef.current !== currentRunId) return;
-
-          if (stepIdx === failAtStep) {
-            // Defect detected at this step
-            setStepStatuses(
-              activeScenario.steps.map((_, i) => {
-                if (i < stepIdx) return "passed";
-                if (i === stepIdx) return "failed";
-                return "skipped";
-              })
-            );
-            setCompletedStepIndex(stepIdx);
-            isRunningRef.current = false;
+        setTimeout(() => {
+          if (currentStep === failAtStep) {
+            // This step failed!
+            setStepStatuses((prev) => {
+              const next = [...prev];
+              next[currentStep] = "failed";
+              // Subsequent steps are skipped
+              for (let i = currentStep + 1; i < next.length; i++) {
+                next[i] = "skipped";
+              }
+              return next;
+            });
+            setCompletedStepIndex(currentStep);
             setIsRunning(false);
             setTestResult("defect");
             const failureMsg = step.failureReason || activeScenario.defectWarning;
-            setDefectInfo({ step: stepIdx + 1, reason: failureMsg });
+            setDefectInfo({ step: currentStep + 1, reason: failureMsg });
             setSimulationLog((prev) => [
               ...prev,
               {
                 type: "fail",
-                text: `step_${stepIdx + 1}: ${step.name} -> FAIL (${stepTime}ms) - ${failureMsg}`,
+                text: `step_${currentStep + 1}: ${step.name} -> FAIL (${stepTime}ms) - ${failureMsg}`,
                 ms: stepTime,
               },
               {
                 type: "skip",
-                text: `Remaining ${activeScenario.steps.length - stepIdx - 1} assertions skipped due to release gate halt.`,
+                text: `Remaining ${activeScenario.steps.length - currentStep - 1} assertions skipped due to release gate halt.`,
               },
             ]);
           } else {
-            // Step passed - mark all steps up to stepIdx as passed
-            setStepStatuses(
-              activeScenario.steps.map((_, i) => {
-                if (i <= stepIdx) return "passed";
-                return "pending";
-              })
-            );
-            setCompletedStepIndex(stepIdx);
+            // Step passed!
+            setStepStatuses((prev) => {
+              const next = [...prev];
+              next[currentStep] = "passed";
+              return next;
+            });
+            setCompletedStepIndex(currentStep);
             setSimulationLog((prev) => [
               ...prev,
               {
                 type: "pass",
-                text: `step_${stepIdx + 1}: ${step.name} -> ${step.assertionCheck} (${stepTime}ms)`,
+                text: `step_${currentStep + 1}: ${step.name} -> ${step.assertionCheck} (${stepTime}ms)`,
                 ms: stepTime,
               },
             ]);
@@ -521,11 +478,7 @@ export function InteractiveQASandbox() {
           }
         }, stepTime);
       } else {
-        // All steps successfully verified
-        if (activeRunIdRef.current !== currentRunId) return;
-        setStepStatuses(activeScenario.steps.map(() => "passed"));
-        setCompletedStepIndex(activeScenario.steps.length - 1);
-        isRunningRef.current = false;
+        // All steps successfully verified!
         setIsRunning(false);
         setTestResult("success");
         setSimulationLog((prev) => [
@@ -539,6 +492,15 @@ export function InteractiveQASandbox() {
     };
 
     runNextStep();
+  };
+
+  const handleReset = () => {
+    setIsRunning(false);
+    setCompletedStepIndex(-1);
+    setTestResult("idle");
+    setDefectInfo(null);
+    setStepStatuses([]);
+    setSimulationLog([]);
   };
 
   const ControlIcon = currentControl?.icon === "shield"
@@ -582,15 +544,13 @@ export function InteractiveQASandbox() {
                   type="button"
                   data-testid={`sandbox-scenario-${sc.id}`}
                   data-cursor={`Select ${sc.name} simulation`}
-                  disabled={isRunning}
                   onClick={() => {
-                    if (isRunning) return;
-                    handleReset();
                     setSelectedId(sc.id);
                     const currentScControls = scenarioControls[sc.id] || {};
                     setPayloadCache(sc.generatePayload(currentScControls));
+                    handleReset();
                   }}
-                  className={`group relative flex w-full items-center gap-3 px-4 py-3.5 text-xs font-mono transition-colors text-left border-line disabled:opacity-70 disabled:cursor-not-allowed ${
+                  className={`group relative flex w-full items-center gap-3 px-4 py-3.5 text-xs font-mono transition-colors text-left border-line ${
                     index < 3 ? "lg:border-r" : "lg:border-r-0"
                   } ${index % 2 === 0 ? "sm:border-r" : "sm:border-r-0"} ${
                     index < 2 ? "sm:border-b" : "sm:border-b-0"
@@ -665,12 +625,8 @@ export function InteractiveQASandbox() {
                     ? "Switch to 5G low-latency mode (20ms)"
                     : "Simulate 3G packet drop & latency jitter (1600ms)"
                 }
-                disabled={isRunning}
-                onClick={() => {
-                  if (isRunning) return;
-                  setIsThrottled(!isThrottled);
-                }}
-                className={`press group flex items-center gap-2.5 border px-3 py-1.5 text-xs font-mono transition-all rounded-xs select-none shadow-2xs disabled:opacity-60 disabled:cursor-not-allowed ${
+                onClick={() => setIsThrottled(!isThrottled)}
+                className={`press group flex items-center gap-2.5 border px-3 py-1.5 text-xs font-mono transition-all rounded-xs select-none shadow-2xs ${
                   isThrottled
                     ? "border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-300"
                     : "border-line bg-card text-ink-soft hover:border-line-deep hover:bg-paper"
@@ -697,7 +653,7 @@ export function InteractiveQASandbox() {
                 >
                   <span
                     className={`inline-block h-3 w-3 rounded-full bg-paper shadow-xs transition-transform duration-200 ease-in-out ${
-                  isThrottled ? "translate-x-3.5" : "translate-x-0.5"
+                      isThrottled ? "translate-x-3.5" : "translate-x-0.5"
                     }`}
                   />
                 </span>
@@ -720,12 +676,8 @@ export function InteractiveQASandbox() {
                       ? `Toggle off to simulate defect: ${currentControl.defectRiskDescription}`
                       : `Enable strict validation to pass release gate`
                   }
-                  disabled={isRunning}
-                  onClick={() => {
-                    if (isRunning) return;
-                    handleToggleControl(currentControl.id);
-                  }}
-                  className={`press group flex items-center gap-2.5 border px-3 py-1.5 text-xs font-mono transition-all rounded-xs select-none shadow-2xs disabled:opacity-60 disabled:cursor-not-allowed ${
+                  onClick={() => handleToggleControl(currentControl.id)}
+                  className={`press group flex items-center gap-2.5 border px-3 py-1.5 text-xs font-mono transition-all rounded-xs select-none shadow-2xs ${
                     currentControlValue
                       ? "border-pass/50 bg-pass/10 text-pass"
                       : "border-red-500/50 bg-red-500/10 text-red-600 dark:text-red-400"
@@ -809,15 +761,7 @@ export function InteractiveQASandbox() {
             <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-4">
                 <span className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase">
-                  Assertion Pipeline (
-                  {testResult === "success"
-                    ? `${activeScenario.steps.length}/${activeScenario.steps.length} Passed`
-                    : testResult === "defect"
-                    ? `${completedStepIndex + 1}/${activeScenario.steps.length} Halted`
-                    : isRunning
-                    ? `${completedStepIndex + 1}/${activeScenario.steps.length} Running`
-                    : `0/${activeScenario.steps.length} Ready`}
-                  )
+                  Assertion Pipeline ({completedStepIndex + 1}/{activeScenario.steps.length} {testResult === "defect" ? "Halted" : "Passed"})
                 </span>
                 <span className="font-mono text-xs text-pass flex items-center gap-1">
                   <Clock className="h-3 w-3" />
@@ -827,17 +771,9 @@ export function InteractiveQASandbox() {
 
               <div className="space-y-3">
                 {activeScenario.steps.map((step, idx) => {
-                  let status = stepStatuses[idx] || "pending";
-                  if (testResult === "success") {
-                    status = "passed";
-                  } else if (testResult === "defect") {
-                    const failIdx = defectInfo ? defectInfo.step - 1 : activeScenario.defectStepIndex;
-                    if (idx < failIdx) status = "passed";
-                    else if (idx === failIdx) status = "failed";
-                    else status = "skipped";
-                  }
+                  const status = stepStatuses[idx] || "pending";
                   const isDone = status === "passed";
-                  const isCurrent = status === "running" && testResult === "idle";
+                  const isCurrent = status === "running";
                   const isFailed = status === "failed";
                   const isSkipped = status === "skipped";
 

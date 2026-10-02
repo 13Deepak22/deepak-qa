@@ -105,11 +105,11 @@
   }
 
   .press:hover {
-    transform: translateY(-1px);
+    /* Stabilized: zero vertical text jump on hover */
   }
 
   .press:active {
-    transform: translateY(0.5px);
+    opacity: 0.92;
   }
 
   .mobile-nav-item {

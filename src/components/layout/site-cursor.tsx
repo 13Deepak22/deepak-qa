@@ -164,7 +164,7 @@ export function SiteCursor() {
           labelW = label.offsetWidth;
         }
         const rect = hoverEl.getBoundingClientRect();
-        const pad = PAD - 4 * pressed;
+        const pad = PAD;
         const header = document.querySelector("header");
         const ceiling = header && !header.contains(hoverEl) ? header.getBoundingClientRect().bottom : 0;
         const top = Math.max(rect.top - pad, ceiling);
@@ -286,6 +286,18 @@ export function SiteCursor() {
       start();
     };
 
+    const onScroll = () => {
+      if (!shown) return;
+      const el = document.elementFromPoint(pos.x, pos.y);
+      const field = el?.closest(FIELD) ?? null;
+      const next = field ? null : (el?.closest(INTERACTIVE) ?? null);
+      if (next !== hoverEl) {
+        hoverEl = next;
+        root.toggleAttribute("data-hide", Boolean(field));
+        root.toggleAttribute("data-hot", Boolean(hoverEl));
+      }
+    };
+
     const onFine = () => (fine.matches ? start() : stop());
     const onReduce = () => (reduce.matches ? stop() : start());
 
@@ -295,6 +307,7 @@ export function SiteCursor() {
     window.addEventListener("pointerdown", onDown);
     window.addEventListener("pointerup", onUp);
     window.addEventListener("resize", sizeCanvas);
+    window.addEventListener("scroll", onScroll, { passive: true });
     document.documentElement.addEventListener("mouseleave", onLeave);
     document.addEventListener("visibilitychange", onVisible);
     start();
@@ -307,6 +320,7 @@ export function SiteCursor() {
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("resize", sizeCanvas);
+      window.removeEventListener("scroll", onScroll);
       document.documentElement.removeEventListener("mouseleave", onLeave);
       document.removeEventListener("visibilitychange", onVisible);
     };

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, IBM_Plex_Mono, Source_Sans_3 } from "next/font/google";
 import { BackToTop } from "@/components/layout/back-to-top";
+import { HashScrollHandler } from "@/components/layout/hash-scroll-handler";
 import { SiteCursor } from "@/components/layout/site-cursor";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -103,6 +104,7 @@ export default function RootLayout({
         {children}
         <SiteFooter />
         <BackToTop />
+        <HashScrollHandler />
         <SiteCursor />
         <script
           type="application/ld+json"

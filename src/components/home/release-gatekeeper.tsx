@@ -172,7 +172,7 @@ export function ReleaseGatekeeper() {
                 data-testid="gatekeeper-preset-all-green"
                 data-cursor="Set all release criteria to healthy pass (Ship to production)"
                 onClick={resetAllGreen}
-                className="px-3 py-1.5 border border-line bg-card text-xs font-mono text-muted hover:text-ink transition-colors flex items-center gap-1 active:scale-95"
+                className="px-3 py-1.5 border border-line bg-card text-xs font-mono text-muted hover:text-ink transition-colors flex items-center gap-1"
               >
                 <CheckCircle2 className="h-3.5 w-3.5 text-pass" />
                 <span>All Green</span>
@@ -182,7 +182,7 @@ export function ReleaseGatekeeper() {
                 data-testid="gatekeeper-preset-simulate-failure"
                 data-cursor="Simulate critical bug injection and deployment halt"
                 onClick={simulateFailure}
-                className="px-3 py-1.5 border border-line bg-card text-xs font-mono text-muted hover:text-ink transition-colors flex items-center gap-1 active:scale-95"
+                className="px-3 py-1.5 border border-line bg-card text-xs font-mono text-muted hover:text-ink transition-colors flex items-center gap-1"
               >
                 <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
                 <span>Simulate Failure</span>
@@ -210,7 +210,7 @@ export function ReleaseGatekeeper() {
                       data-testid={`gatekeeper-toggle-${rule.id}`}
                       data-cursor={`Toggle ${rule.name}: ${isHealthy ? 'Currently passing' : 'Currently blocking'}`}
                       onClick={() => toggleGate(rule.id)}
-                      className={`w-full text-left p-3.5 border transition-colors duration-150 flex items-center justify-between gap-3 select-none active:scale-[0.99] rounded-xs ${
+                      className={`w-full text-left p-3.5 border transition-colors duration-150 flex items-center justify-between gap-3 select-none rounded-xs ${
                         isHealthy
                           ? "border-pass/40 bg-pass-fill/5 hover:border-pass shadow-2xs"
                           : "border-red-500/50 bg-red-500/5 hover:border-red-500 shadow-2xs"
@@ -345,8 +345,6 @@ export function ReleaseGatekeeper() {
                             Action Required
                           </span>
                         </div>
-
-                        {/* Blocked Items */}
                         <div className="space-y-2">
                           {failedRules.map((r) => (
                             <div key={r.id} className="border-l-2 border-red-500 pl-2.5 py-1 bg-red-500/5">
@@ -357,15 +355,23 @@ export function ReleaseGatekeeper() {
                         </div>
                       </div>
 
-                      {/* Healthy / Non-blocking Context to fill space naturally when only 1-3 are failing */}
+                      {/* Balanced Passing Context: fills height cleanly when 1 to 3 items fail */}
                       {passedCount > 0 && (
                         <div className="mt-3 pt-2.5 border-t border-line/60">
-                          <span className="font-mono text-[0.6rem] uppercase tracking-wider text-pass block mb-1">
-                            ✓ Passing Verification Criteria ({passedCount}/4):
+                          <span className="font-mono text-[0.62rem] uppercase tracking-wider text-pass block mb-1.5 font-semibold">
+                            Passing Verification Checks ({passedCount}/4):
                           </span>
-                          <p className="font-sans text-[0.7rem] text-muted truncate">
-                            {GATE_RULES.filter((r) => gateStates[r.id]).map((r) => r.name).join(" • ")}
-                          </p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {GATE_RULES.filter((r) => gateStates[r.id]).map((r) => (
+                              <span
+                                key={r.id}
+                                className="inline-flex items-center gap-1 border border-line bg-card px-2 py-0.5 font-mono text-[0.65rem] text-ink"
+                              >
+                                <span className="h-1.5 w-1.5 rounded-full bg-pass shrink-0" />
+                                {r.name}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>

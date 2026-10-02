@@ -11,10 +11,12 @@ import {
   Fingerprint,
   Globe,
   Landmark,
+  Layers,
   Play,
   RotateCcw,
   ShieldCheck,
   Smartphone,
+  Terminal,
   Wifi,
   Zap,
 } from "lucide-react";
@@ -519,49 +521,95 @@ export function InteractiveQASandbox() {
 
             {/* Right: Live Telemetry & Inspector Tabs */}
             <div className="flex flex-col bg-card/60 p-5 sm:p-6">
-              <div className="flex items-center justify-between border-b border-line pb-3 mb-4">
-                <div className="flex gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3 mb-4">
+                {/* Segmented Interactive Tab Buttons */}
+                <div className="inline-flex items-center gap-1 p-1 rounded-xs border border-line bg-paper/80 shadow-2xs">
                   <button
                     type="button"
                     data-testid="sandbox-tab-logs"
                     data-cursor="View live step-by-step console logs & assertions"
                     onClick={() => setActiveTab("logs")}
-                    className={`font-mono text-[0.7rem] uppercase tracking-wider px-2.5 py-1 transition-colors ${
+                    className={`press flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-xs transition-all ${
                       activeTab === "logs"
-                        ? "bg-paper text-pass border border-line font-medium"
-                        : "text-muted hover:text-ink"
+                        ? "bg-card text-pass border border-pass/30 font-semibold shadow-xs"
+                        : "text-muted hover:text-ink hover:bg-card/50"
                     }`}
                   >
-                    Console Logs
+                    <Terminal className="h-3 w-3 shrink-0" />
+                    <span className="uppercase tracking-wider text-[0.68rem]">Console Logs</span>
                   </button>
                   <button
                     type="button"
                     data-testid="sandbox-tab-payload"
                     data-cursor="Inspect raw JSON request payload & idempotency keys"
                     onClick={() => setActiveTab("payload")}
-                    className={`font-mono text-[0.7rem] uppercase tracking-wider px-2.5 py-1 transition-colors ${
+                    className={`press flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-xs transition-all ${
                       activeTab === "payload"
-                        ? "bg-paper text-pass border border-line font-medium"
-                        : "text-muted hover:text-ink"
+                        ? "bg-card text-pass border border-pass/30 font-semibold shadow-xs"
+                        : "text-muted hover:text-ink hover:bg-card/50"
                     }`}
                   >
-                    JSON Payload
+                    <Code2 className="h-3 w-3 shrink-0" />
+                    <span className="uppercase tracking-wider text-[0.68rem]">JSON Payload</span>
                   </button>
                   <button
                     type="button"
                     data-testid="sandbox-tab-matrix"
                     data-cursor="Inspect edge case assertions & target test matrix"
                     onClick={() => setActiveTab("matrix")}
-                    className={`font-mono text-[0.7rem] uppercase tracking-wider px-2.5 py-1 transition-colors ${
+                    className={`press flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded-xs transition-all ${
                       activeTab === "matrix"
-                        ? "bg-paper text-pass border border-line font-medium"
-                        : "text-muted hover:text-ink"
+                        ? "bg-card text-pass border border-pass/30 font-semibold shadow-xs"
+                        : "text-muted hover:text-ink hover:bg-card/50"
                     }`}
                   >
-                    Test Matrix
+                    <Layers className="h-3 w-3 shrink-0" />
+                    <span className="uppercase tracking-wider text-[0.68rem]">Test Matrix</span>
                   </button>
                 </div>
-                <span className="font-mono text-[0.65rem] text-muted">status: 200 OK</span>
+
+                {/* Read-Only Status Telemetry Chip (Distinct hardware indicator, not a button) */}
+                <div className="flex items-center gap-1.5">
+                  <div
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border font-mono text-[0.68rem] tracking-wider transition-colors shadow-2xs select-none ${
+                      testResult === "defect"
+                        ? "border-red-500/40 bg-red-500/10 text-red-600 dark:text-red-400"
+                        : isRunning
+                        ? "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                        : "border-line bg-paper/90 text-muted"
+                    }`}
+                    title="Real-time HTTP response status"
+                  >
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${
+                        testResult === "defect"
+                          ? "bg-red-600"
+                          : isRunning
+                          ? "bg-amber-500 animate-ping"
+                          : "bg-pass"
+                      }`}
+                      aria-hidden="true"
+                    />
+                    <span className="text-[0.6rem] uppercase tracking-widest text-muted font-semibold">
+                      Status:
+                    </span>
+                    <span
+                      className={`font-semibold tabular-nums ${
+                        testResult === "defect"
+                          ? "text-red-600 dark:text-red-400"
+                          : isRunning
+                          ? "text-amber-600 dark:text-amber-400"
+                          : "text-pass"
+                      }`}
+                    >
+                      {testResult === "defect"
+                        ? "409 CONFLICT"
+                        : isRunning
+                        ? "102 PROCESSING"
+                        : "200 OK"}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               {/* Tab Contents */}

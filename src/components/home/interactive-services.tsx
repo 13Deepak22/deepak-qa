@@ -20,6 +20,11 @@ interface MinimalServiceItem {
   highlights: string[];
   tools: string[];
   outcome: string;
+  liveSimulation: {
+    command: string;
+    runtimeTarget: string;
+    assertions: string[];
+  };
 }
 
 const SERVICES_DATA: MinimalServiceItem[] = [
@@ -36,6 +41,15 @@ const SERVICES_DATA: MinimalServiceItem[] = [
     ],
     tools: ["Playwright", "Appium", "Selenium", "TypeScript"],
     outcome: "Cuts regression turnaround from 2 days to under 4 hours.",
+    liveSimulation: {
+      command: "npx playwright test --project=chromium,mobile-android --workers=4",
+      runtimeTarget: "Playwright 1.48 · Chrome & Android 14 Viewports",
+      assertions: [
+        "Assert biometric biometric-prompt resolves in < 300ms",
+        "Assert checkout cart state survives refresh with zero cache drift",
+        "Capture video trace & zero-flakiness retry assertion confirmed",
+      ],
+    },
   },
   {
     id: "exploratory",
@@ -50,6 +64,15 @@ const SERVICES_DATA: MinimalServiceItem[] = [
     ],
     tools: ["Charles Proxy", "Postman", "ADB Shell", "Xcode Sim"],
     outcome: "100% defect containment on checkout & payment funnels.",
+    liveSimulation: {
+      command: "charles --throttle=3g-slow --drop-packets=12% --inspect-handshake",
+      runtimeTarget: "Charles Proxy 5.1 · 3G Jitter & Session Throttling",
+      assertions: [
+        "Intercept background suspend & assert memory zeroed on trim",
+        "Simulate offline payment swipe and assert FIFO queue replay",
+        "Stress-test rapid 5x tap race condition on payment button",
+      ],
+    },
   },
   {
     id: "api",
@@ -64,6 +87,15 @@ const SERVICES_DATA: MinimalServiceItem[] = [
     ],
     tools: ["Postman", "Apache JMeter", "Newman", "Swagger"],
     outcome: "Sub-300ms SLA verified under 500+ concurrent threads.",
+    liveSimulation: {
+      command: "jmeter -n -t payments_load.jmx -Jthreads=500 -Jrampup=15s",
+      runtimeTarget: "Apache JMeter 5.6 · 500 Virtual Concurrent Users",
+      assertions: [
+        "Validate JSON Schema OpenAPI v3.1 contract compliance",
+        "Assert HMAC-SHA256 signature verification in webhook callback",
+        "p99 latency confirmed at 148ms (< 300ms strict SLA limit)",
+      ],
+    },
   },
   {
     id: "fintech",
@@ -78,13 +110,45 @@ const SERVICES_DATA: MinimalServiceItem[] = [
     ],
     tools: ["UPI Simulator", "Redis Mock", "Charles Proxy", "Postman"],
     outcome: "Zero P0 financial escapes across 20+ production releases.",
+    liveSimulation: {
+      command: "newman run upi_escrow_suite.json --env=staging --bail=false",
+      runtimeTarget: "NPCI UPI 2.0 Simulator & Redis Idempotency Engine",
+      assertions: [
+        "Assert distributed Redis SETNX idempotency lock lease active",
+        "Verify ₹1 penny-drop name similarity >= 85% safety threshold",
+        "Confirm double-entry ledger balance delta == 0.00 INR",
+      ],
+    },
   },
 ];
 
 export function InteractiveServices() {
   const [activeServiceId, setActiveServiceId] = useState<string>("automation");
+  const [isSimulating, setIsSimulating] = useState<boolean>(false);
+  const [simStep, setSimStep] = useState<number>(-1);
+
   const service = SERVICES_DATA.find((s) => s.id === activeServiceId) || SERVICES_DATA[0];
   const ServiceIcon = service.icon;
+
+  const handleRunSimulation = () => {
+    if (isSimulating) return;
+    setIsSimulating(true);
+    setSimStep(-1);
+
+    const steps = service.liveSimulation.assertions.length;
+    let current = 0;
+
+    const interval = setInterval(() => {
+      setSimStep(current);
+      current++;
+      if (current >= steps) {
+        clearInterval(interval);
+        setTimeout(() => {
+          setIsSimulating(false);
+        }, 500);
+      }
+    }, 450);
+  };
 
   return (
     <section id="services" className="scroll-mt-20 border-t border-line bg-paper-deep">
@@ -100,7 +164,7 @@ export function InteractiveServices() {
             </h2>
           </div>
           <p className="max-w-md text-xs sm:text-sm leading-relaxed text-ink-soft sm:text-right">
-            Four core testing disciplines engineered for zero defect escapes. Select a capability to inspect key methods.
+            Four core testing disciplines engineered for zero defect escapes. Select a capability to inspect key methods and execute real-time simulation.
           </p>
         </div>
 
@@ -114,7 +178,11 @@ export function InteractiveServices() {
                 key={s.id}
                 type="button"
                 data-testid={`service-tab-${s.id}`}
-                onClick={() => setActiveServiceId(s.id)}
+                onClick={() => {
+                  setActiveServiceId(s.id);
+                  setSimStep(-1);
+                  setIsSimulating(false);
+                }}
                 className={`p-3 border text-left transition-all flex flex-col justify-between ${
                   isSelected
                     ? "border-pass bg-paper text-pass shadow-xs ring-1 ring-pass/40"
@@ -172,36 +240,82 @@ export function InteractiveServices() {
             </div>
 
             {/* Highlights & Verified Outcome Grid */}
-            <div className="mt-3.5 grid md:grid-cols-2 gap-4 items-center">
-              {/* Left: 3 concise checkmarks */}
-              <div className="space-y-1.5">
-                {service.highlights.map((h, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0" />
-                    <span className="text-xs text-ink font-sans">{h}</span>
+            <div className="mt-3.5 grid md:grid-cols-2 gap-4 items-stretch">
+              {/* Left: 3 concise checkmarks + Live Simulation Trigger */}
+              <div className="space-y-2 flex flex-col justify-between">
+                <div className="space-y-1.5">
+                  {service.highlights.map((h, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-pass shrink-0" />
+                      <span className="text-xs text-ink font-sans">{h}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Interactive Dynamic Verification Run */}
+                <div className="border border-line bg-card/50 p-2.5 mt-2">
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <span className="font-mono text-[0.62rem] text-muted uppercase tracking-wider truncate">
+                      {service.liveSimulation.runtimeTarget}
+                    </span>
+                    <button
+                      type="button"
+                      data-testid={`simulate-service-${service.id}`}
+                      onClick={handleRunSimulation}
+                      disabled={isSimulating}
+                      className="press px-2 py-0.5 border border-pass bg-pass text-on-band font-mono text-[0.62rem] uppercase tracking-wider font-semibold hover:bg-pass-fill transition-colors disabled:opacity-60 shrink-0"
+                    >
+                      {isSimulating ? "Running..." : "Simulate Run"}
+                    </button>
                   </div>
-                ))}
+                  <p className="font-mono text-[0.65rem] text-ink-soft truncate mb-1.5 bg-paper p-1 border border-line">
+                    $ {service.liveSimulation.command}
+                  </p>
+                  <div className="space-y-1">
+                    {service.liveSimulation.assertions.map((a, idx) => {
+                      const isDone = simStep >= idx;
+                      return (
+                        <div key={idx} className="flex items-center gap-1.5 font-mono text-[0.65rem]">
+                          <span className={isDone ? "text-pass font-bold" : "text-muted"}>
+                            {isDone ? "✓" : "○"}
+                          </span>
+                          <span className={isDone ? "text-pass" : "text-muted"}>
+                            {a}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
               {/* Right: Outcome Box + Redirect CTA */}
-              <div className="border border-line bg-card/60 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="border border-line bg-card/60 p-4 flex flex-col justify-between gap-3">
                 <div>
                   <span className="font-mono text-[0.6rem] uppercase tracking-wider text-muted block">
                     Verified Production Outcome:
                   </span>
-                  <p className="font-mono text-xs text-pass font-semibold mt-0.5">
+                  <p className="font-mono text-xs text-pass font-semibold mt-1">
                     {service.outcome}
+                  </p>
+                  <p className="text-xs text-ink-soft mt-2 leading-relaxed">
+                    Designed to protect high-volume fintech and consumer applications from financial loss, downtime, and user trust erosion.
                   </p>
                 </div>
 
-                <Link
-                  href="/services"
-                  data-testid="services-redirect-cta"
-                  className="press inline-flex items-center gap-1.5 border border-pass bg-card px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0 shadow-xs"
-                >
-                  <span>Full methodology</span>
-                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-                </Link>
+                <div className="pt-2 border-t border-line/60 flex items-center justify-between">
+                  <span className="font-mono text-[0.65rem] text-muted">
+                    Zero P0 Defects Standard
+                  </span>
+                  <Link
+                    href="/services"
+                    data-testid="services-redirect-cta"
+                    className="press inline-flex items-center gap-1.5 border border-pass bg-card px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shrink-0 shadow-xs"
+                  >
+                    <span>Full methodology</span>
+                    <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

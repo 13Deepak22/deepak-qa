@@ -6,10 +6,13 @@ import {
   Calculator,
   CheckCircle2,
   FileCheck,
+  Landmark,
   Layers,
   Send,
   ShieldAlert,
+  Smartphone,
   Sparkles,
+  Terminal,
   Zap,
 } from "lucide-react";
 import Link from "next/link";
@@ -93,9 +96,17 @@ const PLANS: ScopePlan[] = [
   },
 ];
 
+const PLAN_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  fintech: Zap,
+  mobile: Smartphone,
+  lending: Landmark,
+  api: Terminal,
+};
+
 export function ScopeEstimator() {
   const [selectedPlanId, setSelectedPlanId] = useState<string>("fintech");
   const plan = PLANS.find((p) => p.id === selectedPlanId) || PLANS[0];
+  const PlanIcon = PLAN_ICONS[plan.id] || Layers;
 
   return (
     <section className="scroll-mt-20 border-t border-line bg-card">
@@ -119,6 +130,7 @@ export function ScopeEstimator() {
         <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-3">
           {PLANS.map((p) => {
             const isSelected = p.id === plan.id;
+            const TabIcon = PLAN_ICONS[p.id] || Layers;
             return (
               <button
                 key={p.id}
@@ -126,16 +138,27 @@ export function ScopeEstimator() {
                 data-testid={`scope-plan-${p.id}`}
                 data-cursor={`Select ${p.title} architecture for test coverage estimate`}
                 onClick={() => setSelectedPlanId(p.id)}
-                className={`p-4 border text-left transition-all flex flex-col justify-between ${
+                className={`press p-4 border text-left transition-all flex flex-col justify-between ${
                   isSelected
                     ? "border-pass bg-paper text-pass shadow-sm ring-1 ring-pass/40"
                     : "border-line bg-paper/60 text-ink-soft hover:bg-paper hover:text-ink"
                 }`}
               >
                 <div>
-                  <span className="block font-mono text-[0.62rem] uppercase tracking-wider text-muted mb-1">
-                    {p.badge}
-                  </span>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="block font-mono text-[0.62rem] uppercase tracking-wider text-muted">
+                      {p.badge}
+                    </span>
+                    <span
+                      className={`inline-flex h-6 w-6 shrink-0 items-center justify-center border transition-colors ${
+                        isSelected
+                          ? "border-pass/40 bg-pass/10 text-pass"
+                          : "border-line bg-card/60 text-muted"
+                      }`}
+                    >
+                      <TabIcon className="h-3 w-3" />
+                    </span>
+                  </div>
                   <span className="block font-serif text-base font-bold text-ink">{p.title}</span>
                 </div>
                 <span
@@ -156,6 +179,9 @@ export function ScopeEstimator() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-line bg-paper-deep p-5 sm:px-6">
             <div>
               <div className="flex items-center gap-2.5">
+                <span className="inline-flex h-8 w-8 items-center justify-center border border-pass/30 bg-pass-fill/15 text-pass shrink-0">
+                  <PlanIcon className="h-4 w-4" />
+                </span>
                 <h3 className="font-serif text-2xl text-ink font-bold">{plan.title}</h3>
                 <span className="border border-pass/40 bg-pass-fill/10 text-pass px-2 py-0.5 font-mono text-[0.65rem] uppercase tracking-wider">
                   Deepak&apos;s Blueprint

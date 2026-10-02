@@ -205,13 +205,15 @@ export function ReleaseGatekeeper() {
                     <button
                       key={rule.id}
                       type="button"
+                      role="switch"
+                      aria-checked={isHealthy}
                       data-testid={`gatekeeper-toggle-${rule.id}`}
                       data-cursor={`Toggle ${rule.name}: ${isHealthy ? 'Currently passing' : 'Currently blocking'}`}
                       onClick={() => toggleGate(rule.id)}
-                      className={`w-full text-left p-4 border transition-all flex items-start justify-between gap-3 ${
+                      className={`press w-full text-left p-4 border transition-all flex items-start justify-between gap-3 select-none ${
                         isHealthy
-                          ? "border-pass/40 bg-pass-fill/5 hover:border-pass"
-                          : "border-red-500/50 bg-red-500/5 hover:border-red-500"
+                          ? "border-pass/40 bg-pass-fill/5 hover:border-pass shadow-2xs"
+                          : "border-red-500/50 bg-red-500/5 hover:border-red-500 shadow-2xs"
                       }`}
                     >
                       <div className="min-w-0">
@@ -237,15 +239,28 @@ export function ReleaseGatekeeper() {
                         </p>
                       </div>
 
-                      <div className="shrink-0 text-right">
+                      <div className="shrink-0 flex items-center gap-2 pt-0.5">
                         <span
-                          className={`inline-block font-mono text-[0.65rem] uppercase tracking-wider px-2 py-1 border ${
+                          className={`inline-block font-mono text-[0.62rem] uppercase tracking-wider px-2 py-0.5 border ${
                             isHealthy
-                              ? "border-pass/30 bg-card text-pass"
-                              : "border-red-500/30 bg-card text-red-600 dark:text-red-400"
+                              ? "border-pass/30 bg-card text-pass font-bold"
+                              : "border-red-500/30 bg-card text-red-600 dark:text-red-400 font-bold"
                           }`}
                         >
                           {isHealthy ? "PASS" : "BLOCK"}
+                        </span>
+                        {/* Hardware Switch Pill */}
+                        <span
+                          className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors duration-200 ease-in-out ${
+                            isHealthy ? "bg-pass" : "bg-red-500"
+                          }`}
+                          aria-hidden="true"
+                        >
+                          <span
+                            className={`inline-block h-3 w-3 rounded-full bg-paper shadow-xs transition-transform duration-200 ease-in-out ${
+                              isHealthy ? "translate-x-3.5" : "translate-x-0.5"
+                            }`}
+                          />
                         </span>
                       </div>
                     </button>

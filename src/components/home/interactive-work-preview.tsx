@@ -3,15 +3,19 @@
 import { useState } from "react";
 import {
   ArrowRight,
+  ArrowUpRight,
   CheckCircle2,
   ChevronRight,
+  CreditCard,
   ExternalLink,
+  Globe,
+  Landmark,
   Layers,
   LockKeyhole,
   Shield,
   Smartphone,
   Sparkles,
-  ArrowUpRight,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { publicApps, unpublishedWork } from "@/data";
@@ -151,6 +155,13 @@ const APPS_DATA: InteractiveAppDetail[] = [
   },
 ];
 
+const APP_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  paulpay: Zap,
+  mayaa: CreditCard,
+  forex: Globe,
+  credme: Landmark,
+};
+
 export function InteractiveWorkPreview() {
   const [activeAppId, setActiveAppId] = useState<string>("paulpay");
   const [activeJourneyIndex, setActiveJourneyIndex] = useState<number>(0);
@@ -180,21 +191,31 @@ export function InteractiveWorkPreview() {
         <div className="mt-10 flex gap-2 overflow-x-auto pb-2">
           {APPS_DATA.map((app) => {
             const isSelected = app.id === selectedApp.id;
+            const AppIcon = APP_ICONS[app.id] || Smartphone;
             return (
               <button
                 key={app.id}
                 type="button"
+                data-testid={`showcase-app-${app.id}`}
                 onClick={() => {
                   setActiveAppId(app.id);
                   setActiveJourneyIndex(0);
                 }}
-                className={`flex shrink-0 items-center gap-2.5 border px-4 py-3 text-left transition-colors ${
+                className={`press flex shrink-0 items-center gap-2.5 border px-4 py-3 text-left transition-colors ${
                   isSelected
                     ? "border-pass bg-paper text-pass shadow-sm font-medium"
                     : "border-line bg-paper/60 text-ink-soft hover:border-line/80 hover:bg-paper hover:text-ink"
                 }`}
               >
-                <Smartphone className={`h-4 w-4 ${isSelected ? "text-pass" : "text-muted"}`} />
+                <span
+                  className={`inline-flex h-7 w-7 shrink-0 items-center justify-center border transition-colors ${
+                    isSelected
+                      ? "border-pass/40 bg-pass/10 text-pass"
+                      : "border-line bg-card/60 text-muted"
+                  }`}
+                >
+                  <AppIcon className="h-3.5 w-3.5" />
+                </span>
                 <div>
                   <span className="block text-xs font-serif font-bold text-ink">{app.name}</span>
                   <span className="block font-mono text-[0.65rem] text-muted">{app.domain}</span>

@@ -27,6 +27,8 @@ export interface SimulatedCheck {
   errorMessage?: string;
   expectedDiff?: string;
   receivedDiff?: string;
+  payloadInfo?: string;
+  impactInfo?: string;
   skipReason?: string;
 }
 
@@ -141,12 +143,14 @@ const SIMULATION_PROFILES: RunProfile[] = [
         targetSeconds: 0.9,
         targetStatus: "fail",
         msLabel: "0.9s",
-        errorMessage: "AssertionError: Duplicate payment accepted without 409 lock",
-        expectedDiff: "409 Conflict (Redis Idempotency Locked)",
-        receivedDiff: "200 OK (Duplicate transaction #TXN_998124_PL created)",
+        errorMessage: "AssertionError: Concurrent duplicate payment processed without 409 lock",
+        expectedDiff: "HTTP 409 Conflict (Idempotency Key Locked in Redis)",
+        receivedDiff: "HTTP 200 OK (Duplicate transaction #TXN_998124_PL created)",
+        payloadInfo: '{ "idempotency_key": "idem_8f7b2c9e", "retry_count": 2 }',
+        impactInfo: "Financial leak prevented: ₹2,499.00 duplicate debit blocked before prod deployment.",
         assertions: [
           "Redis distributed lock acquired",
-          "Assert HTTP 409 Conflict on retry",
+          "Assert HTTP 409 Conflict on identical retry key",
         ],
       },
       {
@@ -166,7 +170,7 @@ const SIMULATION_PROFILES: RunProfile[] = [
         targetSeconds: 0.4,
         targetStatus: "skip",
         msLabel: "0.4s",
-        skipReason: "Disbursal run bypassed due to upstream idempotency defect in api/payments.spec.ts",
+        skipReason: "Blocked: Disbursal pipeline bypassed due to upstream idempotency failure in api/payments.spec.ts",
         assertions: [
           "Load verification halted to prevent dirty staging state",
         ],
@@ -194,7 +198,7 @@ const SIMULATION_PROFILES: RunProfile[] = [
         targetSeconds: 0.5,
         targetStatus: "skip",
         msLabel: "0.5s",
-        skipReason: "DigiLocker staging sandbox rate-limited; synthetic mock active to maintain suite SLA.",
+        skipReason: "DigiLocker staging sandbox rate-limited; synthetic mock bypassed to protect suite execution time.",
         assertions: ["Staging sandbox offline - synthetic mock active"],
       },
       {
@@ -261,8 +265,10 @@ const SIMULATION_PROFILES: RunProfile[] = [
         targetStatus: "fail",
         msLabel: "2.4s",
         errorMessage: "AssertionError: CVV reveal transition exceeded 2000ms SLA limit",
-        expectedDiff: "CVV revealed in < 2,000ms",
-        receivedDiff: "2,540ms (Android main UI thread blocked by synchronous encryption)",
+        expectedDiff: "CVV revealed within 2,000ms threshold",
+        receivedDiff: "2,540ms (Android main UI thread blocked by synchronous encryption cipher)",
+        payloadInfo: '{ "device": "Pixel 8", "os": "Android 14", "memory_pressure": "high" }',
+        impactInfo: "P1 UX Defect flagged: Users experience frozen screen during critical payment step.",
         assertions: [
           "Biometric auth confirmed",
           "Assert CVV animation completed within 2000ms SLA",
@@ -375,15 +381,7 @@ export function TestRun() {
     };
   }, [currentProfile, durations, simulatedTime, totalSeconds]);
 
-  // Auto-expand failed test row when execution completes
-  useEffect(() => {
-    if (isDone && failedCount > 0) {
-      const failedCheck = currentProfile.checks.find((c) => c.targetStatus === "fail");
-      if (failedCheck) {
-        setExpandedRow(failedCheck.file);
-      }
-    }
-  }, [isDone, failedCount, currentProfile]);
+
 
   // Randomly cycle profile on Rerun
   const handleRerun = () => {
@@ -420,7 +418,7 @@ export function TestRun() {
 
   return (
     <section
-      className="report-card max-w-full"
+      className="report-card max-w-full overflow-hidden transition-all duration-300"
       aria-label="Release gate output"
       data-testid="interactive-test-runner"
     >
@@ -429,12 +427,12 @@ export function TestRun() {
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <span
-              className={`inline-block h-2 w-2 rounded-full ${
+              className={`inline-block h-2.5 w-2.5 rounded-full transition-colors duration-300 ${
                 !isDone
                   ? "bg-amber-500 animate-ping"
                   : hasFailed
-                  ? "bg-red-600"
-                  : "bg-pass"
+                  ? "bg-red-600 ring-2 ring-red-400/40"
+                  : "bg-pass ring-2 ring-pass/30"
               }`}
               aria-hidden="true"
             />
@@ -446,7 +444,8 @@ export function TestRun() {
           {/* Rerun Button */}
           <button
             type="button"
-            className="press inline-flex shrink-0 items-center gap-1.5 border border-pass bg-card px-3 py-1.5 font-mono text-xs tracking-[0.12em] uppercase text-ink hover:bg-pass-fill hover:text-on-band transition-colors shadow-xs"
+            className="press inline-flex shrink-0 items-center gap-1.5 border border-pass bg-card px-3 py-1.5 font-mono text-xs tracking-[0.12em] uppercase text-ink hover:bg-pass-fill hover:text-on-band transition-all shadow-xs"
+            data-cursor="Run dynamic simulation"
             onClick={handleRerun}
           >
             <RotateCcw className={`h-3 w-3 ${!isDone ? "animate-spin" : ""}`} />
@@ -489,8 +488,8 @@ export function TestRun() {
           return (
             <li
               key={check.file}
-              className={`py-2 font-mono text-[0.82rem] sm:text-sm ${
-                isFailed ? "border-l-2 border-red-600 pl-2.5 bg-red-600/5 rounded-xs" : ""
+              className={`py-2.5 font-mono text-[0.82rem] sm:text-sm transition-all duration-200 ${
+                isFailed ? "border-l-2 border-red-600 pl-3 bg-red-600/5 rounded-xs" : ""
               }`}
             >
               {/* Row Header */}
@@ -499,10 +498,10 @@ export function TestRun() {
                 onClick={() => setExpandedRow(isExpanded ? null : check.file)}
                 title="Click to toggle assertion details"
               >
-                <div className="flex min-w-0 items-center gap-2">
+                <div className="flex min-w-0 items-center gap-2.5">
                   {/* Status Indicator Badge */}
                   <span
-                    className={`inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-xs ${
+                    className={`inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-xs transition-colors ${
                       isPassed
                         ? "text-pass bg-pass/10"
                         : isFailed
@@ -539,22 +538,22 @@ export function TestRun() {
                 </div>
 
                 {/* Right: Elapsed Clock / Duration + Expand Indicator */}
-                <div className="flex shrink-0 items-center gap-1.5">
+                <div className="flex shrink-0 items-center gap-2">
                   <span className="font-mono text-xs tabular-nums text-muted">
                     {isPassed || isFailed || isSkipped ? check.msLabel : clock(elapsedInTest)}
                   </span>
                   <ChevronDown
-                    className={`h-3.5 w-3.5 text-muted transition-transform duration-150 ${
-                      isExpanded ? "rotate-180 text-ink" : ""
+                    className={`h-3.5 w-3.5 text-muted transition-transform duration-200 group-hover:text-ink ${
+                      isExpanded ? "rotate-180" : ""
                     }`}
                   />
                 </div>
               </div>
 
               {/* Individual Progress Bar */}
-              <span className="mt-1 block h-0.5 w-full bg-line/60 overflow-hidden" aria-hidden="true">
+              <span className="mt-1.5 block h-0.5 w-full bg-line/60 overflow-hidden" aria-hidden="true">
                 <span
-                  className={`block h-full ${
+                  className={`block h-full transition-all duration-100 ${
                     isFailed
                       ? "bg-red-600"
                       : isSkipped
@@ -567,47 +566,70 @@ export function TestRun() {
 
               {/* Expandable Details Drawer */}
               {isExpanded && (
-                <div className="runner-drawer-animate mt-2">
-                  {/* FAILURE STATE: Compact High-Precision Dark Terminal Box */}
+                <div className="runner-drawer-animate mt-2.5">
+                  {/* FAILURE STATE: High-Precision Dark Terminal Box */}
                   {isFailed && (
-                    <div className="border border-ink bg-band text-on-band p-2.5 sm:p-3 my-1 font-mono text-[0.72rem] leading-normal shadow-sm">
-                      {/* Compact Title Row */}
-                      <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-1.5 mb-2">
-                        <div className="flex items-center gap-1.5 text-red-400 font-semibold min-w-0 truncate">
-                          <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-                          <span className="truncate">{check.errorMessage}</span>
+                    <div className="border border-ink bg-band text-on-band p-3.5 sm:p-4 shadow-md font-mono">
+                      {/* Window Bar */}
+                      <div className="flex items-center justify-between border-b border-white/15 pb-2.5 mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-red-500" />
+                          <span className="h-2 w-2 rounded-full bg-amber-500" />
+                          <span className="h-2 w-2 rounded-full bg-pass" />
+                          <span className="ml-1 text-[0.7rem] uppercase tracking-wider text-white/80">
+                            terminal · assertion failure
+                          </span>
                         </div>
-                        <span className="shrink-0 font-mono text-[0.62rem] uppercase tracking-wider text-red-400 border border-red-500/40 bg-red-500/15 px-1.5 py-0.2">
-                          P0 Defect
+                        <span className="border border-red-500/50 bg-red-500/20 px-2 py-0.5 text-[0.65rem] font-bold text-red-400 uppercase tracking-wider">
+                          P0 Defect Caught
                         </span>
                       </div>
 
-                      {/* Tight Diff Box */}
-                      <div className="rounded-xs bg-black/40 border border-white/10 px-2.5 py-1.5 space-y-0.5 text-[0.68rem]">
+                      {/* Error Message */}
+                      <div className="flex items-start gap-2 text-xs font-semibold text-red-400">
+                        <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                        <span>{check.errorMessage}</span>
+                      </div>
+
+                      {/* Diff Comparison Block */}
+                      <div className="mt-2.5 space-y-1.5 rounded-xs bg-black/40 border border-white/10 p-2.5 text-[0.72rem] leading-relaxed">
                         {check.expectedDiff && (
-                          <div className="flex items-baseline gap-1.5 text-emerald-400">
-                            <span className="font-bold select-none text-[0.65rem] opacity-80">[+]</span>
-                            <span className="font-semibold text-white/70">Expected:</span>
+                          <div className="flex items-start gap-2 text-emerald-400">
+                            <span className="font-bold select-none">[+] EXPECTED:</span>
                             <span>{check.expectedDiff}</span>
                           </div>
                         )}
                         {check.receivedDiff && (
-                          <div className="flex items-baseline gap-1.5 text-red-400">
-                            <span className="font-bold select-none text-[0.65rem] opacity-80">[-]</span>
-                            <span className="font-semibold text-white/70">Received:</span>
+                          <div className="flex items-start gap-2 text-red-400 font-medium">
+                            <span className="font-bold select-none">[-] RECEIVED:</span>
                             <span>{check.receivedDiff}</span>
+                          </div>
+                        )}
+                        {check.payloadInfo && (
+                          <div className="flex items-start gap-2 text-white/60 pt-1 border-t border-white/10">
+                            <span className="font-bold select-none">[#] PAYLOAD:</span>
+                            <span className="font-mono">{check.payloadInfo}</span>
                           </div>
                         )}
                       </div>
 
-                      {/* Compact Footer: Smooth RCA link on the right without shifting */}
-                      <div className="mt-2 flex items-center justify-between gap-2 text-[0.68rem] pt-1.5 border-t border-white/10">
-                        <span className="text-white/60 truncate">
-                          Jira #DEF-402 · Race condition isolated
+                      {/* Business Impact Note */}
+                      {check.impactInfo && (
+                        <p className="mt-2 text-[0.7rem] text-on-band/80 leading-relaxed">
+                          <span className="text-amber-400 font-semibold">Quality Impact: </span>
+                          {check.impactInfo}
+                        </p>
+                      )}
+
+                      {/* RCA Footer CTA */}
+                      <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 border-t border-white/15 pt-2.5">
+                        <span className="text-[0.68rem] text-white/60">
+                          Jira #DEF-402 · Root Cause Investigation Available
                         </span>
                         <Link
                           href="/rca"
-                          className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 hover:underline font-medium shrink-0 transition-colors"
+                          className="press inline-flex items-center gap-1.5 border border-white/30 bg-white/10 px-2.5 py-1 text-[0.7rem] text-white hover:bg-pass hover:border-pass hover:text-on-band transition-all font-semibold"
+                          data-cursor="Inspect Deepak's Root Cause Analysis study"
                         >
                           <span>Inspect RCA Case Study</span>
                           <ArrowRight className="h-3 w-3" />
@@ -618,14 +640,14 @@ export function TestRun() {
 
                   {/* SKIPPED STATE: Amber Callout */}
                   {isSkipped && check.skipReason && (
-                    <div className="border border-amber-500/40 bg-amber-500/10 p-2.5 rounded-xs font-mono text-xs">
-                      <div className="flex items-start gap-1.5 text-amber-700 dark:text-amber-300 font-medium">
-                        <MinusCircle className="h-3.5 w-3.5 shrink-0 text-amber-500 mt-0.5" />
+                    <div className="border border-amber-500/40 bg-amber-500/10 p-3 rounded-xs font-mono text-xs">
+                      <div className="flex items-start gap-2 text-amber-700 dark:text-amber-300 font-medium">
+                        <MinusCircle className="h-4 w-4 shrink-0 text-amber-500 mt-0.5" />
                         <div>
-                          <p className="font-semibold uppercase text-[0.68rem] tracking-wider">
+                          <p className="font-semibold uppercase text-[0.7rem] tracking-wider">
                             Suite Bypass Notice:
                           </p>
-                          <p className="mt-0.5 text-[0.7rem] leading-relaxed text-ink-soft">
+                          <p className="mt-0.5 text-[0.72rem] leading-relaxed text-ink-soft">
                             {check.skipReason}
                           </p>
                         </div>
@@ -635,13 +657,13 @@ export function TestRun() {
 
                   {/* PASSED STATE: Green Check Verified Box */}
                   {isPassed && check.assertions && check.assertions.length > 0 && (
-                    <div className="border border-pass/30 bg-card p-2.5 rounded-xs font-mono text-xs">
-                      <p className="font-mono text-[0.65rem] uppercase tracking-wider text-muted mb-1.5">
+                    <div className="border border-pass/30 bg-card p-3 rounded-xs font-mono text-xs">
+                      <p className="font-mono text-[0.68rem] uppercase tracking-wider text-muted mb-2">
                         Assertions Verified:
                       </p>
-                      <ul className="space-y-0.5 text-[0.7rem] text-ink-soft">
+                      <ul className="space-y-1 text-[0.72rem] text-ink-soft">
                         {check.assertions.map((assertion, idx) => (
-                          <li key={idx} className="flex items-center gap-1.5">
+                          <li key={idx} className="flex items-center gap-2">
                             <span className="text-pass font-bold">✓</span>
                             <span>{assertion}</span>
                           </li>
@@ -666,7 +688,7 @@ export function TestRun() {
             </span>
 
             {failedCount > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-xs border border-red-600/50 bg-red-600/15 px-2 py-0.5 text-xs text-red-600 dark:text-red-400 font-semibold">
+              <span className="inline-flex items-center gap-1 rounded-xs border border-red-600/50 bg-red-600/15 px-2 py-0.5 text-xs text-red-600 dark:text-red-400 font-semibold animate-pulse">
                 <AlertCircle className="h-3 w-3" />
                 <span>{failedCount} failed</span>
               </span>
@@ -691,15 +713,15 @@ export function TestRun() {
 
         {/* Gate Verdict Banner */}
         <div
-          className={`mt-2.5 flex flex-wrap items-center justify-between gap-2.5 p-2.5 rounded-xs border transition-colors ${
+          className={`mt-3 flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-xs border transition-all duration-300 ${
             !isDone
               ? "border-line bg-paper/50 text-muted"
               : hasFailed
-              ? "border-2 border-red-600 bg-band text-on-band shadow-sm"
+              ? "border-2 border-red-600 bg-band text-on-band shadow-sm failure-pulse-ring"
               : "border border-pass/50 bg-pass/10 text-pass"
           }`}
         >
-          <div className="flex items-center gap-2 font-mono text-xs min-w-0">
+          <div className="flex items-center gap-2.5 font-mono text-xs min-w-0">
             {!isDone ? (
               <Clock className="h-4 w-4 animate-spin text-muted shrink-0" />
             ) : hasFailed ? (
@@ -721,7 +743,7 @@ export function TestRun() {
               hasFailed ? (
                 <Link
                   href="/rca"
-                  className="inline-flex items-center gap-1 font-mono text-[0.7rem] text-emerald-400 hover:text-emerald-300 hover:underline transition-colors"
+                  className="inline-flex items-center gap-1 font-mono text-[0.72rem] text-on-band hover:text-white underline underline-offset-2 transition-colors"
                 >
                   <span>Deployment Blocked · View RCA</span>
                   <ArrowRight className="h-3 w-3" />

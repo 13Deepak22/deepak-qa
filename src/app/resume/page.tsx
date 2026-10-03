@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Globe, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
-import { InteractiveAtsAnalyzer } from "@/components/resume/interactive-ats-analyzer";
 import { DownloadOptions } from "@/components/resume/download-options";
 import { education, experience, profile, publicApps, resume, toolkit } from "@/data";
 import { experienceLabel } from "@/lib/career";
@@ -56,20 +55,17 @@ export default function ResumePage() {
         <div data-print="hide" className="enter enter-1 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-              <span className="text-pass">CV</span> / Executive Resume &amp; ATS Profile
+              <span className="text-pass">CV</span> / Executive Resume
             </p>
             <h1 className="mt-2 font-serif text-3xl sm:text-4xl text-ink tracking-tight font-bold">
               Deepak Gupta
             </h1>
             <p className="mt-2 max-w-lg text-sm leading-relaxed text-ink-soft">
-              Calibrated for 99% ATS scoring with single-column linear hierarchy, standard headings, and Google XYZ achievement metrics. Download as PDF, Word (.docx), or JPG.
+              Professional resume with single-column linear hierarchy, standard headings, and quantified achievement metrics. Download as PDF, Word (.docx), or JPG.
             </p>
           </div>
           <DownloadOptions />
         </div>
-
-        {/* Interactive ATS Analyzer & Audit Suite */}
-        <InteractiveAtsAnalyzer />
 
         {/* The Formal Resume Document */}
         <article

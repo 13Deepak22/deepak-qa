@@ -2,12 +2,25 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  Activity,
+  AlertCircle,
+  ArrowRight,
   Bot,
+  Brain,
+  CheckCircle2,
   Code2,
+  Cpu,
+  Database,
   FileCode,
+  Flame,
+  Globe,
+  Layers,
+  Lock,
   Play,
   RotateCcw,
   ShieldAlert,
+  ShieldCheck,
+  Smartphone,
   Sparkles,
   Terminal,
   Workflow,
@@ -354,10 +367,12 @@ export function AiAgentsMcpSection() {
   const activeRunIdRef = useRef<number>(0);
 
   useEffect(() => {
+    const runRef = activeRunIdRef;
+    const tRef = timerRef;
     return () => {
-      activeRunIdRef.current++;
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
+      runRef.current++;
+      if (tRef.current) {
+        clearInterval(tRef.current);
       }
     };
   }, []);

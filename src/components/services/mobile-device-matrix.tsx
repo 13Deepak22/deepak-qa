@@ -6,6 +6,8 @@ import {
   Play,
   RotateCcw,
   Smartphone,
+  Tablet,
+  Wifi,
 } from "lucide-react";
 
 interface DeviceItem {

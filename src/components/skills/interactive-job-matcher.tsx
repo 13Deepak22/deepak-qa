@@ -2,8 +2,18 @@
 
 import { useState } from "react";
 import {
+  ArrowRight,
+  Bot,
+  Brain,
+  CheckCircle2,
+  Code2,
+  Cpu,
+  FileCheck,
+  Search,
   ShieldCheck,
+  Sparkles,
   Terminal,
+  Zap,
 } from "lucide-react";
 
 interface RoleProfile {

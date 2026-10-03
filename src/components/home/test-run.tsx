@@ -240,10 +240,10 @@ export function TestRun() {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (prefersReducedMotion) {
-      const timer = window.setTimeout(() => {
+      const timer = setTimeout(() => {
         setSimulatedTime(totalSeconds);
       }, 0);
-      return () => window.clearTimeout(timer);
+      return () => clearTimeout(timer);
     }
 
     let frame = 0;

@@ -3,9 +3,13 @@
 import { useState } from "react";
 import {
   AlertTriangle,
+  CheckCircle2,
+  Lock,
+  Play,
   RotateCcw,
   ShieldAlert,
   ShieldCheck,
+  Unlock,
 } from "lucide-react";
 
 export function InteractiveRaceTimeline() {

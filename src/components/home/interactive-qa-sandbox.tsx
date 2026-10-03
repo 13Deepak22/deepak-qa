@@ -357,11 +357,12 @@ export function InteractiveQASandbox() {
   const isRunningRef = useRef<boolean>(false);
 
   useEffect(() => {
+    const runRef = activeRunIdRef;
+    const tRef = timeoutRef;
     return () => {
-      activeRunIdRef.current++;
-      const currentTimeout = timeoutRef.current;
-      if (currentTimeout) {
-        clearTimeout(currentTimeout);
+      runRef.current++;
+      if (tRef.current) {
+        clearTimeout(tRef.current);
       }
     };
   }, []);

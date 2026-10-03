@@ -3,9 +3,16 @@
 import { useState } from "react";
 import {
   CheckCircle2,
+  Database,
+  ExternalLink,
+  Layers,
+  LockKeyhole,
   Play,
   RotateCcw,
   ShieldAlert,
+  ShieldCheck,
+  Workflow,
+  Zap,
 } from "lucide-react";
 
 interface EnterprisePortal {

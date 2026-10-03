@@ -194,12 +194,12 @@ export function InteractiveAtsAnalyzer() {
     let text = "";
     if (type === "plain") {
       text = `DEEPAK GUPTA
-Senior QA Engineer & SDET
+QA Engineer
 Location: Noida, India | Phone: +91 7888768621 | Email: deepak1322007@gmail.com
 LinkedIn: https://www.linkedin.com/in/deepak-gupta13/ | GitHub: https://github.com/13Deepak22
 
 SUMMARY:
-Results-driven QA Engineer & SDET with ${experienceLabel()} years of specialized experience across fintech payment gateways, native mobile (Android/iOS), and distributed backend services. Builds production-grade test automation with Playwright, Appium, and Selenium WebDriver (TypeScript/Java), cuts manual regression effort by 50%, and enforces zero P0 defect escapes across 20+ production releases. Deep domain expertise in NPCI UPI 2.0, multi-gateway routing (Razorpay, Cashfree, PayU), DigiLocker eKYC, double-entry ledger invariance, and JMeter load testing. Skilled in exploratory testing, root cause analysis (RCA), and AI-accelerated QA workflows. Open to relocation.
+Results-driven QA Engineer with ${experienceLabel()} years of specialized experience across fintech payment gateways, native mobile (Android/iOS), and distributed backend services. Builds production-grade test automation with Playwright, Appium, and Selenium WebDriver (TypeScript/Java), cuts manual regression effort by 50%, and enforces zero P0 defect escapes across 20+ production releases. Deep domain expertise in NPCI UPI 2.0, multi-gateway routing (Razorpay, Cashfree, PayU), DigiLocker eKYC, double-entry ledger invariance, and JMeter load testing. Skilled in exploratory testing, root cause analysis (RCA), and AI-accelerated QA workflows. Open to relocation.
 
 CORE SKILLS:
 - Automation & Frameworks: Playwright, Appium, Selenium WebDriver, TypeScript, Java, Python, TestNG, POM, UiAutomator2, XCUITest
@@ -233,9 +233,9 @@ EDUCATION & TECHNICAL TRAINING:
     } else if (type === "inmail") {
       text = `Hi [Hiring Manager/Recruiter],
 
-I noticed you are hiring for a Senior QA Engineer / SDET. I wanted to reach out regarding my background:
+I noticed you are hiring for a QA Engineer. I wanted to reach out regarding my background:
 
-• ${experienceLabel()} years of QA & SDET experience in high-volume FinTech (NPCI UPI 2.0, Cashfree, Razorpay, DigiLocker eKYC, LOS/LMS ledgers).
+• ${experienceLabel()} years of QA experience in high-volume FinTech (NPCI UPI 2.0, Cashfree, Razorpay, DigiLocker eKYC, LOS/LMS ledgers).
 • Engineered Playwright & Appium test automation frameworks cutting manual regression hours by 50%.
 • 0 P0 defect escapes across 20+ production releases with proven API & performance load testing (500+ TPS in JMeter).
 • Full resume & live interactive portfolio: https://deepak-qa.vercel.app/resume
@@ -245,12 +245,12 @@ Best,
 Deepak Gupta
 +91 7888768621 | deepak1322007@gmail.com`;
     } else {
-      text = `# Deepak Gupta — Senior QA Engineer & SDET
+      text = `# Deepak Gupta — QA Engineer
 **Location**: Noida, India | **Phone**: +91 7888768621 | **Email**: deepak1322007@gmail.com  
 **LinkedIn**: https://www.linkedin.com/in/deepak-gupta13/ | **GitHub**: https://github.com/13Deepak22
 
 ## Executive Summary
-Results-driven QA Engineer & SDET with ${experienceLabel()} years of specialized experience across fintech payment gateways, native mobile (Android/iOS), and distributed backend services. Reduced regression time by 50% with 0 P0 production escapes.
+Results-driven QA Engineer with ${experienceLabel()} years of specialized experience across fintech payment gateways, native mobile (Android/iOS), and distributed backend services. Reduced regression time by 50% with 0 P0 production escapes.
 
 ## Core Competencies
 - **Automation**: Playwright, Appium, Selenium WebDriver, TypeScript, Java, POM, TestNG
@@ -503,7 +503,7 @@ Results-driven QA Engineer & SDET with ${experienceLabel()} years of specialized
 {`{
   "applicant": {
     "name": "Deepak Gupta",
-    "target_role": "Senior QA Engineer & SDET",
+    "target_role": "QA Engineer",
     "experience_years": 3,
     "contact": {
       "email": "deepak1322007@gmail.com",

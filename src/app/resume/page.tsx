@@ -9,13 +9,13 @@ import { experienceLabel } from "@/lib/career";
 import { siteTitleSuffix } from "@/lib/site";
 
 export function generateMetadata(): Metadata {
-  const description = `Resume of Deepak Gupta, Senior QA Engineer & SDET in Noida, India: ${experienceLabel()} years of manual and automation testing, Playwright, Appium, fintech payment gateways, and defect root cause analysis.`;
+  const description = `Resume of Deepak Gupta, QA Engineer in Noida, India: ${experienceLabel()} years of manual and automation testing, Playwright, Appium, fintech payment gateways, and defect root cause analysis.`;
   return {
-    title: "Resume — Senior QA Engineer & SDET",
+    title: "Resume — QA Engineer",
     description,
     alternates: { canonical: "/resume" },
     openGraph: {
-      title: `Resume — Senior QA Engineer & SDET — ${siteTitleSuffix}`,
+      title: `Resume — QA Engineer — ${siteTitleSuffix}`,
       description,
       url: "/resume",
       type: "profile",
@@ -23,7 +23,7 @@ export function generateMetadata(): Metadata {
     },
     twitter: {
       card: "summary_large_image",
-      title: `Resume — Senior QA Engineer & SDET — ${siteTitleSuffix}`,
+      title: `Resume — QA Engineer — ${siteTitleSuffix}`,
       description,
       images: ["/opengraph-image"],
     },

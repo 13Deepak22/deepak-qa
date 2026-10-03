@@ -71,7 +71,7 @@ const QA_AI_CAPABILITIES: QaAiCapability[] = [
     testingChallenge:
       "Human QA engineers typically write 5–10 standard test cases per API endpoint. Edge-case decimal overflows (e.g., ₹0.00000001), leap second timestamps, and malformed UPI VPAs escape to production and crash backend ledger accounting.",
     howAiHelps:
-      "AI models ingest OpenAPI contracts and mathematically generate hundreds of combinatorial edge cases: negative amounts, boundary character lengths, and conflicting timestamp headers, instantly catching unhandled HTTP 500 crashes before deployment.",
+      "AI models ingest OpenAPI / Swagger contracts and mathematically generate hundreds of combinatorial edge cases: negative amounts, Unicode fuzzing, boundary character lengths, and conflicting timestamp headers, instantly catching unhandled HTTP 500 crashes before deployment.",
     modelsAndTools: ["ChatGPT o1 (Chain-of-Thought Reasoning)", "mcp/rest-api", "OpenAPI Schemas", "Postman / Newman"],
     concreteArtifact: {
       type: "Synthetic Fuzzing Payload Matrix",

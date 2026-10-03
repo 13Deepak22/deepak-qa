@@ -105,23 +105,21 @@ const ROLE_PROFILES: RoleProfile[] = [
       "Cursor AI",
       "Model Context Protocol (MCP)",
       "Playwright MCP",
-      "Autonomous Defect Triage",
-      "Edge-Case Synthesis",
+      "Self-Healing Locators",
+      "Synthetic Fuzzing",
       "Grok Telemetry",
     ],
     evidenceSnippet: {
-      title: "agentic/mcp-healer.ts",
-      language: "typescript",
-      code: `async function healBrokenSelector(mcpClient: McpClient) {
-  try {
-    await mcpClient.click("#legacy-pay-btn");
-  } catch (err) {
-    const domTree = await mcpClient.callTool("mcp/playwright", "inspect_dom", { depth: 2 });
-    const resilientSelector = await aiAgent.inferResilientLocator(domTree);
-    await mcpClient.click(resilientSelector);
-    expect(await mcpClient.isVisible("[data-testid='payment-confirmed']")).toBe(true);
-  }
-}`,
+      title: "agentic/mcp-healer.py",
+      language: "python",
+      code: `async def test_agent_heals_broken_selector(mcp_client):
+    try:
+        await mcp_client.click("#legacy-pay-btn")
+    except LocatorTimeoutError:
+        dom_tree = await mcp_client.call_tool("mcp/playwright", "inspect_dom", depth=2)
+        repaired_selector = await ai_agent.infer_resilient_locator(dom_tree)
+        await mcp_client.click(repaired_selector)
+        assert await mcp_client.is_visible("[data-testid='payment-confirmed']")`,
     },
     keyTakeaway: "Pioneering agentic workflows and MCP servers to auto-repair flaky tests, synthesize combinatorial edge cases, and eliminate repetitive QA friction.",
   },
@@ -138,7 +136,7 @@ const ROLE_PROFILES: RoleProfile[] = [
       "JSON Schema",
       "HMAC-SHA256",
       "Latency p99 Benchmarks",
-      "Network Log Analysis",
+      "Charles Proxy",
     ],
     evidenceSnippet: {
       title: "jmeter/concurrency-500threads.jmx",

@@ -12,7 +12,6 @@ export const profile = {
   email: "deepak1322007@gmail.com",
   phone: "+91 7888768621",
   phoneHref: "tel:+917888768621",
-  website: "https://deepak-qa.vercel.app",
   linkedin: "https://www.linkedin.com/in/deepak-gupta13/",
   github: "https://github.com/13Deepak22",
   availability: "Connect me",

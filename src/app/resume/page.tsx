@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Globe, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 import { DownloadOptions } from "@/components/resume/download-options";
-import { education, experience, profile, publicApps, resume, toolkit } from "@/data";
+import { education, experience, profile, publicApps, resume, resumeSkills } from "@/data";
 import { experienceLabel } from "@/lib/career";
 import { siteTitleSuffix } from "@/lib/site";
 
@@ -41,13 +41,6 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 const bare = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
 
 export default function ResumePage() {
-  const keyKpis = [
-    { label: "Critical Escapes", value: "0 P0", hint: "Across 20+ production releases" },
-    { label: "Regression Time Cut", value: "50%", hint: "Via Playwright & Appium suites" },
-    { label: "Verification SLA", value: "99.8%", hint: "High-concurrency payment tests" },
-    { label: "Fintech Domain", value: "UPI 2.0", hint: "NPCI, Cashfree, Razorpay & eKYC" },
-  ];
-
   return (
     <main id="content" tabIndex={-1} className="outline-none">
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
@@ -83,20 +76,9 @@ export default function ResumePage() {
               </span>
             </div>
 
-            <p className="mt-2 text-base font-semibold text-pass sm:text-lg">
+            <p className="mt-1.5 text-base font-semibold text-pass sm:text-lg">
               {resume.headline}
             </p>
-
-            {/* Quick KPI Ribbon inside Resume */}
-            <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2.5 border-t border-b border-line/70 py-3.5 bg-paper/60 px-3">
-              {keyKpis.map((kpi) => (
-                <div key={kpi.label} className="flex flex-col">
-                  <span className="font-mono text-[0.62rem] uppercase tracking-wider text-muted">{kpi.label}</span>
-                  <span className="font-serif text-lg font-bold text-ink">{kpi.value}</span>
-                  <span className="text-[0.65rem] text-ink-soft">{kpi.hint}</span>
-                </div>
-              ))}
-            </div>
 
             {/* Contact Coordinates */}
             <ul className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-ink-soft font-mono">
@@ -140,18 +122,15 @@ export default function ResumePage() {
 
           {/* Technical Skills & Competencies */}
           <Section title="Technical Competencies">
-            <dl className="grid gap-3 text-sm">
-              {toolkit.map((group) => (
-                <div key={group.label} className="resume-item grid gap-x-4 gap-y-1 sm:grid-cols-[10rem_minmax(0,1fr)]">
+            <dl className="grid gap-2.5 text-xs sm:text-sm">
+              {resumeSkills.map((group) => (
+                <div key={group.category} className="resume-item grid gap-x-4 gap-y-0.5 sm:grid-cols-[11rem_minmax(0,1fr)]">
                   <dt className="font-mono text-xs font-bold text-ink uppercase tracking-wider flex items-center gap-1.5">
                     <span className="h-1.5 w-1.5 bg-pass rounded-full shrink-0" />
-                    <span>{group.label}</span>
+                    <span>{group.category}</span>
                   </dt>
-                  <dd className="leading-relaxed text-ink-soft text-xs sm:text-sm">
-                    {group.items.join(", ")}
-                    {group.label.includes("Exposure") ? (
-                      <span className="text-muted"> ({resume.exposureNote})</span>
-                    ) : null}
+                  <dd className="leading-relaxed text-ink-soft">
+                    {group.items}
                   </dd>
                 </div>
               ))}
@@ -187,23 +166,23 @@ export default function ResumePage() {
             </div>
           </Section>
 
-          {/* Commercial Applications & Case Studies */}
+          {/* Key Projects & Applications Verified */}
           <Section title="Key Projects & Applications Verified">
-            <ul className="grid gap-3 text-sm leading-relaxed text-ink-soft">
-              {publicApps.map((app) => (
-                <li key={app.title} className="resume-item border-b border-line/60 pb-3 last:border-b-0 last:pb-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-serif font-bold text-ink text-base">{app.title}</span>
-                    <span className="border border-line bg-paper px-2 py-0.5 font-mono text-[0.65rem] text-muted uppercase">
+            <div className="grid gap-3 sm:grid-cols-2">
+              {publicApps.slice(0, 6).map((app) => (
+                <div key={app.title} className="resume-item border border-line/60 bg-paper/40 p-3">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="font-serif font-bold text-ink text-sm">{app.title}</span>
+                    <span className="border border-line bg-paper px-1.5 py-0.5 font-mono text-[0.62rem] text-muted uppercase">
                       {app.domain}
                     </span>
                   </div>
                   <p className="mt-1 text-xs text-ink-soft leading-relaxed">
                     {app.detail}
                   </p>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           </Section>
 
           {/* Education */}
@@ -218,11 +197,12 @@ export default function ResumePage() {
           </Section>
 
           {/* Certifications and Courses */}
-          <Section title="Technical Training & Tool Certifications">
-            <ul className="list-disc space-y-1.5 pl-4 text-xs sm:text-sm leading-relaxed text-ink-soft marker:text-pass">
+          <Section title="Technical Training & Certifications">
+            <ul className="grid gap-2 sm:grid-cols-2 text-xs sm:text-sm text-ink-soft">
               {education.courses.map((course) => (
-                <li key={course} className="pl-1">
-                  <span className="font-semibold text-ink">{course}</span>
+                <li key={course} className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 bg-pass rounded-full shrink-0" />
+                  <span className="font-medium text-ink">{course}</span>
                 </li>
               ))}
             </ul>

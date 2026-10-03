@@ -222,9 +222,14 @@ EXPERIENCE:
 - Championed defect life cycle governance and Root Cause Analysis (RCA) in Jira, authoring reproducible tickets with Charles Proxy network captures and logs to eliminate 200+ pre-release defects with 0 P0 production escapes.
 - Facilitated regulatory compliance and infrastructure resilience, validating test logs and ledger checkpoints for RBI regulatory reviews, DR/DC failover drills, and VAPT vulnerability remediation across LOS, LMS, and LCS portals.
 
-EDUCATION:
+EDUCATION & TECHNICAL TRAINING:
 - Bachelor of Computer Applications — Chandigarh Group of Colleges (2019 – 2022)
-- Appium — Mobile Testing (Android/iOS) from Scratch + Frameworks (Rahul Shetty, 2024)`;
+- Selenium with Java
+- Appium with Java
+- Playwright with JavaScript / TypeScript
+- API Testing with Postman
+- Stress and Performance Testing with JMeter
+- Testing with GenAI`;
     } else if (type === "inmail") {
       text = `Hi [Hiring Manager/Recruiter],
 

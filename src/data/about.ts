@@ -69,16 +69,10 @@ export const education = {
   courses: [
     "Selenium with Java",
     "Appium with Java",
-    "Playwright with JavaScript",
-    "API testing with Postman",
-    "Stress and performance testing with JMeter",
+    "Playwright with JavaScript / TypeScript",
+    "API Testing with Postman",
+    "Stress and Performance Testing with JMeter",
     "Testing with GenAI",
   ],
-  credentials: [
-    {
-      name: "Appium — Mobile Testing (Android/iOS) from Scratch + Frameworks",
-      by: "Udemy · Rahul Shetty",
-      period: "2024",
-    },
-  ],
+  credentials: [] as { name: string; by: string; period: string }[],
 };

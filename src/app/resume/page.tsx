@@ -222,15 +222,12 @@ export default function ResumePage() {
           </Section>
 
           {/* Certifications and Courses */}
-          <Section title="Certifications & Continuous Learning">
+          <Section title="Technical Training & Tool Certifications">
             <ul className="list-disc space-y-1.5 pl-4 text-xs sm:text-sm leading-relaxed text-ink-soft marker:text-pass">
-              {education.credentials.map((item) => (
-                <li key={item.name} className="pl-1">
-                  <span className="font-bold text-ink">{item.name}</span> — {item.by} ({item.period})
-                </li>
-              ))}
               {education.courses.map((course) => (
-                <li key={course} className="pl-1">{course}</li>
+                <li key={course} className="pl-1">
+                  <span className="font-semibold text-ink">{course}</span>
+                </li>
               ))}
             </ul>
           </Section>

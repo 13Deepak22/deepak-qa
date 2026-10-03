@@ -28,6 +28,7 @@ export function resumeDocument() {
       `${profile.places}, ${profile.location}`,
       profile.phone,
       profile.email,
+      bare(profile.website),
       bare(profile.linkedin),
       bare(profile.github),
     ],

@@ -5,6 +5,25 @@
 
 import { experienceLabel } from "@/lib/career";
 
+export const resumeSkills = [
+  {
+    category: "Test Automation",
+    items: "Playwright, Appium, Selenium WebDriver, TestNG, Page Object Model (POM), TypeScript, Java",
+  },
+  {
+    category: "API & Performance",
+    items: "Postman, Newman, REST APIs, JSON Schema, Apache JMeter (Load & Stress), Charles Proxy",
+  },
+  {
+    category: "FinTech & Payments",
+    items: "NPCI UPI 2.0 (Intent/Collect), Payment Gateways (Razorpay, Cashfree, PayU), DigiLocker eKYC, LOS/LMS Ledgers",
+  },
+  {
+    category: "Methodologies & Tools",
+    items: "Functional, Regression, Mobile (Android/iOS), Root Cause Analysis (RCA), Jira, Docker, Git",
+  },
+];
+
 export const resume = {
   headline: "QA Engineer · Automation & Manual Testing · FinTech & Payments",
   get summary() {

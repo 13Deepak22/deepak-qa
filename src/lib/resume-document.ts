@@ -34,7 +34,7 @@ export function resumeDocument() {
     summary: resume.summary,
     skills: toolkit.map((group) => ({
       label: group.label,
-      value: group.items.join(", ") + (group.label === "Exposure" ? ` (${resume.exposureNote})` : ""),
+      value: group.items.join(", ") + (group.label.includes("Exposure") ? ` (${resume.exposureNote})` : ""),
     })),
     experience: experience.map((role) => ({
       title: role.title,

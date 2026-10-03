@@ -191,7 +191,7 @@ export function InteractiveDeliverables() {
           </div>
 
           <div className="border border-line bg-card/60 p-2 text-[0.68rem] flex items-center justify-between text-muted">
-            <span>Evidence: charles_session.chls (2.4MB) · payments.spec.ts</span>
+            <span>Evidence: network_trace.har (2.4MB) · payments.spec.ts</span>
             <span className="text-pass font-semibold">Fix Deployed &amp; Re-tested</span>
           </div>
         </div>

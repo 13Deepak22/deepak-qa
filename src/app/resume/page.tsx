@@ -45,16 +45,14 @@ export default function ResumePage() {
     <main id="content" tabIndex={-1} className="outline-none">
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
         {/* Header Ribbon & Downloads */}
-        <div data-print="hide" className="enter enter-1 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        <div data-print="hide" className="enter enter-1 mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-              <span className="text-pass">CV</span> / Executive Resume
-            </p>
-            <h1 className="mt-2 font-serif text-3xl sm:text-4xl text-ink tracking-tight font-bold">
+            <p className="font-mono text-xs font-semibold tracking-wider text-pass uppercase">Curriculum Vitae</p>
+            <h1 className="mt-1 font-serif text-2xl sm:text-3xl text-ink font-bold tracking-tight">
               Deepak Gupta
             </h1>
-            <p className="mt-2 max-w-lg text-sm leading-relaxed text-ink-soft">
-              Professional resume with single-column linear hierarchy, standard headings, and quantified achievement metrics. Download as PDF, Word (.docx), or JPG.
+            <p className="mt-1 text-xs text-ink-soft">
+              Minimal single-column format. Optimized for clarity, recruiter scanning, and ATS parsing.
             </p>
           </div>
           <DownloadOptions />
@@ -63,18 +61,13 @@ export default function ResumePage() {
         {/* The Formal Resume Document */}
         <article
           aria-label={`Resume of ${profile.name}`}
-          className="resume-sheet enter enter-2 mt-8 border border-line bg-card px-6 py-8 text-ink shadow-[0_30px_60px_-45px_rgba(28,25,21,0.55)] sm:px-12 sm:py-12"
+          className="resume-sheet enter enter-2 border border-line bg-card px-6 py-8 text-ink shadow-[0_30px_60px_-45px_rgba(28,25,21,0.55)] sm:px-12 sm:py-12"
         >
           {/* Header Block */}
           <header className="border-b border-line pb-6">
-            <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2">
-              <h1 className="font-serif text-3xl tracking-tight sm:text-4xl lg:text-5xl font-bold text-ink">
-                {profile.name}
-              </h1>
-              <span className="font-mono text-xs font-semibold text-pass uppercase tracking-wider">
-                Available for Full-time Roles
-              </span>
-            </div>
+            <h1 className="font-serif text-3xl tracking-tight sm:text-4xl font-bold text-ink">
+              {profile.name}
+            </h1>
 
             <p className="mt-1.5 text-base font-semibold text-pass sm:text-lg">
               {resume.headline}

@@ -15,6 +15,7 @@ import {
   Play,
   RotateCcw,
   ShieldCheck,
+  Smartphone,
   Terminal,
   Wifi,
   Zap,
@@ -357,12 +358,10 @@ export function InteractiveQASandbox() {
   const isRunningRef = useRef<boolean>(false);
 
   useEffect(() => {
-    const runRef = activeRunIdRef;
-    const tRef = timeoutRef;
     return () => {
-      runRef.current++;
-      if (tRef.current) {
-        clearTimeout(tRef.current);
+      activeRunIdRef.current++;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
     };
   }, []);
@@ -372,6 +371,14 @@ export function InteractiveQASandbox() {
   const currentControlValue = currentControl
     ? scenarioControls[activeScenario.id]?.[currentControl.id] ?? currentControl.defaultVal
     : true;
+
+  // Initialize or re-generate payload when scenario or control changes
+  const updatePayload = (scenario = activeScenario, controls = scenarioControls) => {
+    const scControls = controls[scenario.id] || {};
+    const generated = scenario.generatePayload(scControls);
+    setPayloadCache(generated);
+    return generated;
+  };
 
   const handleReset = () => {
     activeRunIdRef.current++;

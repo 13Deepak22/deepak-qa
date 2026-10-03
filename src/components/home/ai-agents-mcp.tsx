@@ -367,12 +367,10 @@ export function AiAgentsMcpSection() {
   const activeRunIdRef = useRef<number>(0);
 
   useEffect(() => {
-    const runRef = activeRunIdRef;
-    const tRef = timerRef;
     return () => {
-      runRef.current++;
-      if (tRef.current) {
-        clearInterval(tRef.current);
+      activeRunIdRef.current++;
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
       }
     };
   }, []);

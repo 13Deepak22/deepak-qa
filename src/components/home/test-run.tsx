@@ -240,10 +240,8 @@ export function TestRun() {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (prefersReducedMotion) {
-      const timer = setTimeout(() => {
-        setSimulatedTime(totalSeconds);
-      }, 0);
-      return () => clearTimeout(timer);
+      setSimulatedTime(totalSeconds);
+      return;
     }
 
     let frame = 0;
@@ -263,17 +261,16 @@ export function TestRun() {
 
   // Compute live test states
   const { rows, passedCount, failedCount, skippedCount, isDone, suiteSeconds } = useMemo(() => {
-    const startOffsets: number[] = [];
-    let acc = 0;
-    for (let i = 0; i < durations.length; i++) {
-      startOffsets.push(acc);
-      acc += durations[i];
-    }
+    let cursor = 0;
+    let passed = 0;
+    let failed = 0;
+    let skipped = 0;
 
     const computedRows = currentRun.checks.map((check, index) => {
-      const start = startOffsets[index];
+      const start = cursor;
       const length = durations[index];
       const end = start + length;
+      cursor = end;
 
       const isFinished = simulatedTime >= end - 0.001;
       const isStarted = simulatedTime >= start;
@@ -281,6 +278,9 @@ export function TestRun() {
       let status: TestStatus = "wait";
       if (isFinished) {
         status = check.targetStatus;
+        if (check.targetStatus === "pass") passed += 1;
+        else if (check.targetStatus === "fail") failed += 1;
+        else if (check.targetStatus === "skip") skipped += 1;
       } else if (isStarted) {
         status = "run";
       }
@@ -296,9 +296,6 @@ export function TestRun() {
       };
     });
 
-    const passed = computedRows.filter((r) => r.status === "pass").length;
-    const failed = computedRows.filter((r) => r.status === "fail").length;
-    const skipped = computedRows.filter((r) => r.status === "skip").length;
     const done = simulatedTime >= totalSeconds - 0.001;
 
     return {

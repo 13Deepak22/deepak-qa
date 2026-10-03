@@ -1,4 +1,4 @@
-import { education, experience, profile, publicApps, resume, toolkit } from "@/data";
+import { education, experience, profile, publicApps, resume, resumeSkills } from "@/data";
 
 export type ResumeFormat = "pdf" | "jpg" | "docx";
 
@@ -19,7 +19,7 @@ export const resumeFileName = (format: ResumeFormat) =>
 const bare = (url?: string) => (url ? url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "") : "");
 const range = (period: string) => period.replace(" — ", " – ");
 
-/** Plain resume content shared by the PDF, Word, and JPG downloads. */
+/** Plain resume content shared by the PDF, Word, and JPG downloads. Matches the /resume page exactly. */
 export function resumeDocument() {
   return {
     name: profile.name,
@@ -33,17 +33,18 @@ export function resumeDocument() {
       bare(profile.github),
     ],
     summary: resume.summary,
-    skills: toolkit.map((group) => ({
-      label: group.label,
-      value: group.items.join(", ") + (group.label.includes("Exposure") ? ` (${resume.exposureNote})` : ""),
+    skills: resumeSkills.map((group) => ({
+      label: group.category,
+      value: group.items,
     })),
     experience: experience.map((role) => ({
       title: role.title,
       org: role.org,
+      location: role.org === "Exude Vincom" ? "Noida, India (Fintech & Lending)" : "Chandigarh, India (Fintech & Payments)",
       period: range(role.period),
       points: [...role.points],
     })),
-    projects: publicApps.map((app) => ({ title: app.title, domain: app.domain, detail: app.detail })),
+    projects: publicApps.slice(0, 6).map((app) => ({ title: app.title, domain: app.domain, detail: app.detail })),
     education: { degree: education.degree, school: education.school, period: range(education.period) },
     certifications: [...education.courses],
   };

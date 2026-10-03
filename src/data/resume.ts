@@ -12,7 +12,7 @@ export const resumeSkills = [
   },
   {
     category: "API & Performance",
-    items: "Postman, Newman, REST APIs, JSON Schema, Apache JMeter (Load & Stress), Charles Proxy",
+    items: "Postman, Newman, REST APIs, JSON Schema, Apache JMeter (Load & Stress)",
   },
   {
     category: "FinTech & Payments",
@@ -20,7 +20,7 @@ export const resumeSkills = [
   },
   {
     category: "Methodologies & Tools",
-    items: "Functional, Regression, Mobile (Android/iOS), Root Cause Analysis (RCA), Jira, Docker, Git",
+    items: "Functional, Regression, Mobile (Android/iOS), Root Cause Analysis (RCA), Jira, Git",
   },
 ];
 

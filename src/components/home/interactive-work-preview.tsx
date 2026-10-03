@@ -48,7 +48,7 @@ const APPS_DATA: InteractiveAppDetail[] = [
       {
         title: "UPI Intent & QR Scan Switcher",
         tactic: "Tested deep-linking handshakes across GPay, PhonePe, and Paytm on Android 10-14.",
-        tool: "Appium + Charles Proxy",
+        tool: "Appium + Network Logs",
         passStatus: "99.9% Pass Rate",
       },
       {
@@ -147,7 +147,7 @@ const APPS_DATA: InteractiveAppDetail[] = [
       {
         title: "e-NACH Mandate & Repayment Gateway",
         tactic: "Tested recurring auto-debit registration, bounce penalty schedules, and partial payments.",
-        tool: "Charles + Postman",
+        tool: "Newman + Postman",
         passStatus: "Verified",
       },
     ],

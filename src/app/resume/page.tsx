@@ -58,7 +58,7 @@ function GitHubIcon({ className = "h-3.5 w-3.5" }: { className?: string }) {
   );
 }
 
-const bare = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+const bare = (url?: string) => (url ? url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "") : "");
 
 export default function ResumePage() {
   return (
@@ -111,12 +111,14 @@ export default function ResumePage() {
                   {profile.email}
                 </a>
               </li>
-              <li className="flex items-center gap-1.5">
-                <Globe className="h-3.5 w-3.5 text-pass shrink-0" />
-                <a href={profile.website} className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
-                  {bare(profile.website)}
-                </a>
-              </li>
+              {profile.website ? (
+                <li className="flex items-center gap-1.5">
+                  <Globe className="h-3.5 w-3.5 text-pass shrink-0" />
+                  <a href={profile.website} className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
+                    {bare(profile.website)}
+                  </a>
+                </li>
+              ) : null}
               <li className="flex items-center gap-1.5">
                 <LinkedInIcon className="h-3.5 w-3.5 text-pass shrink-0" />
                 <a href={profile.linkedin} className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">

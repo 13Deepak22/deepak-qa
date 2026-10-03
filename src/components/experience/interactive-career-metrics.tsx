@@ -61,7 +61,7 @@ const CAREER_HIGHLIGHTS: CareerHighlight[] = [
     metric: "Intercepted in Staging",
     summary: "Discovered an asynchronous race condition in the loan disbursal pipeline where throttled network retries allowed duplicate money movement.",
     technicalImpact: [
-      "Reproduced using Charles Proxy network throttling (3G Slow 450ms RTT profile)",
+      "Reproduced using network throttling simulation (3G Slow 450ms RTT profile)",
       "Proved in-memory idempotency check failed under concurrent worker threads",
       "Mandated distributed Redis SETNX row locks, completely preventing financial leakage",
     ],

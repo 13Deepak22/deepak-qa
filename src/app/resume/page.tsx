@@ -47,9 +47,7 @@ export default function ResumePage() {
         {/* Header Ribbon & Downloads */}
         <div data-print="hide" className="enter enter-1 mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-              <span className="text-pass">CV</span> / Executive Resume
-            </p>
+            <p className="font-mono text-xs font-semibold tracking-wider text-pass uppercase">Curriculum Vitae</p>
             <h1 className="mt-1 font-serif text-2xl sm:text-3xl text-ink font-bold tracking-tight">
               Deepak Gupta
             </h1>

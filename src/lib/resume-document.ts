@@ -16,7 +16,7 @@ export const resumeFormats: { format: ResumeFormat; label: string; hint: string;
 export const resumeFileName = (format: ResumeFormat) =>
   `${profile.name.toLowerCase().replace(/\s+/g, "-")}-resume.${format}`;
 
-const bare = (url: string) => url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+const bare = (url?: string) => (url ? url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "") : "");
 const range = (period: string) => period.replace(" — ", " – ");
 
 /** Plain resume content shared by the PDF, Word, and JPG downloads. */
@@ -28,7 +28,7 @@ export function resumeDocument() {
       `${profile.places}, ${profile.location}`,
       profile.phone,
       profile.email,
-      bare(profile.website),
+      ...(profile.website ? [bare(profile.website)] : []),
       bare(profile.linkedin),
       bare(profile.github),
     ],

@@ -44,10 +44,7 @@ export function resumeDocument() {
     })),
     projects: publicApps.map((app) => ({ title: app.title, domain: app.domain, detail: app.detail })),
     education: { degree: education.degree, school: education.school, period: range(education.period) },
-    certifications: [
-      ...education.credentials.map((item) => `${item.name}, ${item.by} (${item.period})`),
-      ...education.courses,
-    ],
+    certifications: [...education.courses],
   };
 }
 

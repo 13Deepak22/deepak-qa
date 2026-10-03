@@ -199,7 +199,7 @@ Location: Noida, India | Phone: +91 7888768621 | Email: deepak1322007@gmail.com
 LinkedIn: https://www.linkedin.com/in/deepak-gupta13/ | GitHub: https://github.com/13Deepak22
 
 SUMMARY:
-Results-driven QA Engineer with ${experienceLabel()} years of specialized experience across fintech payment gateways, native mobile (Android/iOS), and distributed backend services. Builds production-grade test automation with Playwright, Appium, and Selenium WebDriver (TypeScript/Java), cuts manual regression effort by 50%, and enforces zero P0 defect escapes across 20+ production releases. Deep domain expertise in NPCI UPI 2.0, multi-gateway routing (Razorpay, Cashfree, PayU), DigiLocker eKYC, double-entry ledger invariance, and JMeter load testing. Skilled in exploratory testing, root cause analysis (RCA), and AI-accelerated QA workflows. Open to relocation.
+QA Engineer with ${experienceLabel()} years of experience delivering robust test automation and quality verification for high-volume FinTech systems, mobile applications (Android & iOS), and distributed payment APIs. Builds scalable test suites with Playwright, Appium, and Selenium WebDriver (TypeScript/Java), reducing regression cycles by 50% with zero P0 production escapes across 20+ releases. Deep domain expertise in NPCI UPI 2.0, multi-gateway payment processing, eKYC validation, and JMeter performance load testing. Open to relocation.
 
 CORE SKILLS:
 - Automation & Frameworks: Playwright, Appium, Selenium WebDriver, TypeScript, Java, Python, TestNG, POM, UiAutomator2, XCUITest
@@ -210,26 +210,30 @@ CORE SKILLS:
 
 EXPERIENCE:
 1. QA Engineer — Exude Vincom (August 2026 — Present)
-- Architected and executed end-to-end test verification for the CredMe digital lending platform, validating multi-gateway payment flows (PayU, Cashfree, Razorpay), penny drop bank validations, and Aadhaar eSign with 99.8% pass rate.
-- Engineered rigorous compliance and risk validation test suites for DigiLocker eKYC, facial liveness verification, and bank statement aggregators across LOS/LMS, safeguarding against identity spoofing and unauthorized approvals.
-- Validated AI-driven autonomous calling agents for loan sanction verification and collection escalations, simulating telephony edge cases, latency degradation, and webhook status reconciliation with zero defect escapes.
-- Streamlined Loan Management System (LMS) audit verification across credit sanction, disbursal, and accounting ledgers, validating calculation accuracy against double-entry ledger invariances.
+- Architected and maintained end-to-end regression suites using Playwright and TypeScript, reducing release verification time by 45% with a 99.8% test pass rate.
+- Engineered robust validation test suites for digital loan onboarding, verifying multi-gateway payment processing, DigiLocker eKYC, and bank account penny drop checks.
+- Conducted functional and data integrity testing across Loan Origination & Management Systems (LOS/LMS), verifying calculation accuracy and double-entry ledger invariance.
+- Designed rigorous test scenarios for conversational AI calling agents and webhook event handling, simulating telephony edge cases and preventing transaction desynchronization.
 
 2. QA Engineer — Paul Merchants (July 2023 — August 2026)
-- Spearheaded automated regression frameworks in Playwright, Appium, and Java/TypeScript across 6 core fintech applications (PaulPay, PaulOne, Gifty, Mayaa Money, Presenza, PML Forex Live), reducing manual regression effort by 50%.
-- Engineered comprehensive functional and edge-case testing for NPCI UPI 2.0 protocols (dynamic QR, intent, collect, auto-reversals) and payment gateways (Razorpay, Cashfree) under 3G network throttling and intermittent packet loss.
-- Conducted high-concurrency API performance and stress testing using Apache JMeter and Postman/Newman, validating latency SLAs and isolating throughput bottlenecks under 500+ TPS peak loads.
-- Championed defect life cycle governance and Root Cause Analysis (RCA) in Jira, authoring reproducible tickets with Charles Proxy network captures and logs to eliminate 200+ pre-release defects with 0 P0 production escapes.
-- Facilitated regulatory compliance and infrastructure resilience, validating test logs and ledger checkpoints for RBI regulatory reviews, DR/DC failover drills, and VAPT vulnerability remediation across LOS, LMS, and LCS portals.
+- Engineered hybrid mobile test automation frameworks using Appium, Selenium WebDriver, and Java (POM/TestNG), cutting regression cycle times by 50% across Android and iOS.
+- Executed comprehensive functional and edge-case testing for NPCI UPI 2.0 flows (dynamic QR, intent, collect, auto-reversals) and payment gateways under 3G network throttling.
+- Conducted high-concurrency API performance and stress testing using Apache JMeter and Postman, ensuring sub-second response times under 500+ TPS peak loads.
+- Championed defect lifecycle management in Jira using Charles Proxy network logs and root cause analysis (RCA), preventing 200+ pre-release defects with 0 P0 escapes across 20+ production releases.
+- Facilitated regulatory compliance testing, DR/DC failover drills, and VAPT vulnerability remediation across production prepaid card and transaction settlement portals.
 
-EDUCATION & TECHNICAL TRAINING:
+KEY PROJECTS VERIFIED:
+- PaulPay: PPI wallet, virtual/physical cards, and NPCI UPI 2.0 compliance (Android/iOS).
+- CredMe: Digital lending journeys, DigiLocker eKYC, penny drop, and LMS ledger verification.
+- PaulOne: Gold loan interest payment automation via Razorpay.
+- Gifty: Cross-platform digital gift card issuance, redemption, and transaction automation.
+- Mayaa Money: Digital gold/silver trading workflows and prepaid cards compliance.
+- Presenza: Enterprise mobile attendance and HR workflow management.
+- PML Forex Live: Live forex rate cards, currency cards, and outward remittance testing.
+
+EDUCATION & CERTIFICATIONS:
 - Bachelor of Computer Applications — Chandigarh Group of Colleges (2019 – 2022)
-- Selenium with Java
-- Appium with Java
-- Playwright with JavaScript / TypeScript
-- API Testing with Postman
-- Stress and Performance Testing with JMeter
-- Testing with GenAI`;
+- Technical Training: Selenium with Java, Appium with Java, Playwright with JavaScript/TypeScript, API Testing with Postman, JMeter, Testing with GenAI`;
     } else if (type === "inmail") {
       text = `Hi [Hiring Manager/Recruiter],
 
@@ -250,13 +254,27 @@ Deepak Gupta
 **LinkedIn**: https://www.linkedin.com/in/deepak-gupta13/ | **GitHub**: https://github.com/13Deepak22
 
 ## Executive Summary
-Results-driven QA Engineer with ${experienceLabel()} years of specialized experience across fintech payment gateways, native mobile (Android/iOS), and distributed backend services. Reduced regression time by 50% with 0 P0 production escapes.
+QA Engineer with ${experienceLabel()} years of experience delivering robust test automation and quality verification for high-volume FinTech systems, mobile applications (Android & iOS), and distributed payment APIs. Reduced regression cycles by 50% with 0 P0 production escapes.
 
 ## Core Competencies
 - **Automation**: Playwright, Appium, Selenium WebDriver, TypeScript, Java, POM, TestNG
 - **API & Load**: Postman, Newman, JMeter (500+ TPS), Charles Proxy, REST APIs
 - **Fintech**: UPI 2.0, Razorpay, Cashfree, PayU, DigiLocker eKYC, Double-Entry Ledgers, LOS/LMS
-- **QA Methodologies**: Exploratory Testing, RCA, Jira, Bug Life Cycle, Boundary Value Analysis`;
+- **QA Methodologies**: Exploratory Testing, RCA, Jira, Bug Life Cycle, Boundary Value Analysis
+
+## Experience
+### QA Engineer — Exude Vincom (August 2026 — Present)
+- Architected and maintained end-to-end regression suites using Playwright and TypeScript, reducing release verification time by 45% with a 99.8% test pass rate.
+- Engineered robust validation test suites for digital loan onboarding, verifying multi-gateway payment processing, DigiLocker eKYC, and bank account penny drop checks.
+- Conducted functional and data integrity testing across Loan Origination & Management Systems (LOS/LMS), verifying calculation accuracy and double-entry ledger invariance.
+- Designed rigorous test scenarios for conversational AI calling agents and webhook event handling, simulating telephony edge cases and preventing transaction desynchronization.
+
+### QA Engineer — Paul Merchants (July 2023 — August 2026)
+- Engineered hybrid mobile test automation frameworks using Appium, Selenium WebDriver, and Java (POM/TestNG), cutting regression cycle times by 50% across Android and iOS.
+- Executed comprehensive functional and edge-case testing for NPCI UPI 2.0 flows (dynamic QR, intent, collect, auto-reversals) and payment gateways under 3G network throttling.
+- Conducted high-concurrency API performance and stress testing using Apache JMeter and Postman, ensuring sub-second response times under 500+ TPS peak loads.
+- Championed defect lifecycle management in Jira using Charles Proxy network logs and root cause analysis (RCA), preventing 200+ pre-release defects with 0 P0 escapes across 20+ production releases.
+- Facilitated regulatory compliance testing, DR/DC failover drills, and VAPT vulnerability remediation across production prepaid card and transaction settlement portals.`;
     }
 
     navigator.clipboard.writeText(text);

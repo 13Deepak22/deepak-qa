@@ -14,7 +14,7 @@ export const releaseGate = {
   gate: "ready for review",
 };
 
-export type ToolLogo = "playwright" | "selenium" | "appium" | "postman" | "jmeter" | "jira" | "trello";
+export type ToolLogo = "playwright" | "selenium" | "appium" | "postman" | "jmeter" | "jira" | "trello" | "razorpay" | "paytm";
 
 export type TestingTypeIcon = "functional" | "exploratory" | "ux";
 
@@ -86,7 +86,7 @@ export const services = {
       key: "fintech",
       title: "Fintech domain",
       body: "Payment and lending journeys, checked against the partners they depend on.",
-      logos: [],
+      logos: ["razorpay", "paytm"],
       points: ["UPI", "NPCI", "Razorpay", "Cashfree", "PayU", "eKYC", "DigiLocker", "eSign", "LOS", "LMS"],
     },
   ] satisfies { key: string; title: string; body: string; logos: ToolLogo[]; points: string[] }[],

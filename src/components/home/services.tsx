@@ -12,6 +12,8 @@ const logoSize: Record<ToolLogoName, { large: string; small: string }> = {
   jmeter: { large: "w-12", small: "w-9" },
   jira: { large: "h-7 w-7", small: "h-5 w-5" },
   trello: { large: "h-7 w-7", small: "h-5 w-5" },
+  razorpay: { large: "w-10", small: "w-7" },
+  paytm: { large: "w-12", small: "w-9" },
 };
 
 const typeIcons: Record<TestingTypeIcon, LucideIcon> = {
@@ -21,12 +23,17 @@ const typeIcons: Record<TestingTypeIcon, LucideIcon> = {
 };
 
 const automationStack: ToolLogoName[] = ["playwright", "selenium", "appium"];
-const logoName = (name: ToolLogoName) => (name === "jmeter" ? "JMeter" : name[0].toUpperCase() + name.slice(1));
+const logoName = (name: ToolLogoName) => {
+  if (name === "jmeter") return "JMeter";
+  if (name === "paytm") return "Paytm";
+  if (name === "razorpay") return "Razorpay";
+  return name[0].toUpperCase() + name.slice(1);
+};
 
 function LogoTile({ name, small = false }: { name: ToolLogoName; small?: boolean }) {
   return (
     <span
-      className={`tool-tile inline-flex shrink-0 items-center justify-center border border-black/10 bg-[#fbfaf6] ${
+      className={`tool-tile inline-flex shrink-0 items-center justify-center ${
         small ? "h-10 w-10" : "h-14 w-14"
       }`}
     >
@@ -128,8 +135,8 @@ export function ServicesSection({
                       const Icon = typeIcons[item.icon];
                       return (
                         <li key={item.label} className="flex items-center gap-2.5">
-                          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center border border-black/10 bg-[#fbfaf6] text-[#146c43]">
-                            <Icon aria-hidden="true" className="h-5 w-5" strokeWidth={1.75} />
+                          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center text-[#146c43] dark:text-pass">
+                            <Icon aria-hidden="true" className="h-6 w-6" strokeWidth={1.5} />
                           </span>
                           <span className="text-sm">{item.label}</span>
                         </li>

@@ -140,15 +140,16 @@ export function QaGame() {
       // Check hunger (10-15s)
       if (now - bug.spawnTime > 12000 && !bug.scanning) {
         const elements = document.elementsFromPoint(bug.x + bug.size / 2, bug.y + bug.size / 2);
-        const targetEl = elements.find(el => 
-          el.tagName !== 'BODY' && 
-          el.tagName !== 'HTML' && 
-          el.tagName !== 'DIV' && 
-          el.tagName !== 'MAIN' &&
-          el.tagName !== 'SECTION' &&
-          !el.closest('.z-50') &&
-          !el.closest('.site-cursor')
-        ) as HTMLElement | undefined;
+        const targetEl = elements.find(el => {
+          if (el.tagName === 'BODY' || el.tagName === 'HTML' || el.tagName === 'MAIN') return false;
+          if (el.closest('.z-[60]') || el.closest('.z-50') || el.closest('.site-cursor')) return false;
+          
+          const rect = el.getBoundingClientRect();
+          // Don't eat massive layout wrappers (e.g. over 85% of screen)
+          if (rect.width > window.innerWidth * 0.85 || rect.height > window.innerHeight * 0.85) return false;
+          
+          return true;
+        }) as HTMLElement | undefined;
 
         if (targetEl && !targetEl.hasAttribute('data-eaten')) {
           targetEl.setAttribute('data-eaten', 'true');

@@ -8,6 +8,7 @@ interface Defect {
   x: number;
   y: number;
   squashed: boolean;
+  scanning?: boolean;
   size: number;
   speed: number;
   direction: number; // angle in radians
@@ -35,11 +36,60 @@ export function QaGame() {
   
   const requestRef = useRef<number>(null);
   const defectsRef = useRef<Defect[]>([]);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Keep ref in sync
   useEffect(() => {
     defectsRef.current = defects;
   }, [defects]);
+
+  const squashDefect = useCallback((id: string, x: number, y: number) => {
+    setDefects(prev => prev.map(bug => bug.id === id ? { ...bug, squashed: true, scanning: false } : bug));
+    
+    setScore(s => {
+      const newScore = s + 1;
+      // Show a fact on every squash
+      setCurrentFact({ text: QA_FACTS[newScore % QA_FACTS.length], id: Date.now() });
+      return newScore;
+    });
+    
+    // Create explosion particles
+    const newParticles = Array.from({ length: 5 }).map(() => ({
+      id: Math.random().toString(36).substring(7),
+      x: x,
+      y: y
+    }));
+    setParticles(prev => [...prev, ...newParticles]);
+    
+    setTimeout(() => {
+      setDefects(prev => prev.filter(bug => bug.id !== id));
+    }, 500); // Wait for squash animation
+    
+    setTimeout(() => {
+      setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
+    }, 800);
+  }, []);
+
+  const handlePointerEnter = useCallback((bugId: string) => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    
+    setDefects(prev => prev.map(b => b.id === bugId ? { ...b, scanning: true } : b));
+
+    hoverTimeoutRef.current = setTimeout(() => {
+      const bug = defectsRef.current.find(b => b.id === bugId);
+      if (bug && !bug.squashed) {
+        squashDefect(bugId, bug.x, bug.y);
+      }
+    }, 1200);
+  }, [squashDefect]);
+
+  const handlePointerLeave = useCallback((bugId: string) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setDefects(prev => prev.map(b => b.id === bugId ? { ...b, scanning: false } : b));
+  }, []);
 
   const spawnDefect = useCallback(() => {
     if (defectsRef.current.length >= 10) return; // max bugs
@@ -108,33 +158,6 @@ export function QaGame() {
     }
   }, [isOpen, spawnDefect, updatePositions]);
 
-  const squashDefect = (id: string, x: number, y: number) => {
-    setDefects(prev => prev.map(bug => bug.id === id ? { ...bug, squashed: true } : bug));
-    
-    setScore(s => {
-      const newScore = s + 1;
-      // Show a fact on every squash
-      setCurrentFact({ text: QA_FACTS[newScore % QA_FACTS.length], id: Date.now() });
-      return newScore;
-    });
-    
-    // Create explosion particles
-    const newParticles = Array.from({ length: 5 }).map(() => ({
-      id: Math.random().toString(36).substring(7),
-      x: x,
-      y: y
-    }));
-    setParticles(prev => [...prev, ...newParticles]);
-    
-    setTimeout(() => {
-      setDefects(prev => prev.filter(bug => bug.id !== id));
-    }, 500); // Wait for squash animation
-    
-    setTimeout(() => {
-      setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
-    }, 800);
-  };
-
   return (
     <>
       <button
@@ -161,7 +184,9 @@ export function QaGame() {
               <button
                 key={bug.id}
                 onClick={() => squashDefect(bug.id, bug.x, bug.y)}
-                className="absolute flex items-center justify-center transition-transform pointer-events-auto"
+                onPointerEnter={() => handlePointerEnter(bug.id)}
+                onPointerLeave={() => handlePointerLeave(bug.id)}
+                className="absolute flex items-center justify-center transition-transform pointer-events-auto group"
                 style={{
                   left: bug.x,
                   top: bug.y,
@@ -178,9 +203,21 @@ export function QaGame() {
               >
                 <Bug size={bug.size} strokeWidth={1.5} className={!bug.squashed ? "animate-pulse drop-shadow-[0_0_15px_rgba(239,68,68,0.6)]" : ""} />
                 
-                {/* Crosshair effect when hovering over bug */}
+                {/* Focusing ring for auto-detect */}
                 {!bug.squashed && (
-                  <div className="absolute inset-[-10px] border border-red-500/0 hover:border-red-500/50 rounded-full transition-colors" />
+                  <div 
+                    className="absolute inset-[-12px] border-2 border-pass rounded-full"
+                    style={{
+                      transform: bug.scanning ? "scale(0.5)" : "scale(1.5)",
+                      opacity: bug.scanning ? 1 : 0,
+                      transition: bug.scanning ? "transform 1.2s linear, opacity 0.2s" : "transform 0.2s, opacity 0.2s",
+                    }}
+                  />
+                )}
+                
+                {/* Crosshair effect when hovering over bug */}
+                {!bug.squashed && !bug.scanning && (
+                  <div className="absolute inset-[-10px] border border-red-500/0 group-hover:border-red-500/50 rounded-full transition-colors" />
                 )}
               </button>
             ))}

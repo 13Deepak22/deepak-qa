@@ -138,12 +138,20 @@ export function SiteCursor() {
       last.y = pos.y;
       const speed = Math.hypot(vel.x, vel.y);
       const moving = now - lastMove < GAIT_HOLD_MS && speed > 4;
-      if (moving) {
+      
+      const isGame = document.documentElement.dataset.game === "on";
+
+      if (moving && !isGame) {
         const turn = Math.atan2(vel.y, vel.x) - heading;
         heading += Math.atan2(Math.sin(turn), Math.cos(turn)) * follow(speed < 150 ? 8 : 12, dt);
+      } else if (isGame) {
+        // Smoothly rotate the detector to upright position (0 radians)
+        const turn = 0 - heading;
+        heading += Math.atan2(Math.sin(turn), Math.cos(turn)) * follow(12, dt);
       }
+      
       let nextGait = "";
-      if (moving) {
+      if (moving && !isGame) {
         nextGait = speed < 150 ? "crawl" : speed < 450 ? "walk" : speed < 1100 ? "trot" : "sprint";
       }
       if (nextGait !== gait) {
@@ -337,7 +345,7 @@ export function SiteCursor() {
         <span ref={labelRef} className="site-cursor-label" />
       </span>
       <span ref={bugRef} className="site-cursor-bug">
-        <svg viewBox="0 0 24 24" width="24" height="24">
+        <svg className="bug-svg" viewBox="0 0 24 24" width="24" height="24">
           {LEGS.map((leg) => (
             <line
               key={leg.id}
@@ -358,6 +366,17 @@ export function SiteCursor() {
           <circle className="bug-spot" cx="12.6" cy="9.9" r="0.8" />
           <circle className="bug-spot" cx="12.6" cy="14.1" r="0.8" />
           <circle className="bug-head" cx="17.6" cy="12" r="2.5" />
+        </svg>
+        <svg className="detector-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          {/* Glass background and rim (green border, white/transparent fill) */}
+          <circle cx="11" cy="11" r="8" fill="var(--paper)" fillOpacity="0.75" stroke="var(--pass)" />
+          {/* Glare effect (white/ink-soft) */}
+          <path d="M7 7 A 5.5 5.5 0 0 1 11.5 5" stroke="var(--ink)" strokeWidth="1.5" strokeOpacity="0.3" strokeLinecap="round" />
+          <path d="M14 14 A 4 4 0 0 1 13 16" stroke="var(--ink)" strokeWidth="1.5" strokeOpacity="0.3" strokeLinecap="round" />
+          {/* Handle (black/ink) */}
+          <line x1="22" y1="22" x2="16.65" y2="16.65" stroke="var(--ink)" strokeWidth="3" />
+          {/* Inner target circle */}
+          <circle cx="11" cy="11" r="2.5" stroke="var(--pass)" strokeWidth="1.5" strokeOpacity="0.8" />
         </svg>
       </span>
     </div>

@@ -91,17 +91,20 @@ export function QaGame() {
 
   useEffect(() => {
     if (isOpen) {
+      document.documentElement.dataset.game = "on";
       const interval = setInterval(spawnDefect, 1500);
       requestRef.current = requestAnimationFrame(updatePositions);
       return () => {
         clearInterval(interval);
         if (requestRef.current) cancelAnimationFrame(requestRef.current);
+        delete document.documentElement.dataset.game;
       };
     } else {
       setDefects([]);
       setScore(0);
       setCurrentFact(null);
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      delete document.documentElement.dataset.game;
     }
   }, [isOpen, spawnDefect, updatePositions]);
 
@@ -136,37 +139,21 @@ export function QaGame() {
     <>
       <button
         type="button"
-        onClick={() => setIsOpen(true)}
-        className="press fixed left-5 bottom-5 z-40 inline-flex h-12 w-12 items-center justify-center border border-pass bg-paper text-pass shadow-[4px_4px_0_var(--ink)] hover:bg-pass-fill hover:text-on-band"
-        aria-label="Play QA Defect Hunter Game"
+        onClick={() => setIsOpen(!isOpen)}
+        className="press fixed left-5 bottom-5 z-[60] inline-flex h-12 w-12 items-center justify-center border border-pass bg-paper text-pass shadow-[4px_4px_0_var(--ink)] hover:bg-pass-fill hover:text-on-band"
+        aria-label={isOpen ? "Close QA Defect Hunter Game" : "Play QA Defect Hunter Game"}
         title="QA Mini-game"
       >
-        <Gamepad2 size={20} strokeWidth={1.75} />
+        {isOpen ? <X size={20} strokeWidth={1.75} /> : <Gamepad2 size={20} strokeWidth={1.75} />}
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm overflow-hidden selection:bg-transparent">
+        <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden selection:bg-transparent">
           {/* Game HUD */}
-          <div className="absolute top-6 left-6 right-6 flex items-center justify-between text-white z-10 pointer-events-none">
-            <div className="flex flex-col">
-              <span className="text-sm uppercase tracking-widest text-white/70 font-mono">Defects Squashed</span>
-              <div className="flex items-center gap-3">
-                <ShieldCheck className="text-green-400" size={32} />
-                <span className="text-4xl font-bold font-mono text-green-400">{score}</span>
-              </div>
-            </div>
-            
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white backdrop-blur-md"
-              aria-label="Close game"
-            >
-              <X size={24} />
-            </button>
+          <div className="absolute top-6 right-6 flex items-center gap-2 z-[60] pointer-events-none bg-paper/90 backdrop-blur-sm px-4 py-2 rounded-full border border-pass text-pass shadow-[4px_4px_0_var(--ink)]">
+            <ShieldCheck size={20} />
+            <span className="text-xl font-bold font-mono">{score}</span>
           </div>
-
-          <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-green-500/20 via-transparent to-transparent" />
 
           {/* Game Area */}
           <div className="absolute inset-0">
@@ -174,7 +161,7 @@ export function QaGame() {
               <button
                 key={bug.id}
                 onClick={() => squashDefect(bug.id, bug.x, bug.y)}
-                className="absolute flex items-center justify-center transition-transform"
+                className="absolute flex items-center justify-center transition-transform pointer-events-auto"
                 style={{
                   left: bug.x,
                   top: bug.y,
@@ -221,17 +208,16 @@ export function QaGame() {
           </div>
 
           {score === 0 && defects.length === 0 && (
-            <div className="absolute text-center text-white/50 animate-pulse font-mono pointer-events-none">
-              <Target size={48} className="mx-auto mb-4 opacity-50" />
-              <p className="text-xl">Waiting for QA defects...</p>
-              <p className="text-sm mt-2">Squash bugs to reveal QA Facts!</p>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-pass/50 animate-pulse font-mono pointer-events-none bg-paper/80 backdrop-blur p-4 rounded-xl border border-pass/30">
+              <Target size={32} className="mx-auto mb-2 opacity-50" />
+              <p className="text-lg">Waiting for defects...</p>
             </div>
           )}
 
           {currentFact && (
             <div
               key={currentFact.id}
-              className="absolute bottom-16 left-1/2 -translate-x-1/2 px-6 py-3 bg-green-900/90 text-green-300 font-mono text-sm sm:text-base border border-green-500/50 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.3)] pointer-events-none whitespace-nowrap text-center fact-toast z-20"
+              className="fixed bottom-24 right-5 px-4 py-3 bg-ink text-paper font-mono text-xs sm:text-sm border border-pass rounded-lg shadow-[4px_4px_0_var(--pass)] pointer-events-none whitespace-normal text-right max-w-[280px] fact-toast z-[60]"
             >
               💡 {currentFact.text}
             </div>
@@ -246,10 +232,10 @@ export function QaGame() {
               }
             }
             @keyframes floatUp {
-              0% { transform: translate(-50%, 20px); opacity: 0; }
-              15% { transform: translate(-50%, 0); opacity: 1; }
-              85% { transform: translate(-50%, 0); opacity: 1; }
-              100% { transform: translate(-50%, -20px); opacity: 0; }
+              0% { transform: translateY(20px); opacity: 0; }
+              15% { transform: translateY(0); opacity: 1; }
+              85% { transform: translateY(0); opacity: 1; }
+              100% { transform: translateY(-20px); opacity: 0; }
             }
             .fact-toast {
               animation: floatUp 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;

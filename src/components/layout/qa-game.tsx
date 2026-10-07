@@ -13,11 +13,25 @@ interface Defect {
   direction: number; // angle in radians
 }
 
+const QA_FACTS = [
+  "Specializes in Playwright & UI Automation.",
+  "Led RBI audit verifications for FinTechs.",
+  "Tested UPI 2.0 (Intent/Collect) and NPCI compliance.",
+  "Automated Gold loan payment flows via Razorpay.",
+  "Extensive testing of DigiLocker eKYC & Penny Drop.",
+  "Expert in Root Cause Analysis (RCA).",
+  "Ensures zero defects in production releases.",
+  "Tested cross-platform mobile apps for Android & iOS.",
+  "Managed DR/DC failover drill testing.",
+  "Validates complex Business Rules and API responses."
+];
+
 export function QaGame() {
   const [isOpen, setIsOpen] = useState(false);
   const [score, setScore] = useState(0);
   const [defects, setDefects] = useState<Defect[]>([]);
   const [particles, setParticles] = useState<{ id: string; x: number; y: number }[]>([]);
+  const [currentFact, setCurrentFact] = useState<{ text: string; id: number } | null>(null);
   
   const requestRef = useRef<number>(null);
   const defectsRef = useRef<Defect[]>([]);
@@ -86,13 +100,20 @@ export function QaGame() {
     } else {
       setDefects([]);
       setScore(0);
+      setCurrentFact(null);
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
     }
   }, [isOpen, spawnDefect, updatePositions]);
 
   const squashDefect = (id: string, x: number, y: number) => {
     setDefects(prev => prev.map(bug => bug.id === id ? { ...bug, squashed: true } : bug));
-    setScore(s => s + 1);
+    
+    setScore(s => {
+      const newScore = s + 1;
+      // Show a fact on every squash
+      setCurrentFact({ text: QA_FACTS[newScore % QA_FACTS.length], id: Date.now() });
+      return newScore;
+    });
     
     // Create explosion particles
     const newParticles = Array.from({ length: 5 }).map(() => ({
@@ -202,8 +223,17 @@ export function QaGame() {
           {score === 0 && defects.length === 0 && (
             <div className="absolute text-center text-white/50 animate-pulse font-mono pointer-events-none">
               <Target size={48} className="mx-auto mb-4 opacity-50" />
-              <p className="text-xl">Waiting for defects...</p>
-              <p className="text-sm mt-2">Click bugs to squash them</p>
+              <p className="text-xl">Waiting for QA defects...</p>
+              <p className="text-sm mt-2">Squash bugs to reveal QA Facts!</p>
+            </div>
+          )}
+
+          {currentFact && (
+            <div
+              key={currentFact.id}
+              className="absolute bottom-16 left-1/2 -translate-x-1/2 px-6 py-3 bg-green-900/90 text-green-300 font-mono text-sm sm:text-base border border-green-500/50 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.3)] pointer-events-none whitespace-nowrap text-center fact-toast z-20"
+            >
+              💡 {currentFact.text}
             </div>
           )}
           
@@ -214,6 +244,15 @@ export function QaGame() {
                 transform: translate(var(--tx), var(--ty)) scale(0);
                 opacity: 0;
               }
+            }
+            @keyframes floatUp {
+              0% { transform: translate(-50%, 20px); opacity: 0; }
+              15% { transform: translate(-50%, 0); opacity: 1; }
+              85% { transform: translate(-50%, 0); opacity: 1; }
+              100% { transform: translate(-50%, -20px); opacity: 0; }
+            }
+            .fact-toast {
+              animation: floatUp 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             }
           `}} />
         </div>

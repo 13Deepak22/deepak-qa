@@ -82,7 +82,7 @@ function ResumeImage({ doc }: { doc: ResumeDocument }) {
           switch (item.type) {
             case "map-pin":
               icon = (
-                <svg viewBox="0 0 24 24" width="18" height="18" style={{ marginRight: 8, marginTop: 4 }}>
+                <svg viewBox="0 0 24 24" width="18" height="18" style={{ marginRight: 8 }}>
                   <path {...p} d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
                   <circle {...p} cx="12" cy="10" r="3" />
                 </svg>
@@ -90,14 +90,14 @@ function ResumeImage({ doc }: { doc: ResumeDocument }) {
               break;
             case "phone":
               icon = (
-                <svg viewBox="0 0 24 24" width="18" height="18" style={{ marginRight: 8, marginTop: 4 }}>
+                <svg viewBox="0 0 24 24" width="18" height="18" style={{ marginRight: 8 }}>
                   <path {...p} d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" />
                 </svg>
               );
               break;
             case "mail":
               icon = (
-                <svg viewBox="0 0 24 24" width="18" height="18" style={{ marginRight: 8, marginTop: 4 }}>
+                <svg viewBox="0 0 24 24" width="18" height="18" style={{ marginRight: 8 }}>
                   <path {...p} d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" />
                   <rect {...p} x="2" y="4" width="20" height="16" rx="2" ry="2" />
                 </svg>
@@ -105,7 +105,7 @@ function ResumeImage({ doc }: { doc: ResumeDocument }) {
               break;
             case "globe":
               icon = (
-                <svg viewBox="0 0 24 24" width="18" height="18" style={{ marginRight: 8, marginTop: 4 }}>
+                <svg viewBox="0 0 24 24" width="18" height="18" style={{ marginRight: 8 }}>
                   <circle {...p} cx="12" cy="12" r="10" />
                   <path {...p} d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
                   <path {...p} d="M2 12h20" />
@@ -114,7 +114,7 @@ function ResumeImage({ doc }: { doc: ResumeDocument }) {
               break;
             case "linkedin":
               icon = (
-                <svg viewBox="0 0 24 24" width="18" height="18" style={{ marginRight: 8, marginTop: 4 }}>
+                <svg viewBox="0 0 24 24" width="18" height="18" style={{ marginRight: 8 }}>
                   <path {...p} d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
                   <rect {...p} x="2" y="9" width="4" height="12" />
                   <circle {...p} cx="4" cy="4" r="2" />
@@ -123,7 +123,7 @@ function ResumeImage({ doc }: { doc: ResumeDocument }) {
               break;
             case "github":
               icon = (
-                <svg viewBox="0 0 24 24" width="18" height="18" style={{ marginRight: 8, marginTop: 4 }}>
+                <svg viewBox="0 0 24 24" width="18" height="18" style={{ marginRight: 8 }}>
                   <path {...p} d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
                   <path {...p} d="M9 18c-4.51 2-5-2-7-2" />
                 </svg>
@@ -134,7 +134,7 @@ function ResumeImage({ doc }: { doc: ResumeDocument }) {
           return (
             <div key={item.value} style={{ display: "flex", alignItems: "center", marginRight: 28 }}>
               {icon}
-              <div style={{ display: "flex" }}>{item.value}</div>
+              <div style={{ display: "flex", transform: "translateY(1px)" }}>{item.value}</div>
             </div>
           );
         })}
@@ -184,6 +184,14 @@ function ResumeImage({ doc }: { doc: ResumeDocument }) {
       <Section title="Education">
         <TitleRow title={doc.education.degree} period={doc.education.period} />
         <div style={{ display: "flex", fontWeight: 600, color: c.pass }}>{doc.education.school}</div>
+      </Section>
+
+      <Section title="Certifications">
+        {doc.certifications.map((course) => (
+          <Bullet key={course}>
+            <div style={{ display: "flex" }}>{course}</div>
+          </Bullet>
+        ))}
       </Section>
     </div>
   );

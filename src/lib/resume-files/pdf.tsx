@@ -108,10 +108,10 @@ function ResumePdf({ doc }: { doc: ResumeDocument }) {
         <View style={s.contacts}>
           {doc.contacts.map((item) => (
             <View key={item.value} style={[s.contact, { flexDirection: "row", alignItems: "center" }]}>
-              <View style={{ marginRight: 4, marginTop: 1.5 }}>
+              <View style={{ marginRight: 4 }}>
                 <IconRenderer type={item.type} />
               </View>
-              <Text>{item.value}</Text>
+              <Text style={{ transform: "translateY(1px)" }}>{item.value}</Text>
             </View>
           ))}
         </View>
@@ -163,6 +163,12 @@ function ResumePdf({ doc }: { doc: ResumeDocument }) {
             <Text style={s.period}>{doc.education.period}</Text>
           </View>
           <Text style={s.org}>{doc.education.school}</Text>
+        </Section>
+
+        <Section title="Certifications">
+          {doc.certifications.map((course) => (
+            <Bullet key={course}>{course}</Bullet>
+          ))}
         </Section>
 
       </Page>

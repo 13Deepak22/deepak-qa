@@ -98,6 +98,9 @@ export function renderResumeDocx(doc: ResumeDocument) {
           heading("Education"),
           titleRow(doc.education.degree, doc.education.period),
           new Paragraph({ children: [line(doc.education.school, { bold: true, color: c.pass })] }),
+
+          heading("Certifications"),
+          ...doc.certifications.map((course) => bullet([line(course)])),
         ],
       },
     ],

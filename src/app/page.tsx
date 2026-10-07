@@ -10,7 +10,6 @@ import { InteractiveQASandbox } from "@/components/home/interactive-qa-sandbox";
 import { InteractiveServices } from "@/components/home/interactive-services";
 import { InteractiveWorkPreview } from "@/components/home/interactive-work-preview";
 import { ReleaseGatekeeper } from "@/components/home/release-gatekeeper";
-import { ScopeEstimator } from "@/components/home/scope-estimator";
 import { TestRun } from "@/components/home/test-run";
 import { profile } from "@/data";
 import { experienceLabel } from "@/lib/career";

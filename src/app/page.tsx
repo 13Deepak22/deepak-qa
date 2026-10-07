@@ -34,6 +34,8 @@ export default function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <Link
                 href="/work"
+                aria-label="View selected work and applications"
+                title="View selected work"
                 data-testid="hero-work-link"
                 className="press flex items-center justify-between border border-pass bg-card px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shadow-2xs"
                 data-cursor="15+ apps & portals"
@@ -43,6 +45,8 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/services"
+                aria-label="View testing services and methodology"
+                title="View testing services"
                 data-testid="hero-services-link"
                 className="press flex items-center justify-between border border-pass bg-card px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shadow-2xs"
                 data-cursor="Services & methodology"
@@ -52,6 +56,8 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/skills"
+                aria-label="View verified skills directory"
+                title="View skills directory"
                 data-testid="hero-skills-link"
                 className="press flex items-center justify-between border border-pass bg-card px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shadow-2xs"
                 data-cursor="97+ verified skills"
@@ -61,6 +67,8 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/experience"
+                aria-label="View experience timeline"
+                title="View experience timeline"
                 data-testid="hero-experience-link"
                 className="press flex items-center justify-between border border-pass bg-card px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shadow-2xs"
                 data-cursor={`${years} years experience`}
@@ -73,6 +81,8 @@ export default function HomePage() {
             {/* Primary Action Button (Spans exact width of grid) */}
             <Link
               href="/#contact"
+              aria-label="Start a conversation with Deepak"
+              title="Start a conversation"
               data-testid="hero-contact-link"
               className="press flex w-full items-center justify-center border-2 border-pass bg-pass text-on-band px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass-fill transition-colors shadow-xs"
               data-cursor="Tell me what's shipping"
@@ -121,6 +131,8 @@ export default function HomePage() {
               <div className="mt-auto pt-6">
                 <Link
                   href="/about"
+                  aria-label="Read full bio and personal story"
+                  title="Read full bio"
                   data-testid="about-redirect-cta"
                   className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2 text-xs font-mono uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
                   data-cursor="Read Deepak's story"
@@ -148,6 +160,8 @@ export default function HomePage() {
               <div className="mt-auto pt-6">
                 <Link
                   href="/resume"
+                  aria-label="View and download resume"
+                  title="Download resume"
                   data-testid="resume-redirect-cta"
                   className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2 text-xs font-mono uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
                   data-cursor="Download resume"

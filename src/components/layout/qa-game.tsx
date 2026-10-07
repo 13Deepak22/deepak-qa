@@ -9,6 +9,10 @@ interface Defect {
   y: number;
   squashed: boolean;
   scanning?: boolean;
+  eating?: boolean;
+  eatStartTime?: number;
+  originalSpeed: number;
+  spawnTime: number;
   size: number;
   speed: number;
   direction: number; // angle in radians
@@ -92,18 +96,22 @@ export function QaGame() {
   }, []);
 
   const spawnDefect = useCallback(() => {
-    if (defectsRef.current.length >= 10) return; // max bugs
+    if (defectsRef.current.length >= 5) return; // max bugs
     const margin = 50;
     const x = margin + Math.random() * (window.innerWidth - margin * 2);
     const y = margin + Math.random() * (window.innerHeight - margin * 2);
     
+    const initialSpeed = 1 + Math.random() * 2;
     const newDefect: Defect = {
       id: Math.random().toString(36).substring(7),
       x,
       y,
       squashed: false,
+      eating: false,
+      spawnTime: Date.now(),
+      originalSpeed: initialSpeed,
       size: 32 + Math.random() * 24, // 32 to 56px
-      speed: 1 + Math.random() * 2,
+      speed: initialSpeed,
       direction: Math.random() * Math.PI * 2,
     };
     
@@ -111,8 +119,48 @@ export function QaGame() {
   }, []);
 
   const updatePositions = useCallback(() => {
+    const now = Date.now();
     setDefects(prev => prev.map(bug => {
       if (bug.squashed) return bug;
+      
+      if (bug.eating) {
+        if (now - (bug.eatStartTime || 0) > 1000) {
+          // Finished eating, become larger and move again
+          return { 
+            ...bug, 
+            eating: false, 
+            speed: bug.originalSpeed * 1.5, 
+            size: bug.size * 1.3, 
+            spawnTime: now 
+          };
+        }
+        return bug; // Stay still while eating
+      }
+
+      // Check hunger (10-15s)
+      if (now - bug.spawnTime > 12000 && !bug.scanning) {
+        const elements = document.elementsFromPoint(bug.x + bug.size / 2, bug.y + bug.size / 2);
+        const targetEl = elements.find(el => 
+          el.tagName !== 'BODY' && 
+          el.tagName !== 'HTML' && 
+          el.tagName !== 'DIV' && 
+          el.tagName !== 'MAIN' &&
+          el.tagName !== 'SECTION' &&
+          !el.closest('.z-50') &&
+          !el.closest('.site-cursor')
+        ) as HTMLElement | undefined;
+
+        if (targetEl && !targetEl.hasAttribute('data-eaten')) {
+          targetEl.setAttribute('data-eaten', 'true');
+          targetEl.style.transition = "all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+          targetEl.style.transform = "scale(0) rotate(15deg) skewX(20deg)";
+          targetEl.style.opacity = "0";
+          targetEl.style.filter = "blur(8px) sepia(1) hue-rotate(-50deg) saturate(3)";
+          targetEl.style.pointerEvents = "none";
+          
+          return { ...bug, eating: true, eatStartTime: now, speed: 0 };
+        }
+      }
       
       let newX = bug.x + Math.cos(bug.direction) * bug.speed;
       let newY = bug.y + Math.sin(bug.direction) * bug.speed;
@@ -201,7 +249,10 @@ export function QaGame() {
                 }}
                 aria-label="Squash bug"
               >
-                <Bug size={bug.size} strokeWidth={1.5} className={!bug.squashed ? "animate-pulse drop-shadow-[0_0_15px_rgba(239,68,68,0.6)]" : ""} />
+                <Bug size={bug.size} strokeWidth={1.5} className={
+                  bug.eating ? "animate-[spin_0.3s_linear_infinite] text-green-500 drop-shadow-[0_0_20px_rgba(34,197,94,0.8)]" : 
+                  !bug.squashed ? "animate-pulse drop-shadow-[0_0_15px_rgba(239,68,68,0.6)]" : ""
+                } />
                 
                 {/* Focusing ring for auto-detect */}
                 {!bug.squashed && (

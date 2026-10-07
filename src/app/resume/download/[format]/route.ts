@@ -3,7 +3,7 @@ import { renderResumeJpg } from "@/lib/resume-files/jpg";
 import { renderResumePdf } from "@/lib/resume-files/pdf";
 import { type ResumeFormat, resumeDocument, resumeFileName, resumeFormats } from "@/lib/resume-document";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
 
 export function generateStaticParams() {
   return resumeFormats.map(({ format }) => ({ format }));

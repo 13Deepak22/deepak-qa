@@ -25,12 +25,12 @@ export function resumeDocument() {
     name: profile.name,
     headline: resume.headline,
     contacts: [
-      profile.places,
-      profile.phone,
-      profile.email,
-      ...(profile.website ? [bare(profile.website)] : []),
-      bare(profile.linkedin),
-      bare(profile.github),
+      { label: "Location", type: "map-pin", value: profile.places },
+      { label: "Phone", type: "phone", value: profile.phone },
+      { label: "Email", type: "mail", value: profile.email },
+      ...(profile.website ? [{ label: "Website", type: "globe", value: bare(profile.website)! }] : []),
+      { label: "LinkedIn", type: "linkedin", value: bare(profile.linkedin)! },
+      { label: "GitHub", type: "github", value: bare(profile.github)! },
     ],
     summary: resume.summary,
     skills: resumeSkills.map((group) => ({
@@ -40,6 +40,7 @@ export function resumeDocument() {
     experience: experience.map((role) => ({
       title: role.title,
       org: role.org,
+      location: role.org === "Exude Vincom" ? "Noida, India (Fintech & Lending)" : "Chandigarh, India (Fintech & Payments)",
       period: range(role.period),
       points: [...role.points],
     })),

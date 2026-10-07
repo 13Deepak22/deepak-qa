@@ -158,7 +158,7 @@ export function MobileDeviceMatrix() {
       </div>
 
       {/* Device Model Selector Bar */}
-      <div className="mt-5 grid grid-cols-3 gap-2">
+      <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-2">
         {filteredDevices.map((dev) => {
           const isSelected = dev.id === activeDevice.id;
           return (

@@ -4,7 +4,6 @@ import {
   User,
 } from "lucide-react";
 import Link from "next/link";
-import { AiAgentsMcpSection } from "@/components/home/ai-agents-mcp";
 import { HeadlineCycle } from "@/components/home/headline-cycle";
 import { ImpactMetrics } from "@/components/home/impact-metrics";
 import { InteractiveQASandbox } from "@/components/home/interactive-qa-sandbox";
@@ -97,17 +96,10 @@ export default function HomePage() {
       {/* 02 / Interactive Testing Services (Explore Methodology, Sample Assertions & Code) */}
       <InteractiveServices />
 
-      {/* 03 / AI Agents & Model Context Protocol (MCP) Live Testing Stack */}
-      <AiAgentsMcpSection />
-
       {/* 04 / Interactive Release Gatekeeper (Ship or Halt? Decision Simulator) */}
       <ReleaseGatekeeper />
 
-      {/* 04 / Interactive Applications Showcase (Explore 15+ Products, Journeys & Edge Cases) */}
-      <InteractiveWorkPreview />
 
-      {/* 05 / Interactive Quality Planner & Scope Estimator */}
-      <ScopeEstimator />
 
       {/* 06 / Meet the Tester & ATS Resume Downloads */}
       <section className="scroll-mt-20 border-t border-line bg-paper-deep">

@@ -99,7 +99,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full">
+      <body className="min-h-full overflow-x-hidden">
         <a href="#content" className="skip-link" data-cursor="Skip the header">
           Skip to content
         </a>

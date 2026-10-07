@@ -69,10 +69,17 @@ export function renderResumeDocx(doc: ResumeDocument) {
         children: [
           new Paragraph({ children: [new TextRun({ text: doc.name, font: "Georgia", size: 48, color: c.ink })] }),
           new Paragraph({ spacing: { before: 60 }, children: [line(doc.headline, { bold: true, color: c.pass })] }),
-          new Paragraph({ spacing: { before: 100 }, children: [line(doc.contacts.join("   |   "))] }),
+          new Paragraph({ spacing: { before: 100 }, children: [line(doc.contacts.map((c) => `${c.label}: ${c.value}`).join("   |   "))] }),
 
-          heading("Summary"),
+          heading("Professional Summary"),
           new Paragraph({ children: [line(doc.summary)] }),
+
+          heading("Professional Experience"),
+          ...doc.experience.flatMap((role, index) => [
+            titleRow(role.title, role.period, index ? 200 : 0),
+            new Paragraph({ keepNext: true, spacing: { after: 60 }, children: [line(role.org, { bold: true, color: c.pass }), line(` | ${role.location}`)] }),
+            ...role.points.map((point) => bullet([line(point)])),
+          ]),
 
           heading("Skills"),
           ...doc.skills.map(
@@ -83,13 +90,6 @@ export function renderResumeDocx(doc: ResumeDocument) {
               }),
           ),
 
-          heading("Experience"),
-          ...doc.experience.flatMap((role, index) => [
-            titleRow(role.title, role.period, index ? 200 : 0),
-            new Paragraph({ keepNext: true, spacing: { after: 60 }, children: [line(role.org, { bold: true, color: c.pass })] }),
-            ...role.points.map((point) => bullet([line(point)])),
-          ]),
-
           heading("Public Projects"),
           ...doc.projects.map((app) =>
             bullet([line(app.title, { bold: true, color: c.ink }), line(` (${app.domain})`, { color: c.muted }), line(`: ${app.detail}`)]),
@@ -98,9 +98,6 @@ export function renderResumeDocx(doc: ResumeDocument) {
           heading("Education"),
           titleRow(doc.education.degree, doc.education.period),
           new Paragraph({ children: [line(doc.education.school, { bold: true, color: c.pass })] }),
-
-          heading("Certifications and Courses"),
-          ...doc.certifications.map((item) => bullet([line(item)])),
         ],
       },
     ],

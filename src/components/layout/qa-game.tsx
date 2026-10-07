@@ -254,9 +254,10 @@ export function QaGame() {
           {currentFact && (
             <div
               key={currentFact.id}
-              className="fixed bottom-24 right-5 px-4 py-3 bg-ink text-paper font-mono text-xs sm:text-sm border border-pass rounded-lg shadow-[4px_4px_0_var(--pass)] pointer-events-none whitespace-normal text-right max-w-[280px] fact-toast z-[60]"
+              className="fixed bottom-24 right-5 p-3 bg-ink text-paper font-mono text-xs sm:text-sm border border-pass rounded-lg shadow-[4px_4px_0_var(--pass)] pointer-events-none w-72 fact-toast z-[60] flex items-start gap-3 text-left"
             >
-              💡 {currentFact.text}
+              <span className="text-lg leading-tight shrink-0">💡</span>
+              <span className="leading-snug">{currentFact.text}</span>
             </div>
           )}
           

@@ -1,4 +1,4 @@
-import { education, experience, profile, publicApps, resume, toolkit } from "@/data";
+import { education, experience, profile, publicApps, resume, resumeSkills } from "@/data";
 
 export type ResumeFormat = "pdf" | "jpg" | "docx";
 
@@ -25,7 +25,7 @@ export function resumeDocument() {
     name: profile.name,
     headline: resume.headline,
     contacts: [
-      `${profile.places}, ${profile.location}`,
+      profile.places,
       profile.phone,
       profile.email,
       ...(profile.website ? [bare(profile.website)] : []),
@@ -33,9 +33,9 @@ export function resumeDocument() {
       bare(profile.github),
     ],
     summary: resume.summary,
-    skills: toolkit.map((group) => ({
-      label: group.label,
-      value: group.items.join(", ") + (group.label.includes("Exposure") ? ` (${resume.exposureNote})` : ""),
+    skills: resumeSkills.map((group) => ({
+      label: group.category,
+      value: group.items,
     })),
     experience: experience.map((role) => ({
       title: role.title,

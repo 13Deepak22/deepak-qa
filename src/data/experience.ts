@@ -6,10 +6,10 @@ export const experience = [
     title: "QA Engineer",
     org: "Exude Vincom",
     points: [
-      "Architected and maintained end-to-end regression suites using Playwright and TypeScript, reducing release verification time by 45% with a 99.8% test pass rate.",
-      "Engineered robust validation test suites for digital loan onboarding, verifying multi-gateway payment processing, DigiLocker eKYC, and bank account penny drop checks.",
-      "Conducted functional and data integrity testing across Loan Origination & Management Systems (LOS/LMS), verifying calculation accuracy and balance integrity.",
-      "Designed rigorous test scenarios for conversational AI calling agents and webhook event handling, simulating telephony edge cases and preventing transaction desynchronization.",
+      "Architected scalable E2E test automation suites with Playwright and TypeScript, reducing verification time by 45%.",
+      "Validated digital loan onboarding, multi-gateway payments, DigiLocker eKYC, and bank penny drop integrations.",
+      "Executed functional, regression, and data integrity testing for Loan Origination & Management Systems (LOS/LMS).",
+      "Tested backend webhook events and conversational AI edge cases to guarantee transaction synchronization.",
     ],
   },
   {
@@ -17,11 +17,11 @@ export const experience = [
     title: "QA Engineer",
     org: "Paul Merchants",
     points: [
-      "Engineered hybrid mobile test automation frameworks using Appium, Selenium WebDriver, and Java (POM/TestNG), cutting regression cycle times by 50% across Android and iOS.",
-      "Executed comprehensive functional and edge-case testing for NPCI UPI 2.0 flows (dynamic QR, intent, collect, auto-reversals) and payment gateways under 3G network throttling.",
-      "Conducted high-concurrency API performance and stress testing using Apache JMeter and Postman, ensuring sub-second response times under 500+ TPS peak loads.",
-      "Championed defect lifecycle management in Jira using network traffic logs and root cause analysis (RCA), preventing 200+ pre-release defects with 0 P0 escapes across 20+ production releases.",
-      "Facilitated regulatory compliance testing, DR/DC failover drills, and VAPT vulnerability remediation across production prepaid card and transaction settlement portals.",
+      "Built hybrid mobile automation frameworks with Appium, Selenium, Java, and TestNG, accelerating regression by 50%.",
+      "Tested NPCI UPI 2.0 flows (intent, collect, auto-reversals) and payment gateways across Android and iOS platforms.",
+      "Performed API and stress testing using JMeter and Postman to ensure system stability under 500+ TPS load.",
+      "Managed defect lifecycles in Jira utilizing Root Cause Analysis (RCA), achieving zero P0 production escapes.",
+      "Led regulatory compliance testing, VAPT vulnerability remediation, and disaster recovery drills for card portals.",
     ],
   },
 ];

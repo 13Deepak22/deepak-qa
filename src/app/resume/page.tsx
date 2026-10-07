@@ -94,75 +94,62 @@ export default function ResumePage() {
             </p>
 
             {/* Contact Coordinates */}
-            <ul className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-ink-soft font-mono">
-              <li className="flex items-center gap-1.5">
-                <MapPin className="h-3.5 w-3.5 text-pass shrink-0" />
-                <span>{profile.places}, {profile.location}</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <Phone className="h-3.5 w-3.5 text-pass shrink-0" />
-                <a href={profile.phoneHref} className="hover:text-pass transition-colors">
-                  {profile.phone}
-                </a>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <Mail className="h-3.5 w-3.5 text-pass shrink-0" />
-                <a href={`mailto:${profile.email}`} className="hover:text-pass transition-colors">
-                  {profile.email}
-                </a>
-              </li>
-              {profile.website ? (
+            <div className="mt-4 flex flex-col gap-2 text-xs text-ink-soft font-mono">
+              <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <li className="flex items-center gap-1.5">
-                  <Globe className="h-3.5 w-3.5 text-pass shrink-0" />
-                  <a href={profile.website} className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
-                    {bare(profile.website)}
+                  <MapPin className="h-3.5 w-3.5 text-pass shrink-0" />
+                  <span>{profile.places}</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <Phone className="h-3.5 w-3.5 text-pass shrink-0" />
+                  <a href={profile.phoneHref} className="hover:text-pass transition-colors">
+                    {profile.phone}
                   </a>
                 </li>
-              ) : null}
-              <li className="flex items-center gap-1.5">
-                <LinkedInIcon className="h-3.5 w-3.5 text-pass shrink-0" />
-                <a href={profile.linkedin} className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
-                  {bare(profile.linkedin)}
-                </a>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <GitHubIcon className="h-3.5 w-3.5 text-pass shrink-0" />
-                <a href={profile.github} className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
-                  {bare(profile.github)}
-                </a>
-              </li>
-            </ul>
+                <li className="flex items-center gap-1.5">
+                  <Mail className="h-3.5 w-3.5 text-pass shrink-0" />
+                  <a href={`mailto:${profile.email}`} className="hover:text-pass transition-colors">
+                    {profile.email}
+                  </a>
+                </li>
+              </ul>
+              <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                {profile.website ? (
+                  <li className="flex items-center gap-1.5">
+                    <Globe className="h-3.5 w-3.5 text-pass shrink-0" />
+                    <a href={profile.website} className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
+                      {bare(profile.website)}
+                    </a>
+                  </li>
+                ) : null}
+                <li className="flex items-center gap-1.5">
+                  <LinkedInIcon className="h-3.5 w-3.5 text-pass shrink-0" />
+                  <a href={profile.linkedin} className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
+                    {bare(profile.linkedin)}
+                  </a>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <GitHubIcon className="h-3.5 w-3.5 text-pass shrink-0" />
+                  <a href={profile.github} className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
+                    {bare(profile.github)}
+                  </a>
+                </li>
+              </ul>
+            </div>
           </header>
 
           {/* Professional Summary */}
-          <Section title="Executive Summary">
+          <Section title="Professional Summary">
             <p className="leading-relaxed text-ink-soft text-sm sm:text-base font-normal">
               {resume.summary}
             </p>
           </Section>
 
-          {/* Technical Skills & Competencies */}
-          <Section title="Technical Competencies">
-            <dl className="grid gap-2.5 text-xs sm:text-sm">
-              {resumeSkills.map((group) => (
-                <div key={group.category} className="resume-item grid gap-x-4 gap-y-0.5 sm:grid-cols-[11rem_minmax(0,1fr)]">
-                  <dt className="font-mono text-xs font-bold text-ink uppercase tracking-wider flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 bg-pass rounded-full shrink-0" />
-                    <span>{group.category}</span>
-                  </dt>
-                  <dd className="leading-relaxed text-ink-soft">
-                    {group.items}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </Section>
-
           {/* Professional Experience */}
           <Section title="Professional Experience">
-            <div className="grid gap-8">
+            <div className="grid gap-6">
               {experience.map((role) => (
-                <div key={`${role.org}-${role.period}`} className="resume-item border-l-2 border-pass/40 pl-4 py-0.5">
+                <div key={`${role.org}-${role.period}`} className="resume-item">
                   <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                     <h3 className="font-serif text-lg sm:text-xl font-bold text-ink">{role.title}</h3>
                     <p className="font-mono text-xs text-muted tracking-wider">{role.period.replace(" — ", " – ")}</p>
@@ -175,7 +162,7 @@ export default function ResumePage() {
                     </span>
                   </div>
 
-                  <ul className="mt-3 list-disc space-y-2 pl-4 text-xs sm:text-sm leading-relaxed text-ink-soft marker:text-pass">
+                  <ul className="mt-3 list-disc space-y-1.5 pl-4 text-xs sm:text-sm leading-relaxed text-ink-soft marker:text-pass">
                     {role.points.map((point) => (
                       <li key={point} className="pl-1">
                         {point}
@@ -187,23 +174,39 @@ export default function ResumePage() {
             </div>
           </Section>
 
-          {/* Key Projects & Applications Verified */}
-          <Section title="Key Projects & Applications Verified">
-            <div className="grid gap-3 sm:grid-cols-2">
-              {publicApps.slice(0, 6).map((app) => (
-                <div key={app.title} className="resume-item border border-line/60 bg-paper/40 p-3">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-serif font-bold text-ink text-sm">{app.title}</span>
-                    <span className="border border-line bg-paper px-1.5 py-0.5 font-mono text-[0.62rem] text-muted uppercase">
-                      {app.domain}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-ink-soft leading-relaxed">
-                    {app.detail}
-                  </p>
+          {/* Skills */}
+          <Section title="Skills">
+            <dl className="grid gap-2 text-xs sm:text-sm">
+              {resumeSkills.map((group) => (
+                <div key={group.category} className="resume-item grid gap-x-4 gap-y-0.5 sm:grid-cols-[13rem_minmax(0,1fr)] items-baseline">
+                  <dt className="font-serif text-sm font-bold text-ink">
+                    {group.category}
+                  </dt>
+                  <dd className="leading-relaxed text-ink-soft">
+                    {group.items}
+                  </dd>
                 </div>
               ))}
-            </div>
+            </dl>
+          </Section>
+
+          {/* Projects */}
+          <Section title="Public Projects">
+            <ul className="grid gap-3 list-disc pl-4 marker:text-pass">
+              {publicApps.slice(0, 6).map((app) => (
+                <li key={app.title} className="resume-item pl-1">
+                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                    <span className="font-serif font-bold text-ink text-sm sm:text-base">{app.title}</span>
+                    <span className="text-muted text-xs font-mono uppercase tracking-wider">
+                      ({app.domain})
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-xs sm:text-sm text-ink-soft leading-relaxed">
+                    {app.detail}
+                  </p>
+                </li>
+              ))}
+            </ul>
           </Section>
 
           {/* Education */}
@@ -217,12 +220,11 @@ export default function ResumePage() {
             </div>
           </Section>
 
-          {/* Certifications and Courses */}
-          <Section title="Technical Training & Certifications">
-            <ul className="grid gap-2 sm:grid-cols-2 text-xs sm:text-sm text-ink-soft">
+          {/* Certifications */}
+          <Section title="Certifications">
+            <ul className="grid gap-2 sm:grid-cols-2 list-disc pl-4 marker:text-pass text-xs sm:text-sm text-ink-soft">
               {education.courses.map((course) => (
-                <li key={course} className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 bg-pass rounded-full shrink-0" />
+                <li key={course} className="pl-1">
                   <span className="font-medium text-ink">{course}</span>
                 </li>
               ))}

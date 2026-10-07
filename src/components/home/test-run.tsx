@@ -365,6 +365,7 @@ export function TestRun() {
             type="button"
             className="press inline-flex shrink-0 items-center gap-1.5 border border-pass bg-card px-3 py-1.5 font-mono text-xs tracking-[0.12em] uppercase text-ink hover:bg-pass-fill hover:text-on-band transition-colors shadow-xs"
             onClick={handleRerun}
+            aria-label="Rerun test suite"
           >
             <RotateCcw className={`h-3 w-3 ${!isDone ? "animate-spin" : ""}`} />
             <span>Rerun</span>
@@ -412,9 +413,19 @@ export function TestRun() {
             >
               {/* Row Header */}
               <div
-                className="flex cursor-pointer items-baseline justify-between gap-3 group"
+                className="flex cursor-pointer items-baseline justify-between gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pass focus-visible:ring-offset-2 rounded-xs"
                 onClick={() => setExpandedRow(isExpanded ? null : check.file)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setExpandedRow(isExpanded ? null : check.file);
+                  }
+                }}
                 title="Click to toggle assertion details"
+                role="button"
+                tabIndex={0}
+                aria-expanded={isExpanded}
+                aria-label={`Toggle assertion details for ${check.file}`}
               >
                 <div className="flex min-w-0 items-center gap-2">
                   {/* Status Indicator Badge */}
@@ -484,7 +495,10 @@ export function TestRun() {
 
               {/* Expandable Details Drawer */}
               {isExpanded && (
-                <div className="runner-drawer-animate mt-2">
+                <div
+                  id={`test-details-${check.file.replace(/[^a-zA-Z0-9]/g, '-')}`}
+                  className="runner-drawer-animate mt-2"
+                >
                   {/* FAILURE STATE: Compact High-Precision Dark Terminal Box */}
                   {isFailed && (
                     <div className="border border-ink bg-band text-on-band p-2.5 sm:p-3 my-1 font-mono text-[0.72rem] leading-normal shadow-sm">

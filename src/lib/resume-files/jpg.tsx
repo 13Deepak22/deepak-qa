@@ -108,7 +108,7 @@ function ResumeImage({ doc }: { doc: ResumeDocument }) {
         ))}
       </Section>
 
-      <Section title="Projects">
+      <Section title="Public Projects">
         {doc.projects.map((app) => (
           <Bullet key={app.title}>
             <div style={{ display: "flex" }}>

@@ -33,33 +33,33 @@ export const aboutChapters = [
 
 export const about = {
   journey: [
-    { when: "2019", title: "Computer applications", note: "A Bachelor of Computer Applications begins." },
-    { when: "2022", title: "The base is set", note: "The degree is complete." },
-    { when: "Then", title: "The manual path", note: "Live fintech releases, tested journey by journey." },
-    { when: "Now", title: "Automation", note: "The path that has to ship again runs on its own." },
+    { when: "2019", title: "Academic Foundation", note: "Commenced Bachelor of Computer Applications." },
+    { when: "2022", title: "Degree Completion", note: "Graduated with a strong foundation in software principles." },
+    { when: "Then", title: "Manual QA & FinTech", note: "Started testing complex financial systems and payment gateways." },
+    { when: "Now", title: "Test Automation", note: "Architecting scalable automation frameworks to accelerate CI/CD." },
   ],
   expertiseGroups,
-  interestTags: ["Technology", "Gaming", "Payment journeys", "Lending flows", "Mobile apps", "Readable automation"],
+  interestTags: ["Continuous Testing", "Payment Architectures", "Test Automation", "Performance Engineering", "Mobile Ecosystems", "Agile Methodologies"],
   goalChecks: [
-    "Critical path automated",
-    "API checked",
-    "Defects closed with a root cause",
-    "Frameworks that cut repeat manual work",
-    "Room for exploratory testing",
+    "Comprehensive automation coverage",
+    "Zero critical production escapes",
+    "Data-driven RCA",
+    "Optimized CI/CD pipelines",
+    "Scalable framework architecture",
     "Open to relocation",
   ],
   get who() {
-    return `I am a QA engineer with more than ${experienceWords()} years in manual testing and test automation. I work on mobile, web, and API releases in fintech. I look for the defect that can move money the wrong way, and I treat a release as ready only when the evidence is in.`;
+    return `I am a Quality Assurance Engineer with over ${experienceWords()} years of expertise in software testing and test automation. Specializing in the FinTech sector, I engineer robust validation strategies for mobile, web, and API ecosystems. My focus is on mitigating risk in high-stakes financial applications, ensuring that every release is backed by empirical test coverage and uncompromised quality standards.`;
   },
   started:
-    "I started with a Bachelor of Computer Applications at Chandigarh Group of Colleges, from 2019 to 2022. Computer applications were the base. I then built a testing practice on live fintech releases: first the manual path, then automation for the path that has to ship again.",
+    "My journey began with a Bachelor of Computer Applications from Chandigarh Group of Colleges (2019–2022), where I established a rigorous technical foundation. I quickly transitioned into the FinTech industry, initially mastering manual testing methodologies before advancing into test automation. This progression allowed me to bridge the gap between user-centric quality verification and highly efficient, automated release cycles.",
   expertise:
-    "I cover functional testing, regression testing, smoke, sanity, integration, and end-to-end testing. I test APIs in Postman and run load and performance checks in JMeter. I automate Android, iOS, and web with Appium, Selenium, and Playwright, in Java and JavaScript, with TestNG and the Page Object Model. I log defects in Jira and trace a critical bug to its cause. My domain is fintech: UPI, payment gateways, eKYC, cards, LOS, and LMS.",
+    "My technical repertoire spans functional, regression, integration, and end-to-end testing. I engineer automated frameworks for Android, iOS, and Web platforms using Playwright, Appium, and Selenium WebDriver (Java/TypeScript) under the Page Object Model. I conduct comprehensive API validations using Postman and execute high-concurrency performance testing with Apache JMeter. My domain expertise is deeply rooted in FinTech, covering NPCI UPI 2.0, multi-gateway payments, eKYC compliance, and Loan Management Systems (LOS/LMS).",
   expertiseTerms: expertiseGroups.flatMap((group) => group.items),
   interests:
-    "I am interested in technology and gaming, and in payment journeys, lending flows, and mobile apps where a small miss becomes a financial defect. I care about automation that stays readable, and about the gap between a passing check and a release that is actually safe.",
+    "Beyond quality assurance, I am deeply interested in emerging technologies, complex payment architectures, and digital lending flows where precision is paramount. I am passionate about writing clean, maintainable automation code and exploring the intersection of continuous integration and continuous testing to build resilient software delivery pipelines.",
   goals:
-    "I want the next release I own to ship with evidence: the critical path automated, the API checked, and the defect closed with a root cause. I am building frameworks that cut repeat manual work and still leave room for exploratory testing. I am open to relocation.",
+    "My objective is to drive engineering excellence by embedding quality directly into the development lifecycle. I strive to achieve comprehensive test automation coverage, zero critical production escapes, and highly optimized CI/CD pipelines. Ultimately, my goal is to build scalable automation frameworks that eliminate manual redundancy while leaving strategic bandwidth for exploratory and edge-case testing. I am open to relocation.",
 };
 
 export const education = {

@@ -8,19 +8,27 @@ import { experienceLabel } from "@/lib/career";
 export const resumeSkills = [
   {
     category: "Test Automation",
-    items: "Playwright, Appium, Selenium WebDriver, TestNG, Page Object Model (POM), TypeScript, Java",
+    items: "Playwright, Appium, Selenium WebDriver, TestNG, Page Object Model (POM), BDD, TypeScript, Java",
+  },
+  {
+    category: "QA Methodologies",
+    items: "Manual Testing, Functional, Regression, Smoke & Sanity, Integration, System, UAT, Exploratory Testing, Agile/Scrum, SDLC, STLC",
   },
   {
     category: "API & Performance",
-    items: "Postman, Newman, REST APIs, JSON Schema, Apache JMeter (Load & Stress)",
+    items: "Postman, Newman, REST APIs, JSON Schema, Apache JMeter (Load & Stress), Swagger",
+  },
+  {
+    category: "Defect & Test Management",
+    items: "Jira, TestRail, Zephyr, Root Cause Analysis (RCA), Test Planning, Test Strategy, Traceability Matrix",
+  },
+  {
+    category: "Tools & CI/CD",
+    items: "Git, GitHub, Jenkins, CI/CD Pipelines, Chrome DevTools",
   },
   {
     category: "FinTech & Payments",
-    items: "NPCI UPI 2.0 (Intent/Collect), Payment Gateways (Razorpay, Cashfree, PayU), DigiLocker eKYC, LOS/LMS Ledgers",
-  },
-  {
-    category: "Methodologies & Tools",
-    items: "Functional, Regression, Mobile (Android/iOS), Root Cause Analysis (RCA), Jira, Git",
+    items: "NPCI UPI 2.0 (Intent/Collect), Payment Gateways (Razorpay, Cashfree), DigiLocker eKYC, LOS/LMS",
   },
 ];
 

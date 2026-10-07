@@ -22,7 +22,7 @@ export default function HomePage() {
   return (
     <main id="content" tabIndex={-1} className="outline-none">
       {/* Hero & Live Release Gate */}
-      <section className="mx-auto grid max-w-6xl gap-10 px-4 pt-12 pb-14 sm:px-6 sm:pt-14 sm:pb-16 md:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.9fr)] md:items-start md:gap-x-8 lg:gap-x-14 lg:pt-20 lg:pb-24">
+      <section className="mx-auto grid max-w-6xl gap-10 px-4 pt-12 pb-14 sm:px-6 sm:pt-14 sm:pb-16 lg:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.9fr)] lg:items-start lg:gap-x-14 lg:pt-20 lg:pb-24">
         <div className="min-w-0">
           <HeadlineCycle />
           <p className="enter enter-3 mt-6 max-w-lg text-xl leading-relaxed text-ink-soft">
@@ -83,7 +83,7 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-        <div className="enter enter-5 min-w-0 md:pt-2 lg:pt-6">
+        <div className="enter enter-5 min-w-0 pt-2 lg:pt-6">
           <TestRun />
         </div>
       </section>

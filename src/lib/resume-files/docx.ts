@@ -90,7 +90,7 @@ export function renderResumeDocx(doc: ResumeDocument) {
             ...role.points.map((point) => bullet([line(point)])),
           ]),
 
-          heading("Projects"),
+          heading("Public Projects"),
           ...doc.projects.map((app) =>
             bullet([line(app.title, { bold: true, color: c.ink }), line(` (${app.domain})`, { color: c.muted }), line(`: ${app.detail}`)]),
           ),

@@ -91,7 +91,7 @@ function ResumePdf({ doc }: { doc: ResumeDocument }) {
           ))}
         </Section>
 
-        <Section title="Projects">
+        <Section title="Public Projects">
           {doc.projects.map((app) => (
             <Bullet key={app.title}>
               <Text style={s.strong}>{app.title}</Text>

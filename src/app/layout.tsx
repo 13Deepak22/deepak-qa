@@ -6,6 +6,7 @@ import { HashScrollHandler } from "@/components/layout/hash-scroll-handler";
 import { SiteCursor } from "@/components/layout/site-cursor";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { QaGame } from "@/components/layout/qa-game";
 import { profile } from "@/data";
 import { personJsonLd, siteDescription, siteKeywords, siteTitle, siteTitleSuffix, siteUrl } from "@/lib/site";
 import "./globals.css";
@@ -107,6 +108,7 @@ export default function RootLayout({
         {children}
         <SiteFooter />
         <BackToTop />
+        <QaGame />
         <HashScrollHandler />
         <SiteCursor />
         <script

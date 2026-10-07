@@ -1,0 +1,223 @@
+"use client";
+
+import { useEffect, useState, useCallback, useRef } from "react";
+import { Gamepad2, Bug, X, Target, ShieldCheck } from "lucide-react";
+
+interface Defect {
+  id: string;
+  x: number;
+  y: number;
+  squashed: boolean;
+  size: number;
+  speed: number;
+  direction: number; // angle in radians
+}
+
+export function QaGame() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [score, setScore] = useState(0);
+  const [defects, setDefects] = useState<Defect[]>([]);
+  const [particles, setParticles] = useState<{ id: string; x: number; y: number }[]>([]);
+  
+  const requestRef = useRef<number>(null);
+  const defectsRef = useRef<Defect[]>([]);
+  
+  // Keep ref in sync
+  useEffect(() => {
+    defectsRef.current = defects;
+  }, [defects]);
+
+  const spawnDefect = useCallback(() => {
+    if (defectsRef.current.length >= 10) return; // max bugs
+    const margin = 50;
+    const x = margin + Math.random() * (window.innerWidth - margin * 2);
+    const y = margin + Math.random() * (window.innerHeight - margin * 2);
+    
+    const newDefect: Defect = {
+      id: Math.random().toString(36).substring(7),
+      x,
+      y,
+      squashed: false,
+      size: 32 + Math.random() * 24, // 32 to 56px
+      speed: 1 + Math.random() * 2,
+      direction: Math.random() * Math.PI * 2,
+    };
+    
+    setDefects(prev => [...prev, newDefect]);
+  }, []);
+
+  const updatePositions = useCallback(() => {
+    setDefects(prev => prev.map(bug => {
+      if (bug.squashed) return bug;
+      
+      let newX = bug.x + Math.cos(bug.direction) * bug.speed;
+      let newY = bug.y + Math.sin(bug.direction) * bug.speed;
+      let newDir = bug.direction;
+      
+      // Bounce off walls
+      if (newX < 0 || newX > window.innerWidth - bug.size) {
+        newDir = Math.PI - newDir;
+        newX = Math.max(0, Math.min(newX, window.innerWidth - bug.size));
+      }
+      if (newY < 0 || newY > window.innerHeight - bug.size) {
+        newDir = -newDir;
+        newY = Math.max(0, Math.min(newY, window.innerHeight - bug.size));
+      }
+      
+      // Random direction change sometimes
+      if (Math.random() < 0.02) {
+        newDir += (Math.random() - 0.5);
+      }
+      
+      return { ...bug, x: newX, y: newY, direction: newDir };
+    }));
+    
+    requestRef.current = requestAnimationFrame(updatePositions);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      const interval = setInterval(spawnDefect, 1500);
+      requestRef.current = requestAnimationFrame(updatePositions);
+      return () => {
+        clearInterval(interval);
+        if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      };
+    } else {
+      setDefects([]);
+      setScore(0);
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+    }
+  }, [isOpen, spawnDefect, updatePositions]);
+
+  const squashDefect = (id: string, x: number, y: number) => {
+    setDefects(prev => prev.map(bug => bug.id === id ? { ...bug, squashed: true } : bug));
+    setScore(s => s + 1);
+    
+    // Create explosion particles
+    const newParticles = Array.from({ length: 5 }).map(() => ({
+      id: Math.random().toString(36).substring(7),
+      x: x,
+      y: y
+    }));
+    setParticles(prev => [...prev, ...newParticles]);
+    
+    setTimeout(() => {
+      setDefects(prev => prev.filter(bug => bug.id !== id));
+    }, 500); // Wait for squash animation
+    
+    setTimeout(() => {
+      setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
+    }, 800);
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setIsOpen(true)}
+        className="press fixed left-5 bottom-5 z-40 inline-flex h-12 w-12 items-center justify-center border border-pass bg-paper text-pass shadow-[4px_4px_0_var(--ink)] hover:bg-pass-fill hover:text-on-band"
+        aria-label="Play QA Defect Hunter Game"
+        title="QA Mini-game"
+      >
+        <Gamepad2 size={20} strokeWidth={1.75} />
+      </button>
+
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm overflow-hidden selection:bg-transparent">
+          {/* Game HUD */}
+          <div className="absolute top-6 left-6 right-6 flex items-center justify-between text-white z-10 pointer-events-none">
+            <div className="flex flex-col">
+              <span className="text-sm uppercase tracking-widest text-white/70 font-mono">Defects Squashed</span>
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="text-green-400" size={32} />
+                <span className="text-4xl font-bold font-mono text-green-400">{score}</span>
+              </div>
+            </div>
+            
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white backdrop-blur-md"
+              aria-label="Close game"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-green-500/20 via-transparent to-transparent" />
+
+          {/* Game Area */}
+          <div className="absolute inset-0">
+            {defects.map(bug => (
+              <button
+                key={bug.id}
+                onClick={() => squashDefect(bug.id, bug.x, bug.y)}
+                className="absolute flex items-center justify-center transition-transform"
+                style={{
+                  left: bug.x,
+                  top: bug.y,
+                  width: bug.size,
+                  height: bug.size,
+                  transform: bug.squashed ? "scale(0)" : "scale(1)",
+                  transitionDuration: bug.squashed ? "400ms" : "0ms",
+                  opacity: bug.squashed ? 0 : 1,
+                  color: "rgb(239, 68, 68)", // text-red-500
+                  rotate: `${(bug.direction * 180) / Math.PI + 90}deg`,
+                  cursor: "crosshair"
+                }}
+                aria-label="Squash bug"
+              >
+                <Bug size={bug.size} strokeWidth={1.5} className={!bug.squashed ? "animate-pulse drop-shadow-[0_0_15px_rgba(239,68,68,0.6)]" : ""} />
+                
+                {/* Crosshair effect when hovering over bug */}
+                {!bug.squashed && (
+                  <div className="absolute inset-[-10px] border border-red-500/0 hover:border-red-500/50 rounded-full transition-colors" />
+                )}
+              </button>
+            ))}
+
+            {/* Particles */}
+            {particles.map((p, i) => {
+              const tx = (Math.random() - 0.5) * 150;
+              const ty = (Math.random() - 0.5) * 150;
+              return (
+                <div
+                  key={`${p.id}-${i}`}
+                  className="absolute h-3 w-3 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)] pointer-events-none"
+                  style={{
+                    left: p.x + 16,
+                    top: p.y + 16,
+                    animation: `explode 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards`,
+                    animationDelay: `${(i % 5) * 0.02}s`,
+                    transformOrigin: "center",
+                    "--tx": `${tx}px`,
+                    "--ty": `${ty}px`,
+                  } as React.CSSProperties}
+                />
+              );
+            })}
+          </div>
+
+          {score === 0 && defects.length === 0 && (
+            <div className="absolute text-center text-white/50 animate-pulse font-mono pointer-events-none">
+              <Target size={48} className="mx-auto mb-4 opacity-50" />
+              <p className="text-xl">Waiting for defects...</p>
+              <p className="text-sm mt-2">Click bugs to squash them</p>
+            </div>
+          )}
+          
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes explode {
+              0% { transform: translate(0, 0) scale(1); opacity: 1; }
+              100% { 
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+              }
+            }
+          `}} />
+        </div>
+      )}
+    </>
+  );
+}

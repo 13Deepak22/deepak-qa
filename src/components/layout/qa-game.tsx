@@ -14,6 +14,7 @@ interface Defect {
   squashed: boolean;
   scanning?: boolean;
   eating?: boolean;
+  eatingTarget?: HTMLElement | null;
   eatStartTime?: number;
   lastHitTest?: number;
   originalSpeed: number;
@@ -205,6 +206,56 @@ export function QaGame() {
     } catch {}
   }, [getAudio]);
 
+  const playCrashAudio = useCallback(() => {
+    const ctx = getAudio();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(280, now);
+      osc.frequency.exponentialRampToValueAtTime(32, now + 0.35);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.35);
+
+      const sub = ctx.createOscillator();
+      const subGain = ctx.createGain();
+      sub.type = "triangle";
+      sub.frequency.setValueAtTime(90, now);
+      sub.frequency.linearRampToValueAtTime(25, now + 0.4);
+      subGain.gain.setValueAtTime(0.18, now);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      sub.connect(subGain);
+      subGain.connect(ctx.destination);
+      sub.start(now);
+      sub.stop(now + 0.4);
+    } catch {}
+  }, [getAudio]);
+
+  const playBirthAudio = useCallback(() => {
+    const ctx = getAudio();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.14);
+      gain.gain.setValueAtTime(0.09, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.14);
+    } catch {}
+  }, [getAudio]);
+
   const playBreakpointAudio = useCallback(() => {
     const ctx = getAudio();
     if (!ctx) return;
@@ -228,10 +279,11 @@ export function QaGame() {
   // Clean DOM restoration helper
   const restoreAllEatenElements = useCallback(() => {
     if (typeof document === "undefined") return;
-    document.querySelectorAll('[data-eaten="true"]').forEach(el => {
+    document.querySelectorAll('[data-eaten="true"], [data-eating-by]').forEach(el => {
       const targetEl = el as HTMLElement;
       targetEl.removeAttribute('data-eaten');
-      targetEl.style.transition = "opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease, outline 0.4s ease";
+      targetEl.removeAttribute('data-eating-by');
+      targetEl.style.transition = "opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease, outline 0.4s ease, color 0.4s ease, text-decoration 0.4s ease";
       targetEl.style.opacity = "";
       targetEl.style.pointerEvents = "";
       targetEl.style.position = "";
@@ -239,6 +291,7 @@ export function QaGame() {
       targetEl.style.color = "";
       targetEl.style.outline = "";
       targetEl.style.outlineOffset = "";
+      targetEl.style.textDecoration = "";
       targetEl.style.transform = "";
       targetEl.style.boxShadow = "";
       targetEl.style.backgroundColor = "";
@@ -318,8 +371,19 @@ export function QaGame() {
       return nextScore;
     });
 
+    // If bug was eating an element, save and restore the element from being eaten
+    if (targetBug.eatingTarget) {
+      const targetEl = targetBug.eatingTarget;
+      targetEl.removeAttribute('data-eating-by');
+      targetEl.style.color = "";
+      targetEl.style.outline = "";
+      targetEl.style.outlineOffset = "";
+      targetEl.style.textDecoration = "";
+      targetEl.style.transform = "";
+    }
+
     // Mark bug as squashed
-    setDefects(prev => prev.map(b => b.id === id ? { ...b, squashed: true, scanning: false } : b));
+    setDefects(prev => prev.map(b => b.id === id ? { ...b, squashed: true, scanning: false, eating: false } : b));
 
     // Spawn Score Floater text
     const floaterId = Math.random().toString(36).substring(7);
@@ -421,12 +485,107 @@ export function QaGame() {
     setDefects(prev => [...prev, newDefect]);
   }, []);
 
+  // Helper: Find discrete leaf content element under point (never container or whole section)
+  const findContentLeafTarget = (x: number, y: number): HTMLElement | null => {
+    if (typeof document === "undefined") return null;
+    const elements = document.elementsFromPoint(x, y);
+
+    const FORBIDDEN_CONTAINERS = new Set([
+      'HTML', 'BODY', 'MAIN', 'SECTION', 'ARTICLE', 'NAV', 
+      'HEADER', 'FOOTER', 'ASIDE', 'DIALOG', 'HEAD', 'SCRIPT', 'STYLE'
+    ]);
+
+    const LEAF_TAGS = new Set([
+      'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 
+      'LI', 'BUTTON', 'A', 'SPAN', 'CODE', 'PRE', 
+      'TD', 'TH', 'LABEL', 'STRONG', 'EM', 'B', 'I', 
+      'IMG', 'SVG', 'BLOCKQUOTE', 'CITE', 'TIME'
+    ]);
+
+    for (const el of elements) {
+      if (!(el instanceof HTMLElement)) continue;
+      if (el.closest('[data-game-ui="true"]') || el.closest('.z-\\[60\\]') || el.closest('.site-cursor')) continue;
+      if (el.id === '__next' || el.id === 'root') continue;
+      if (el.hasAttribute('data-eaten') || el.closest('[data-eaten="true"]')) continue;
+      if (el.hasAttribute('data-eating-by')) continue;
+
+      const tag = el.tagName.toUpperCase();
+      if (FORBIDDEN_CONTAINERS.has(tag)) continue;
+
+      // Direct leaf elements
+      if (LEAF_TAGS.has(tag)) {
+        const rect = el.getBoundingClientRect();
+        if (rect.width > 6 && rect.height > 6 && (el.textContent?.trim() || tag === 'IMG' || tag === 'SVG')) {
+          return el;
+        }
+      }
+
+      // Small content divs (badges, counters, tags, chips)
+      if (tag === 'DIV') {
+        const rect = el.getBoundingClientRect();
+        // Skip large containers
+        if (rect.width > 550 || rect.height > 300) continue;
+        
+        // If it contains child leaf content, pick the leaf child rather than the container
+        if (el.childElementCount > 1) {
+          const leafChild = el.querySelector<HTMLElement>(
+            'p:not([data-eaten]):not([data-eating-by]), span:not([data-eaten]):not([data-eating-by]), h1:not([data-eaten]):not([data-eating-by]), h2:not([data-eaten]):not([data-eating-by]), h3:not([data-eaten]):not([data-eating-by]), li:not([data-eaten]):not([data-eating-by]), button:not([data-eaten]):not([data-eating-by]), a:not([data-eaten]):not([data-eating-by]), code:not([data-eaten]):not([data-eating-by])'
+          );
+          if (leafChild && !leafChild.hasAttribute('data-eaten') && !leafChild.hasAttribute('data-eating-by')) {
+            return leafChild;
+          }
+          continue;
+        }
+        
+        if (el.textContent?.trim() && rect.width > 10 && rect.height > 10) {
+          return el;
+        }
+      }
+    }
+
+    return null;
+  };
+
+  // Helper: Find nearest visible uneaten leaf content element on screen to steer critical bugs towards
+  const findNearbyLeafElement = (x: number, y: number): HTMLElement | null => {
+    if (typeof document === "undefined") return null;
+    const candidates = document.querySelectorAll<HTMLElement>(
+      'p:not([data-eaten]):not([data-eating-by]), h1:not([data-eaten]):not([data-eating-by]), h2:not([data-eaten]):not([data-eating-by]), h3:not([data-eaten]):not([data-eating-by]), li:not([data-eaten]):not([data-eating-by]), button:not([data-eaten]):not([data-eating-by]), a:not([data-eaten]):not([data-eating-by]), code:not([data-eaten]):not([data-eating-by])'
+    );
+
+    let closest: HTMLElement | null = null;
+    let minDistance = 600;
+
+    for (let i = 0; i < candidates.length; i++) {
+      const el = candidates[i];
+      if (el.closest('[data-game-ui="true"]') || el.closest('.z-\\[60\\]')) continue;
+      const rect = el.getBoundingClientRect();
+      if (
+        rect.top >= 0 && 
+        rect.bottom <= window.innerHeight && 
+        rect.left >= 0 && 
+        rect.right <= window.innerWidth && 
+        rect.width > 8 && 
+        rect.height > 8
+      ) {
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dist = Math.hypot(cx - x, cy - y);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closest = el;
+        }
+      }
+    }
+    return closest;
+  };
+
   // Movement & Game Physics Loop
   const updatePositions = useCallback(() => {
     const now = Date.now();
     const newBugsToSpawn: Defect[] = [];
 
-    const nextDefects = defectsRef.current.map(bug => {
+    const nextDefects: (Defect | null)[] = defectsRef.current.map(bug => {
       if (bug.squashed) return bug;
       
       const age = now - bug.spawnTime;
@@ -470,140 +629,188 @@ export function QaGame() {
       
       // Eating handling
       if (bug.eating) {
-        if (now - (bug.eatStartTime || 0) > 1000) {
-          // Finished eating: Clones a new low priority bug (born big, light yellow, slow)
-          const newBaseSpeed = 0.85 + Math.random() * 0.35;
-          const newBaseSize = 60 + Math.random() * 8;
+        if (now - (bug.eatStartTime || 0) > 950) {
+          // Finished eating!
+          // 1. Mark target element eaten with smooth dissolve & layout preservation
+          if (bug.eatingTarget && !bug.eatingTarget.hasAttribute('data-eaten')) {
+            const targetEl = bug.eatingTarget;
+            targetEl.removeAttribute('data-eating-by');
+            targetEl.setAttribute('data-eaten', 'true');
+            targetEl.style.transition = "opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), filter 0.65s ease, transform 0.65s ease, color 0.4s ease, outline 0.4s ease";
+            targetEl.style.opacity = "0.08";
+            targetEl.style.pointerEvents = "none";
+            if (window.getComputedStyle(targetEl).position === 'static') {
+              targetEl.style.position = "relative";
+            }
+            targetEl.style.filter = "blur(1.2px) grayscale(0.8) contrast(1.1)";
+            targetEl.style.color = "#ef4444";
+            targetEl.style.outline = "1.5px dashed rgba(239, 68, 68, 0.4)";
+            targetEl.style.outlineOffset = "2px";
+            targetEl.style.textDecoration = "line-through 2px #ef4444";
+            targetEl.style.transform = "scale(0.97)";
+
+            // Trigger section glitch crash tremor
+            const parentSection = targetEl.closest('section, main, article, header, footer');
+            if (parentSection instanceof HTMLElement) {
+              parentSection.style.animation = "sectionGlitchCrash 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97)";
+              setTimeout(() => {
+                if (parentSection instanceof HTMLElement) {
+                  parentSection.style.animation = "";
+                }
+              }, 600);
+            }
+          }
+
+          // 2. Play crash detonation audio
+          playCrashAudio();
+
+          // 3. Child bug logic: Spawn brand new P3 low bug (big, light yellow, slow crawl)
+          const childSpeed = 0.85 + Math.random() * 0.35;
+          const childSize = 60 + Math.random() * 8;
           newBugsToSpawn.push({
             id: Math.random().toString(36).substring(7),
-            x: bug.x,
-            y: bug.y,
+            x: Math.max(20, Math.min(window.innerWidth - childSize - 20, bug.x + (Math.random() - 0.5) * 40)),
+            y: Math.max(20, Math.min(window.innerHeight - childSize - 20, bug.y + (Math.random() - 0.5) * 40)),
             squashed: false,
             eating: false,
+            eatingTarget: null,
             spawnTime: now,
-            originalSpeed: newBaseSpeed,
-            size: newBaseSize,
-            baseSize: newBaseSize,
-            speed: newBaseSpeed,
-            color: "#fde047",
+            originalSpeed: childSpeed,
+            speed: childSpeed,
+            size: childSize,
+            baseSize: childSize,
+            color: "#fde047", // light yellow
             isPulsing: false,
             direction: Math.random() * Math.PI * 2,
-            hungerThreshold: 8000 + Math.random() * 6000,
+            hungerThreshold: 8500 + Math.random() * 5500,
             wobbleSeed: Math.random() * 1000
           });
 
-          // The original critical bug also resets to low priority (big, light yellow, slow)
-          return { 
-            ...bug, 
-            eating: false, 
-            spawnTime: now,
-            color: "#fde047",
-            isPulsing: false,
-            size: bug.baseSize,
-            speed: bug.originalSpeed
-          };
-        }
-        return { ...bug, color: "#b91c1c", isPulsing: true, size: currentSize }; // Stay still while chewing
-      }
+          playBirthAudio();
 
-      let nextLastHitTest = bug.lastHitTest || 0;
-      let nextEating: boolean | undefined = bug.eating;
-      let nextEatStartTime = bug.eatStartTime;
-      let nextSpeed = activeSpeed;
+          // Floater for section crash & child spawn
+          const crashFloaterId = Math.random().toString(36).substring(7);
+          setFloaters(prev => [
+            ...prev,
+            {
+              id: crashFloaterId,
+              x: bug.x,
+              y: bug.y - 15,
+              text: "💥 SECTION CRASH! 🌱 Child P3 Bug Born",
+              color: "#ef4444",
+              points: 0
+            }
+          ]);
+          setTimeout(() => {
+            setFloaters(prev => prev.filter(f => f.id !== crashFloaterId));
+          }, 1100);
 
-      // Check hunger: When critical, scan for elements to corrupt every 500ms
-      if (progress >= 1.0 && !bug.scanning && !isFrozen && (now - nextLastHitTest > 500)) {
-        nextLastHitTest = now;
-        const elements = document.elementsFromPoint(bug.x + currentSize / 2, bug.y + currentSize / 2);
-        const validTargets = elements.filter(el => {
-          const tag = el.tagName.toUpperCase();
-          if (tag === 'BODY' || tag === 'HTML' || tag === 'MAIN' || tag === 'HEAD') return false;
-          if (el.id === '__next' || el.id === 'root') return false;
-          if (el.closest('.z-\\[60\\]') || el.closest('.site-cursor') || el.closest('[data-game-ui="true"]')) return false;
-          return true;
-        }) as HTMLElement[];
+          // Spawn crash explosion debris particles
+          const crashParticles = Array.from({ length: 12 }).map(() => ({
+            id: Math.random().toString(36).substring(7),
+            x: bug.x,
+            y: bug.y,
+            color: "#ef4444"
+          }));
+          setParticles(prev => [...prev, ...crashParticles]);
+          setTimeout(() => {
+            setParticles(prev => prev.filter(p => !crashParticles.find(cp => cp.id === p.id)));
+          }, 800);
 
-        // Prioritize eating elements that are not the sticky header
-        let targetEl = validTargets.find(el => el.tagName !== 'HEADER');
-        if (!targetEl && validTargets.length > 0) {
-          targetEl = validTargets[0];
-        }
-
-        if (targetEl && !targetEl.hasAttribute('data-eaten')) {
-          targetEl.setAttribute('data-eaten', 'true');
-          
-          playGlitchAudio();
-          
-          // Smooth glitch and dissolve animation (content smoothly fades out while preserving layout)
-          targetEl.style.transition = "opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), filter 0.75s ease, transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), outline 0.6s ease, color 0.4s ease";
-          targetEl.style.opacity = "0.06";
-          targetEl.style.pointerEvents = "none";
-          if (window.getComputedStyle(targetEl).position === 'static') {
-            targetEl.style.position = "relative";
-          }
-          targetEl.style.filter = "blur(1.5px) grayscale(1) contrast(1.2)";
-          targetEl.style.color = "#ef4444";
-          targetEl.style.outline = "1.5px dashed rgba(239, 68, 68, 0.4)";
-          targetEl.style.outlineOffset = "2px";
-          targetEl.style.transform = "scale(0.98)";
-          
-          // Count corrupted items & calculate System Integrity
+          // Update integrity and log
           const corruptedCount = document.querySelectorAll('[data-eaten="true"]').length;
           setEatenCount(corruptedCount);
-          const integrityLeft = Math.max(0, 100 - corruptedCount * 8);
+          const integrityLeft = Math.max(0, 100 - corruptedCount * 7);
           setSystemIntegrity(integrityLeft);
 
           const remainingTextElements = document.querySelectorAll(
             'h1:not([data-eaten]), h2:not([data-eaten]), h3:not([data-eaten]), p:not([data-eaten])'
           );
-
           if (integrityLeft <= 0 || remainingTextElements.length === 0) {
             setHasCrashed(true);
           }
 
-          nextEating = true;
-          nextEatStartTime = now;
-          nextSpeed = 0;
+          const newLog: TerminalLog = {
+            id: Date.now(),
+            text: "💥 P0 Defect crashed section content and burned out. Spawned child defect.",
+            priority: "P0 [CRASH]",
+            icon: "💥",
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+          };
+          setTerminalLogs(prev => [newLog, ...prev.slice(0, 2)]);
+
+          // 4. Old critical bug DIES! Returning null removes it from defects list.
+          return null;
+        }
+        return { ...bug, color: "#b91c1c", isPulsing: true, size: currentSize }; // Stay still while chewing
+      }
+
+      let nextLastHitTest = bug.lastHitTest || 0;
+      let nextDirection = bug.direction;
+      let nextSpeed = activeSpeed;
+
+      // When critical: scan for discrete leaf elements to corrupt
+      if (progress >= 1.0 && !bug.scanning && !isFrozen) {
+        if (now - nextLastHitTest > 350) {
+          nextLastHitTest = now;
+          const leafTarget = findContentLeafTarget(bug.x + currentSize / 2, bug.y + currentSize / 2);
+          if (leafTarget) {
+            leafTarget.setAttribute('data-eating-by', bug.id);
+            leafTarget.style.transition = 'color 0.2s ease, text-decoration 0.2s ease, outline 0.2s ease, transform 0.2s ease';
+            leafTarget.style.color = '#ef4444';
+            leafTarget.style.outline = '1.5px dashed #ef4444';
+            leafTarget.style.outlineOffset = '2px';
+            leafTarget.style.textDecoration = 'line-through 2px #ef4444';
+            leafTarget.style.transform = 'scale(0.98)';
+
+            playGlitchAudio();
+
+            return {
+              ...bug,
+              eating: true,
+              eatingTarget: leafTarget,
+              eatStartTime: now,
+              speed: 0,
+              lastHitTest: nextLastHitTest,
+              color: '#b91c1c',
+              isPulsing: true,
+              size: currentSize
+            };
+          } else {
+            // Steer towards nearest leaf in section/viewport
+            const nearby = findNearbyLeafElement(bug.x + currentSize / 2, bug.y + currentSize / 2);
+            if (nearby) {
+              const rect = nearby.getBoundingClientRect();
+              const targetAngle = Math.atan2((rect.top + rect.height / 2) - bug.y, (rect.left + rect.width / 2) - bug.x);
+              nextDirection = targetAngle + (Math.random() - 0.5) * 0.35;
+            }
+          }
         }
       }
-      
-      if (nextEating) {
-        return { 
-          ...bug, 
-          eating: nextEating, 
-          eatStartTime: nextEatStartTime, 
-          speed: nextSpeed, 
-          lastHitTest: nextLastHitTest, 
-          color, 
-          isPulsing, 
-          size: currentSize 
-        };
-      }
-      
-      let newX = bug.x + Math.cos(bug.direction) * nextSpeed;
-      let newY = bug.y + Math.sin(bug.direction) * nextSpeed;
-      let newDir = bug.direction;
-      
+
+      let newX = bug.x + Math.cos(nextDirection) * nextSpeed;
+      let newY = bug.y + Math.sin(nextDirection) * nextSpeed;
+
       // Bounce off viewport boundaries
       if (newX < 0 || newX > window.innerWidth - currentSize) {
-        newDir = Math.PI - newDir;
+        nextDirection = Math.PI - nextDirection;
         newX = Math.max(0, Math.min(newX, window.innerWidth - currentSize));
       }
       if (newY < 0 || newY > window.innerHeight - currentSize) {
-        newDir = -newDir;
+        nextDirection = -nextDirection;
         newY = Math.max(0, Math.min(newY, window.innerHeight - currentSize));
       }
-      
+
       // Random gentle wander
-      if (Math.random() < 0.02 && !isFrozen) {
-        newDir += (Math.random() - 0.5);
+      if (Math.random() < 0.02 && !isFrozen && progress < 1.0) {
+        nextDirection += (Math.random() - 0.5);
       }
-      
+
       return { 
         ...bug, 
         x: newX, 
         y: newY, 
-        direction: newDir, 
+        direction: nextDirection, 
         lastHitTest: nextLastHitTest, 
         size: currentSize, 
         speed: nextSpeed, 
@@ -611,10 +818,11 @@ export function QaGame() {
         isPulsing 
       };
     });
-    
-    setDefects([...nextDefects, ...newBugsToSpawn]);
+
+    const activeDefects = nextDefects.filter((b): b is Defect => b !== null);
+    setDefects([...activeDefects, ...newBugsToSpawn]);
     requestRef.current = requestAnimationFrame(updatePositions);
-  }, [isFrozen, playGlitchAudio]);
+  }, [isFrozen, playGlitchAudio, playCrashAudio, playBirthAudio]);
 
   // Main game lifecycle
   useEffect(() => {
@@ -674,47 +882,52 @@ export function QaGame() {
       {isOpen && (
         <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden selection:bg-transparent" data-game-ui="true">
           
-          {/* Top Unified HUD Dashboard */}
-          <header className="fixed top-3 left-1/2 -translate-x-1/2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 z-[60] pointer-events-auto max-w-[96vw]">
-            {/* Left: Score & QA Rank */}
-            <div className="flex items-center gap-2.5 bg-paper/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-pass text-ink shadow-[4px_4px_0_var(--ink)]">
-              <div className="flex items-center gap-2 pr-2.5 border-r border-line">
-                <ShieldCheck size={20} className="text-pass animate-pulse" />
+          {/* Top-Left Stacked HUD Dashboard - Zero interruption to site content */}
+          <aside 
+            aria-label="QA Defect Hunter Dashboard"
+            className="fixed top-3 left-3 z-[60] flex flex-col gap-1.5 pointer-events-auto w-[252px] sm:w-[270px] select-none animate-fade-in"
+          >
+            <div className="w-full bg-paper/95 backdrop-blur-md p-2.5 rounded-xl border border-pass text-ink shadow-[4px_4px_0_var(--ink)]">
+              {/* Row 1: Title + Rank Badge */}
+              <div className="flex items-center justify-between border-b border-line pb-1 mb-1.5">
+                <div className="flex items-center gap-1.5 font-mono text-[10px] font-bold text-pass uppercase tracking-wide">
+                  <ShieldCheck size={14} className="text-pass animate-pulse" />
+                  <span>QA Defect Hunter</span>
+                </div>
+                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-pass/10 text-pass font-semibold border border-pass/30">
+                  {currentRank.badge}
+                </span>
+              </div>
+
+              {/* Row 2: Fixed Count + Combo + Rank */}
+              <div className="flex items-center justify-between font-mono mb-1.5">
                 <div>
-                  <div className="text-[9px] uppercase font-mono tracking-wider text-muted">Defects Fixed</div>
-                  <span className="text-lg font-bold font-mono text-pass">{score}</span>
+                  <span className="text-[8px] uppercase tracking-wider text-muted font-mono block leading-none">Fixed</span>
+                  <span className="text-base font-bold font-mono text-pass leading-tight">{score}</span>
+                </div>
+                {combo > 1 && (
+                  <div className="flex items-center gap-0.5 px-1.5 py-0.2 rounded bg-orange-500/15 border border-orange-500/40 text-orange-600 dark:text-orange-400 font-mono text-[10px] font-bold animate-bounce">
+                    <Zap size={11} className="fill-current" />
+                    <span>{combo}x</span>
+                  </div>
+                )}
+                <div className="text-right">
+                  <span className="text-[8px] uppercase tracking-wider text-muted font-mono block leading-none">Rank</span>
+                  <span className="text-[11px] font-semibold text-ink truncate max-w-[95px] block">{currentRank.title}</span>
                 </div>
               </div>
 
-              {/* Combo Meter */}
-              {combo > 1 && (
-                <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-orange-500/15 border border-orange-500/40 text-orange-600 dark:text-orange-400 font-mono text-xs font-bold animate-bounce">
-                  <Zap size={13} className="fill-current" />
-                  <span>{combo}x</span>
-                </div>
-              )}
-
-              {/* Rank Chip */}
-              <div className="hidden md:flex items-center gap-1.5 pl-1 font-mono text-xs text-muted">
-                <Award size={15} className="text-amber-500" />
-                <span className="font-semibold text-ink text-xs">{currentRank.title}</span>
-                <span className="text-[10px] opacity-70">({currentRank.badge})</span>
-              </div>
-            </div>
-
-            {/* Center: System Integrity Meter */}
-            <div className="flex items-center gap-2.5 bg-paper/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-pass text-ink shadow-[4px_4px_0_var(--ink)]">
-              <div className="flex flex-col gap-1 w-24 sm:w-32">
-                <div className="flex items-center justify-between text-[10px] font-mono">
+              {/* Row 3: Integrity Progress */}
+              <div className="space-y-0.5 mb-2">
+                <div className="flex items-center justify-between text-[9px] font-mono">
                   <span className="text-muted flex items-center gap-1">
-                    <AlertTriangle size={11} className={systemIntegrity < 40 ? "text-red-500 animate-spin" : "text-amber-500"} />
+                    <AlertTriangle size={10} className={systemIntegrity < 40 ? "text-red-500 animate-spin" : "text-amber-500"} />
                     Integrity
                   </span>
-                  <span className={`font-bold text-[11px] ${systemIntegrity < 40 ? "text-red-500 font-mono animate-pulse" : "text-pass"}`}>
+                  <span className={`font-bold font-mono ${systemIntegrity < 40 ? "text-red-500 animate-pulse" : "text-pass"}`}>
                     {systemIntegrity}%
                   </span>
                 </div>
-                {/* Progress track */}
                 <div className="h-1.5 w-full bg-line rounded-full overflow-hidden">
                   <div 
                     className={`h-full transition-all duration-300 rounded-full ${
@@ -723,61 +936,68 @@ export function QaGame() {
                     style={{ width: `${systemIntegrity}%` }}
                   />
                 </div>
+                {eatenCount > 0 && (
+                  <div className="mt-1 flex items-center justify-between text-[9px] font-mono text-red-500">
+                    <span>⚠️ Corrupted:</span>
+                    <span className="font-bold">{eatenCount} nodes</span>
+                  </div>
+                )}
               </div>
 
-              {eatenCount > 0 && (
-                <span className="text-[9px] font-mono text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/30">
-                  {eatenCount} Hacked
-                </span>
-              )}
+              {/* Row 4: Controls inline */}
+              <div className="flex items-center justify-between pt-1.5 border-t border-line">
+                <button
+                  type="button"
+                  onClick={triggerBreakpoint}
+                  disabled={breakpoints <= 0 || isFrozen}
+                  title="Trigger Debugger Breakpoint (Spacebar)"
+                  className={`flex items-center gap-1 px-2 py-0.5 rounded-lg font-mono text-[10px] font-bold transition-all ${
+                    isFrozen 
+                      ? "bg-blue-600 text-white animate-pulse" 
+                      : breakpoints > 0 
+                        ? "bg-blue-500/15 border border-blue-500/40 text-blue-600 hover:bg-blue-500/25 active:scale-95" 
+                        : "opacity-40 cursor-not-allowed bg-line/30 text-muted"
+                  }`}
+                >
+                  {isFrozen ? <Pause size={10} /> : <Play size={10} />}
+                  <span>breakpoint;</span>
+                  <span className="px-1.5 py-0.1 rounded-full bg-blue-600 text-white text-[8px]">
+                    {breakpoints}
+                  </span>
+                </button>
+
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsMuted(!isMuted)}
+                    className="p-1 rounded-lg border border-line hover:border-pass hover:bg-pass/10 transition-colors text-ink"
+                    title={isMuted ? "Unmute Sound FX" : "Mute Sound FX"}
+                    aria-label={isMuted ? "Unmute Sound FX" : "Mute Sound FX"}
+                  >
+                    {isMuted ? <VolumeX size={12} className="text-muted" /> : <Volume2 size={12} className="text-pass" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      restoreAllEatenElements();
+                      setDefects([]);
+                      setScore(0);
+                      setCombo(0);
+                      setBreakpoints(1);
+                      setIsFrozen(false);
+                      setHasCrashed(false);
+                      spawnDefect();
+                    }}
+                    className="p-1 rounded-lg border border-line hover:border-amber-500 hover:text-amber-500 transition-colors text-ink"
+                    title="Reboot QA Environment"
+                    aria-label="Reboot Environment"
+                  >
+                    <RefreshCw size={12} />
+                  </button>
+                </div>
+              </div>
             </div>
-
-            {/* Right: Controls (Debugger Breakpoint + Sound + Reset) */}
-            <div className="flex items-center gap-1.5 bg-paper/95 backdrop-blur-md px-3 py-2 rounded-2xl border border-pass text-ink shadow-[4px_4px_0_var(--ink)]">
-              {/* Breakpoint Powerup Button */}
-              <button
-                type="button"
-                onClick={triggerBreakpoint}
-                disabled={breakpoints <= 0 || isFrozen}
-                title="Trigger Debugger Breakpoint (Spacebar)"
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-xl font-mono text-xs font-bold transition-all ${
-                  isFrozen 
-                    ? "bg-blue-600 text-white animate-pulse" 
-                    : breakpoints > 0 
-                      ? "bg-blue-500/15 border border-blue-500/40 text-blue-600 hover:bg-blue-500/25 active:scale-95" 
-                      : "opacity-40 cursor-not-allowed bg-line/30 text-muted"
-                }`}
-              >
-                {isFrozen ? <Pause size={13} /> : <Play size={13} />}
-                <span>breakpoint;</span>
-                <span className="px-1.5 py-0.2 rounded-full bg-blue-600 text-white text-[9px]">
-                  {breakpoints}
-                </span>
-              </button>
-
-              {/* Audio Toggle */}
-              <button
-                type="button"
-                onClick={() => setIsMuted(!isMuted)}
-                className="p-1.5 rounded-lg hover:bg-paper-deep text-muted hover:text-ink transition-colors"
-                title={isMuted ? "Unmute Sound" : "Mute Sound"}
-                aria-label={isMuted ? "Unmute Sound" : "Mute Sound"}
-              >
-                {isMuted ? <VolumeX size={17} /> : <Volume2 size={17} />}
-              </button>
-
-              {/* Refresh / Hotfix Clean Button */}
-              <button
-                type="button"
-                onClick={restoreAllEatenElements}
-                className="p-1.5 rounded-lg hover:bg-paper-deep text-muted hover:text-ink transition-colors"
-                title="Hotfix: Restore Site DOM Elements"
-                aria-label="Hotfix: Restore Site DOM Elements"
-              >
-                <RefreshCw size={16} />
-              </button>
-            </div>
-          </header>
+          </aside>
 
           {/* Frozen Debugger Overlay Banner */}
           {isFrozen && (
@@ -821,7 +1041,7 @@ export function QaGame() {
                     size={bug.size}
                     strokeWidth={2.2}
                     color={bug.color}
-                    className={`${bug.isPulsing ? "animate-pulse" : ""} drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]`}
+                    className={`${bug.isPulsing ? "animate-pulse" : ""} ${bug.eating ? "scale-110" : ""} drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]`}
                   />
 
                   {/* Threat Indicator Ping for Critical P0 Bugs */}
@@ -829,6 +1049,13 @@ export function QaGame() {
                     <span 
                       className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-600 animate-ping pointer-events-none" 
                     />
+                  )}
+
+                  {/* Chewing/Eating indicator badge above bug */}
+                  {bug.eating && (
+                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 font-mono text-[9px] font-bold text-red-500 bg-black/85 px-1 py-0.2 rounded border border-red-500 animate-pulse whitespace-nowrap pointer-events-none">
+                      CORRUPTING...
+                    </span>
                   )}
                 </button>
               );
@@ -972,6 +1199,14 @@ export function QaGame() {
             }
             header.sticky, .site-header {
               transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            }
+            @keyframes sectionGlitchCrash {
+              0% { transform: translate(0, 0); filter: none; }
+              20% { transform: translate(-3px, 2px); filter: contrast(1.3) hue-rotate(-20deg); }
+              40% { transform: translate(3px, -2px); filter: invert(0.08); }
+              60% { transform: translate(-2px, -1px); filter: contrast(1.15); }
+              80% { transform: translate(2px, 1px); filter: none; }
+              100% { transform: translate(0, 0); filter: none; }
             }
             @keyframes explode {
               0% { transform: translate(0, 0) scale(1.4); opacity: 1; }

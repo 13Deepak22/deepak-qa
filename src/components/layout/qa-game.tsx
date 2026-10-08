@@ -625,7 +625,45 @@ export function QaGame() {
     setDefects(prev => [...prev, newDefect]);
   }, []);
 
+  // Helper: Check if an element belongs to the site header or footer
+  const isHeaderOrFooterElement = (el: HTMLElement): boolean => {
+    return !!(
+      el.closest('header') || 
+      el.closest('.site-header') || 
+      el.closest('footer') || 
+      el.closest('.site-footer')
+    );
+  };
+
+  // Helper: Check if active main page content (outside header/footer) still remains uneaten
+  const hasActiveMainPageContent = (): boolean => {
+    if (typeof document === "undefined") return false;
+    const candidates = document.querySelectorAll<HTMLElement>(
+      'main p:not([data-eaten]):not([data-eating-by]), ' +
+      'main h1:not([data-eaten]):not([data-eating-by]), ' +
+      'main h2:not([data-eaten]):not([data-eating-by]), ' +
+      'main h3:not([data-eaten]):not([data-eating-by]), ' +
+      'main h4:not([data-eaten]):not([data-eating-by]), ' +
+      'main li:not([data-eaten]):not([data-eating-by]), ' +
+      'main button:not([data-eaten]):not([data-eating-by]), ' +
+      'main a:not([data-eaten]):not([data-eating-by]), ' +
+      'main code:not([data-eaten]):not([data-eating-by]), ' +
+      'main span:not([data-eaten]):not([data-eating-by])'
+    );
+
+    for (let i = 0; i < candidates.length; i++) {
+      const el = candidates[i];
+      if (el.closest('[data-game-ui="true"]') || el.closest('.z-\\[60\\]') || el.closest('.site-cursor')) continue;
+      if (isHeaderOrFooterElement(el)) continue;
+      if (el.offsetWidth > 10 && el.offsetHeight > 8 && el.textContent?.trim()) {
+        return true; // Still have main section content to eat!
+      }
+    }
+    return false; // Main content is fully consumed, now header/footer can be targeted
+  };
+
   // Helper: Find discrete leaf content element under point (never container or whole section)
+  // Header and footer are strictly the LAST targets on the active page
   const findContentLeafTarget = (x: number, y: number): HTMLElement | null => {
     if (typeof document === "undefined") return null;
     const elements = document.elementsFromPoint(x, y);
@@ -642,12 +680,19 @@ export function QaGame() {
       'IMG', 'SVG', 'BLOCKQUOTE', 'CITE', 'TIME'
     ]);
 
+    const mainContentRemains = hasActiveMainPageContent();
+
     for (const el of elements) {
       if (!(el instanceof HTMLElement)) continue;
       if (el.closest('[data-game-ui="true"]') || el.closest('.z-\\[60\\]') || el.closest('.site-cursor')) continue;
       if (el.id === '__next' || el.id === 'root') continue;
       if (el.hasAttribute('data-eaten') || el.closest('[data-eaten="true"]')) continue;
       if (el.hasAttribute('data-eating-by')) continue;
+
+      // RULE: Header and Footer are the LAST targets — skip if main page content still remains
+      if (mainContentRemains && isHeaderOrFooterElement(el)) {
+        continue;
+      }
 
       const tag = el.tagName.toUpperCase();
       if (FORBIDDEN_CONTAINERS.has(tag)) continue;
@@ -672,6 +717,9 @@ export function QaGame() {
             'p:not([data-eaten]):not([data-eating-by]), span:not([data-eaten]):not([data-eating-by]), h1:not([data-eaten]):not([data-eating-by]), h2:not([data-eaten]):not([data-eating-by]), h3:not([data-eaten]):not([data-eating-by]), li:not([data-eaten]):not([data-eating-by]), button:not([data-eaten]):not([data-eating-by]), a:not([data-eaten]):not([data-eating-by]), code:not([data-eaten]):not([data-eating-by])'
           );
           if (leafChild && !leafChild.hasAttribute('data-eaten') && !leafChild.hasAttribute('data-eating-by')) {
+            if (mainContentRemains && isHeaderOrFooterElement(leafChild)) {
+              continue;
+            }
             return leafChild;
           }
           continue;
@@ -687,8 +735,11 @@ export function QaGame() {
   };
 
   // Helper: Find nearest visible uneaten leaf content element on screen to steer critical bugs towards
+  // Header and footer are strictly the LAST targets on the active page
   const findNearbyLeafElement = (x: number, y: number): HTMLElement | null => {
     if (typeof document === "undefined") return null;
+    const mainContentRemains = hasActiveMainPageContent();
+
     const candidates = document.querySelectorAll<HTMLElement>(
       'p:not([data-eaten]):not([data-eating-by]), h1:not([data-eaten]):not([data-eating-by]), h2:not([data-eaten]):not([data-eating-by]), h3:not([data-eaten]):not([data-eating-by]), li:not([data-eaten]):not([data-eating-by]), button:not([data-eaten]):not([data-eating-by]), a:not([data-eaten]):not([data-eating-by]), code:not([data-eaten]):not([data-eating-by])'
     );
@@ -699,6 +750,12 @@ export function QaGame() {
     for (let i = 0; i < candidates.length; i++) {
       const el = candidates[i];
       if (el.closest('[data-game-ui="true"]') || el.closest('.z-\\[60\\]')) continue;
+
+      // RULE: Do not steer toward header or footer if main page content still remains
+      if (mainContentRemains && isHeaderOrFooterElement(el)) {
+        continue;
+      }
+
       const rect = el.getBoundingClientRect();
       if (
         rect.top >= 0 && 
@@ -1318,12 +1375,10 @@ export function QaGame() {
 
           {/* Keyframe Styles */}
           <style dangerouslySetInnerHTML={{__html: `
-            html[data-game="on"] header.sticky,
-            html[data-game="on"] .site-header {
-              transform: translateY(-100%) !important;
-              opacity: 0 !important;
-              pointer-events: none !important;
-              transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease !important;
+            html[data-game="on"] header.sticky > div,
+            html[data-game="on"] .site-header > div {
+              padding-left: calc(330px + 1rem);
+              transition: padding 0.3s ease;
             }
             header.sticky, .site-header {
               transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;

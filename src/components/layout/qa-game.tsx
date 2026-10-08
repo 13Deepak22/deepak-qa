@@ -22,6 +22,7 @@ interface Defect {
   size: number;
   baseSize: number;
   speed: number;
+  speedScale?: number;
   direction: number; // angle in radians
   color: string;
   isPulsing?: boolean;
@@ -103,6 +104,145 @@ const generateBugMessage = (score: number, progress: number = 0) => {
     icon
   };
 };
+
+interface AnimatedBugProps {
+  size: number;
+  color: string;
+  speedScale: number;
+  isEating?: boolean;
+  isPulsing?: boolean;
+  isFrozen?: boolean;
+}
+
+function AnimatedBug({ size, color, speedScale, isEating, isPulsing, isFrozen }: AnimatedBugProps) {
+  // Speed-synchronized leg stride duration (tripod crawling gait)
+  const legCycleDuration = isFrozen 
+    ? '0s' 
+    : isEating 
+      ? '0.08s' 
+      : `${Math.max(0.06, 0.38 / (speedScale || 1))}s`;
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 44 44"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={`${isPulsing ? "animate-pulse" : ""} ${isEating ? "animate-scuttle-chew" : "animate-bug-waddle"}`}
+      style={{
+        animationDuration: legCycleDuration,
+        filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.35))"
+      }}
+    >
+      <g stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        {/* Antennae (twitching feelers) */}
+        <g className="animate-antenna-left" style={{ animationDuration: '0.4s', transformOrigin: '19px 10px' }}>
+          <path d="M 19 10 Q 15 5 11 3" />
+          <circle cx="11" cy="3" r="1" fill={color} stroke="none" />
+        </g>
+        <g className="animate-antenna-right" style={{ animationDuration: '0.4s', transformOrigin: '25px 10px' }}>
+          <path d="M 25 10 Q 29 5 33 3" />
+          <circle cx="33" cy="3" r="1" fill={color} stroke="none" />
+        </g>
+
+        {/* Mandibles / Pincers at mouth */}
+        <path d={isEating ? "M 19 8 L 22 10 L 25 8" : "M 19 9 Q 22 11 25 9"} />
+
+        {/* --- LEGS (Tripod Locomotion) --- */}
+        {/* Group A: Front-Left, Mid-Right, Rear-Left */}
+        {/* Front-Left Leg */}
+        <g 
+          className="animate-leg-tripod-a" 
+          style={{ 
+            transformOrigin: '18px 16px', 
+            animationDuration: legCycleDuration,
+            animationPlayState: isFrozen ? 'paused' : 'running'
+          }}
+        >
+          <path d="M 18 16 Q 10 12 6 8" />
+        </g>
+
+        {/* Mid-Right Leg */}
+        <g 
+          className="animate-leg-tripod-a" 
+          style={{ 
+            transformOrigin: '26px 21px', 
+            animationDuration: legCycleDuration,
+            animationPlayState: isFrozen ? 'paused' : 'running'
+          }}
+        >
+          <path d="M 26 21 Q 35 21 39 23" />
+        </g>
+
+        {/* Rear-Left Leg */}
+        <g 
+          className="animate-leg-tripod-a" 
+          style={{ 
+            transformOrigin: '18px 25px', 
+            animationDuration: legCycleDuration,
+            animationPlayState: isFrozen ? 'paused' : 'running'
+          }}
+        >
+          <path d="M 18 25 Q 10 32 5 37" />
+        </g>
+
+        {/* Group B: Front-Right, Mid-Left, Rear-Right */}
+        {/* Front-Right Leg */}
+        <g 
+          className="animate-leg-tripod-b" 
+          style={{ 
+            transformOrigin: '26px 16px', 
+            animationDuration: legCycleDuration,
+            animationPlayState: isFrozen ? 'paused' : 'running'
+          }}
+        >
+          <path d="M 26 16 Q 34 12 38 8" />
+        </g>
+
+        {/* Mid-Left Leg */}
+        <g 
+          className="animate-leg-tripod-b" 
+          style={{ 
+            transformOrigin: '18px 21px', 
+            animationDuration: legCycleDuration,
+            animationPlayState: isFrozen ? 'paused' : 'running'
+          }}
+        >
+          <path d="M 18 21 Q 9 21 5 23" />
+        </g>
+
+        {/* Rear-Right Leg */}
+        <g 
+          className="animate-leg-tripod-b" 
+          style={{ 
+            transformOrigin: '26px 25px', 
+            animationDuration: legCycleDuration,
+            animationPlayState: isFrozen ? 'paused' : 'running'
+          }}
+        >
+          <path d="M 26 25 Q 34 32 39 37" />
+        </g>
+      </g>
+
+      {/* Insect Body Chitin Plates (Thorax & Abdomen) */}
+      <g fill={color} fillOpacity="0.85" stroke={color} strokeWidth="1.8">
+        {/* Head */}
+        <circle cx="22" cy="12" r="3.5" />
+        {/* Eyes (dark dots) */}
+        <circle cx="20" cy="11" r="0.8" fill="#111" stroke="none" />
+        <circle cx="24" cy="11" r="0.8" fill="#111" stroke="none" />
+        {/* Thorax */}
+        <ellipse cx="22" cy="19" rx="4.5" ry="4" />
+        {/* Abdomen (segmented with ridges) */}
+        <ellipse cx="22" cy="28" rx="6.5" ry="7.5" />
+        {/* Chitin defect rings on abdomen */}
+        <line x1="17" y1="26" x2="27" y2="26" stroke="#111" strokeWidth="1.2" strokeOpacity="0.4" />
+        <line x1="18" y1="30" x2="26" y2="30" stroke="#111" strokeWidth="1.2" strokeOpacity="0.4" />
+      </g>
+    </svg>
+  );
+}
 
 export function QaGame() {
   const [isOpen, setIsOpen] = useState(false);
@@ -771,6 +911,7 @@ export function QaGame() {
               eatingTarget: leafTarget,
               eatStartTime: now,
               speed: 0,
+              speedScale: 0,
               lastHitTest: nextLastHitTest,
               color: '#b91c1c',
               isPulsing: true,
@@ -788,8 +929,10 @@ export function QaGame() {
         }
       }
 
-      let newX = bug.x + Math.cos(nextDirection) * nextSpeed;
-      let newY = bug.y + Math.sin(nextDirection) * nextSpeed;
+      // Natural organic scurrying stride oscillation
+      const scuttleStride = isFrozen ? 0 : nextSpeed * (1 + 0.18 * Math.sin(now * 0.024 + bug.wobbleSeed));
+      let newX = bug.x + Math.cos(nextDirection) * scuttleStride;
+      let newY = bug.y + Math.sin(nextDirection) * scuttleStride;
 
       // Bounce off viewport boundaries
       if (newX < 0 || newX > window.innerWidth - currentSize) {
@@ -814,6 +957,7 @@ export function QaGame() {
         lastHitTest: nextLastHitTest, 
         size: currentSize, 
         speed: nextSpeed, 
+        speedScale,
         color, 
         isPulsing 
       };
@@ -882,121 +1026,102 @@ export function QaGame() {
       {isOpen && (
         <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden selection:bg-transparent" data-game-ui="true">
           
-          {/* Top-Left Stacked HUD Dashboard - Zero interruption to site content */}
+          {/* Small & Minimal Micro Status Pill - Minimalist QA HUD */}
           <aside 
-            aria-label="QA Defect Hunter Dashboard"
-            className="fixed top-3 left-3 z-[60] flex flex-col gap-1.5 pointer-events-auto w-[252px] sm:w-[270px] select-none animate-fade-in"
+            aria-label="QA Game Stats"
+            className="fixed top-3.5 left-3.5 z-[60] flex items-center gap-2 bg-paper/92 backdrop-blur-md px-3 py-1.5 rounded-full border border-pass/60 text-ink shadow-[2px_2px_0_var(--ink)] font-mono text-[10px] select-none pointer-events-auto animate-fade-in"
           >
-            <div className="w-full bg-paper/95 backdrop-blur-md p-2.5 rounded-xl border border-pass text-ink shadow-[4px_4px_0_var(--ink)]">
-              {/* Row 1: Title + Rank Badge */}
-              <div className="flex items-center justify-between border-b border-line pb-1 mb-1.5">
-                <div className="flex items-center gap-1.5 font-mono text-[10px] font-bold text-pass uppercase tracking-wide">
-                  <ShieldCheck size={14} className="text-pass animate-pulse" />
-                  <span>QA Defect Hunter</span>
-                </div>
-                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-pass/10 text-pass font-semibold border border-pass/30">
-                  {currentRank.badge}
-                </span>
-              </div>
+            {/* Defect count */}
+            <div className="flex items-center gap-1 font-bold text-pass">
+              <ShieldCheck size={13} className="text-pass animate-pulse" />
+              <span className="text-xs">{score}</span>
+              <span className="text-[8px] text-muted font-normal uppercase hidden xs:inline">FIXED</span>
+            </div>
 
-              {/* Row 2: Fixed Count + Combo + Rank */}
-              <div className="flex items-center justify-between font-mono mb-1.5">
-                <div>
-                  <span className="text-[8px] uppercase tracking-wider text-muted font-mono block leading-none">Fixed</span>
-                  <span className="text-base font-bold font-mono text-pass leading-tight">{score}</span>
-                </div>
-                {combo > 1 && (
-                  <div className="flex items-center gap-0.5 px-1.5 py-0.2 rounded bg-orange-500/15 border border-orange-500/40 text-orange-600 dark:text-orange-400 font-mono text-[10px] font-bold animate-bounce">
-                    <Zap size={11} className="fill-current" />
-                    <span>{combo}x</span>
-                  </div>
-                )}
-                <div className="text-right">
-                  <span className="text-[8px] uppercase tracking-wider text-muted font-mono block leading-none">Rank</span>
-                  <span className="text-[11px] font-semibold text-ink truncate max-w-[95px] block">{currentRank.title}</span>
-                </div>
-              </div>
+            <span className="text-line opacity-50">|</span>
 
-              {/* Row 3: Integrity Progress */}
-              <div className="space-y-0.5 mb-2">
-                <div className="flex items-center justify-between text-[9px] font-mono">
-                  <span className="text-muted flex items-center gap-1">
-                    <AlertTriangle size={10} className={systemIntegrity < 40 ? "text-red-500 animate-spin" : "text-amber-500"} />
-                    Integrity
-                  </span>
-                  <span className={`font-bold font-mono ${systemIntegrity < 40 ? "text-red-500 animate-pulse" : "text-pass"}`}>
-                    {systemIntegrity}%
-                  </span>
-                </div>
-                <div className="h-1.5 w-full bg-line rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full transition-all duration-300 rounded-full ${
-                      systemIntegrity < 30 ? "bg-red-500 animate-pulse" : systemIntegrity < 65 ? "bg-amber-500" : "bg-pass"
-                    }`}
-                    style={{ width: `${systemIntegrity}%` }}
-                  />
-                </div>
-                {eatenCount > 0 && (
-                  <div className="mt-1 flex items-center justify-between text-[9px] font-mono text-red-500">
-                    <span>⚠️ Corrupted:</span>
-                    <span className="font-bold">{eatenCount} nodes</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Row 4: Controls inline */}
-              <div className="flex items-center justify-between pt-1.5 border-t border-line">
-                <button
-                  type="button"
-                  onClick={triggerBreakpoint}
-                  disabled={breakpoints <= 0 || isFrozen}
-                  title="Trigger Debugger Breakpoint (Spacebar)"
-                  className={`flex items-center gap-1 px-2 py-0.5 rounded-lg font-mono text-[10px] font-bold transition-all ${
-                    isFrozen 
-                      ? "bg-blue-600 text-white animate-pulse" 
-                      : breakpoints > 0 
-                        ? "bg-blue-500/15 border border-blue-500/40 text-blue-600 hover:bg-blue-500/25 active:scale-95" 
-                        : "opacity-40 cursor-not-allowed bg-line/30 text-muted"
-                  }`}
-                >
-                  {isFrozen ? <Pause size={10} /> : <Play size={10} />}
-                  <span>breakpoint;</span>
-                  <span className="px-1.5 py-0.1 rounded-full bg-blue-600 text-white text-[8px]">
-                    {breakpoints}
-                  </span>
-                </button>
-
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setIsMuted(!isMuted)}
-                    className="p-1 rounded-lg border border-line hover:border-pass hover:bg-pass/10 transition-colors text-ink"
-                    title={isMuted ? "Unmute Sound FX" : "Mute Sound FX"}
-                    aria-label={isMuted ? "Unmute Sound FX" : "Mute Sound FX"}
-                  >
-                    {isMuted ? <VolumeX size={12} className="text-muted" /> : <Volume2 size={12} className="text-pass" />}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      restoreAllEatenElements();
-                      setDefects([]);
-                      setScore(0);
-                      setCombo(0);
-                      setBreakpoints(1);
-                      setIsFrozen(false);
-                      setHasCrashed(false);
-                      spawnDefect();
-                    }}
-                    className="p-1 rounded-lg border border-line hover:border-amber-500 hover:text-amber-500 transition-colors text-ink"
-                    title="Reboot QA Environment"
-                    aria-label="Reboot Environment"
-                  >
-                    <RefreshCw size={12} />
-                  </button>
-                </div>
+            {/* System Integrity */}
+            <div className="flex items-center gap-1.5" title={`System Integrity: ${systemIntegrity}%`}>
+              <span className={systemIntegrity < 40 ? "text-red-500 font-bold animate-pulse text-[11px]" : "text-pass font-bold text-[11px]"}>
+                {systemIntegrity}%
+              </span>
+              <div className="w-8 h-1 bg-line rounded-full overflow-hidden">
+                <div 
+                  className={`h-full transition-all duration-300 ${
+                    systemIntegrity < 30 ? "bg-red-500" : systemIntegrity < 65 ? "bg-amber-500" : "bg-pass"
+                  }`} 
+                  style={{ width: `${systemIntegrity}%` }} 
+                />
               </div>
             </div>
+
+            {combo > 1 && (
+              <>
+                <span className="text-line opacity-50">|</span>
+                <div className="flex items-center gap-0.5 text-orange-600 dark:text-orange-400 font-bold animate-bounce">
+                  <Zap size={10} className="fill-current" />
+                  <span>{combo}x</span>
+                </div>
+              </>
+            )}
+
+            <span className="text-line opacity-50 hidden sm:inline">|</span>
+
+            {/* Rank Badge */}
+            <span className="hidden sm:inline-block px-1.5 py-0.2 rounded bg-pass/10 text-pass text-[9px] font-semibold border border-pass/30 truncate max-w-[85px]">
+              {currentRank.badge}
+            </span>
+
+            <span className="text-line opacity-50">|</span>
+
+            {/* Breakpoint Powerup */}
+            <button
+              type="button"
+              onClick={triggerBreakpoint}
+              disabled={breakpoints <= 0 || isFrozen}
+              title="Debugger Breakpoint (Spacebar)"
+              className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded-full font-bold transition-all text-[9px] ${
+                isFrozen 
+                  ? "bg-blue-600 text-white animate-pulse" 
+                  : breakpoints > 0 
+                    ? "bg-blue-500/15 text-blue-600 hover:bg-blue-500/25 active:scale-95" 
+                    : "opacity-40 cursor-not-allowed text-muted"
+              }`}
+            >
+              {isFrozen ? <Pause size={9} /> : <Play size={9} />}
+              <span>{breakpoints}</span>
+            </button>
+
+            {/* Audio Mute/Unmute */}
+            <button
+              type="button"
+              onClick={() => setIsMuted(!isMuted)}
+              className="text-muted hover:text-ink transition-colors p-0.5"
+              title={isMuted ? "Unmute Sound" : "Mute Sound"}
+              aria-label={isMuted ? "Unmute Sound" : "Mute Sound"}
+            >
+              {isMuted ? <VolumeX size={12} /> : <Volume2 size={12} />}
+            </button>
+
+            {/* Reset */}
+            <button
+              type="button"
+              onClick={() => {
+                restoreAllEatenElements();
+                setDefects([]);
+                setScore(0);
+                setCombo(0);
+                setBreakpoints(1);
+                setIsFrozen(false);
+                setHasCrashed(false);
+                spawnDefect();
+              }}
+              className="text-muted hover:text-amber-500 transition-colors p-0.5"
+              title="Reboot Environment"
+              aria-label="Reboot Environment"
+            >
+              <RefreshCw size={11} />
+            </button>
           </aside>
 
           {/* Frozen Debugger Overlay Banner */}
@@ -1010,10 +1135,11 @@ export function QaGame() {
           {/* Bug Entities Game Area */}
           <div className="absolute inset-0">
             {defects.map(bug => {
-              // Crawling leg wobble calculation
+              // Crawling leg wobble calculation - frequency scales with speed
+              const isFast = (bug.speedScale || 1) > 2;
               const wobbleDeg = bug.eating 
-                ? Math.sin(Date.now() / 50) * 12 
-                : Math.sin((Date.now() + bug.wobbleSeed) / 80) * 14;
+                ? Math.sin(Date.now() / 40) * 10 
+                : Math.sin((Date.now() + bug.wobbleSeed) / (isFast ? 35 : 75)) * (isFast ? 14 : 9);
 
               return (
                 <button
@@ -1037,11 +1163,13 @@ export function QaGame() {
                   }}
                   aria-label="Squash defect"
                 >
-                  <Bug
+                  <AnimatedBug
                     size={bug.size}
-                    strokeWidth={2.2}
                     color={bug.color}
-                    className={`${bug.isPulsing ? "animate-pulse" : ""} ${bug.eating ? "scale-110" : ""} drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]`}
+                    speedScale={bug.speedScale || 1}
+                    isEating={bug.eating}
+                    isPulsing={bug.isPulsing}
+                    isFrozen={isFrozen}
                   />
 
                   {/* Threat Indicator Ping for Critical P0 Bugs */}
@@ -1230,6 +1358,56 @@ export function QaGame() {
             }
             .animate-fade-in {
               animation: fadeIn 0.25s ease-out forwards;
+            }
+            @keyframes legTripodA {
+              0% { transform: rotate(-24deg); }
+              50% { transform: rotate(24deg); }
+              100% { transform: rotate(-24deg); }
+            }
+            @keyframes legTripodB {
+              0% { transform: rotate(24deg); }
+              50% { transform: rotate(-24deg); }
+              100% { transform: rotate(24deg); }
+            }
+            @keyframes bugBodyWaddle {
+              0% { transform: rotate(-3deg) scale(0.97, 1.03); }
+              50% { transform: rotate(3deg) scale(1.03, 0.97); }
+              100% { transform: rotate(-3deg) scale(0.97, 1.03); }
+            }
+            @keyframes scuttleChew {
+              0% { transform: scale(1) translateY(0); }
+              50% { transform: scale(1.1) translateY(-1px); }
+              100% { transform: scale(1) translateY(0); }
+            }
+            @keyframes antennaTwitchLeft {
+              0% { transform: rotate(0deg); }
+              35% { transform: rotate(-14deg); }
+              70% { transform: rotate(8deg); }
+              100% { transform: rotate(0deg); }
+            }
+            @keyframes antennaTwitchRight {
+              0% { transform: rotate(0deg); }
+              35% { transform: rotate(14deg); }
+              70% { transform: rotate(-8deg); }
+              100% { transform: rotate(0deg); }
+            }
+            .animate-leg-tripod-a {
+              animation: legTripodA infinite ease-in-out;
+            }
+            .animate-leg-tripod-b {
+              animation: legTripodB infinite ease-in-out;
+            }
+            .animate-bug-waddle {
+              animation: bugBodyWaddle infinite ease-in-out;
+            }
+            .animate-scuttle-chew {
+              animation: scuttleChew 0.12s infinite ease-in-out;
+            }
+            .animate-antenna-left {
+              animation: antennaTwitchLeft 0.5s infinite ease-in-out;
+            }
+            .animate-antenna-right {
+              animation: antennaTwitchRight 0.6s infinite ease-in-out;
             }
           `}} />
         </div>

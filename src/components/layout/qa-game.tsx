@@ -231,12 +231,15 @@ export function QaGame() {
     document.querySelectorAll('[data-eaten="true"]').forEach(el => {
       const targetEl = el as HTMLElement;
       targetEl.removeAttribute('data-eaten');
-      targetEl.style.transition = "";
+      targetEl.style.transition = "opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease, outline 0.4s ease";
       targetEl.style.opacity = "";
       targetEl.style.pointerEvents = "";
       targetEl.style.position = "";
       targetEl.style.filter = "";
       targetEl.style.color = "";
+      targetEl.style.outline = "";
+      targetEl.style.outlineOffset = "";
+      targetEl.style.transform = "";
       targetEl.style.boxShadow = "";
       targetEl.style.backgroundColor = "";
     });
@@ -531,15 +534,18 @@ export function QaGame() {
           
           playGlitchAudio();
           
-          // Apply hacked glitch styling (preserves page layout completely)
-          targetEl.style.transition = "all 0.1s steps(2)";
-          targetEl.style.opacity = "0.7";
+          // Smooth glitch and dissolve animation (content smoothly fades out while preserving layout)
+          targetEl.style.transition = "opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), filter 0.75s ease, transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), outline 0.6s ease, color 0.4s ease";
+          targetEl.style.opacity = "0.06";
           targetEl.style.pointerEvents = "none";
           if (window.getComputedStyle(targetEl).position === 'static') {
             targetEl.style.position = "relative";
           }
-          targetEl.style.filter = "contrast(1.5) sepia(1) hue-rotate(-50deg) saturate(3)";
+          targetEl.style.filter = "blur(1.5px) grayscale(1) contrast(1.2)";
           targetEl.style.color = "#ef4444";
+          targetEl.style.outline = "1.5px dashed rgba(239, 68, 68, 0.4)";
+          targetEl.style.outlineOffset = "2px";
+          targetEl.style.transform = "scale(0.98)";
           
           // Count corrupted items & calculate System Integrity
           const corruptedCount = document.querySelectorAll('[data-eaten="true"]').length;
@@ -867,37 +873,17 @@ export function QaGame() {
             })}
           </div>
 
-          {/* Initial Waiting Overlay */}
-          {score === 0 && defects.length === 0 && !hasCrashed && (
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-pass font-mono pointer-events-none bg-paper/90 backdrop-blur-md p-6 rounded-2xl border border-pass shadow-[6px_6px_0_var(--ink)]">
-              <Target size={36} className="mx-auto mb-3 animate-spin text-pass" />
-              <p className="text-lg font-bold">Scanning for Defects...</p>
-              <p className="text-xs text-muted mt-1">Hover or click bugs to resolve them. Press Spacebar for Breakpoint.</p>
-            </div>
-          )}
-
-          {/* Real-time CI/CD Terminal Log Window */}
-          {terminalLogs.length > 0 && !hasCrashed && (
+          {/* Real-time Non-overlapping CI/CD Resolution Toast */}
+          {terminalLogs[0] && !hasCrashed && (
             <aside 
+              key={terminalLogs[0].id}
               aria-label="CI/CD Pipeline Log"
-              className="fixed bottom-24 right-5 w-80 sm:w-96 p-3 bg-ink/95 text-paper font-mono text-xs rounded-xl border border-pass/60 shadow-[6px_6px_0_var(--ink)] pointer-events-auto z-[60] backdrop-blur-sm"
+              className="fixed bottom-6 right-6 z-[60] pointer-events-none flex items-center gap-2.5 bg-ink/95 text-paper px-4 py-2.5 rounded-xl border border-pass shadow-[4px_4px_0_var(--pass)] font-mono text-xs animate-fade-in backdrop-blur-md max-w-sm sm:max-w-md"
             >
-              <div className="flex items-center justify-between pb-2 mb-2 border-b border-paper/15 text-[11px] text-muted">
-                <span className="flex items-center gap-1.5 text-pass font-bold">
-                  <span className="w-2 h-2 rounded-full bg-pass animate-pulse" />
-                  CI/CD Test Runner Logs
-                </span>
-                <span className="text-[10px] text-paper/50">Auto-resolved</span>
-              </div>
-              <div className="space-y-1.5 max-h-36 overflow-hidden">
-                {terminalLogs.map((log) => (
-                  <div key={log.id} className="leading-snug flex items-start gap-2 text-paper/90 animate-fade-in text-[11px]">
-                    <span className="text-xs shrink-0 select-none">{log.icon}</span>
-                    <div className="overflow-hidden">
-                      <span className="font-semibold text-pass">{log.priority}</span>: {log.text.split(': ')[1] || log.text}
-                    </div>
-                  </div>
-                ))}
+              <span className="text-sm shrink-0 select-none">{terminalLogs[0].icon}</span>
+              <div className="truncate">
+                <span className="font-bold text-pass mr-1.5">{terminalLogs[0].priority}:</span>
+                <span className="text-paper/90 text-[11px]">{terminalLogs[0].text.split(': ')[1] || terminalLogs[0].text}</span>
               </div>
             </aside>
           )}
@@ -977,6 +963,16 @@ export function QaGame() {
 
           {/* Keyframe Styles */}
           <style dangerouslySetInnerHTML={{__html: `
+            html[data-game="on"] header.sticky,
+            html[data-game="on"] .site-header {
+              transform: translateY(-100%) !important;
+              opacity: 0 !important;
+              pointer-events: none !important;
+              transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease !important;
+            }
+            header.sticky, .site-header {
+              transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            }
             @keyframes explode {
               0% { transform: translate(0, 0) scale(1.4); opacity: 1; }
               100% { 

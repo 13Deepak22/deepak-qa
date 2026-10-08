@@ -198,7 +198,7 @@ export function QaGame() {
     const scoreMultiplier = 1 + Math.min(scoreRef.current * 0.1, 2);
     const initialSpeed = (1 + Math.random() * 2) * scoreMultiplier;
     
-    const baseSize = 32 + Math.random() * 24; // 32 to 56px
+    const baseSize = 48 + Math.random() * 32; // 32 to 56px
     const newDefect: Defect = {
       id: Math.random().toString(36).substring(7),
       x,
@@ -239,7 +239,7 @@ export function QaGame() {
           // Finished eating, spawn a new low priority bug
           const scoreMultiplier = 1 + Math.min(scoreRef.current * 0.1, 2);
           const initialSpeed = (1 + Math.random() * 2) * scoreMultiplier;
-          const baseSize = 32 + Math.random() * 24;
+          const baseSize = 48 + Math.random() * 32;
           newBugsToSpawn.push({
             id: Math.random().toString(36).substring(7),
             x: bug.x,
@@ -260,7 +260,6 @@ export function QaGame() {
             ...bug, 
             eating: false, 
             originalSpeed: bug.originalSpeed * 1.2,
-            size: bug.size * 1.3, 
             spawnTime: now,
             colorClass: "text-yellow-300"
           };

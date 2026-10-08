@@ -11,28 +11,112 @@ interface Defect {
   scanning?: boolean;
   eating?: boolean;
   eatStartTime?: number;
+  lastHitTest?: number;
   originalSpeed: number;
   spawnTime: number;
   size: number;
+  baseSize: number;
   speed: number;
   direction: number; // angle in radians
+  colorClass?: string;
+  hungerThreshold?: number;
 }
 
-const QA_FACTS = [
-  "Specializes in Playwright & UI Automation.",
-  "Led RBI audit verifications for FinTechs.",
-  "Tested UPI 2.0 (Intent/Collect) and NPCI compliance.",
-  "Automated Gold loan payment flows via Razorpay.",
-  "Extensive testing of DigiLocker eKYC & Penny Drop.",
-  "Expert in Root Cause Analysis (RCA).",
-  "Ensures zero defects in production releases.",
-  "Tested cross-platform mobile apps for Android & iOS.",
-  "Managed DR/DC failover drill testing.",
-  "Validates complex Business Rules and API responses."
-];
+const generateBugMessage = (score: number, age: number = 0) => {
+  const ACTIONS = ["Isolated", "Detected", "Logged", "Squashed", "Resolved", "Mitigated", "Intercepted"];
+  const ISSUES = [
+    "memory leak in main thread", "race condition in payment gateway",
+    "null pointer exception in checkout", "infinite rendering loop",
+    "uncaught promise rejection", "XSS vulnerability vector",
+    "unauthorized state mutation", "CSS overflow on mobile",
+    "flaky e2e test assertion", "broken OAuth callback",
+    "stale cache invalidation", "unhandled WebSocket disconnect",
+    "missing loading skeleton", "API timeout fallback failure",
+    "database deadlock scenario", "incorrect locale mapping",
+    "hydration mismatch on SSR", "malformed JSON payload",
+    "accessibility ARIA label missing", "unoptimized bundle size",
+    "z-index context stacking issue", "JWT token expiration edge case",
+    "incorrect timezone offset", "CORS policy violation",
+    "service worker cache miss", "layout thrashing on scroll",
+    "uncontrolled form input state", "missing error boundary",
+    "duplicate DOM ID collision"
+  ];
+  let priority = "P3 [Low]";
+  let icon = "✅";
+  let urgency = "routine.";
+  
+  if (age > 12000) { priority = "P0 [Critical]"; icon = "🔥"; urgency = "before system crash!"; }
+  else if (age > 8000) { priority = "P1 [High]"; icon = "🚨"; urgency = "preventing data loss."; }
+  else if (age > 4000) { priority = "P2 [Medium]"; icon = "⚠️"; urgency = "improving stability."; }
+  
+  const action = ACTIONS[(score * 3) % ACTIONS.length];
+  const issue = ISSUES[(score * 7) % ISSUES.length];
+  
+  const baseMessage = `${icon} ${priority}: ${action} ${issue}`;
+  return age > 4000 ? `${baseMessage} ${urgency}` : `${baseMessage}.`;
+};
+
+const playGlitchSound = () => {
+  try {
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    
+    osc.type = 'sawtooth';
+    // Digital glitch: random rapid frequency jumps
+    osc.frequency.setValueAtTime(100, ctx.currentTime);
+    osc.frequency.linearRampToValueAtTime(800, ctx.currentTime + 0.05);
+    osc.frequency.linearRampToValueAtTime(50, ctx.currentTime + 0.1);
+    osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.15);
+    
+    gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+    
+    osc.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    
+    osc.start();
+    osc.stop(ctx.currentTime + 0.2);
+  } catch (e) {}
+};
+
+const playResolveSound = () => {
+  try {
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    
+    // Double "ding" success sound (like a ticket being resolved)
+    const osc1 = ctx.createOscillator();
+    const gainNode1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(800, ctx.currentTime);
+    gainNode1.gain.setValueAtTime(0.1, ctx.currentTime);
+    gainNode1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+    osc1.connect(gainNode1);
+    gainNode1.connect(ctx.destination);
+    osc1.start(ctx.currentTime);
+    osc1.stop(ctx.currentTime + 0.1);
+    
+    const osc2 = ctx.createOscillator();
+    const gainNode2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(1200, ctx.currentTime + 0.1);
+    gainNode2.gain.setValueAtTime(0, ctx.currentTime);
+    gainNode2.gain.setValueAtTime(0.1, ctx.currentTime + 0.1);
+    gainNode2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+    osc2.connect(gainNode2);
+    gainNode2.connect(ctx.destination);
+    osc2.start(ctx.currentTime + 0.1);
+    osc2.stop(ctx.currentTime + 0.3);
+  } catch (e) {}
+};
 
 export function QaGame() {
   const [isOpen, setIsOpen] = useState(false);
+  const [hasCrashed, setHasCrashed] = useState(false);
   const [score, setScore] = useState(0);
   const [defects, setDefects] = useState<Defect[]>([]);
   const [particles, setParticles] = useState<{ id: string; x: number; y: number }[]>([]);
@@ -42,18 +126,27 @@ export function QaGame() {
   const defectsRef = useRef<Defect[]>([]);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Keep ref in sync
+  const scoreRef = useRef(0);
+  
+  // Keep refs in sync
   useEffect(() => {
     defectsRef.current = defects;
-  }, [defects]);
+    scoreRef.current = score;
+  }, [defects, score]);
 
   const squashDefect = useCallback((id: string, x: number, y: number) => {
+    playResolveSound();
+    
+    // Find the bug to get its age
+    const targetBug = defectsRef.current.find(b => b.id === id);
+    const age = targetBug ? Date.now() - targetBug.spawnTime : 0;
+    
     setDefects(prev => prev.map(bug => bug.id === id ? { ...bug, squashed: true, scanning: false } : bug));
     
     setScore(s => {
       const newScore = s + 1;
-      // Show a fact on every squash
-      setCurrentFact({ text: QA_FACTS[newScore % QA_FACTS.length], id: Date.now() });
+      // Show a professional bug report fact on every squash
+      setCurrentFact({ text: generateBugMessage(newScore, age), id: Date.now() });
       return newScore;
     });
     
@@ -84,7 +177,7 @@ export function QaGame() {
       if (bug && !bug.squashed) {
         squashDefect(bugId, bug.x, bug.y);
       }
-    }, 1200);
+    }, 300);
   }, [squashDefect]);
 
   const handlePointerLeave = useCallback((bugId: string) => {
@@ -101,7 +194,11 @@ export function QaGame() {
     const x = margin + Math.random() * (window.innerWidth - margin * 2);
     const y = margin + Math.random() * (window.innerHeight - margin * 2);
     
-    const initialSpeed = 1 + Math.random() * 2;
+    // Speed scales up with player's score (up to 3x base speed)
+    const scoreMultiplier = 1 + Math.min(scoreRef.current * 0.1, 2);
+    const initialSpeed = (1 + Math.random() * 2) * scoreMultiplier;
+    
+    const baseSize = 32 + Math.random() * 24; // 32 to 56px
     const newDefect: Defect = {
       id: Math.random().toString(36).substring(7),
       x,
@@ -110,71 +207,131 @@ export function QaGame() {
       eating: false,
       spawnTime: Date.now(),
       originalSpeed: initialSpeed,
-      size: 32 + Math.random() * 24, // 32 to 56px
+      size: baseSize,
+      baseSize,
       speed: initialSpeed,
       direction: Math.random() * Math.PI * 2,
-    };
+        hungerThreshold: 8000 + Math.random() * 8000,
+      };
     
     setDefects(prev => [...prev, newDefect]);
   }, []);
 
   const updatePositions = useCallback(() => {
-    const now = Date.now();
-    setDefects(prev => prev.map(bug => {
+      const now = Date.now();
+      const newBugsToSpawn: Defect[] = [];
+      const nextDefects = defectsRef.current.map(bug => {
       if (bug.squashed) return bug;
+      
+      let colorClass = "text-yellow-300";
+      let currentSize = bug.baseSize;
+      let activeSpeed = bug.originalSpeed;
+      const age = now - bug.spawnTime;
+      
+      // Reactive properties based on hunger
+      const threshold = bug.hungerThreshold || 12000;
+      if (age > threshold * 0.33) { colorClass = "text-orange-400"; currentSize = bug.baseSize * 1.15; activeSpeed = bug.originalSpeed * 1.2; }
+      if (age > threshold * 0.66) { colorClass = "text-red-500"; currentSize = bug.baseSize * 1.35; activeSpeed = bug.originalSpeed * 1.5; }
+      if (age > threshold) { colorClass = "text-red-600 animate-pulse"; currentSize = bug.baseSize * 1.6; activeSpeed = bug.originalSpeed * 2.0; }
       
       if (bug.eating) {
         if (now - (bug.eatStartTime || 0) > 1000) {
-          // Finished eating, become larger and move again
+          // Finished eating, spawn a new low priority bug
+          const scoreMultiplier = 1 + Math.min(scoreRef.current * 0.1, 2);
+          const initialSpeed = (1 + Math.random() * 2) * scoreMultiplier;
+          const baseSize = 32 + Math.random() * 24;
+          newBugsToSpawn.push({
+            id: Math.random().toString(36).substring(7),
+            x: bug.x,
+            y: bug.y,
+            squashed: false,
+            eating: false,
+            spawnTime: now,
+            originalSpeed: initialSpeed,
+            size: baseSize,
+            baseSize,
+            speed: initialSpeed,
+            direction: Math.random() * Math.PI * 2,
+            hungerThreshold: 8000 + Math.random() * 8000,
+          });
+
+          // The original critical bug keeps its properties and works the same, but resets hunger
           return { 
             ...bug, 
             eating: false, 
-            speed: bug.originalSpeed * 1.5, 
+            originalSpeed: bug.originalSpeed * 1.2,
             size: bug.size * 1.3, 
-            spawnTime: now 
+            spawnTime: now,
+            colorClass: "text-yellow-300"
           };
         }
-        return bug; // Stay still while eating
+        colorClass = "animate-[pulse_0.2s_ease-in-out_infinite] scale-125 text-red-600";
+        return { ...bug, colorClass }; // Stay still while eating
       }
 
-      // Check hunger (10-15s)
-      if (now - bug.spawnTime > 12000 && !bug.scanning) {
+      let nextLastHitTest = bug.lastHitTest || 0;
+      let nextEating: boolean | undefined = bug.eating;
+      let nextEatStartTime = bug.eatStartTime;
+      let nextSpeed = activeSpeed;
+
+      // Check hunger (10-15s), throttle hit testing to every 500ms to prevent browser crash
+      if (age > threshold && !bug.scanning && (now - nextLastHitTest > 500)) {
+        nextLastHitTest = now;
         const elements = document.elementsFromPoint(bug.x + bug.size / 2, bug.y + bug.size / 2);
-        const targetEl = elements.find(el => {
-          if (el.tagName === 'BODY' || el.tagName === 'HTML' || el.tagName === 'MAIN') return false;
-          if (el.closest('.z-[60]') || el.closest('.z-50') || el.closest('.site-cursor')) return false;
-          
-          const rect = el.getBoundingClientRect();
-          // Don't eat massive layout wrappers (e.g. over 85% of screen)
-          if (rect.width > window.innerWidth * 0.85 || rect.height > window.innerHeight * 0.85) return false;
+        const validTargets = elements.filter(el => {
+          const tag = el.tagName.toUpperCase();
+          if (tag === 'BODY' || tag === 'HTML' || tag === 'MAIN' || tag === 'HEAD') return false;
+          if (el.id === '__next' || el.id === 'root') return false;
+          if (el.closest('.z-\\[60\\]') || el.closest('.site-cursor')) return false;
           
           return true;
-        }) as HTMLElement | undefined;
+        }) as HTMLElement[];
+
+        // Prioritize eating elements that are not the header (e.g. content scrolling underneath it)
+        let targetEl = validTargets.find(el => el.tagName !== 'HEADER');
+        if (!targetEl && validTargets.length > 0) {
+          targetEl = validTargets[0];
+        }
 
         if (targetEl && !targetEl.hasAttribute('data-eaten')) {
           targetEl.setAttribute('data-eaten', 'true');
-          targetEl.style.transition = "all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-          targetEl.style.transform = "scale(0) rotate(15deg) skewX(20deg)";
-          targetEl.style.opacity = "0";
-          targetEl.style.filter = "blur(8px) sepia(1) hue-rotate(-50deg) saturate(3)";
-          targetEl.style.pointerEvents = "none";
           
-          return { ...bug, eating: true, eatStartTime: now, speed: 0 };
+          playGlitchSound();
+          
+          // Apply inline styles to guarantee it overrides Tailwind classes
+          targetEl.style.transition = "all 0.1s steps(2)";
+          targetEl.style.opacity = "0.7";
+          targetEl.style.pointerEvents = "none";
+          if (window.getComputedStyle(targetEl).position === 'static') {
+            targetEl.style.position = "relative";
+          }
+          targetEl.style.filter = "contrast(1.5) sepia(1) hue-rotate(-50deg) saturate(3)";
+          targetEl.style.boxShadow = "0 0 0 2px red, inset 0 0 0 2px red";
+          targetEl.style.backgroundColor = "rgba(239, 68, 68, 0.15)";
+          targetEl.style.color = "#ef4444";
+          
+          nextEating = true;
+          nextEatStartTime = now;
+          nextSpeed = 0;
         }
       }
       
-      let newX = bug.x + Math.cos(bug.direction) * bug.speed;
-      let newY = bug.y + Math.sin(bug.direction) * bug.speed;
+      if (nextEating) {
+        return { ...bug, eating: nextEating, eatStartTime: nextEatStartTime, speed: nextSpeed, lastHitTest: nextLastHitTest, colorClass, size: currentSize };
+      }
+      
+      let newX = bug.x + Math.cos(bug.direction) * nextSpeed;
+      let newY = bug.y + Math.sin(bug.direction) * nextSpeed;
       let newDir = bug.direction;
       
       // Bounce off walls
-      if (newX < 0 || newX > window.innerWidth - bug.size) {
+      if (newX < 0 || newX > window.innerWidth - currentSize) {
         newDir = Math.PI - newDir;
-        newX = Math.max(0, Math.min(newX, window.innerWidth - bug.size));
+        newX = Math.max(0, Math.min(newX, window.innerWidth - currentSize));
       }
-      if (newY < 0 || newY > window.innerHeight - bug.size) {
+      if (newY < 0 || newY > window.innerHeight - currentSize) {
         newDir = -newDir;
-        newY = Math.max(0, Math.min(newY, window.innerHeight - bug.size));
+        newY = Math.max(0, Math.min(newY, window.innerHeight - currentSize));
       }
       
       // Random direction change sometimes
@@ -182,19 +339,27 @@ export function QaGame() {
         newDir += (Math.random() - 0.5);
       }
       
-      return { ...bug, x: newX, y: newY, direction: newDir };
-    }));
+      return { ...bug, x: newX, y: newY, direction: newDir, lastHitTest: nextLastHitTest, size: currentSize };
+    });
     
-    requestRef.current = requestAnimationFrame(updatePositions);
+    setDefects([...nextDefects, ...newBugsToSpawn]);
+      requestRef.current = requestAnimationFrame(updatePositions);
   }, []);
 
   useEffect(() => {
     if (isOpen) {
       document.documentElement.dataset.game = "on";
-      const interval = setInterval(spawnDefect, 1500);
+      let timeoutId: NodeJS.Timeout;
+        const scheduleNext = () => {
+          timeoutId = setTimeout(() => {
+            spawnDefect();
+            scheduleNext();
+          }, 500 + Math.random() * 2000);
+        };
+        scheduleNext();
       requestRef.current = requestAnimationFrame(updatePositions);
       return () => {
-        clearInterval(interval);
+        clearTimeout(timeoutId);
         if (requestRef.current) cancelAnimationFrame(requestRef.current);
         delete document.documentElement.dataset.game;
       };
@@ -204,6 +369,20 @@ export function QaGame() {
       setCurrentFact(null);
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
       delete document.documentElement.dataset.game;
+      
+      // Restore all eaten elements to normal by clearing inline styles
+      document.querySelectorAll('[data-eaten="true"]').forEach(el => {
+        const targetEl = el as HTMLElement;
+        targetEl.removeAttribute('data-eaten');
+        targetEl.style.transition = "";
+        targetEl.style.opacity = "";
+        targetEl.style.pointerEvents = "";
+        targetEl.style.position = "";
+        targetEl.style.filter = "";
+        targetEl.style.boxShadow = "";
+        targetEl.style.backgroundColor = "";
+        targetEl.style.color = "";
+      });
     }
   }, [isOpen, spawnDefect, updatePositions]);
 
@@ -222,7 +401,7 @@ export function QaGame() {
       {isOpen && (
         <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden selection:bg-transparent">
           {/* Game HUD */}
-          <div className="absolute top-6 right-6 flex items-center gap-2 z-[60] pointer-events-none bg-paper/90 backdrop-blur-sm px-4 py-2 rounded-full border border-pass text-pass shadow-[4px_4px_0_var(--ink)]">
+          <div className="fixed top-6 left-6 flex items-center gap-2 z-[60] pointer-events-none bg-paper/90 backdrop-blur-sm px-4 py-2 rounded-full border border-pass text-pass shadow-[4px_4px_0_var(--ink)]">
             <ShieldCheck size={20} />
             <span className="text-xl font-bold font-mono">{score}</span>
           </div>
@@ -251,26 +430,9 @@ export function QaGame() {
                 aria-label="Squash bug"
               >
                 <Bug size={bug.size} strokeWidth={1.5} className={
-                  bug.eating ? "animate-[spin_0.3s_linear_infinite] text-green-500 drop-shadow-[0_0_20px_rgba(34,197,94,0.8)]" : 
-                  !bug.squashed ? "animate-pulse drop-shadow-[0_0_15px_rgba(239,68,68,0.6)]" : ""
+                  bug.colorClass || "text-yellow-300"
                 } />
                 
-                {/* Focusing ring for auto-detect */}
-                {!bug.squashed && (
-                  <div 
-                    className="absolute inset-[-12px] border-2 border-pass rounded-full"
-                    style={{
-                      transform: bug.scanning ? "scale(0.5)" : "scale(1.5)",
-                      opacity: bug.scanning ? 1 : 0,
-                      transition: bug.scanning ? "transform 1.2s linear, opacity 0.2s" : "transform 0.2s, opacity 0.2s",
-                    }}
-                  />
-                )}
-                
-                {/* Crosshair effect when hovering over bug */}
-                {!bug.squashed && !bug.scanning && (
-                  <div className="absolute inset-[-10px] border border-red-500/0 group-hover:border-red-500/50 rounded-full transition-colors" />
-                )}
               </button>
             ))}
 
@@ -321,14 +483,23 @@ export function QaGame() {
                 opacity: 0;
               }
             }
-            @keyframes floatUp {
-              0% { transform: translateY(20px); opacity: 0; }
-              15% { transform: translateY(0); opacity: 1; }
-              85% { transform: translateY(0); opacity: 1; }
-              100% { transform: translateY(-20px); opacity: 0; }
+            @keyframes flyToScore {
+              0% { transform: translateY(20px) scale(0.9); opacity: 0; }
+              10% { transform: translateY(0) scale(1); opacity: 1; }
+              70% { transform: translateY(0) scale(1); opacity: 1; }
+              100% { transform: translate(calc(-100vw + 300px), calc(-100vh + 130px)) scale(0.1); opacity: 0; }
             }
             .fact-toast {
-              animation: floatUp 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+              animation: flyToScore 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+            .defected-element {
+              transition: all 0.1s steps(2) !important;
+              opacity: 0.7 !important;
+              pointer-events: none !important;
+              position: relative !important;
+              filter: contrast(1.5) sepia(1) hue-rotate(-50deg) saturate(3) !important;
+              box-shadow: 0 0 0 1px red, inset 0 0 0 1px red !important;
+              background-color: rgba(239, 68, 68, 0.1) !important;
             }
           `}} />
         </div>
@@ -336,3 +507,4 @@ export function QaGame() {
     </>
   );
 }
+

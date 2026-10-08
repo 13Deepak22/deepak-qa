@@ -160,6 +160,32 @@ export function SiteCursor() {
         else delete root.dataset.gait;
       }
 
+      // Check if current hover element has died or was removed from DOM
+      if (hoverEl) {
+        const isDead = 
+          !hoverEl.isConnected ||
+          hoverEl.getAttribute("aria-hidden") === "true" ||
+          hoverEl.hasAttribute("disabled") ||
+          hoverEl.hasAttribute("data-squashed") ||
+          (hoverEl instanceof HTMLElement && (
+            hoverEl.style.display === "none" ||
+            hoverEl.style.visibility === "hidden" ||
+            hoverEl.style.pointerEvents === "none"
+          ));
+
+        if (isDead) {
+          // Re-evaluate element under pointer
+          const el = document.elementFromPoint(pos.x, pos.y);
+          const field = el?.closest(FIELD) ?? null;
+          const candidate = field ? null : (el?.closest(INTERACTIVE) ?? null);
+          const next = candidate && candidate.isConnected && !candidate.hasAttribute("data-squashed") && candidate.getAttribute("aria-hidden") !== "true" ? candidate : null;
+          
+          hoverEl = next;
+          root.toggleAttribute("data-hide", Boolean(field));
+          root.toggleAttribute("data-hot", Boolean(hoverEl));
+        }
+      }
+
       const step = (dt * 1000) / MORPH_MS;
       progress = hoverEl ? Math.min(1, progress + step) : Math.max(0, progress - step);
       const morph = easeInOutCubic(progress);
@@ -209,18 +235,22 @@ export function SiteCursor() {
       frames += 1;
       drawTrail(now, 1 - morph);
 
-      const left = x - w / 2;
-      const room = document.documentElement.clientWidth - EDGE - labelW;
-      const shift = Math.max(EDGE, Math.min(left, room)) - left;
-      if (shift !== labelShift) {
-        labelShift = shift;
-        label.style.translate = `${shift}px 0`;
-      }
+      if (hoverEl) {
+        const left = x - w / 2;
+        const room = document.documentElement.clientWidth - EDGE - labelW;
+        const shift = Math.max(EDGE, Math.min(left, room)) - left;
+        if (shift !== labelShift) {
+          labelShift = shift;
+          label.style.translate = `${shift}px 0`;
+        }
 
-      const nextFlip = y + h / 2 > window.innerHeight - 40;
-      if (nextFlip !== flip) {
-        flip = nextFlip;
-        root.toggleAttribute("data-flip", flip);
+        const nextFlip = y + h / 2 > window.innerHeight - 40;
+        if (nextFlip !== flip) {
+          flip = nextFlip;
+          root.toggleAttribute("data-flip", flip);
+        }
+      } else if (progress <= 0 && label.textContent) {
+        label.textContent = "";
       }
 
       frame = window.requestAnimationFrame(tick);

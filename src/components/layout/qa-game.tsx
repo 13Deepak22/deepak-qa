@@ -522,17 +522,25 @@ export function QaGame() {
       targetEl.style.transform = "";
     }
 
+    // Cancel hover squash timeout if pending
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+
     // Mark bug as squashed
     setDefects(prev => prev.map(b => b.id === id ? { ...b, squashed: true, scanning: false, eating: false } : b));
 
-    // Spawn Score Floater text
+    // Spawn Score Floater text centered directly on the defect
     const floaterId = Math.random().toString(36).substring(7);
+    const floaterX = x + targetBug.size / 2;
+    const floaterY = y - 10;
     setFloaters(prev => [
       ...prev,
       {
         id: floaterId,
-        x,
-        y: y - 10,
+        x: floaterX,
+        y: floaterY,
         text: newCombo > 1 ? `${pointTag} (${newCombo}x COMBO!)` : pointTag,
         color: pointColor,
         points: earnedPoints
@@ -891,7 +899,7 @@ export function QaGame() {
             ...prev,
             {
               id: crashFloaterId,
-              x: bug.x,
+              x: bug.x + currentSize / 2,
               y: bug.y - 15,
               text: "💥 SECTION CRASH! 🌱 Child P3 Bug Born",
               color: "#ef4444",
@@ -1201,24 +1209,30 @@ export function QaGame() {
               return (
                 <button
                   key={bug.id}
+                  data-squashed={bug.squashed ? "true" : undefined}
                   onClick={() => squashDefect(bug.id, bug.x, bug.y)}
                   onPointerEnter={() => handlePointerEnter(bug.id)}
                   onPointerLeave={() => handlePointerLeave(bug.id)}
-                  className="absolute flex items-center justify-center pointer-events-auto group border-none bg-transparent outline-none ring-0 focus:outline-none focus:ring-0 select-none"
+                  className={`absolute flex items-center justify-center group border-none bg-transparent outline-none ring-0 focus:outline-none focus:ring-0 select-none ${
+                    bug.squashed ? "pointer-events-none" : "pointer-events-auto"
+                  }`}
                   style={{
                     left: bug.x,
                     top: bug.y,
                     width: bug.size,
                     height: bug.size,
                     transform: bug.squashed ? "scale(0)" : "scale(1)",
-                    transition: bug.squashed ? "transform 350ms cubic-bezier(0.1, 0.9, 0.2, 1)" : "width 200ms ease, height 200ms ease",
+                    transition: bug.squashed ? "transform 350ms cubic-bezier(0.1, 0.9, 0.2, 1), opacity 350ms ease" : "width 200ms ease, height 200ms ease",
                     opacity: bug.squashed ? 0 : 1,
                     color: bug.color,
                     rotate: `${(bug.direction * 180) / Math.PI + 90 + wobbleDeg}deg`,
                     cursor: "crosshair",
+                    pointerEvents: bug.squashed ? "none" : "auto",
                     filter: isFrozen ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)" : undefined
                   }}
-                  aria-label="Squash defect"
+                  aria-label={bug.squashed ? undefined : "Squash defect"}
+                  aria-hidden={bug.squashed ? "true" : undefined}
+                  disabled={bug.squashed}
                 >
                   <AnimatedBug
                     size={bug.size}
@@ -1230,15 +1244,15 @@ export function QaGame() {
                   />
 
                   {/* Threat Indicator Ping for Critical P0 Bugs */}
-                  {bug.isPulsing && (
+                  {bug.isPulsing && !bug.squashed && (
                     <span 
                       className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-600 animate-ping pointer-events-none" 
                     />
                   )}
 
                   {/* Chewing/Eating indicator badge above bug */}
-                  {bug.eating && (
-                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 font-mono text-[9px] font-bold text-red-500 bg-black/85 px-1 py-0.2 rounded border border-red-500 animate-pulse whitespace-nowrap pointer-events-none">
+                  {bug.eating && !bug.squashed && (
+                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 font-mono text-[9px] font-bold text-red-500 bg-black/85 px-1 py-0.2 rounded border border-red-500 animate-pulse whitespace-nowrap pointer-events-none transition-opacity duration-200">
                       CORRUPTING...
                     </span>
                   )}
@@ -1250,7 +1264,7 @@ export function QaGame() {
             {floaters.map(f => (
               <div
                 key={f.id}
-                className="absolute font-mono font-extrabold text-sm sm:text-base pointer-events-none z-[65] animate-floater select-none drop-shadow-md"
+                className="absolute font-mono font-extrabold text-sm sm:text-base pointer-events-none z-[65] animate-floater select-none drop-shadow-md -translate-x-1/2 whitespace-nowrap"
                 style={{
                   left: f.x,
                   top: f.y,
@@ -1399,10 +1413,11 @@ export function QaGame() {
               }
             }
             @keyframes floater {
-              0% { transform: translateY(0) scale(0.85); opacity: 0; }
-              20% { transform: translateY(-10px) scale(1.05); opacity: 1; }
-              80% { transform: translateY(-35px) scale(1); opacity: 0.9; }
-              100% { transform: translateY(-50px) scale(0.9); opacity: 0; }
+              0% { transform: translate(-50%, 0) scale(0.85); opacity: 0; }
+              16% { transform: translate(-50%, -10px) scale(1.06); opacity: 1; }
+              36% { transform: translate(-50%, -18px) scale(1); opacity: 1; }
+              75% { transform: translate(-50%, -36px) scale(0.98); opacity: 0.85; }
+              100% { transform: translate(-50%, -48px) scale(0.92); opacity: 0; }
             }
             .animate-floater {
               animation: floater 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;

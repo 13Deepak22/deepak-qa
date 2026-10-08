@@ -18,11 +18,12 @@ interface Defect {
   baseSize: number;
   speed: number;
   direction: number; // angle in radians
-  colorClass?: string;
+  color: string;
+  isPulsing?: boolean;
   hungerThreshold?: number;
 }
 
-const generateBugMessage = (score: number, age: number = 0) => {
+const generateBugMessage = (score: number, progress: number = 0) => {
   const ACTIONS = ["Isolated", "Detected", "Logged", "Squashed", "Resolved", "Mitigated", "Intercepted"];
   const ISSUES = [
     "memory leak in main thread", "race condition in payment gateway",
@@ -45,15 +46,15 @@ const generateBugMessage = (score: number, age: number = 0) => {
   let icon = "✅";
   let urgency = "routine.";
   
-  if (age > 12000) { priority = "P0 [Critical]"; icon = "🔥"; urgency = "before system crash!"; }
-  else if (age > 8000) { priority = "P1 [High]"; icon = "🚨"; urgency = "preventing data loss."; }
-  else if (age > 4000) { priority = "P2 [Medium]"; icon = "⚠️"; urgency = "improving stability."; }
+  if (progress >= 1.0) { priority = "P0 [Critical]"; icon = "🔥"; urgency = "before system crash!"; }
+  else if (progress >= 0.70) { priority = "P1 [High]"; icon = "🚨"; urgency = "preventing data loss."; }
+  else if (progress >= 0.35) { priority = "P2 [Medium]"; icon = "⚠️"; urgency = "improving stability."; }
   
   const action = ACTIONS[(score * 3) % ACTIONS.length];
   const issue = ISSUES[(score * 7) % ISSUES.length];
   
   const baseMessage = `${icon} ${priority}: ${action} ${issue}`;
-  return age > 4000 ? `${baseMessage} ${urgency}` : `${baseMessage}.`;
+  return progress >= 0.35 ? `${baseMessage} ${urgency}` : `${baseMessage}.`;
 };
 
 const playGlitchSound = () => {
@@ -137,16 +138,16 @@ export function QaGame() {
   const squashDefect = useCallback((id: string, x: number, y: number) => {
     playResolveSound();
     
-    // Find the bug to get its age
+    // Find the bug to get its progress
     const targetBug = defectsRef.current.find(b => b.id === id);
-    const age = targetBug ? Date.now() - targetBug.spawnTime : 0;
+    const progress = targetBug ? (Date.now() - targetBug.spawnTime) / (targetBug.hungerThreshold || 10000) : 0;
     
     setDefects(prev => prev.map(bug => bug.id === id ? { ...bug, squashed: true, scanning: false } : bug));
     
     setScore(s => {
       const newScore = s + 1;
       // Show a professional bug report fact on every squash
-      setCurrentFact({ text: generateBugMessage(newScore, age), id: Date.now() });
+      setCurrentFact({ text: generateBugMessage(newScore, progress), id: Date.now() });
       return newScore;
     });
     
@@ -189,16 +190,16 @@ export function QaGame() {
   }, []);
 
   const spawnDefect = useCallback(() => {
-    if (defectsRef.current.length >= 5) return; // max bugs
-    const margin = 50;
+    if (defectsRef.current.length >= 6) return; // max bugs
+    const margin = 60;
     const x = margin + Math.random() * (window.innerWidth - margin * 2);
     const y = margin + Math.random() * (window.innerHeight - margin * 2);
     
-    // Speed scales up with player's score (up to 3x base speed)
-    const scoreMultiplier = 1 + Math.min(scoreRef.current * 0.1, 2);
-    const initialSpeed = (1 + Math.random() * 2) * scoreMultiplier;
+    // Low priority when born: big, light yellow, slow
+    const baseSpeed = 0.9 + Math.random() * 0.3; // Slow crawl (0.9 to 1.2 px/frame)
+    const baseSize = 60 + Math.random() * 8; // Big (60px to 68px)
+    const hungerThreshold = 8000 + Math.random() * 6000; // 8s to 14s before critical
     
-    const baseSize = 48 + Math.random() * 32; // 32 to 56px
     const newDefect: Defect = {
       id: Math.random().toString(36).substring(7),
       x,
@@ -206,40 +207,69 @@ export function QaGame() {
       squashed: false,
       eating: false,
       spawnTime: Date.now(),
-      originalSpeed: initialSpeed,
+      originalSpeed: baseSpeed,
+      speed: baseSpeed,
       size: baseSize,
       baseSize,
-      speed: initialSpeed,
+      color: "#fde047", // Light yellow
+      isPulsing: false,
       direction: Math.random() * Math.PI * 2,
-        hungerThreshold: 8000 + Math.random() * 8000,
-      };
+      hungerThreshold,
+    };
     
     setDefects(prev => [...prev, newDefect]);
   }, []);
 
   const updatePositions = useCallback(() => {
-      const now = Date.now();
-      const newBugsToSpawn: Defect[] = [];
-      const nextDefects = defectsRef.current.map(bug => {
+    const now = Date.now();
+    const newBugsToSpawn: Defect[] = [];
+    const nextDefects = defectsRef.current.map(bug => {
       if (bug.squashed) return bug;
       
-      let colorClass = "text-yellow-300";
-      let currentSize = bug.baseSize;
-      let activeSpeed = bug.originalSpeed;
       const age = now - bug.spawnTime;
+      const threshold = bug.hungerThreshold || 10000;
+      const progress = Math.min(age / threshold, 1.2);
       
-      // Reactive properties based on hunger
-      const threshold = bug.hungerThreshold || 12000;
-      if (age > threshold * 0.33) { colorClass = "text-orange-400"; currentSize = bug.baseSize * 1.15; activeSpeed = bug.originalSpeed * 1.2; }
-      if (age > threshold * 0.66) { colorClass = "text-red-500"; currentSize = bug.baseSize * 1.35; activeSpeed = bug.originalSpeed * 1.5; }
-      if (age > threshold) { colorClass = "text-red-600 animate-pulse"; currentSize = bug.baseSize * 1.6; activeSpeed = bug.originalSpeed * 2.0; }
+      // Fully reactive state progression:
+      // P3 [Low]: Light yellow (#fde047), big (1.0x), slow (1.0x)
+      // P2 [Medium]: Orange (#f97316), shrinking (0.75x), faster (2.0x)
+      // P1 [High]: Red (#ef4444), small (0.55x), fast (3.2x)
+      // P0 [Critical]: Dark crimson (#b91c1c), smallest (0.40x), frantic fast (4.6x), pulsing
+      let color = "#fde047";
+      let isPulsing = false;
+      let sizeScale = 1.0;
+      let speedScale = 1.0;
+
+      if (progress >= 1.0) {
+        color = "#b91c1c";
+        isPulsing = true;
+        sizeScale = 0.40; // ~24px - 27px
+        speedScale = 4.6; // ~4.6x (super fast)
+      } else if (progress >= 0.70) {
+        color = "#ef4444";
+        isPulsing = false;
+        sizeScale = 0.55; // ~33px - 37px
+        speedScale = 3.2; // ~3.2x (fast)
+      } else if (progress >= 0.35) {
+        color = "#f97316";
+        isPulsing = false;
+        sizeScale = 0.75; // ~45px - 51px
+        speedScale = 2.0; // ~2.0x (medium)
+      } else {
+        color = "#fde047";
+        isPulsing = false;
+        sizeScale = 1.0;  // ~60px - 68px (big)
+        speedScale = 1.0; // ~0.9 - 1.2 px/frame (slow)
+      }
+
+      const currentSize = Math.round(bug.baseSize * sizeScale);
+      let activeSpeed = bug.originalSpeed * speedScale;
       
       if (bug.eating) {
         if (now - (bug.eatStartTime || 0) > 1000) {
-          // Finished eating, spawn a new low priority bug
-          const scoreMultiplier = 1 + Math.min(scoreRef.current * 0.1, 2);
-          const initialSpeed = (1 + Math.random() * 2) * scoreMultiplier;
-          const baseSize = 48 + Math.random() * 32;
+          // Finished eating, spawn a new low priority bug (born big, light yellow, slow)
+          const newBaseSpeed = 0.9 + Math.random() * 0.3;
+          const newBaseSize = 60 + Math.random() * 8;
           newBugsToSpawn.push({
             id: Math.random().toString(36).substring(7),
             x: bug.x,
@@ -247,25 +277,28 @@ export function QaGame() {
             squashed: false,
             eating: false,
             spawnTime: now,
-            originalSpeed: initialSpeed,
-            size: baseSize,
-            baseSize,
-            speed: initialSpeed,
+            originalSpeed: newBaseSpeed,
+            size: newBaseSize,
+            baseSize: newBaseSize,
+            speed: newBaseSpeed,
+            color: "#fde047",
+            isPulsing: false,
             direction: Math.random() * Math.PI * 2,
-            hungerThreshold: 8000 + Math.random() * 8000,
+            hungerThreshold: 8000 + Math.random() * 6000,
           });
 
-          // The original critical bug keeps its properties and works the same, but resets hunger
+          // The original bug resets hunger and priority to low (big, light yellow, slow)
           return { 
             ...bug, 
             eating: false, 
-            originalSpeed: bug.originalSpeed * 1.2,
             spawnTime: now,
-            colorClass: "text-yellow-300"
+            color: "#fde047",
+            isPulsing: false,
+            size: bug.baseSize,
+            speed: bug.originalSpeed
           };
         }
-        colorClass = "animate-[pulse_0.2s_ease-in-out_infinite] scale-125 text-red-600";
-        return { ...bug, colorClass }; // Stay still while eating
+        return { ...bug, color: "#b91c1c", isPulsing: true, size: currentSize }; // Stay still while eating
       }
 
       let nextLastHitTest = bug.lastHitTest || 0;
@@ -273,10 +306,10 @@ export function QaGame() {
       let nextEatStartTime = bug.eatStartTime;
       let nextSpeed = activeSpeed;
 
-      // Check hunger (10-15s), throttle hit testing to every 500ms to prevent browser crash
-      if (age > threshold && !bug.scanning && (now - nextLastHitTest > 500)) {
+      // Check hunger, throttle hit testing to every 500ms
+      if (progress >= 1.0 && !bug.scanning && (now - nextLastHitTest > 500)) {
         nextLastHitTest = now;
-        const elements = document.elementsFromPoint(bug.x + bug.size / 2, bug.y + bug.size / 2);
+        const elements = document.elementsFromPoint(bug.x + currentSize / 2, bug.y + currentSize / 2);
         const validTargets = elements.filter(el => {
           const tag = el.tagName.toUpperCase();
           if (tag === 'BODY' || tag === 'HTML' || tag === 'MAIN' || tag === 'HEAD') return false;
@@ -305,10 +338,13 @@ export function QaGame() {
             targetEl.style.position = "relative";
           }
           targetEl.style.filter = "contrast(1.5) sepia(1) hue-rotate(-50deg) saturate(3)";
-          
-          
           targetEl.style.color = "#ef4444";
           
+          const remaining = document.querySelectorAll('h1:not([data-eaten]), h2:not([data-eaten]), h3:not([data-eaten]), p:not([data-eaten])');
+          if (remaining.length === 0) {
+            setHasCrashed(true);
+          }
+
           nextEating = true;
           nextEatStartTime = now;
           nextSpeed = 0;
@@ -316,7 +352,7 @@ export function QaGame() {
       }
       
       if (nextEating) {
-        return { ...bug, eating: nextEating, eatStartTime: nextEatStartTime, speed: nextSpeed, lastHitTest: nextLastHitTest, colorClass, size: currentSize };
+        return { ...bug, eating: nextEating, eatStartTime: nextEatStartTime, speed: nextSpeed, lastHitTest: nextLastHitTest, color, isPulsing, size: currentSize };
       }
       
       let newX = bug.x + Math.cos(bug.direction) * nextSpeed;
@@ -338,11 +374,11 @@ export function QaGame() {
         newDir += (Math.random() - 0.5);
       }
       
-      return { ...bug, x: newX, y: newY, direction: newDir, lastHitTest: nextLastHitTest, size: currentSize };
+      return { ...bug, x: newX, y: newY, direction: newDir, lastHitTest: nextLastHitTest, size: currentSize, speed: nextSpeed, color, isPulsing };
     });
     
     setDefects([...nextDefects, ...newBugsToSpawn]);
-      requestRef.current = requestAnimationFrame(updatePositions);
+    requestRef.current = requestAnimationFrame(updatePositions);
   }, []);
 
   useEffect(() => {
@@ -413,25 +449,27 @@ export function QaGame() {
                 onClick={() => squashDefect(bug.id, bug.x, bug.y)}
                 onPointerEnter={() => handlePointerEnter(bug.id)}
                 onPointerLeave={() => handlePointerLeave(bug.id)}
-                className="absolute flex items-center justify-center transition-transform pointer-events-auto group border-none bg-transparent outline-none ring-0 focus:outline-none focus:ring-0"
+                className="absolute flex items-center justify-center pointer-events-auto group border-none bg-transparent outline-none ring-0 focus:outline-none focus:ring-0"
                 style={{
                   left: bug.x,
                   top: bug.y,
                   width: bug.size,
                   height: bug.size,
                   transform: bug.squashed ? "scale(0)" : "scale(1)",
-                  transitionDuration: bug.squashed ? "400ms" : "0ms",
+                  transition: bug.squashed ? "transform 400ms ease" : "width 200ms ease, height 200ms ease",
                   opacity: bug.squashed ? 0 : 1,
-                  color: "rgb(239, 68, 68)", // text-red-500
+                  color: bug.color || "#fde047",
                   rotate: `${(bug.direction * 180) / Math.PI + 90}deg`,
                   cursor: "crosshair"
                 }}
                 aria-label="Squash bug"
               >
-                <Bug size={bug.size} strokeWidth={1.5} className={
-                  bug.colorClass || "text-yellow-300"
-                } />
-                
+                <Bug
+                  size={bug.size}
+                  strokeWidth={2}
+                  color={bug.color || "#fde047"}
+                  className={bug.isPulsing ? "animate-pulse" : ""}
+                />
               </button>
             ))}
 

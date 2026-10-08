@@ -306,8 +306,8 @@ export function QaGame() {
             targetEl.style.position = "relative";
           }
           targetEl.style.filter = "contrast(1.5) sepia(1) hue-rotate(-50deg) saturate(3)";
-          targetEl.style.boxShadow = "0 0 0 2px red, inset 0 0 0 2px red";
-          targetEl.style.backgroundColor = "rgba(239, 68, 68, 0.15)";
+          
+          
           targetEl.style.color = "#ef4444";
           
           nextEating = true;
@@ -414,7 +414,7 @@ export function QaGame() {
                 onClick={() => squashDefect(bug.id, bug.x, bug.y)}
                 onPointerEnter={() => handlePointerEnter(bug.id)}
                 onPointerLeave={() => handlePointerLeave(bug.id)}
-                className="absolute flex items-center justify-center transition-transform pointer-events-auto group"
+                className="absolute flex items-center justify-center transition-transform pointer-events-auto group border-none bg-transparent outline-none ring-0 focus:outline-none focus:ring-0"
                 style={{
                   left: bug.x,
                   top: bug.y,

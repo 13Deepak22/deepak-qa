@@ -1091,26 +1091,57 @@ export function QaGame() {
       {isOpen && (
         <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden selection:bg-transparent" data-game-ui="true">
           
-          {/* Small & Minimal Micro Status Pill - Minimalist QA HUD */}
+          {/* QA Defect Hunter Stat HUD - Positioned in the left gutter so its right edge ends where website begins */}
           <aside 
             aria-label="QA Game Stats"
-            className="fixed top-3.5 left-3.5 z-[60] flex items-center gap-2 bg-paper/92 backdrop-blur-md px-3 py-1.5 rounded-full border border-pass/60 text-ink shadow-[2px_2px_0_var(--ink)] font-mono text-[10px] select-none pointer-events-auto animate-fade-in"
+            className="fixed top-3.5 z-[60] flex flex-col gap-2 bg-paper/95 backdrop-blur-md p-2.5 rounded-2xl border border-pass text-ink shadow-[3px_3px_0_var(--ink)] font-mono select-none pointer-events-auto animate-fade-in w-[165px] max-w-[calc(100vw-1rem)]"
+            style={{
+              left: "max(8px, calc(50vw - 36rem - 165px - 8px))"
+            }}
           >
-            {/* Defect count */}
-            <div className="flex items-center gap-1 font-bold text-pass">
-              <ShieldCheck size={13} className="text-pass animate-pulse" />
-              <span className="text-xs">{score}</span>
-              <span className="text-[8px] text-muted font-normal uppercase hidden xs:inline">FIXED</span>
+            {/* Row 1: Header + Tier Badge */}
+            <div className="flex items-center justify-between gap-1 border-b border-line pb-1">
+              <div className="flex items-center gap-1 font-bold text-pass text-[10px] tracking-tight truncate">
+                <ShieldCheck size={13} className="text-pass animate-pulse shrink-0" />
+                <span className="truncate">QA DEFECTS</span>
+              </div>
+              <span className="px-1 py-0.2 rounded bg-pass/10 text-pass text-[8px] font-semibold border border-pass/30 shrink-0">
+                {currentRank.badge}
+              </span>
             </div>
 
-            <span className="text-line opacity-50">|</span>
+            {/* Row 2: Fixed Count + Rank Title + Combo */}
+            <div className="flex items-start justify-between gap-1.5">
+              <div>
+                <span className="text-[7.5px] text-muted uppercase tracking-wider block">FIXED</span>
+                <span className="text-lg font-extrabold text-pass leading-tight">{score}</span>
+              </div>
+              <div className="text-right min-w-0">
+                <span className="text-[7.5px] text-muted uppercase tracking-wider block">RANK</span>
+                <span className="text-[9px] font-bold text-ink truncate block max-w-[85px] leading-tight" title={currentRank.title}>
+                  {currentRank.title}
+                </span>
+                {combo > 1 && (
+                  <div className="flex items-center justify-end gap-0.5 text-orange-600 dark:text-orange-400 font-bold text-[8.5px] animate-bounce mt-0.5">
+                    <Zap size={8} className="fill-current" />
+                    <span>{combo}x COMBO</span>
+                  </div>
+                )}
+              </div>
+            </div>
 
-            {/* System Integrity */}
-            <div className="flex items-center gap-1.5" title={`System Integrity: ${systemIntegrity}%`}>
-              <span className={systemIntegrity < 40 ? "text-red-500 font-bold animate-pulse text-[11px]" : "text-pass font-bold text-[11px]"}>
-                {systemIntegrity}%
-              </span>
-              <div className="w-8 h-1 bg-line rounded-full overflow-hidden">
+            {/* Row 3: System Integrity & Reactive Bar */}
+            <div className="space-y-0.5">
+              <div className="flex items-center justify-between text-[8.5px]">
+                <span className="text-muted flex items-center gap-0.5">
+                  <AlertTriangle size={9} className={systemIntegrity < 40 ? "text-red-500 animate-pulse" : "text-amber-500"} />
+                  <span>Integrity</span>
+                </span>
+                <span className={systemIntegrity < 40 ? "text-red-500 font-bold animate-pulse text-[9px]" : "text-pass font-bold text-[9px]"}>
+                  {systemIntegrity}%
+                </span>
+              </div>
+              <div className="w-full h-1 bg-line rounded-full overflow-hidden">
                 <div 
                   className={`h-full transition-all duration-300 ${
                     systemIntegrity < 30 ? "bg-red-500" : systemIntegrity < 65 ? "bg-amber-500" : "bg-pass"
@@ -1120,73 +1151,59 @@ export function QaGame() {
               </div>
             </div>
 
-            {combo > 1 && (
-              <>
-                <span className="text-line opacity-50">|</span>
-                <div className="flex items-center gap-0.5 text-orange-600 dark:text-orange-400 font-bold animate-bounce">
-                  <Zap size={10} className="fill-current" />
-                  <span>{combo}x</span>
-                </div>
-              </>
-            )}
+            {/* Row 4: Action Controls (Breakpoint, Sound, Reset) */}
+            <div className="flex items-center justify-between gap-1 pt-0.5">
+              {/* Breakpoint Powerup */}
+              <button
+                type="button"
+                onClick={triggerBreakpoint}
+                disabled={breakpoints <= 0 || isFrozen}
+                title="Debugger Breakpoint (Spacebar)"
+                className={`flex items-center gap-0.5 px-2 py-0.5 rounded-full font-bold transition-all text-[8.5px] ${
+                  isFrozen 
+                    ? "bg-blue-600 text-white animate-pulse" 
+                    : breakpoints > 0 
+                      ? "bg-blue-500/15 text-blue-600 border border-blue-500/30 hover:bg-blue-500/25 active:scale-95" 
+                      : "opacity-40 cursor-not-allowed text-muted border border-line"
+                }`}
+              >
+                {isFrozen ? <Pause size={8} /> : <Play size={8} className="fill-current" />}
+                <span>pause; {breakpoints}</span>
+              </button>
 
-            <span className="text-line opacity-50 hidden sm:inline">|</span>
+              <div className="flex items-center gap-0.5">
+                {/* Audio Mute/Unmute */}
+                <button
+                  type="button"
+                  onClick={() => setIsMuted(!isMuted)}
+                  className="text-muted hover:text-ink hover:border-pass transition-colors p-0.5 rounded-full border border-line"
+                  title={isMuted ? "Unmute Sound" : "Mute Sound"}
+                  aria-label={isMuted ? "Unmute Sound" : "Mute Sound"}
+                >
+                  {isMuted ? <VolumeX size={10} /> : <Volume2 size={10} />}
+                </button>
 
-            {/* Rank Badge */}
-            <span className="hidden sm:inline-block px-1.5 py-0.2 rounded bg-pass/10 text-pass text-[9px] font-semibold border border-pass/30 truncate max-w-[85px]">
-              {currentRank.badge}
-            </span>
-
-            <span className="text-line opacity-50">|</span>
-
-            {/* Breakpoint Powerup */}
-            <button
-              type="button"
-              onClick={triggerBreakpoint}
-              disabled={breakpoints <= 0 || isFrozen}
-              title="Debugger Breakpoint (Spacebar)"
-              className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded-full font-bold transition-all text-[9px] ${
-                isFrozen 
-                  ? "bg-blue-600 text-white animate-pulse" 
-                  : breakpoints > 0 
-                    ? "bg-blue-500/15 text-blue-600 hover:bg-blue-500/25 active:scale-95" 
-                    : "opacity-40 cursor-not-allowed text-muted"
-              }`}
-            >
-              {isFrozen ? <Pause size={9} /> : <Play size={9} />}
-              <span>{breakpoints}</span>
-            </button>
-
-            {/* Audio Mute/Unmute */}
-            <button
-              type="button"
-              onClick={() => setIsMuted(!isMuted)}
-              className="text-muted hover:text-ink transition-colors p-0.5"
-              title={isMuted ? "Unmute Sound" : "Mute Sound"}
-              aria-label={isMuted ? "Unmute Sound" : "Mute Sound"}
-            >
-              {isMuted ? <VolumeX size={12} /> : <Volume2 size={12} />}
-            </button>
-
-            {/* Reset */}
-            <button
-              type="button"
-              onClick={() => {
-                restoreAllEatenElements();
-                setDefects([]);
-                setScore(0);
-                setCombo(0);
-                setBreakpoints(1);
-                setIsFrozen(false);
-                setHasCrashed(false);
-                spawnDefect();
-              }}
-              className="text-muted hover:text-amber-500 transition-colors p-0.5"
-              title="Reboot Environment"
-              aria-label="Reboot Environment"
-            >
-              <RefreshCw size={11} />
-            </button>
+                {/* Reset */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    restoreAllEatenElements();
+                    setDefects([]);
+                    setScore(0);
+                    setCombo(0);
+                    setBreakpoints(1);
+                    setIsFrozen(false);
+                    setHasCrashed(false);
+                    spawnDefect();
+                  }}
+                  className="text-muted hover:text-amber-500 hover:border-amber-500 transition-colors p-0.5 rounded-full border border-line"
+                  title="Reboot Environment"
+                  aria-label="Reboot Environment"
+                >
+                  <RefreshCw size={9} />
+                </button>
+              </div>
+            </div>
           </aside>
 
           {/* Frozen Debugger Overlay Banner */}
@@ -1389,11 +1406,6 @@ export function QaGame() {
 
           {/* Keyframe Styles */}
           <style dangerouslySetInnerHTML={{__html: `
-            html[data-game="on"] header.sticky > div,
-            html[data-game="on"] .site-header > div {
-              padding-left: calc(330px + 1rem);
-              transition: padding 0.3s ease;
-            }
             header.sticky, .site-header {
               transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
             }

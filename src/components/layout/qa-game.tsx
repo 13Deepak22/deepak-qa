@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { 
   Gamepad2, Bug, X, Target, ShieldCheck, 
   Volume2, VolumeX, Pause, Play, AlertTriangle, 
@@ -268,6 +269,7 @@ function AnimatedBug({ size, color, speedScale, isEating, isPulsing, isFrozen }:
 }
 
 export function QaGame() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [hasCrashed, setHasCrashed] = useState(false);
   const [score, setScore] = useState(0);
@@ -591,9 +593,9 @@ export function QaGame() {
     const y = margin + Math.random() * (window.innerHeight - margin * 2);
     
     // Low priority when born: big, light yellow, slow crawl
-    const baseSpeed = 0.85 + Math.random() * 0.35; // 0.85 to 1.2 px/frame
-    const baseSize = 60 + Math.random() * 8; // 60px to 68px
-    const hungerThreshold = 8000 + Math.random() * 6000; // 8s to 14s before critical
+    const baseSpeed = 0.95 + Math.random() * 0.35; // 0.95 to 1.3 px/frame
+    const baseSize = 58 + Math.random() * 8; // 58px to 66px
+    const hungerThreshold = 5500 + Math.random() * 3200; // 5.5s to 8.7s before critical
     
     const newDefect: Defect = {
       id: Math.random().toString(36).substring(7),
@@ -616,6 +618,31 @@ export function QaGame() {
     setDefects(prev => [...prev, newDefect]);
   }, []);
 
+  // Universal leaf content selector covering text, headings, badges, lists, code, buttons across all sections
+  const LEAF_SELECTOR = [
+    'p:not([data-eaten]):not([data-eating-by])',
+    'h1:not([data-eaten]):not([data-eating-by])',
+    'h2:not([data-eaten]):not([data-eating-by])',
+    'h3:not([data-eaten]):not([data-eating-by])',
+    'h4:not([data-eaten]):not([data-eating-by])',
+    'h5:not([data-eaten]):not([data-eating-by])',
+    'h6:not([data-eaten]):not([data-eating-by])',
+    'li:not([data-eaten]):not([data-eating-by])',
+    'button:not([data-eaten]):not([data-eating-by])',
+    'a:not([data-eaten]):not([data-eating-by])',
+    'code:not([data-eaten]):not([data-eating-by])',
+    'pre:not([data-eaten]):not([data-eating-by])',
+    'span:not([data-eaten]):not([data-eating-by])',
+    'strong:not([data-eaten]):not([data-eating-by])',
+    'em:not([data-eaten]):not([data-eating-by])',
+    'td:not([data-eaten]):not([data-eating-by])',
+    'th:not([data-eaten]):not([data-eating-by])',
+    'blockquote:not([data-eaten]):not([data-eating-by])',
+    'figcaption:not([data-eaten]):not([data-eating-by])',
+    'time:not([data-eaten]):not([data-eating-by])',
+    'label:not([data-eaten]):not([data-eating-by])'
+  ].join(', ');
+
   // Helper: Check if an element belongs to the site header or footer
   const isHeaderOrFooterElement = (el: HTMLElement): boolean => {
     return !!(
@@ -629,24 +656,13 @@ export function QaGame() {
   // Helper: Check if active main page content (outside header/footer) still remains uneaten
   const hasActiveMainPageContent = (): boolean => {
     if (typeof document === "undefined") return false;
-    const candidates = document.querySelectorAll<HTMLElement>(
-      'main p:not([data-eaten]):not([data-eating-by]), ' +
-      'main h1:not([data-eaten]):not([data-eating-by]), ' +
-      'main h2:not([data-eaten]):not([data-eating-by]), ' +
-      'main h3:not([data-eaten]):not([data-eating-by]), ' +
-      'main h4:not([data-eaten]):not([data-eating-by]), ' +
-      'main li:not([data-eaten]):not([data-eating-by]), ' +
-      'main button:not([data-eaten]):not([data-eating-by]), ' +
-      'main a:not([data-eaten]):not([data-eating-by]), ' +
-      'main code:not([data-eaten]):not([data-eating-by]), ' +
-      'main span:not([data-eaten]):not([data-eating-by])'
-    );
+    const candidates = document.querySelectorAll<HTMLElement>(`main ${LEAF_SELECTOR}`);
 
     for (let i = 0; i < candidates.length; i++) {
       const el = candidates[i];
       if (el.closest('[data-game-ui="true"]') || el.closest('.z-\\[60\\]') || el.closest('.site-cursor')) continue;
       if (isHeaderOrFooterElement(el)) continue;
-      if (el.offsetWidth > 10 && el.offsetHeight > 8 && el.textContent?.trim()) {
+      if (el.offsetWidth >= 8 && el.offsetHeight >= 8 && Boolean(el.textContent?.trim())) {
         return true; // Still have main section content to eat!
       }
     }
@@ -657,7 +673,15 @@ export function QaGame() {
   // Header and footer are strictly the LAST targets on the active page
   const findContentLeafTarget = (x: number, y: number): HTMLElement | null => {
     if (typeof document === "undefined") return null;
-    const elements = document.elementsFromPoint(x, y);
+
+    // Multi-point sampling around bug center to catch text lines immediately
+    const samplePoints = [
+      { px: x, py: y },
+      { px: x + 8, py: y },
+      { px: x - 8, py: y },
+      { px: x, py: y + 8 },
+      { px: x, py: y - 8 }
+    ];
 
     const FORBIDDEN_CONTAINERS = new Set([
       'HTML', 'BODY', 'MAIN', 'SECTION', 'ARTICLE', 'NAV', 
@@ -668,56 +692,56 @@ export function QaGame() {
       'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 
       'LI', 'BUTTON', 'A', 'SPAN', 'CODE', 'PRE', 
       'TD', 'TH', 'LABEL', 'STRONG', 'EM', 'B', 'I', 
-      'IMG', 'SVG', 'BLOCKQUOTE', 'CITE', 'TIME'
+      'IMG', 'SVG', 'BLOCKQUOTE', 'CITE', 'TIME', 'FIGCAPTION'
     ]);
 
     const mainContentRemains = hasActiveMainPageContent();
 
-    for (const el of elements) {
-      if (!(el instanceof HTMLElement)) continue;
-      if (el.closest('[data-game-ui="true"]') || el.closest('.z-\\[60\\]') || el.closest('.site-cursor')) continue;
-      if (el.id === '__next' || el.id === 'root') continue;
-      if (el.hasAttribute('data-eaten') || el.closest('[data-eaten="true"]')) continue;
-      if (el.hasAttribute('data-eating-by')) continue;
+    for (const pt of samplePoints) {
+      if (pt.px < 0 || pt.px > window.innerWidth || pt.py < 0 || pt.py > window.innerHeight) continue;
+      const elements = document.elementsFromPoint(pt.px, pt.py);
 
-      // RULE: Header and Footer are the LAST targets — skip if main page content still remains
-      if (mainContentRemains && isHeaderOrFooterElement(el)) {
-        continue;
-      }
+      for (const el of elements) {
+        if (!(el instanceof HTMLElement)) continue;
+        if (el.closest('[data-game-ui="true"]') || el.closest('.z-\\[60\\]') || el.closest('.site-cursor')) continue;
+        if (el.id === '__next' || el.id === 'root') continue;
+        if (el.hasAttribute('data-eaten') || el.closest('[data-eaten="true"]')) continue;
+        if (el.hasAttribute('data-eating-by')) continue;
 
-      const tag = el.tagName.toUpperCase();
-      if (FORBIDDEN_CONTAINERS.has(tag)) continue;
-
-      // Direct leaf elements
-      if (LEAF_TAGS.has(tag)) {
-        const rect = el.getBoundingClientRect();
-        if (rect.width > 6 && rect.height > 6 && (el.textContent?.trim() || tag === 'IMG' || tag === 'SVG')) {
-          return el;
-        }
-      }
-
-      // Small content divs (badges, counters, tags, chips)
-      if (tag === 'DIV') {
-        const rect = el.getBoundingClientRect();
-        // Skip large containers
-        if (rect.width > 550 || rect.height > 300) continue;
-        
-        // If it contains child leaf content, pick the leaf child rather than the container
-        if (el.childElementCount > 1) {
-          const leafChild = el.querySelector<HTMLElement>(
-            'p:not([data-eaten]):not([data-eating-by]), span:not([data-eaten]):not([data-eating-by]), h1:not([data-eaten]):not([data-eating-by]), h2:not([data-eaten]):not([data-eating-by]), h3:not([data-eaten]):not([data-eating-by]), li:not([data-eaten]):not([data-eating-by]), button:not([data-eaten]):not([data-eating-by]), a:not([data-eaten]):not([data-eating-by]), code:not([data-eaten]):not([data-eating-by])'
-          );
-          if (leafChild && !leafChild.hasAttribute('data-eaten') && !leafChild.hasAttribute('data-eating-by')) {
-            if (mainContentRemains && isHeaderOrFooterElement(leafChild)) {
-              continue;
-            }
-            return leafChild;
-          }
+        // RULE: Header and Footer are strictly the LAST targets on the active page
+        if (mainContentRemains && isHeaderOrFooterElement(el)) {
           continue;
         }
-        
-        if (el.textContent?.trim() && rect.width > 10 && rect.height > 10) {
-          return el;
+
+        const tag = el.tagName.toUpperCase();
+        if (FORBIDDEN_CONTAINERS.has(tag)) continue;
+
+        // Direct leaf elements
+        if (LEAF_TAGS.has(tag)) {
+          const rect = el.getBoundingClientRect();
+          if (rect.width >= 6 && rect.height >= 6 && (Boolean(el.textContent?.trim()) || tag === 'IMG' || tag === 'SVG')) {
+            return el;
+          }
+        }
+
+        // Small content divs (badges, counters, tags, chips)
+        if (tag === 'DIV') {
+          const rect = el.getBoundingClientRect();
+          if (rect.width > 550 || rect.height > 350) continue;
+          
+          if (el.childElementCount > 0) {
+            const leafChild = el.querySelector<HTMLElement>(LEAF_SELECTOR);
+            if (leafChild && !leafChild.hasAttribute('data-eaten') && !leafChild.hasAttribute('data-eating-by')) {
+              if (mainContentRemains && isHeaderOrFooterElement(leafChild)) {
+                continue;
+              }
+              return leafChild;
+            }
+          }
+          
+          if (Boolean(el.textContent?.trim()) && rect.width >= 8 && rect.height >= 8) {
+            return el;
+          }
         }
       }
     }
@@ -725,36 +749,36 @@ export function QaGame() {
     return null;
   };
 
-  // Helper: Find nearest visible uneaten leaf content element on screen to steer critical bugs towards
+  // Helper: Find nearest visible uneaten leaf content element on screen to steer hungry bugs towards
   // Header and footer are strictly the LAST targets on the active page
   const findNearbyLeafElement = (x: number, y: number): HTMLElement | null => {
     if (typeof document === "undefined") return null;
     const mainContentRemains = hasActiveMainPageContent();
 
-    const candidates = document.querySelectorAll<HTMLElement>(
-      'p:not([data-eaten]):not([data-eating-by]), h1:not([data-eaten]):not([data-eating-by]), h2:not([data-eaten]):not([data-eating-by]), h3:not([data-eaten]):not([data-eating-by]), li:not([data-eaten]):not([data-eating-by]), button:not([data-eaten]):not([data-eating-by]), a:not([data-eaten]):not([data-eating-by]), code:not([data-eaten]):not([data-eating-by])'
-    );
+    const candidates = document.querySelectorAll<HTMLElement>(LEAF_SELECTOR);
 
     let closest: HTMLElement | null = null;
-    let minDistance = 600;
+    let minDistance = Infinity;
 
     for (let i = 0; i < candidates.length; i++) {
       const el = candidates[i];
       if (el.closest('[data-game-ui="true"]') || el.closest('.z-\\[60\\]')) continue;
 
-      // RULE: Do not steer toward header or footer if main page content still remains
+      // RULE: Do not steer toward header or footer if main page section content still remains
       if (mainContentRemains && isHeaderOrFooterElement(el)) {
         continue;
       }
 
       const rect = el.getBoundingClientRect();
+      // Detect if element is visible in the viewport across any scrolled section
       if (
-        rect.top >= 0 && 
-        rect.bottom <= window.innerHeight && 
-        rect.left >= 0 && 
-        rect.right <= window.innerWidth && 
-        rect.width > 8 && 
-        rect.height > 8
+        rect.top < window.innerHeight - 15 && 
+        rect.bottom > 15 && 
+        rect.left < window.innerWidth - 15 && 
+        rect.right > 15 && 
+        rect.width >= 6 && 
+        rect.height >= 6 &&
+        Boolean(el.textContent?.trim())
       ) {
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
@@ -837,8 +861,8 @@ export function QaGame() {
             targetEl.style.textDecoration = "line-through 2px #ef4444";
             targetEl.style.transform = "scale(0.97)";
 
-            // Trigger section glitch crash tremor
-            const parentSection = targetEl.closest('section, main, article, header, footer');
+            // Trigger section glitch crash tremor on closest section or card container
+            const parentSection = targetEl.closest('section, article, [data-section], [id^="section"], .card, div.border, main, header, footer');
             if (parentSection instanceof HTMLElement) {
               parentSection.style.animation = "sectionGlitchCrash 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97)";
               setTimeout(() => {
@@ -853,12 +877,12 @@ export function QaGame() {
           playCrashAudio();
 
           // 3. Child bug logic: Spawn brand new P3 low bug (big, light yellow, slow crawl)
-          const childSpeed = 0.85 + Math.random() * 0.35;
-          const childSize = 60 + Math.random() * 8;
+          const childSpeed = 0.95 + Math.random() * 0.35;
+          const childSize = 58 + Math.random() * 8;
           newBugsToSpawn.push({
             id: Math.random().toString(36).substring(7),
-            x: Math.max(20, Math.min(window.innerWidth - childSize - 20, bug.x + (Math.random() - 0.5) * 40)),
-            y: Math.max(20, Math.min(window.innerHeight - childSize - 20, bug.y + (Math.random() - 0.5) * 40)),
+            x: Math.max(20, Math.min(window.innerWidth - childSize - 20, bug.x + (Math.random() - 0.5) * 50)),
+            y: Math.max(20, Math.min(window.innerHeight - childSize - 20, bug.y + (Math.random() - 0.5) * 50)),
             squashed: false,
             eating: false,
             eatingTarget: null,
@@ -870,7 +894,7 @@ export function QaGame() {
             color: "#fde047", // light yellow
             isPulsing: false,
             direction: Math.random() * Math.PI * 2,
-            hungerThreshold: 8500 + Math.random() * 5500,
+            hungerThreshold: 5500 + Math.random() * 3200,
             wobbleSeed: Math.random() * 1000
           });
 
@@ -920,9 +944,11 @@ export function QaGame() {
       let nextDirection = bug.direction;
       let nextSpeed = activeSpeed;
 
-      // When critical: scan for discrete leaf elements to corrupt
-      if (progress >= 1.0 && !bug.scanning && !isFrozen) {
-        if (now - nextLastHitTest > 350) {
+      // Food seeking and section consumption:
+      // Starts seeking at P2 (progress >= 0.40), actively eating at P1 (>= 0.70) and P0 (>= 1.0)
+      const isSeekingFood = progress >= 0.40;
+      if (isSeekingFood && !bug.scanning && !isFrozen) {
+        if (now - nextLastHitTest > 260) {
           nextLastHitTest = now;
           const leafTarget = findContentLeafTarget(bug.x + currentSize / 2, bug.y + currentSize / 2);
           if (leafTarget) {
@@ -944,8 +970,8 @@ export function QaGame() {
               speed: 0,
               speedScale: 0,
               lastHitTest: nextLastHitTest,
-              color: '#b91c1c',
-              isPulsing: true,
+              color: progress >= 1.0 ? '#b91c1c' : bug.color,
+              isPulsing: progress >= 1.0,
               size: currentSize
             };
           } else {
@@ -954,7 +980,7 @@ export function QaGame() {
             if (nearby) {
               const rect = nearby.getBoundingClientRect();
               const targetAngle = Math.atan2((rect.top + rect.height / 2) - bug.y, (rect.left + rect.width / 2) - bug.x);
-              nextDirection = targetAngle + (Math.random() - 0.5) * 0.35;
+              nextDirection = targetAngle + (Math.random() - 0.5) * 0.28;
             }
           }
         }
@@ -1038,6 +1064,50 @@ export function QaGame() {
     }
   }, [isOpen, spawnDefect, updatePositions, restoreAllEatenElements]);
 
+  // Route transition synchronization: re-link bugs and active section content on navigation
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Clear any detached targets from previous route
+    setDefects(prev => prev.map(bug => {
+      if (bug.eatingTarget && !bug.eatingTarget.isConnected) {
+        return { ...bug, eating: false, eatingTarget: null, speed: bug.originalSpeed };
+      }
+      return bug;
+    }));
+
+    // Re-evaluate integrity and eaten count on the active route
+    const corruptedCount = document.querySelectorAll('[data-eaten="true"]').length;
+    setEatenCount(corruptedCount);
+    const integrityLeft = Math.max(0, 100 - corruptedCount * 7);
+    setSystemIntegrity(integrityLeft);
+
+    const remainingOnPage = document.querySelectorAll(
+      'main p:not([data-eaten]), main h1:not([data-eaten]), main h2:not([data-eaten]), main h3:not([data-eaten]), main li:not([data-eaten])'
+    );
+    if (corruptedCount > 0 && remainingOnPage.length === 0) {
+      setHasCrashed(true);
+    } else {
+      setHasCrashed(false);
+    }
+  }, [pathname, isOpen]);
+
+  // Viewport resize guard: clamp defects within responsive boundaries
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleResize = () => {
+      const maxX = window.innerWidth - 30;
+      const maxY = window.innerHeight - 30;
+      setDefects(prev => prev.map(b => ({
+        ...b,
+        x: Math.min(Math.max(10, b.x), maxX),
+        y: Math.min(Math.max(10, b.y), maxY)
+      })));
+    };
+    window.addEventListener('resize', handleResize, { passive: true });
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isOpen]);
+
   // Current QA title rank
   const currentRank = QA_TITLES.reduce((acc, curr) => score >= curr.minScore ? curr : acc, QA_TITLES[0]);
 
@@ -1057,13 +1127,10 @@ export function QaGame() {
       {isOpen && (
         <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden selection:bg-transparent" data-game-ui="true">
           
-          {/* QA Defect Hunter Stat HUD - Positioned in the left gutter so its right edge ends where website begins */}
+          {/* QA Defect Hunter Stat HUD - Responsive: bottom-left above launcher on mobile, desktop gutter on large screens */}
           <aside 
             aria-label="QA Game Stats"
-            className="fixed top-3.5 z-[60] flex flex-col gap-2 bg-paper/95 backdrop-blur-md p-2.5 rounded-2xl border border-pass text-ink shadow-[3px_3px_0_var(--ink)] font-mono select-none pointer-events-auto animate-fade-in w-[165px] max-w-[calc(100vw-1rem)]"
-            style={{
-              left: "max(8px, calc(50vw - 36rem - 165px - 8px))"
-            }}
+            className="fixed z-[60] flex flex-col gap-2 bg-paper/95 backdrop-blur-md p-2.5 rounded-2xl border border-pass text-ink shadow-[3px_3px_0_var(--ink)] font-mono select-none pointer-events-auto animate-fade-in w-[165px] max-w-[calc(100vw-1.5rem)] bottom-20 left-4 lg:bottom-auto lg:top-3.5 lg:left-[max(8px,calc(50vw-36rem-165px-8px))]"
           >
             {/* Row 1: Header + Tier Badge */}
             <div className="flex items-center justify-between gap-1 border-b border-line pb-1">

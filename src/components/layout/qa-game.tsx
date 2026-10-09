@@ -274,6 +274,7 @@ export function QaGame() {
   const [hasCrashed, setHasCrashed] = useState(false);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
   const [breakpoints, setBreakpoints] = useState(1);
   const [isFrozen, setIsFrozen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -294,13 +295,15 @@ export function QaGame() {
   const scoreRef = useRef(0);
   const isMutedRef = useRef(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const hasCrashedRef = useRef(false);
 
   // Sync state refs
   useEffect(() => {
     defectsRef.current = defects;
     scoreRef.current = score;
     isMutedRef.current = isMuted;
-  }, [defects, score, isMuted]);
+    hasCrashedRef.current = hasCrashed;
+  }, [defects, score, isMuted, hasCrashed]);
 
   // Clean Audio Context Manager
   const getAudio = useCallback(() => {
@@ -501,6 +504,7 @@ export function QaGame() {
     if (comboTimerRef.current) clearTimeout(comboTimerRef.current);
     const newCombo = combo + 1;
     setCombo(newCombo);
+    setMaxCombo(prev => Math.max(prev, newCombo));
     comboTimerRef.current = setTimeout(() => setCombo(0), 2000);
 
     // Audio
@@ -703,7 +707,7 @@ export function QaGame() {
 
       for (const el of elements) {
         if (!(el instanceof HTMLElement)) continue;
-        if (el.closest('[data-game-ui="true"]') || el.closest('.z-\\[60\\]') || el.closest('.site-cursor')) continue;
+        if (el.closest('[data-game-ui="true"], [role="dialog"], [aria-modal="true"], aside, .press, .site-cursor') || el.closest('.z-\\[60\\]')) continue;
         if (el.id === '__next' || el.id === 'root') continue;
         if (el.hasAttribute('data-eaten') || el.closest('[data-eaten="true"]')) continue;
         if (el.hasAttribute('data-eating-by')) continue;
@@ -762,7 +766,7 @@ export function QaGame() {
 
     for (let i = 0; i < candidates.length; i++) {
       const el = candidates[i];
-      if (el.closest('[data-game-ui="true"]') || el.closest('.z-\\[60\\]')) continue;
+      if (el.closest('[data-game-ui="true"], [role="dialog"], [aria-modal="true"], aside, .press') || el.closest('.z-\\[60\\]')) continue;
 
       // RULE: Do not steer toward header or footer if main page section content still remains
       if (mainContentRemains && isHeaderOrFooterElement(el)) {
@@ -794,6 +798,11 @@ export function QaGame() {
 
   // Movement & Game Physics Loop
   const updatePositions = useCallback(() => {
+    if (hasCrashedRef.current) {
+      requestRef.current = requestAnimationFrame(updatePositions);
+      return;
+    }
+
     const now = Date.now();
     const newBugsToSpawn: Defect[] = [];
 
@@ -1032,7 +1041,9 @@ export function QaGame() {
       let timeoutId: NodeJS.Timeout;
       const scheduleNext = () => {
         timeoutId = setTimeout(() => {
-          spawnDefect();
+          if (!hasCrashedRef.current) {
+            spawnDefect();
+          }
           scheduleNext();
         }, 600 + Math.random() * 1800);
       };
@@ -1359,45 +1370,80 @@ export function QaGame() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="crash-title"
-              className="fixed inset-0 z-[100] bg-red-950/95 text-paper flex flex-col items-center justify-center font-mono p-6 sm:p-10 pointer-events-auto backdrop-blur-md overflow-y-auto"
+              className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 font-mono pointer-events-auto animate-fade-in overflow-y-auto"
             >
-              <div className="max-w-2xl w-full bg-black/80 border-2 border-red-600 rounded-2xl p-6 sm:p-8 shadow-[0_0_50px_rgba(220,38,38,0.5)]">
-                
-                {/* Header Badge */}
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-600 text-white text-xs font-bold rounded uppercase tracking-widest mb-4">
-                  <AlertTriangle size={14} /> Production Severity 1 Outage
+              <div className="relative max-w-lg w-full bg-[#0d1117] border border-red-500/30 rounded-2xl p-6 sm:p-8 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_40px_rgba(239,68,68,0.12)] text-zinc-100 overflow-hidden">
+                {/* Top ambient status gradient bar */}
+                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-red-600 via-rose-500 to-amber-500" />
+
+                {/* Status Pill & Header */}
+                <div className="flex items-center justify-between gap-2 mb-4">
+                  <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/25 text-red-400 text-[11px] font-semibold tracking-wide">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                    </span>
+                    <span>SEV-1 INCIDENT · SYSTEM OUTAGE</span>
+                  </div>
+                  <span className="text-[10px] text-zinc-500 font-mono tracking-wider">
+                    SUITE HALTED
+                  </span>
                 </div>
 
-                <h2 id="crash-title" className="text-3xl sm:text-4xl font-bold tracking-tight text-red-500 mb-2">
-                  FATAL_SYSTEM_ERROR: MEMORY_CORRUPTED
+                {/* Title & Description */}
+                <h2 id="crash-title" className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2 leading-tight">
+                  Pipeline Assertion Failure
                 </h2>
-                
-                <p className="text-paper/80 text-sm sm:text-base mb-6 leading-relaxed">
-                  Defects breached automated assertions and corrupted 100% of the active site layout. The QA Defect Hunter test suite halted.
+                <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6 font-sans">
+                  Critical defects breached automated test guardrails and depleted page integrity. Execution was halted to prevent cascading UI corruption.
                 </p>
 
-                {/* Incident Post-Mortem Box */}
-                <div className="bg-red-950/40 border border-red-800/80 rounded-xl p-4 mb-6 space-y-2 text-xs text-red-200">
-                  <div className="flex justify-between border-b border-red-900/60 pb-1.5">
-                    <span className="text-red-400">Total Bugs Intercepted:</span>
-                    <span className="font-bold text-white">{score}</span>
+                {/* Post-Mortem 4-Box Metrics Grid */}
+                <div className="grid grid-cols-2 gap-2.5 mb-6">
+                  {/* Metric 1: Bugs Intercepted */}
+                  <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl p-3">
+                    <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold block mb-1">
+                      Intercepted
+                    </span>
+                    <span className="text-2xl font-black text-emerald-400 font-mono leading-none">
+                      {score} <span className="text-xs font-normal text-zinc-500">defects</span>
+                    </span>
                   </div>
-                  <div className="flex justify-between border-b border-red-900/60 pb-1.5">
-                    <span className="text-red-400">Peak Performance Combo:</span>
-                    <span className="font-bold text-white">{combo}x Multiplier</span>
+
+                  {/* Metric 2: QA Rank */}
+                  <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl p-3">
+                    <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold block mb-1">
+                      Hunter Rank
+                    </span>
+                    <div className="text-sm font-bold text-white truncate leading-none mt-1" title={currentRank.title}>
+                      <span className="mr-1">{currentRank.badge}</span>
+                      <span className="text-zinc-300 font-normal">{currentRank.title}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between border-b border-red-900/60 pb-1.5">
-                    <span className="text-red-400">Final QA Assessment:</span>
-                    <span className="font-bold text-white">{currentRank.title} ({currentRank.badge})</span>
+
+                  {/* Metric 3: Peak Streak */}
+                  <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl p-3">
+                    <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold block mb-1">
+                      Peak Streak
+                    </span>
+                    <span className="text-2xl font-black text-amber-400 font-mono leading-none">
+                      {maxCombo > 1 ? `${maxCombo}x` : "1x"}
+                    </span>
                   </div>
-                  <div className="flex justify-between pt-1">
-                    <span className="text-red-400">Incident Code:</span>
-                    <span className="font-mono text-red-300">0x0000000A_ASSERT_FAIL</span>
+
+                  {/* Metric 4: Root Cause */}
+                  <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl p-3">
+                    <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold block mb-1">
+                      Failure Signature
+                    </span>
+                    <span className="text-xs font-mono font-bold text-rose-400 block truncate leading-none mt-1">
+                      ASSERTION_FAIL
+                    </span>
                   </div>
                 </div>
 
                 {/* Hotfix Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col sm:flex-row gap-2.5">
                   <button
                     type="button"
                     onClick={() => {
@@ -1405,19 +1451,28 @@ export function QaGame() {
                       setHasCrashed(false);
                       setScore(0);
                       setCombo(0);
+                      setMaxCombo(0);
                       setBreakpoints(1);
                       setDefects([]);
+                      spawnDefect();
                     }}
-                    className="flex-1 px-5 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold transition-all text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg active:scale-95"
+                    className="flex-1 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold transition-all text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(220,38,38,0.35)] active:scale-95 cursor-pointer whitespace-nowrap"
                   >
-                    <RefreshCw size={16} /> Deploy Hotfix & Retry
+                    <RefreshCw size={14} className="shrink-0" />
+                    Deploy Hotfix & Retry
                   </button>
                   <button
                     type="button"
                     onClick={() => {
+                      restoreAllEatenElements();
+                      setHasCrashed(false);
+                      setDefects([]);
+                      setScore(0);
+                      setCombo(0);
+                      setMaxCombo(0);
                       setIsOpen(false);
                     }}
-                    className="px-5 py-3 rounded-xl bg-paper/10 hover:bg-paper/20 text-paper font-semibold transition-all text-sm uppercase tracking-wider"
+                    className="px-5 py-3 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 hover:text-white font-semibold transition-colors text-xs sm:text-sm flex items-center justify-center border border-zinc-700/60 cursor-pointer"
                   >
                     Close Game
                   </button>

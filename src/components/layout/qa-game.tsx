@@ -30,14 +30,6 @@ interface Defect {
   wobbleSeed: number;
 }
 
-interface ScoreFloater {
-  id: string;
-  x: number;
-  y: number;
-  text: string;
-  color: string;
-  points: number;
-}
 
 interface TerminalLog {
   id: number;
@@ -288,7 +280,7 @@ export function QaGame() {
 
   const [defects, setDefects] = useState<Defect[]>([]);
   const [particles, setParticles] = useState<{ id: string; x: number; y: number; color: string }[]>([]);
-  const [floaters, setFloaters] = useState<ScoreFloater[]>([]);
+
   const [terminalLogs, setTerminalLogs] = useState<TerminalLog[]>([]);
 
   const requestRef = useRef<number>(null);
@@ -512,27 +504,6 @@ export function QaGame() {
     // Audio
     playResolveAudio(newCombo);
 
-    // Score calculation
-    let basePoints = 25;
-    let pointTag = "+25 P3 LOW";
-    let pointColor = "#fde047";
-
-    if (progress >= 1.0) {
-      basePoints = 200;
-      pointTag = `+${basePoints * (isFrozen ? 2 : 1)} P0 CRITICAL!`;
-      pointColor = "#ef4444";
-    } else if (progress >= 0.70) {
-      basePoints = 100;
-      pointTag = `+${basePoints * (isFrozen ? 2 : 1)} P1 HIGH`;
-      pointColor = "#f97316";
-    } else if (progress >= 0.35) {
-      basePoints = 50;
-      pointTag = `+${basePoints * (isFrozen ? 2 : 1)} P2 MED`;
-      pointColor = "#facc15";
-    }
-
-    const earnedPoints = isFrozen ? basePoints * 2 : basePoints;
-
     // Award Breakpoint charge every 8 squashes
     setScore(s => {
       const nextScore = s + 1;
@@ -561,25 +532,6 @@ export function QaGame() {
 
     // Mark bug as squashed
     setDefects(prev => prev.map(b => b.id === id ? { ...b, squashed: true, scanning: false, eating: false } : b));
-
-    // Spawn Score Floater text centered directly on the defect
-    const floaterId = Math.random().toString(36).substring(7);
-    const floaterX = x + targetBug.size / 2;
-    const floaterY = y - 10;
-    setFloaters(prev => [
-      ...prev,
-      {
-        id: floaterId,
-        x: floaterX,
-        y: floaterY,
-        text: newCombo > 1 ? `${pointTag} (${newCombo}x COMBO!)` : pointTag,
-        color: pointColor,
-        points: earnedPoints
-      }
-    ]);
-    setTimeout(() => {
-      setFloaters(prev => prev.filter(f => f.id !== floaterId));
-    }, 850);
 
     // Spawn colorful debris particles matching bug color
     const newParticles = Array.from({ length: 7 }).map(() => ({
@@ -924,23 +876,6 @@ export function QaGame() {
 
           playBirthAudio();
 
-          // Floater for section crash & child spawn
-          const crashFloaterId = Math.random().toString(36).substring(7);
-          setFloaters(prev => [
-            ...prev,
-            {
-              id: crashFloaterId,
-              x: bug.x + currentSize / 2,
-              y: bug.y - 15,
-              text: "💥 SECTION CRASH! 🌱 Child P3 Bug Born",
-              color: "#ef4444",
-              points: 0
-            }
-          ]);
-          setTimeout(() => {
-            setFloaters(prev => prev.filter(f => f.id !== crashFloaterId));
-          }, 1100);
-
           // Spawn crash explosion debris particles
           const crashParticles = Array.from({ length: 12 }).map(() => ({
             id: Math.random().toString(36).substring(7),
@@ -1091,7 +1026,7 @@ export function QaGame() {
       setBreakpoints(1);
       setIsFrozen(false);
       setTerminalLogs([]);
-      setFloaters([]);
+
       setHasCrashed(false);
 
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
@@ -1308,20 +1243,7 @@ export function QaGame() {
               );
             })}
 
-            {/* Score Float Pops */}
-            {floaters.map(f => (
-              <div
-                key={f.id}
-                className="absolute font-mono font-extrabold text-sm sm:text-base pointer-events-none z-[65] animate-floater select-none drop-shadow-md -translate-x-1/2 whitespace-nowrap"
-                style={{
-                  left: f.x,
-                  top: f.y,
-                  color: f.color
-                }}
-              >
-                {f.text}
-              </div>
-            ))}
+
 
             {/* Explosive Splat Particles */}
             {particles.map((p, i) => {
@@ -1455,16 +1377,7 @@ export function QaGame() {
                 opacity: 0;
               }
             }
-            @keyframes floater {
-              0% { transform: translate(-50%, 0) scale(0.85); opacity: 0; }
-              16% { transform: translate(-50%, -10px) scale(1.06); opacity: 1; }
-              36% { transform: translate(-50%, -18px) scale(1); opacity: 1; }
-              75% { transform: translate(-50%, -36px) scale(0.98); opacity: 0.85; }
-              100% { transform: translate(-50%, -48px) scale(0.92); opacity: 0; }
-            }
-            .animate-floater {
-              animation: floater 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            }
+
             @keyframes fadeIn {
               from { opacity: 0; transform: translateY(4px); }
               to { opacity: 1; transform: translateY(0); }

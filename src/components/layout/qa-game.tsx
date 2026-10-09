@@ -1138,47 +1138,41 @@ export function QaGame() {
       {isOpen && (
         <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden selection:bg-transparent" data-game-ui="true">
           
-          {/* QA Defect Hunter Stat HUD - Minimal, clean, non-intrusive */}
+          {/* QA Defect Hunter Stat HUD - Professional, minimal, brand-aligned */}
           <aside 
             aria-label="QA Game Stats"
-            className="fixed z-[60] flex flex-col gap-1.5 bg-paper/95 backdrop-blur-md p-2 rounded-xl border border-line text-ink shadow-sm font-mono select-none pointer-events-auto animate-fade-in w-[118px] max-w-[calc(100vw-1.5rem)] bottom-20 left-4 lg:bottom-auto lg:top-3.5 lg:left-[max(12px,calc(50vw-36rem-118px-10px))]"
+            className="fixed z-[60] flex flex-col gap-2 bg-paper/95 backdrop-blur-md p-2.5 rounded-2xl border border-pass text-ink shadow-[3px_3px_0_var(--ink)] font-mono select-none pointer-events-auto animate-fade-in w-[132px] max-w-[calc(100vw-1.5rem)] top-20 right-4 sm:top-20 sm:right-6 lg:top-[4.5rem] lg:right-6"
           >
             {/* Row 1: Header + Tier Badge */}
-            <div className="flex items-center justify-between text-[8px] pb-1 border-b border-line/60">
-              <span className="flex items-center gap-1 font-bold text-pass tracking-wider text-[8.5px]">
-                <ShieldCheck size={11} className="text-pass shrink-0" />
-                QA
-              </span>
+            <div className="flex items-center justify-between gap-1 pb-1 border-b border-line">
+              <div className="flex items-center gap-1 font-bold text-pass text-[10px] tracking-tight">
+                <ShieldCheck size={12} className="text-pass animate-pulse shrink-0" />
+                <span>QA</span>
+              </div>
               <span 
-                className="px-1 py-0.2 rounded bg-pass/10 text-pass font-bold text-[7.5px] cursor-help" 
+                className="px-1.5 py-0.2 rounded bg-pass/10 text-pass font-bold text-[8px] border border-pass/30 shrink-0 cursor-help" 
                 title={currentRank.title}
               >
                 {currentRank.badge}
               </span>
             </div>
 
-            {/* Row 2: Fixed Count + Health % */}
-            <div className="flex items-end justify-between px-0.5">
-              <div>
-                <span className="text-[7px] text-muted uppercase tracking-wider block font-semibold leading-none mb-1">
-                  FIXED
-                </span>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-base font-black text-pass leading-none">{score}</span>
-                  {combo > 1 && (
-                    <span className="text-[7.5px] font-bold text-amber-500 animate-pulse leading-none">
-                      x{combo}
-                    </span>
-                  )}
-                </div>
+            {/* Row 2: Fixed Count & Integrity % (Clean metrics without 'HEALTH' or 'FIXED' text) */}
+            <div className="flex items-center justify-between px-0.5">
+              <div className="flex items-baseline gap-1">
+                <Bug size={13} className="text-pass shrink-0 self-center" />
+                <span className="text-lg font-black text-pass leading-none">{score}</span>
+                {combo > 1 && (
+                  <span className="text-[7.5px] font-bold text-amber-500 animate-pulse leading-none">
+                    x{combo}
+                  </span>
+                )}
               </div>
-              <div className="text-right">
-                <span className="text-[7px] text-muted uppercase tracking-wider block font-semibold leading-none mb-1">
-                  HEALTH
-                </span>
+              <div className="flex items-center gap-1">
+                <AlertTriangle size={10} className={systemIntegrity < 40 ? "text-red-500 animate-pulse shrink-0" : "text-pass shrink-0"} />
                 <span 
-                  className={`text-xs font-bold leading-none ${
-                    systemIntegrity < 30 ? "text-red-500 animate-pulse" : systemIntegrity < 65 ? "text-amber-500" : "text-ink"
+                  className={`text-xs font-extrabold leading-none ${
+                    systemIntegrity < 30 ? "text-red-500 animate-pulse" : systemIntegrity < 65 ? "text-amber-500" : "text-pass"
                   }`}
                 >
                   {systemIntegrity}%
@@ -1186,47 +1180,47 @@ export function QaGame() {
               </div>
             </div>
 
-            {/* Health Micro-bar */}
-            <div className="w-full h-[2px] bg-line/60 rounded-full overflow-hidden">
+            {/* Row 3: Reactive Micro Integrity Bar */}
+            <div className="w-full h-1 bg-line rounded-full overflow-hidden">
               <div 
-                className={`h-full transition-all duration-300 ${
+                className={`h-full transition-all duration-300 rounded-full ${
                   systemIntegrity < 30 ? "bg-red-500" : systemIntegrity < 65 ? "bg-amber-500" : "bg-pass"
                 }`} 
                 style={{ width: `${systemIntegrity}%` }} 
               />
             </div>
 
-            {/* Row 3: Action Controls (Breakpoint, Sound, Reset) */}
-            <div className="flex items-center justify-between pt-1 border-t border-line/50 text-muted">
+            {/* Row 4: Action Controls (Breakpoint, Sound, Reset) */}
+            <div className="flex items-center justify-between gap-1 pt-0.5 border-t border-line">
               {/* Breakpoint Powerup */}
               <button
                 type="button"
                 onClick={triggerBreakpoint}
                 disabled={breakpoints <= 0 || isFrozen}
-                title="Freeze (Spacebar)"
+                title="Debugger Breakpoint (Spacebar)"
                 aria-label="Freeze Bugs"
-                className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-bold transition-all ${
+                className={`flex items-center gap-1 px-2 py-0.5 rounded-full font-bold transition-all text-[8px] ${
                   isFrozen 
                     ? "bg-blue-600 text-white animate-pulse" 
                     : breakpoints > 0 
-                      ? "bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 active:scale-95 border border-blue-500/20" 
-                      : "opacity-40 cursor-not-allowed border border-line"
+                      ? "bg-blue-500/15 text-blue-600 border border-blue-500/30 hover:bg-blue-500/25 active:scale-95" 
+                      : "opacity-40 cursor-not-allowed border border-line text-muted"
                 }`}
               >
                 {isFrozen ? <Pause size={7} /> : <Play size={7} className="fill-current" />}
                 <span>{breakpoints}</span>
               </button>
 
-              <div className="flex items-center gap-0.5">
+              <div className="flex items-center gap-1">
                 {/* Audio toggle */}
                 <button
                   type="button"
                   onClick={() => setIsMuted(!isMuted)}
-                  className="hover:text-ink transition-colors p-1 rounded hover:bg-line/40"
+                  className="text-muted hover:text-ink hover:border-pass transition-colors p-1 rounded-full border border-line"
                   title={isMuted ? "Unmute Sound" : "Mute Sound"}
                   aria-label={isMuted ? "Unmute Sound" : "Mute Sound"}
                 >
-                  {isMuted ? <VolumeX size={11} /> : <Volume2 size={11} />}
+                  {isMuted ? <VolumeX size={10} /> : <Volume2 size={10} />}
                 </button>
 
                 {/* Reset */}
@@ -1237,16 +1231,17 @@ export function QaGame() {
                     setDefects([]);
                     setScore(0);
                     setCombo(0);
+                    setMaxCombo(0);
                     setBreakpoints(1);
                     setIsFrozen(false);
                     setHasCrashed(false);
                     spawnDefect();
                   }}
-                  className="hover:text-amber-500 transition-colors p-1 rounded hover:bg-line/40"
+                  className="text-muted hover:text-amber-500 hover:border-amber-500 transition-colors p-1 rounded-full border border-line"
                   title="Reboot Environment"
                   aria-label="Reboot Environment"
                 >
-                  <RefreshCw size={10} />
+                  <RefreshCw size={9} />
                 </button>
               </div>
             </div>

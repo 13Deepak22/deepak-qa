@@ -1359,79 +1359,73 @@ export function QaGame() {
             </aside>
           )}
 
-          {/* Fatal System Crash / Post-Mortem Incident Screen */}
+          {/* Fatal System Crash / Post-Mortem Incident Screen - Fully on-theme */}
           {hasCrashed && (
             <div 
               role="dialog"
               aria-modal="true"
               aria-labelledby="crash-title"
-              className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 font-mono pointer-events-auto animate-fade-in overflow-y-auto"
+              className="fixed inset-0 z-[100] bg-ink/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 font-mono pointer-events-auto animate-fade-in overflow-y-auto"
             >
-              <div className="relative max-w-lg w-full bg-[#0d1117] border border-red-500/30 rounded-2xl p-6 sm:p-8 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_40px_rgba(239,68,68,0.12)] text-zinc-100 overflow-hidden">
-                {/* Top ambient status gradient bar */}
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-red-600 via-rose-500 to-amber-500" />
-
-                {/* Status Pill & Header */}
-                <div className="flex items-center justify-between gap-2 mb-4">
-                  <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/25 text-red-400 text-[11px] font-semibold tracking-wide">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
-                    </span>
-                    <span>SEV-1 INCIDENT · SYSTEM OUTAGE</span>
+              <div className="relative max-w-lg w-full bg-paper border-2 border-pass text-ink rounded-2xl p-6 sm:p-8 shadow-[6px_6px_0_var(--ink)] overflow-hidden font-mono">
+                {/* Header Badge */}
+                <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-line">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-[10.5px] font-bold font-mono tracking-wider whitespace-nowrap">
+                    <span className="w-2 h-2 rounded-full bg-red-600 dark:bg-red-400 animate-pulse shrink-0" />
+                    <span>SEV-1 · SYSTEM OUTAGE</span>
                   </div>
-                  <span className="text-[10px] text-zinc-500 font-mono tracking-wider">
+                  <span className="text-[11px] text-muted font-mono tracking-wider uppercase font-semibold">
                     SUITE HALTED
                   </span>
                 </div>
 
                 {/* Title & Description */}
-                <h2 id="crash-title" className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2 leading-tight">
+                <h2 id="crash-title" className="font-serif text-2xl sm:text-3xl text-ink tracking-tight font-bold mb-2 leading-tight">
                   Pipeline Assertion Failure
                 </h2>
-                <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6 font-sans">
-                  Critical defects breached automated test guardrails and depleted page integrity. Execution was halted to prevent cascading UI corruption.
+                <p className="text-ink-soft text-xs sm:text-sm leading-relaxed mb-6 font-sans">
+                  Critical defects breached automated test guardrails and depleted page integrity. Execution was halted to prevent cascading layout collapse.
                 </p>
 
                 {/* Post-Mortem 4-Box Metrics Grid */}
                 <div className="grid grid-cols-2 gap-2.5 mb-6">
                   {/* Metric 1: Bugs Intercepted */}
-                  <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl p-3">
-                    <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold block mb-1">
+                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
+                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
                       Intercepted
                     </span>
-                    <span className="text-2xl font-black text-emerald-400 font-mono leading-none">
-                      {score} <span className="text-xs font-normal text-zinc-500">defects</span>
+                    <span className="text-2xl font-black text-pass leading-none">
+                      {score} <span className="text-xs font-normal text-muted">defects</span>
                     </span>
                   </div>
 
                   {/* Metric 2: QA Rank */}
-                  <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl p-3">
-                    <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold block mb-1">
+                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
+                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
                       Hunter Rank
                     </span>
-                    <div className="text-sm font-bold text-white truncate leading-none mt-1" title={currentRank.title}>
+                    <div className="text-sm font-bold text-ink truncate leading-none mt-1" title={currentRank.title}>
                       <span className="mr-1">{currentRank.badge}</span>
-                      <span className="text-zinc-300 font-normal">{currentRank.title}</span>
+                      <span className="text-ink-soft font-normal">{currentRank.title}</span>
                     </div>
                   </div>
 
                   {/* Metric 3: Peak Streak */}
-                  <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl p-3">
-                    <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold block mb-1">
+                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
+                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
                       Peak Streak
                     </span>
-                    <span className="text-2xl font-black text-amber-400 font-mono leading-none">
+                    <span className="text-2xl font-black text-amber-600 dark:text-amber-400 leading-none">
                       {maxCombo > 1 ? `${maxCombo}x` : "1x"}
                     </span>
                   </div>
 
                   {/* Metric 4: Root Cause */}
-                  <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl p-3">
-                    <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold block mb-1">
+                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
+                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
                       Failure Signature
                     </span>
-                    <span className="text-xs font-mono font-bold text-rose-400 block truncate leading-none mt-1">
+                    <span className="text-[11px] font-mono font-bold text-red-600 dark:text-red-400 block truncate leading-none mt-1">
                       ASSERTION_FAIL
                     </span>
                   </div>
@@ -1451,7 +1445,7 @@ export function QaGame() {
                       setDefects([]);
                       spawnDefect();
                     }}
-                    className="flex-1 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold transition-all text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(220,38,38,0.35)] active:scale-95 cursor-pointer whitespace-nowrap"
+                    className="press flex-1 inline-flex items-center justify-center gap-2 border border-pass bg-pass text-on-band hover:bg-pass-fill font-bold py-3 px-4 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm tracking-wide transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer whitespace-nowrap"
                   >
                     <RefreshCw size={14} className="shrink-0" />
                     Deploy Hotfix & Retry
@@ -1467,7 +1461,7 @@ export function QaGame() {
                       setMaxCombo(0);
                       setIsOpen(false);
                     }}
-                    className="px-5 py-3 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 hover:text-white font-semibold transition-colors text-xs sm:text-sm flex items-center justify-center border border-zinc-700/60 cursor-pointer"
+                    className="press inline-flex items-center justify-center border border-line bg-card text-ink hover:border-ink hover:text-ink font-semibold py-3 px-5 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer"
                   >
                     Close Game
                   </button>

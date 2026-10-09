@@ -114,132 +114,163 @@ interface AnimatedBugProps {
   isFrozen?: boolean;
 }
 
+const BUG_LEGS = [
+  { id: "ft", set: "a", x1: 14.6, y1: 9.4, x2: 18.2, y2: 5.4 },
+  { id: "mt", set: "b", x1: 11.2, y1: 8.4, x2: 11.6, y2: 3.6 },
+  { id: "bt", set: "a", x1: 7.8, y1: 9.2, x2: 4.6, y2: 5.2 },
+  { id: "fb", set: "b", x1: 14.6, y1: 14.6, x2: 18.2, y2: 18.6 },
+  { id: "mb", set: "a", x1: 11.2, y1: 15.6, x2: 11.6, y2: 20.4 },
+  { id: "bb", set: "b", x1: 7.8, y1: 14.8, x2: 4.6, y2: 18.8 },
+];
+
 function AnimatedBug({ size, color, speedScale, isEating, isPulsing, isFrozen }: AnimatedBugProps) {
   // Speed-synchronized leg stride duration (tripod crawling gait)
   const legCycleDuration = isFrozen 
     ? '0s' 
     : isEating 
-      ? '0.08s' 
-      : `${Math.max(0.06, 0.38 / (speedScale || 1))}s`;
+      ? '0.07s' 
+      : `${Math.max(0.06, 0.28 / (speedScale || 1))}s`;
 
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 44 44"
+      viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={`${isPulsing ? "animate-pulse" : ""} ${isEating ? "animate-scuttle-chew" : "animate-bug-waddle"}`}
+      className={`${isPulsing ? "animate-pulse" : ""} ${isEating ? "bug-game-eating" : "bug-game-crawling"}`}
       style={{
-        animationDuration: legCycleDuration,
-        filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.35))"
+        animationDuration: isEating ? "0.1s" : legCycleDuration,
+        filter: isFrozen
+          ? "drop-shadow(0 0 6px #38bdf8) brightness(1.2)"
+          : isPulsing
+            ? "drop-shadow(0 2px 6px rgba(185, 28, 28, 0.65))"
+            : "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35))",
       }}
     >
-      <g stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        {/* Antennae (twitching feelers) */}
-        <g className="animate-antenna-left" style={{ animationDuration: '0.4s', transformOrigin: '19px 10px' }}>
-          <path d="M 19 10 Q 15 5 11 3" />
-          <circle cx="11" cy="3" r="1" fill={color} stroke="none" />
-        </g>
-        <g className="animate-antenna-right" style={{ animationDuration: '0.4s', transformOrigin: '25px 10px' }}>
-          <path d="M 25 10 Q 29 5 33 3" />
-          <circle cx="33" cy="3" r="1" fill={color} stroke="none" />
-        </g>
+      {/* P0 Critical energetic pulse ring */}
+      {isPulsing && (
+        <ellipse
+          cx="11"
+          cy="12"
+          rx="7.4"
+          ry="5.8"
+          fill="none"
+          stroke="#ef4444"
+          strokeWidth="0.9"
+          className="bug-game-pulse-aura"
+        />
+      )}
 
-        {/* Mandibles / Pincers at mouth */}
-        <path d={isEating ? "M 19 8 L 22 10 L 25 8" : "M 19 9 Q 22 11 25 9"} />
-
-        {/* --- LEGS (Tripod Locomotion) --- */}
-        {/* Group A: Front-Left, Mid-Right, Rear-Left */}
-        {/* Front-Left Leg */}
-        <g 
-          className="animate-leg-tripod-a" 
-          style={{ 
-            transformOrigin: '18px 16px', 
+      {/* --- Precision Articulated Legs (Tripod Locomotion) --- */}
+      {BUG_LEGS.map((leg) => (
+        <line
+          key={leg.id}
+          className={`bug-game-leg ${leg.set === "a" ? "bug-game-leg-a" : "bug-game-leg-b"}`}
+          x1={leg.x1}
+          y1={leg.y1}
+          x2={leg.x2}
+          y2={leg.y2}
+          stroke="var(--ink)"
+          strokeWidth="1.35"
+          strokeLinecap="round"
+          style={{
+            transformOrigin: `${leg.x1}px ${leg.y1}px`,
+            transformBox: "view-box",
             animationDuration: legCycleDuration,
-            animationPlayState: isFrozen ? 'paused' : 'running'
+            animationPlayState: isFrozen ? "paused" : "running",
           }}
-        >
-          <path d="M 18 16 Q 10 12 6 8" />
-        </g>
+        />
+      ))}
 
-        {/* Mid-Right Leg */}
-        <g 
-          className="animate-leg-tripod-a" 
-          style={{ 
-            transformOrigin: '26px 21px', 
-            animationDuration: legCycleDuration,
-            animationPlayState: isFrozen ? 'paused' : 'running'
-          }}
-        >
-          <path d="M 26 21 Q 35 21 39 23" />
-        </g>
+      {/* Twitching Sensory Antennae */}
+      <path
+        className="bug-game-antenna"
+        d="M18.6 10.8 Q20.4 8.6 22.4 8.2 M18.6 13.2 Q20.4 15.4 22.4 15.8"
+        stroke="var(--ink)"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+        fill="none"
+        style={{
+          transformOrigin: "18.6px 12px",
+          transformBox: "view-box",
+          animationDuration: isEating ? "0.4s" : "2.4s",
+          animationPlayState: isFrozen ? "paused" : "running",
+        }}
+      />
 
-        {/* Rear-Left Leg */}
-        <g 
-          className="animate-leg-tripod-a" 
-          style={{ 
-            transformOrigin: '18px 25px', 
-            animationDuration: legCycleDuration,
-            animationPlayState: isFrozen ? 'paused' : 'running'
+      {/* Chewing Mandibles / Pincers */}
+      <g>
+        <path
+          className={isEating ? "bug-game-mandible-upper" : ""}
+          d="M 19.3 11.1 Q 21.3 11.3 20.8 12.0"
+          stroke="var(--ink)"
+          strokeWidth="1.0"
+          strokeLinecap="round"
+          fill="none"
+          style={{
+            transformOrigin: "19.3px 11.1px",
+            transformBox: "view-box",
           }}
-        >
-          <path d="M 18 25 Q 10 32 5 37" />
-        </g>
-
-        {/* Group B: Front-Right, Mid-Left, Rear-Right */}
-        {/* Front-Right Leg */}
-        <g 
-          className="animate-leg-tripod-b" 
-          style={{ 
-            transformOrigin: '26px 16px', 
-            animationDuration: legCycleDuration,
-            animationPlayState: isFrozen ? 'paused' : 'running'
+        />
+        <path
+          className={isEating ? "bug-game-mandible-lower" : ""}
+          d="M 19.3 12.9 Q 21.3 12.7 20.8 12.0"
+          stroke="var(--ink)"
+          strokeWidth="1.0"
+          strokeLinecap="round"
+          fill="none"
+          style={{
+            transformOrigin: "19.3px 12.9px",
+            transformBox: "view-box",
           }}
-        >
-          <path d="M 26 16 Q 34 12 38 8" />
-        </g>
-
-        {/* Mid-Left Leg */}
-        <g 
-          className="animate-leg-tripod-b" 
-          style={{ 
-            transformOrigin: '18px 21px', 
-            animationDuration: legCycleDuration,
-            animationPlayState: isFrozen ? 'paused' : 'running'
-          }}
-        >
-          <path d="M 18 21 Q 9 21 5 23" />
-        </g>
-
-        {/* Rear-Right Leg */}
-        <g 
-          className="animate-leg-tripod-b" 
-          style={{ 
-            transformOrigin: '26px 25px', 
-            animationDuration: legCycleDuration,
-            animationPlayState: isFrozen ? 'paused' : 'running'
-          }}
-        >
-          <path d="M 26 25 Q 34 32 39 37" />
-        </g>
+        />
       </g>
 
-      {/* Insect Body Chitin Plates (Thorax & Abdomen) */}
-      <g fill={color} fillOpacity="0.85" stroke={color} strokeWidth="1.8">
-        {/* Head */}
-        <circle cx="22" cy="12" r="3.5" />
-        {/* Eyes (dark dots) */}
-        <circle cx="20" cy="11" r="0.8" fill="#111" stroke="none" />
-        <circle cx="24" cy="11" r="0.8" fill="#111" stroke="none" />
-        {/* Thorax */}
-        <ellipse cx="22" cy="19" rx="4.5" ry="4" />
-        {/* Abdomen (segmented with ridges) */}
-        <ellipse cx="22" cy="28" rx="6.5" ry="7.5" />
-        {/* Chitin defect rings on abdomen */}
-        <line x1="17" y1="26" x2="27" y2="26" stroke="#111" strokeWidth="1.2" strokeOpacity="0.4" />
-        <line x1="18" y1="30" x2="26" y2="30" stroke="#111" strokeWidth="1.2" strokeOpacity="0.4" />
-      </g>
+      {/* Elytra Shell (Reactive Priority Color) */}
+      <ellipse
+        cx="11"
+        cy="12"
+        rx="6.2"
+        ry="4.8"
+        fill={color}
+        stroke="rgba(0,0,0,0.2)"
+        strokeWidth="0.4"
+      />
+
+      {/* Chitin Specular Gloss Luster */}
+      <path
+        d="M 7.2 9.6 C 9.0 8.3 12.0 8.3 13.8 9.6"
+        stroke="#ffffff"
+        strokeWidth="0.75"
+        strokeLinecap="round"
+        opacity="0.45"
+        fill="none"
+      />
+
+      {/* Wing Divider Seam */}
+      <line
+        x1="5.6"
+        y1="12"
+        x2="15.4"
+        y2="12"
+        stroke="var(--paper)"
+        strokeWidth="0.8"
+        opacity="0.85"
+      />
+
+      {/* 4 Signature Defect Spots */}
+      <circle cx="9" cy="10.1" r="1" fill="var(--paper)" opacity="0.65" />
+      <circle cx="9" cy="13.9" r="1" fill="var(--paper)" opacity="0.65" />
+      <circle cx="12.6" cy="9.9" r="0.8" fill="var(--paper)" opacity="0.65" />
+      <circle cx="12.6" cy="14.1" r="0.8" fill="var(--paper)" opacity="0.65" />
+
+      {/* Sleek Chitin Head */}
+      <circle cx="17.6" cy="12" r="2.5" fill="var(--ink)" />
+
+      {/* Specular Eye Glints */}
+      <circle cx="18.5" cy="10.9" r="0.48" fill="var(--paper)" opacity="0.9" />
+      <circle cx="18.5" cy="13.1" r="0.48" fill="var(--paper)" opacity="0.9" />
     </svg>
   );
 }
@@ -1220,8 +1251,8 @@ export function QaGame() {
               // Crawling leg wobble calculation - frequency scales with speed
               const isFast = (bug.speedScale || 1) > 2;
               const wobbleDeg = bug.eating 
-                ? Math.sin(Date.now() / 40) * 10 
-                : Math.sin((Date.now() + bug.wobbleSeed) / (isFast ? 35 : 75)) * (isFast ? 14 : 9);
+                ? Math.sin(Date.now() / 40) * 8 
+                : Math.sin((Date.now() + bug.wobbleSeed) / (isFast ? 35 : 75)) * (isFast ? 10 : 6);
 
               return (
                 <button
@@ -1242,7 +1273,7 @@ export function QaGame() {
                     transition: bug.squashed ? "transform 350ms cubic-bezier(0.1, 0.9, 0.2, 1), opacity 350ms ease" : "width 200ms ease, height 200ms ease",
                     opacity: bug.squashed ? 0 : 1,
                     color: bug.color,
-                    rotate: `${(bug.direction * 180) / Math.PI + 90 + wobbleDeg}deg`,
+                    rotate: `${(bug.direction * 180) / Math.PI + wobbleDeg}deg`,
                     cursor: "crosshair",
                     pointerEvents: bug.squashed ? "none" : "auto",
                     filter: isFrozen ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)" : undefined
@@ -1441,55 +1472,74 @@ export function QaGame() {
             .animate-fade-in {
               animation: fadeIn 0.25s ease-out forwards;
             }
-            @keyframes legTripodA {
-              0% { transform: rotate(-24deg); }
+            @keyframes bugGameLegStepA {
+              0% { transform: rotate(-16deg); }
+              50% { transform: rotate(16deg); }
+              100% { transform: rotate(-16deg); }
+            }
+            @keyframes bugGameLegStepB {
+              0% { transform: rotate(16deg); }
+              50% { transform: rotate(-16deg); }
+              100% { transform: rotate(16deg); }
+            }
+            @keyframes bugGameAntennaSniff {
+              0%, 76%, 100% { transform: rotate(0deg); }
+              82% { transform: rotate(-10deg); }
+              88% { transform: rotate(8deg); }
+              94% { transform: rotate(-6deg); }
+            }
+            @keyframes bugGameMandibleUpper {
+              0%, 100% { transform: rotate(0deg); }
               50% { transform: rotate(24deg); }
-              100% { transform: rotate(-24deg); }
             }
-            @keyframes legTripodB {
-              0% { transform: rotate(24deg); }
+            @keyframes bugGameMandibleLower {
+              0%, 100% { transform: rotate(0deg); }
               50% { transform: rotate(-24deg); }
-              100% { transform: rotate(24deg); }
             }
-            @keyframes bugBodyWaddle {
-              0% { transform: rotate(-3deg) scale(0.97, 1.03); }
-              50% { transform: rotate(3deg) scale(1.03, 0.97); }
-              100% { transform: rotate(-3deg) scale(0.97, 1.03); }
+            @keyframes bugGameEatingScuttle {
+              0% { transform: scale(1) translateX(0); }
+              50% { transform: scale(1.06, 0.94) translateX(0.6px); }
+              100% { transform: scale(1) translateX(0); }
             }
-            @keyframes scuttleChew {
-              0% { transform: scale(1) translateY(0); }
-              50% { transform: scale(1.1) translateY(-1px); }
-              100% { transform: scale(1) translateY(0); }
+            @keyframes bugGameWaddle {
+              0% { transform: translateY(-0.3px) rotate(-1.5deg); }
+              50% { transform: translateY(0.3px) rotate(1.5deg); }
+              100% { transform: translateY(-0.3px) rotate(-1.5deg); }
             }
-            @keyframes antennaTwitchLeft {
-              0% { transform: rotate(0deg); }
-              35% { transform: rotate(-14deg); }
-              70% { transform: rotate(8deg); }
-              100% { transform: rotate(0deg); }
+            @keyframes bugGamePulseRing {
+              0% { transform: scale(0.92); opacity: 0.85; }
+              100% { transform: scale(1.35); opacity: 0; }
             }
-            @keyframes antennaTwitchRight {
-              0% { transform: rotate(0deg); }
-              35% { transform: rotate(14deg); }
-              70% { transform: rotate(-8deg); }
-              100% { transform: rotate(0deg); }
+            .bug-game-leg,
+            .bug-game-antenna,
+            .bug-game-mandible-upper,
+            .bug-game-mandible-lower,
+            .bug-game-pulse-aura {
+              transform-box: view-box;
             }
-            .animate-leg-tripod-a {
-              animation: legTripodA infinite ease-in-out;
+            .bug-game-leg-a {
+              animation: bugGameLegStepA infinite ease-in-out;
             }
-            .animate-leg-tripod-b {
-              animation: legTripodB infinite ease-in-out;
+            .bug-game-leg-b {
+              animation: bugGameLegStepB infinite ease-in-out;
             }
-            .animate-bug-waddle {
-              animation: bugBodyWaddle infinite ease-in-out;
+            .bug-game-antenna {
+              animation: bugGameAntennaSniff 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
             }
-            .animate-scuttle-chew {
-              animation: scuttleChew 0.12s infinite ease-in-out;
+            .bug-game-mandible-upper {
+              animation: bugGameMandibleUpper 0.12s infinite ease-in-out;
             }
-            .animate-antenna-left {
-              animation: antennaTwitchLeft 0.5s infinite ease-in-out;
+            .bug-game-mandible-lower {
+              animation: bugGameMandibleLower 0.12s infinite ease-in-out;
             }
-            .animate-antenna-right {
-              animation: antennaTwitchRight 0.6s infinite ease-in-out;
+            .bug-game-eating {
+              animation: bugGameEatingScuttle 0.1s infinite ease-in-out;
+            }
+            .bug-game-crawling {
+              animation: bugGameWaddle infinite ease-in-out;
+            }
+            .bug-game-pulse-aura {
+              animation: bugGamePulseRing 0.75s ease-out infinite;
             }
           `}} />
         </div>

@@ -5,6 +5,7 @@ import { DocsSidebar, MobileDocsDrawer } from "@/components/learn/docs-sidebar";
 import { DocViewer, getDocToc } from "@/components/learn/doc-viewer";
 import { DocsToc } from "@/components/learn/docs-toc";
 import { ApiDrawer } from "@/components/learn/api-drawer";
+import { DOC_CATEGORIES } from "@/data/learn-docs-data";
 
 function LearnPageContent() {
   const [activeDocId, setActiveDocId] = useState<string>("library");
@@ -16,23 +17,10 @@ function LearnPageContent() {
       const hash = window.location.hash.replace("#", "").trim();
       if (!hash) return;
 
-      // Check if hash matches a doc ID
-      const knownDocs = [
-        "library",
-        "intro",
-        "writing-tests",
-        "codegen",
-        "running-tests",
-        "trace-viewer",
-        "accessibility-testing",
-        "locators",
-        "assertions",
-        "browsers",
-        "configuration",
-        "release-notes",
-      ];
+      // Check if hash matches any known doc ID across all categories
+      const allKnownDocIds = DOC_CATEGORIES.flatMap((c) => c.items).map((i) => i.id);
 
-      if (knownDocs.includes(hash)) {
+      if (allKnownDocIds.includes(hash)) {
         setActiveDocId(hash);
       } else {
         // Could be an in-page section of current doc

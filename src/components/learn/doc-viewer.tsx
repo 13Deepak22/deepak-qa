@@ -6,7 +6,8 @@ import { ArrowLeft, ArrowRight, ExternalLink, Home, Sparkles } from "lucide-reac
 import { DocTabs } from "./doc-tabs";
 import { DocCodeBlock } from "./doc-code-block";
 import { ComparisonTable } from "./comparison-table";
-import type { TocHeading } from "@/data/learn-docs-data";
+import { DOC_CATEGORIES, type TocHeading } from "@/data/learn-docs-data";
+import { EXTENDED_DOCS } from "@/data/learn-extended-docs";
 
 export interface DocViewerProps {
   activeDocId: string;
@@ -107,7 +108,28 @@ export function getDocToc(docId: string): TocHeading[] {
         { id: "browser-versions", text: "Updated Browser Versions", level: 2 },
       ];
     case "library":
+      return [
+        { id: "introduction", text: "Introduction", level: 2 },
+        { id: "differences-when-using-library", text: "Differences when using library", level: 2 },
+        { id: "library-example", text: "Library Example", level: 3 },
+        { id: "test-example", text: "Test Example", level: 3 },
+        { id: "key-differences", text: "Key Differences", level: 3 },
+        { id: "usage", text: "Usage", level: 2 },
+        { id: "first-script", text: "First script", level: 2 },
+        { id: "record-scripts", text: "Record scripts", level: 2 },
+        { id: "browser-downloads", text: "Browser downloads", level: 2 },
+        { id: "typescript-support", text: "TypeScript support", level: 2 },
+        { id: "in-javascript", text: "In JavaScript", level: 3 },
+        { id: "in-typescript", text: "In TypeScript", level: 3 },
+      ];
     default:
+      if (EXTENDED_DOCS[docId]) {
+        return EXTENDED_DOCS[docId].sections.map((s) => ({
+          id: s.id,
+          text: s.heading,
+          level: s.level || 2,
+        }));
+      }
       return [
         { id: "introduction", text: "Introduction", level: 2 },
         { id: "differences-when-using-library", text: "Differences when using library", level: 2 },
@@ -1211,11 +1233,130 @@ export default defineConfig({
         </article>
       );
 
-    /* ------------------------------------------------------------- */
-    /* 12. LIBRARY (DEFAULT, EXACT REPLICA OF playwright.dev/docs/library) */
-    /* ------------------------------------------------------------- */
+    default: {
+      const extendedDoc = EXTENDED_DOCS[activeDocId];
+      if (extendedDoc) {
+        const allDocItems = DOC_CATEGORIES.flatMap((c) => c.items);
+        const currentIndex = allDocItems.findIndex((i) => i.id === activeDocId);
+        const prevDoc = currentIndex > 0 ? allDocItems[currentIndex - 1] : null;
+        const nextDoc = currentIndex < allDocItems.length - 1 ? allDocItems[currentIndex + 1] : null;
+
+        return (
+          <article className="prose-custom max-w-none font-sans text-ink leading-relaxed">
+            {/* Breadcrumbs */}
+            <nav aria-label="Breadcrumbs" className="mb-6 flex items-center gap-2 text-xs text-muted">
+              <Link href="/" className="flex items-center hover:text-ink transition-colors" aria-label="Home page">
+                <Home className="h-3.5 w-3.5" />
+              </Link>
+              <span className="text-line">/</span>
+              <span className="hover:text-ink cursor-default">{extendedDoc.category}</span>
+              <span className="text-line">/</span>
+              <span className="font-medium text-pass">{extendedDoc.title}</span>
+            </nav>
+
+            {/* Main Title Header */}
+            <header className="mb-8 border-b border-line/60 pb-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+                <div className="inline-flex items-center gap-2 rounded-full border border-pass/30 bg-pass/10 px-3 py-1 text-xs font-mono font-medium text-pass">
+                  <span className="h-2 w-2 rounded-full bg-pass animate-pulse" />
+                  {extendedDoc.category}
+                </div>
+                <a
+                  href={extendedDoc.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-pass transition"
+                >
+                  <span>Original source</span>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
+              <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl mb-2">{extendedDoc.title}</h1>
+              <p className="text-sm sm:text-base text-muted">{extendedDoc.description}</p>
+            </header>
+
+            {/* Sections */}
+            {extendedDoc.sections.map((sec, idx) => (
+              <section
+                key={sec.id}
+                id={sec.id}
+                className={`mb-10 scroll-mt-32 ${idx > 0 ? "border-t border-line/60 pt-8" : ""}`}
+              >
+                <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">
+                  <a href={`#${sec.id}`} onClick={(e) => scrollToAnchor(sec.id, e)} className="hover:text-pass transition">
+                    {sec.heading}
+                  </a>
+                </h2>
+                {sec.paragraphs.map((p, pIdx) => (
+                  <p key={pIdx} className="text-sm sm:text-base leading-relaxed text-ink/90 mb-3">
+                    {p}
+                  </p>
+                ))}
+                {sec.codeBlocks?.map((cb, cbIdx) => (
+                  <div key={cbIdx} className="mb-4">
+                    {cb.title && (
+                      <div className="mb-1.5 font-mono text-xs text-muted">{cb.title}</div>
+                    )}
+                    {cb.tabs ? (
+                      <DocTabs tabs={cb.tabs} />
+                    ) : cb.code ? (
+                      <DocCodeBlock code={cb.code} language={cb.language || "typescript"} />
+                    ) : null}
+                  </div>
+                ))}
+                {sec.table && (
+                  <div className="my-4 overflow-x-auto rounded-lg border border-line">
+                    <table className="w-full text-left text-xs sm:text-sm">
+                      <thead className="border-b border-line bg-card/80 font-mono text-ink">
+                        <tr>
+                          {sec.table.headers.map((h, hIdx) => (
+                            <th key={hIdx} className="px-3.5 py-2.5 font-semibold">
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-line/60 bg-paper/40 font-mono text-xs">
+                        {sec.table.rows.map((row, rIdx) => (
+                          <tr key={rIdx} className="hover:bg-card/40 transition">
+                            {row.map((cell, cIdx) => (
+                              <td key={cIdx} className="px-3.5 py-2.5">
+                                {cell}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </section>
+            ))}
+
+            {/* Dynamic Prev / Next Pagination */}
+            <nav aria-label="Docs pagination" className="mt-16 flex items-center justify-between border-t border-line pt-6">
+              {prevDoc ? (
+                <button
+                  onClick={() => onNavigate(prevDoc.id)}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-pass transition cursor-pointer"
+                >
+                  <ArrowLeft className="h-4 w-4" /> {prevDoc.text}
+                </button>
+              ) : <div />}
+              {nextDoc ? (
+                <button
+                  onClick={() => onNavigate(nextDoc.id)}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-pass hover:opacity-80 transition cursor-pointer"
+                >
+                  {nextDoc.text} <ArrowRight className="h-4 w-4" />
+                </button>
+              ) : <div />}
+            </nav>
+          </article>
+        );
+      }
+    }
     case "library":
-    default:
       return (
         <article className="prose-custom max-w-none font-sans text-ink leading-relaxed">
           {/* Breadcrumbs */}

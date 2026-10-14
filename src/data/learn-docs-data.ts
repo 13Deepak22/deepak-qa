@@ -4,14 +4,18 @@ export interface TocHeading {
   level: number;
 }
 
+export interface DocItem {
+  id: string;
+  text: string;
+  badge?: string;
+}
+
 export interface DocCategory {
   title: string;
+  id?: string;
+  isDirectLink?: boolean;
   defaultOpen?: boolean;
-  items: {
-    id: string;
-    text: string;
-    badge?: string;
-  }[];
+  items: DocItem[];
 }
 
 export interface ApiDoc {
@@ -33,8 +37,48 @@ export const DOC_CATEGORIES: DocCategory[] = [
       { id: "intro", text: "Installation" },
       { id: "writing-tests", text: "Writing tests" },
       { id: "codegen", text: "Generating tests" },
-      { id: "running-tests", text: "Running & debugging tests" },
+      { id: "running-tests", text: "Running and debugging tests" },
       { id: "trace-viewer", text: "Trace viewer" },
+      { id: "ci-intro", text: "Setting up CI" },
+      { id: "vscode", text: "VS Code" },
+    ],
+  },
+  {
+    title: "Release notes",
+    id: "release-notes",
+    isDirectLink: true,
+    defaultOpen: false,
+    items: [{ id: "release-notes", text: "Release notes" }],
+  },
+  {
+    title: "Canary releases",
+    id: "canary-releases",
+    isDirectLink: true,
+    defaultOpen: false,
+    items: [{ id: "canary-releases", text: "Canary releases" }],
+  },
+  {
+    title: "Playwright Test",
+    defaultOpen: false,
+    items: [
+      { id: "test-agents", text: "Agents" },
+      { id: "test-annotations", text: "Annotations" },
+      { id: "test-cli", text: "Command line" },
+      { id: "test-configuration", text: "Configuration" },
+      { id: "test-use-options", text: "Configuration (use)" },
+      { id: "emulation", text: "Emulation" },
+      { id: "test-fixtures", text: "Fixtures" },
+      { id: "test-global-setup-teardown", text: "Global setup and teardown" },
+      { id: "test-parallel", text: "Parallelism" },
+      { id: "test-parameterize", text: "Parameterize tests" },
+      { id: "test-projects", text: "Projects" },
+      { id: "test-reporters", text: "Reporters" },
+      { id: "test-retries", text: "Retries" },
+      { id: "test-sharding", text: "Sharding" },
+      { id: "test-timeouts", text: "Timeouts" },
+      { id: "test-typescript", text: "TypeScript" },
+      { id: "test-ui-mode", text: "UI Mode" },
+      { id: "test-webserver", text: "Web server" },
     ],
   },
   {
@@ -43,18 +87,68 @@ export const DOC_CATEGORIES: DocCategory[] = [
     items: [
       { id: "library", text: "Library", badge: "Primary" },
       { id: "accessibility-testing", text: "Accessibility testing" },
-      { id: "locators", text: "Locators" },
+      { id: "input", text: "Actions" },
       { id: "assertions", text: "Assertions" },
-      { id: "browsers", text: "Browsers & Binaries" },
-      { id: "configuration", text: "Configuration" },
+      { id: "api-testing", text: "API testing" },
+      { id: "auth", text: "Authentication" },
+      { id: "actionability", text: "Auto-waiting" },
+      { id: "best-practices", text: "Best Practices" },
+      { id: "browsers", text: "Browsers" },
+      { id: "chrome-extensions", text: "Chrome extensions" },
+      { id: "clock", text: "Clock" },
+      { id: "test-components", text: "Component testing" },
+      { id: "debug", text: "Debugging Tests" },
+      { id: "dialogs", text: "Dialogs" },
+      { id: "downloads", text: "Downloads" },
+      { id: "evaluating", text: "Evaluating JavaScript" },
+      { id: "events", text: "Events" },
+      { id: "extensibility", text: "Extensibility" },
+      { id: "frames", text: "Frames" },
+      { id: "handles", text: "Handles" },
+      { id: "browser-contexts", text: "Isolation" },
+      { id: "locators", text: "Locators" },
+      { id: "mock", text: "Mock APIs" },
+      { id: "mock-browser-apis", text: "Mock browser APIs" },
+      { id: "navigations", text: "Navigations" },
+      { id: "network", text: "Network" },
+      { id: "other-locators", text: "Other locators" },
+      { id: "pages", text: "Pages" },
+      { id: "pom", text: "Page object models" },
+      { id: "screenshots", text: "Screenshots" },
+      { id: "service-workers", text: "Service Workers" },
+      { id: "aria-snapshots", text: "Snapshot testing" },
+      { id: "codegen-guide", text: "Test generator" },
+      { id: "touch-events", text: "Touch events (legacy)" },
+      { id: "trace-viewer-guide", text: "Trace viewer" },
+      { id: "videos", text: "Videos" },
+      { id: "test-snapshots", text: "Visual comparisons" },
+      { id: "webview2", text: "WebView2" },
     ],
   },
   {
-    title: "Release notes",
+    title: "Migration",
     defaultOpen: false,
     items: [
-      { id: "release-notes", text: "Release notes v1.50+" },
+      { id: "protractor", text: "Migrating from Protractor" },
+      { id: "puppeteer", text: "Migrating from Puppeteer" },
+      { id: "testing-library", text: "Migrating from Testing Library" },
     ],
+  },
+  {
+    title: "Integrations",
+    defaultOpen: false,
+    items: [
+      { id: "docker", text: "Docker" },
+      { id: "ci", text: "Continuous Integration" },
+      { id: "selenium-grid", text: "Selenium Grid (experimental)" },
+    ],
+  },
+  {
+    title: "Supported languages",
+    id: "languages",
+    isDirectLink: true,
+    defaultOpen: false,
+    items: [{ id: "languages", text: "Supported languages" }],
   },
 ];
 

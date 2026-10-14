@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown, ChevronRight, Search, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ChevronDown, ChevronRight, Menu, Search, X } from "lucide-react";
 import { DOC_CATEGORIES, type DocCategory } from "@/data/learn-docs-data";
 
 interface DocsSidebarProps {
@@ -14,9 +14,23 @@ export function DocsSidebar({ activeDocId, onSelectDoc, className = "" }: DocsSi
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     "Getting Started": true,
     Guides: true,
-    "Release notes": false,
+    "Playwright Test": false,
+    Migration: false,
+    Integrations: false,
   });
   const [filter, setFilter] = useState("");
+
+  // Automatically expand category if active doc belongs to it
+  useEffect(() => {
+    for (const cat of DOC_CATEGORIES) {
+      if (!cat.isDirectLink && cat.items.some((item) => item.id === activeDocId)) {
+        setOpenSections((prev) => ({
+          ...prev,
+          [cat.title]: true,
+        }));
+      }
+    }
+  }, [activeDocId]);
 
   const toggleSection = (title: string) => {
     setOpenSections((prev) => ({
@@ -60,6 +74,28 @@ export function DocsSidebar({ activeDocId, onSelectDoc, className = "" }: DocsSi
 
       <nav className="flex-1 space-y-1 overflow-y-auto pr-2 scrollbar-thin">
         {filteredCategories.map((cat) => {
+          // Direct Link (Release notes, Canary releases, Supported languages)
+          if (cat.isDirectLink) {
+            const targetId = cat.items[0]?.id || cat.id!;
+            const isActive = targetId === activeDocId;
+
+            return (
+              <div key={cat.title} className="space-y-0.5">
+                <button
+                  type="button"
+                  onClick={() => onSelectDoc(targetId)}
+                  className={`flex w-full items-center justify-between px-2 py-1.5 font-medium transition hover:bg-card rounded-md ${
+                    isActive ? "bg-pass/15 font-semibold text-pass" : "text-ink"
+                  }`}
+                >
+                  <span>{cat.title}</span>
+                </button>
+              </div>
+            );
+          }
+
+          // Expandable Category (Getting Started, Playwright Test, Guides, Migration, Integrations)
+          const hasActiveChild = cat.items.some((item) => item.id === activeDocId);
           const isOpen = filter ? true : (openSections[cat.title] ?? cat.defaultOpen ?? false);
 
           return (
@@ -67,13 +103,15 @@ export function DocsSidebar({ activeDocId, onSelectDoc, className = "" }: DocsSi
               <button
                 type="button"
                 onClick={() => toggleSection(cat.title)}
-                className="flex w-full items-center justify-between px-2 py-1.5 font-medium text-ink transition hover:bg-card rounded-md"
+                className={`flex w-full items-center justify-between px-2 py-1.5 font-medium transition hover:bg-card rounded-md ${
+                  hasActiveChild ? "text-pass font-semibold" : "text-ink"
+                }`}
               >
                 <span>{cat.title}</span>
                 {isOpen ? (
-                  <ChevronDown className="h-3.5 w-3.5 text-muted/70" />
+                  <ChevronDown className="h-3.5 w-3.5 opacity-70" />
                 ) : (
-                  <ChevronRight className="h-3.5 w-3.5 text-muted/70" />
+                  <ChevronRight className="h-3.5 w-3.5 opacity-70" />
                 )}
               </button>
 
@@ -119,6 +157,16 @@ interface MobileDocsDrawerProps {
 export function MobileDocsDrawer({ activeDocId, onSelectDoc }: MobileDocsDrawerProps) {
   const [open, setOpen] = useState(false);
 
+  // Find active doc title for display in the mobile trigger button
+  let activeTitle = "Documentation Menu";
+  for (const cat of DOC_CATEGORIES) {
+    const item = cat.items.find((i) => i.id === activeDocId);
+    if (item) {
+      activeTitle = item.text;
+      break;
+    }
+  }
+
   const handleSelect = (id: string, anchorId?: string) => {
     onSelectDoc(id, anchorId);
     setOpen(false);
@@ -127,35 +175,39 @@ export function MobileDocsDrawer({ activeDocId, onSelectDoc }: MobileDocsDrawerP
   return (
     <>
       <button
+        type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 rounded-lg border border-line bg-card px-3 py-2 text-xs font-semibold text-ink shadow-xs transition hover:border-pass/60 lg:hidden"
+        className="flex w-full items-center justify-between rounded-lg border border-line bg-card/80 px-3.5 py-2 text-xs font-medium text-ink shadow-xs backdrop-blur-xs hover:border-pass/60 transition"
       >
-        <span className="text-muted">☰</span>
-        <span>Docs Topics</span>
+        <span className="flex items-center gap-2">
+          <Menu className="h-4 w-4 text-pass" />
+          <span className="text-muted">Topic:</span>
+          <span className="font-semibold text-ink">{activeTitle}</span>
+        </span>
+        <span className="rounded bg-pass/10 px-2 py-0.5 font-mono text-[10px] text-pass">
+          All Docs
+        </span>
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex lg:hidden">
-          <div
-            className="fixed inset-0 bg-ink/40 backdrop-blur-xs"
-            onClick={() => setOpen(false)}
-          />
-          <div className="relative flex w-4/5 max-w-xs flex-col bg-paper p-4 shadow-xl border-r border-line z-10">
-            <div className="flex items-center justify-between pb-3 border-b border-line mb-3">
-              <span className="font-semibold text-xs text-ink uppercase tracking-wider">
-                Playwright Documentation
-              </span>
+        <div className="fixed inset-0 z-50 flex bg-paper/80 backdrop-blur-sm">
+          <div className="relative flex w-full max-w-xs flex-col border-r border-line bg-paper p-4 shadow-xl">
+            <div className="flex items-center justify-between border-b border-line pb-3 mb-3">
+              <span className="font-serif font-semibold text-ink">Documentation Index</span>
               <button
+                type="button"
                 onClick={() => setOpen(false)}
-                className="rounded px-2 py-1 text-sm text-muted hover:text-ink font-mono"
+                className="rounded p-1 text-muted hover:text-ink hover:bg-card"
+                aria-label="Close menu"
               >
-                ✕
+                <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto pr-1">
+            <div className="flex-1 overflow-y-auto">
               <DocsSidebar activeDocId={activeDocId} onSelectDoc={handleSelect} />
             </div>
           </div>
+          <div className="flex-1" onClick={() => setOpen(false)} />
         </div>
       )}
     </>

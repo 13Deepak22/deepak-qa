@@ -192,3 +192,4 @@ expect(response.ok()).toBeTruthy();`}
     </article>
   );
 }
+

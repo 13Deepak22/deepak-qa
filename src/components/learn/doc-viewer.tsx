@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, ExternalLink, Home, Sparkles } from "lucide-reac
 import { DocTabs } from "./doc-tabs";
 import { DocCodeBlock } from "./doc-code-block";
 import { ComparisonTable } from "./comparison-table";
+import { InteractiveRunner } from "./interactive-runner";
 import { DOC_CATEGORIES, type TocHeading } from "@/data/learn-docs-data";
 import { EXTENDED_DOCS } from "@/data/learn-extended-docs";
 
@@ -515,6 +516,7 @@ tests/
               By default tests run headless in parallel across Chromium, Firefox and WebKit:
             </p>
             <DocTabs tabs={runTestTabs} />
+            <InteractiveRunner />
           </section>
 
           <section id="html-test-reports" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
@@ -1421,6 +1423,7 @@ export default defineConfig({
               </button>
               .
             </p>
+            <InteractiveRunner />
           </section>
 
           {/* Section 2: Differences when using library */}

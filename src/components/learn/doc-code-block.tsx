@@ -32,11 +32,9 @@ export function DocCodeBlock({
     }
   };
 
-  // Format code lines with lightweight syntax highlighting
   const lines = code.trim().split("\n");
 
   const highlightToken = (line: string, lang: string) => {
-    // If it's a comment
     const trimmed = line.trimStart();
     if (trimmed.startsWith("//") || trimmed.startsWith("/*") || trimmed.startsWith("*")) {
       return <span className="text-zinc-400 dark:text-zinc-500 italic">{line}</span>;
@@ -45,13 +43,13 @@ export function DocCodeBlock({
       return <span className="text-zinc-400 dark:text-zinc-500 italic">{line}</span>;
     }
 
-    // Keyword & string highlighting for TS/JS and Shell
-    const tokens = line.split(/(\/\*.*?\*\/|\/\/.*|#.*|'.*?'|".*?"|`.*?`|\b(?:import|export|from|const|let|var|await|async|require|function|return|test|expect|devices|chromium|webkit|firefox|true|false|set|npm|npx)\b|[{}()[\];,.])/g);
+    const tokens = line.split(
+      /(\/\*.*?\*\/|\/\/.*|#.*|'.*?'|".*?"|`.*?`|\b(?:import|export|from|const|let|var|await|async|require|function|return|test|expect|devices|chromium|webkit|firefox|true|false|set|npm|npx)\b|[{}()[\];,.])/g
+    );
 
     return tokens.map((token, idx) => {
       if (!token) return null;
 
-      // Comment
       if (token.startsWith("//") || token.startsWith("/*") || token.startsWith("#")) {
         return (
           <span key={idx} className="text-zinc-400 dark:text-zinc-500 italic">
@@ -60,7 +58,6 @@ export function DocCodeBlock({
         );
       }
 
-      // Strings
       if (
         (token.startsWith("'") && token.endsWith("'")) ||
         (token.startsWith('"') && token.endsWith('"')) ||
@@ -73,7 +70,6 @@ export function DocCodeBlock({
         );
       }
 
-      // Keywords
       if (
         [
           "import",
@@ -95,7 +91,6 @@ export function DocCodeBlock({
         );
       }
 
-      // Test & Browser core entities
       if (["test", "expect", "devices", "chromium", "webkit", "firefox", "require"].includes(token)) {
         return (
           <span key={idx} className="text-amber-600 dark:text-amber-400 font-medium">
@@ -104,7 +99,6 @@ export function DocCodeBlock({
         );
       }
 
-      // CLI / Shell commands
       if (["npm", "npx", "install", "set"].includes(token)) {
         return (
           <span key={idx} className="text-indigo-600 dark:text-indigo-400 font-semibold">
@@ -113,7 +107,6 @@ export function DocCodeBlock({
         );
       }
 
-      // Punctuation
       if (["{", "}", "(", ")", "[", "]", ";", ",", "."].includes(token)) {
         return (
           <span key={idx} className="text-zinc-500 dark:text-zinc-400">
@@ -122,9 +115,30 @@ export function DocCodeBlock({
         );
       }
 
-      // Methods / variables
       if (/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(token)) {
-        if (["launch", "newPage", "newContext", "goto", "route", "abort", "title", "close", "toHaveTitle", "screenshot", "use"].includes(token)) {
+        if (
+          [
+            "launch",
+            "newPage",
+            "newContext",
+            "goto",
+            "route",
+            "abort",
+            "title",
+            "close",
+            "toHaveTitle",
+            "screenshot",
+            "use",
+            "fill",
+            "click",
+            "press",
+            "check",
+            "locator",
+            "getByRole",
+            "getByText",
+            "getByLabel",
+          ].includes(token)
+        ) {
           return (
             <span key={idx} className="text-sky-600 dark:text-sky-400">
               {token}
@@ -139,10 +153,10 @@ export function DocCodeBlock({
 
   return (
     <div
-      className={`group relative overflow-hidden transition-colors ${
+      className={`group relative overflow-hidden transition-all duration-300 ${
         borderless
           ? "my-0 border-0 rounded-none bg-transparent shadow-none"
-          : "my-4 rounded-lg border border-line bg-card shadow-xs"
+          : "my-4 rounded-lg border border-line bg-card shadow-xs hover:border-pass/40 hover:shadow-sm"
       }`}
     >
       {!hideHeader && filename && (
@@ -152,21 +166,29 @@ export function DocCodeBlock({
         </div>
       )}
 
-      {/* Copy Button */}
+      {/* Copy Button with smooth tooltip and animation */}
       <button
+        type="button"
         onClick={handleCopy}
         aria-label="Copy code to clipboard"
-        className="absolute top-2.5 right-2.5 z-10 flex h-7 w-7 items-center justify-center rounded-md border border-line bg-paper/90 text-muted opacity-80 backdrop-blur-xs transition hover:border-pass hover:bg-card hover:text-ink hover:opacity-100 group-hover:opacity-100"
-        title={copied ? "Copied!" : "Copy code"}
+        className="absolute top-2.5 right-2.5 z-10 flex h-7 items-center gap-1.5 rounded-md border border-line bg-paper/90 px-2 text-xs font-mono text-muted opacity-80 backdrop-blur-xs transition-all duration-200 hover:border-pass hover:bg-card hover:text-ink hover:opacity-100 group-hover:opacity-100 cursor-pointer"
       >
         {copied ? (
-          <Check className="h-3.5 w-3.5 text-pass" />
+          <>
+            <Check className="h-3.5 w-3.5 text-pass animate-in zoom-in-75 duration-200" />
+            <span className="text-[10px] text-pass font-semibold animate-in fade-in-50 duration-200">
+              Copied!
+            </span>
+          </>
         ) : (
-          <Copy className="h-3.5 w-3.5" />
+          <>
+            <Copy className="h-3.5 w-3.5" />
+            <span className="text-[10px] hidden sm:inline">Copy</span>
+          </>
         )}
       </button>
 
-      {/* Code Area */}
+      {/* Code Area with smooth horizontal scroll */}
       <div className="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-ink scrollbar-thin">
         <pre className="m-0 bg-transparent p-0">
           <code>
@@ -188,4 +210,3 @@ export function DocCodeBlock({
     </div>
   );
 }
-

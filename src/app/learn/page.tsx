@@ -136,20 +136,25 @@ function LearnPageContent() {
               <DocsToc items={activeToc} />
             </div>
 
-            {/* Active View Body */}
-            {activeView === "docs" && (
-              <DocViewer
-                activeDocId={activeDocId}
-                onNavigate={handleNavigate}
-                onOpenApi={(id) => setActiveApiId(id)}
-              />
-            )}
+            {/* Active View Body with theme-matched transition animation */}
+            <div
+              key={`${activeView}-${activeDocId}`}
+              className="page-transition min-h-[60vh]"
+            >
+              {activeView === "docs" && (
+                <DocViewer
+                  activeDocId={activeDocId}
+                  onNavigate={handleNavigate}
+                  onOpenApi={(id) => setActiveApiId(id)}
+                />
+              )}
 
-            {activeView === "mcp" && <McpView />}
+              {activeView === "mcp" && <McpView />}
 
-            {activeView === "cli" && <CliView />}
+              {activeView === "cli" && <CliView />}
 
-            {activeView === "api" && <ApiView onOpenApi={(id) => setActiveApiId(id)} />}
+              {activeView === "api" && <ApiView onOpenApi={(id) => setActiveApiId(id)} />}
+            </div>
           </main>
 
           {/* Right Table of Contents (Desktop) */}

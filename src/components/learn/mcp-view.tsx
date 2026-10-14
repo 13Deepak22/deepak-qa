@@ -262,3 +262,4 @@ await callMcpTool("playwright", "browser_click", {
     </article>
   );
 }
+

@@ -2,18 +2,74 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, ExternalLink, Home, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, ExternalLink, Home, Info, Sparkles } from "lucide-react";
 import { DocTabs } from "./doc-tabs";
 import { DocCodeBlock } from "./doc-code-block";
 import { ComparisonTable } from "./comparison-table";
 import { InteractiveRunner } from "./interactive-runner";
 import { DOC_CATEGORIES, type TocHeading } from "@/data/learn-docs-data";
 import { EXTENDED_DOCS } from "@/data/learn-extended-docs";
+import type { LanguageType } from "./docs-header-bar";
 
 export interface DocViewerProps {
   activeDocId: string;
   onNavigate: (docId: string, anchorId?: string) => void;
   onOpenApi: (apiId: string) => void;
+  selectedLanguage?: LanguageType;
+}
+
+function formatDocText(text: string): React.ReactNode[] {
+  const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[([^\]]+)\]\(([^)]+)\))/g;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+
+    const token = match[0];
+    if (token.startsWith("`") && token.endsWith("`")) {
+      parts.push(
+        <code
+          key={match.index}
+          className="font-mono text-xs bg-paper-deep text-pass px-1.5 py-0.5 rounded border border-line/40 font-medium"
+        >
+          {token.slice(1, -1)}
+        </code>
+      );
+    } else if (token.startsWith("**") && token.endsWith("**")) {
+      parts.push(
+        <strong key={match.index} className="font-semibold text-ink">
+          {token.slice(2, -2)}
+        </strong>
+      );
+    } else if (match[2] && match[3]) {
+      const linkText = match[2];
+      const linkUrl = match[3];
+      const isExternal = linkUrl.startsWith("http");
+      parts.push(
+        <a
+          key={match.index}
+          href={linkUrl}
+          target={isExternal ? "_blank" : undefined}
+          rel={isExternal ? "noopener noreferrer" : undefined}
+          className="text-pass hover:underline font-medium"
+        >
+          {linkText}
+        </a>
+      );
+    }
+
+    lastIndex = pattern.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+
+  return parts;
 }
 
 export function getDocToc(docId: string): TocHeading[] {
@@ -131,24 +187,11 @@ export function getDocToc(docId: string): TocHeading[] {
           level: s.level || 2,
         }));
       }
-      return [
-        { id: "introduction", text: "Introduction", level: 2 },
-        { id: "differences-when-using-library", text: "Differences when using library", level: 2 },
-        { id: "library-example", text: "Library Example", level: 3 },
-        { id: "test-example", text: "Test Example", level: 3 },
-        { id: "key-differences", text: "Key Differences", level: 3 },
-        { id: "usage", text: "Usage", level: 2 },
-        { id: "first-script", text: "First script", level: 2 },
-        { id: "record-scripts", text: "Record scripts", level: 2 },
-        { id: "browser-downloads", text: "Browser downloads", level: 2 },
-        { id: "typescript-support", text: "TypeScript support", level: 2 },
-        { id: "in-javascript", text: "In JavaScript", level: 3 },
-        { id: "in-typescript", text: "In TypeScript", level: 3 },
-      ];
+      return [];
   }
 }
 
-export function DocViewer({ activeDocId, onNavigate, onOpenApi }: DocViewerProps) {
+export function DocViewer({ activeDocId, onNavigate, onOpenApi, selectedLanguage = "node" }: DocViewerProps) {
   // Common interactive tabs data
   const packageManagerTabs = [
     { label: "npm", language: "bash", code: "npm init playwright@latest" },
@@ -1235,129 +1278,6 @@ export default defineConfig({
         </article>
       );
 
-    default: {
-      const extendedDoc = EXTENDED_DOCS[activeDocId];
-      if (extendedDoc) {
-        const allDocItems = DOC_CATEGORIES.flatMap((c) => c.items);
-        const currentIndex = allDocItems.findIndex((i) => i.id === activeDocId);
-        const prevDoc = currentIndex > 0 ? allDocItems[currentIndex - 1] : null;
-        const nextDoc = currentIndex < allDocItems.length - 1 ? allDocItems[currentIndex + 1] : null;
-
-        return (
-          <article className="prose-custom max-w-none font-sans text-ink leading-relaxed">
-            {/* Breadcrumbs */}
-            <nav aria-label="Breadcrumbs" className="mb-6 flex items-center gap-2 text-xs text-muted">
-              <Link href="/" className="flex items-center hover:text-ink transition-colors" aria-label="Home page">
-                <Home className="h-3.5 w-3.5" />
-              </Link>
-              <span className="text-line">/</span>
-              <span className="hover:text-ink cursor-default">{extendedDoc.category}</span>
-              <span className="text-line">/</span>
-              <span className="font-medium text-pass">{extendedDoc.title}</span>
-            </nav>
-
-            {/* Main Title Header */}
-            <header className="mb-8 border-b border-line/60 pb-6">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
-                <div className="inline-flex items-center gap-2 rounded-full border border-pass/30 bg-pass/10 px-3 py-1 text-xs font-mono font-medium text-pass">
-                  <span className="h-2 w-2 rounded-full bg-pass animate-pulse" />
-                  {extendedDoc.category}
-                </div>
-                <a
-                  href={extendedDoc.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-pass transition"
-                >
-                  <span>Original source</span>
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
-              </div>
-              <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl mb-2">{extendedDoc.title}</h1>
-              <p className="text-sm sm:text-base text-muted">{extendedDoc.description}</p>
-            </header>
-
-            {/* Sections */}
-            {extendedDoc.sections.map((sec, idx) => (
-              <section
-                key={sec.id}
-                id={sec.id}
-                className={`mb-10 scroll-mt-32 ${idx > 0 ? "border-t border-line/60 pt-8" : ""}`}
-              >
-                <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">
-                  <a href={`#${sec.id}`} onClick={(e) => scrollToAnchor(sec.id, e)} className="hover:text-pass transition">
-                    {sec.heading}
-                  </a>
-                </h2>
-                {sec.paragraphs.map((p, pIdx) => (
-                  <p key={pIdx} className="text-sm sm:text-base leading-relaxed text-ink/90 mb-3">
-                    {p}
-                  </p>
-                ))}
-                {sec.codeBlocks?.map((cb, cbIdx) => (
-                  <div key={cbIdx} className="mb-4">
-                    {cb.title && (
-                      <div className="mb-1.5 font-mono text-xs text-muted">{cb.title}</div>
-                    )}
-                    {cb.tabs ? (
-                      <DocTabs tabs={cb.tabs} />
-                    ) : cb.code ? (
-                      <DocCodeBlock code={cb.code} language={cb.language || "typescript"} />
-                    ) : null}
-                  </div>
-                ))}
-                {sec.table && (
-                  <div className="my-4 overflow-x-auto rounded-lg border border-line">
-                    <table className="w-full text-left text-xs sm:text-sm">
-                      <thead className="border-b border-line bg-card/80 font-mono text-ink">
-                        <tr>
-                          {sec.table.headers.map((h, hIdx) => (
-                            <th key={hIdx} className="px-3.5 py-2.5 font-semibold">
-                              {h}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-line/60 bg-paper/40 font-mono text-xs">
-                        {sec.table.rows.map((row, rIdx) => (
-                          <tr key={rIdx} className="hover:bg-card/40 transition">
-                            {row.map((cell, cIdx) => (
-                              <td key={cIdx} className="px-3.5 py-2.5">
-                                {cell}
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </section>
-            ))}
-
-            {/* Dynamic Prev / Next Pagination */}
-            <nav aria-label="Docs pagination" className="mt-16 flex items-center justify-between border-t border-line pt-6">
-              {prevDoc ? (
-                <button
-                  onClick={() => onNavigate(prevDoc.id)}
-                  className="flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-pass transition cursor-pointer"
-                >
-                  <ArrowLeft className="h-4 w-4" /> {prevDoc.text}
-                </button>
-              ) : <div />}
-              {nextDoc ? (
-                <button
-                  onClick={() => onNavigate(nextDoc.id)}
-                  className="flex items-center gap-1.5 text-xs font-semibold text-pass hover:opacity-80 transition cursor-pointer"
-                >
-                  {nextDoc.text} <ArrowRight className="h-4 w-4" />
-                </button>
-              ) : <div />}
-            </nav>
-          </article>
-        );
-      }
-    }
     case "library":
       return (
         <article className="prose-custom max-w-none font-sans text-ink leading-relaxed">
@@ -1802,6 +1722,240 @@ export default defineConfig({
           </nav>
         </article>
       );
+
+    default: {
+      const extDoc = EXTENDED_DOCS[activeDocId];
+      if (extDoc) {
+        // Flatten all items from DOC_CATEGORIES to find adjacent pages
+        const allDocItems = DOC_CATEGORIES.flatMap((c) => c.items);
+        const currentIndex = allDocItems.findIndex((item) => item.id === activeDocId);
+        const prevDoc = currentIndex > 0 ? allDocItems[currentIndex - 1] : null;
+        const nextDoc =
+          currentIndex >= 0 && currentIndex < allDocItems.length - 1
+            ? allDocItems[currentIndex + 1]
+            : null;
+
+        const langLabels: Record<string, string> = {
+          node: "Node.js",
+          python: "Python",
+          java: "Java",
+          dotnet: ".NET",
+        };
+
+        return (
+          <article className="prose-custom max-w-none font-sans text-ink leading-relaxed">
+            {/* Breadcrumbs */}
+            <nav aria-label="Breadcrumbs" className="mb-6 flex items-center gap-2 text-xs text-muted">
+              <Link href="/" className="flex items-center hover:text-ink transition-colors" aria-label="Home page">
+                <Home className="h-3.5 w-3.5" />
+              </Link>
+              <span className="text-line">/</span>
+              <span className="text-muted">{extDoc.category}</span>
+              <span className="text-line">/</span>
+              <span className="font-medium text-pass">{extDoc.title}</span>
+            </nav>
+
+            {/* Header */}
+            <header className="mb-8 border-b border-line/60 pb-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-pass/30 bg-pass/10 px-3 py-1 text-xs font-mono font-medium text-pass">
+                    <span className="h-2 w-2 rounded-full bg-pass animate-pulse" />
+                    {extDoc.category}
+                  </span>
+                  {selectedLanguage && selectedLanguage !== "node" && (
+                    <span className="inline-flex items-center rounded-md border border-line bg-paper-deep px-2 py-0.5 text-[11px] font-mono text-muted">
+                      {langLabels[selectedLanguage] || selectedLanguage}
+                    </span>
+                  )}
+                </div>
+                {extDoc.sourceUrl && (
+                  <a
+                    href={extDoc.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-muted hover:text-pass transition"
+                  >
+                    <span>Original source</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                )}
+              </div>
+              <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">{extDoc.title}</h1>
+              {extDoc.description && (
+                <p className="mt-2 text-sm sm:text-base text-muted leading-relaxed">
+                  {extDoc.description}
+                </p>
+              )}
+            </header>
+
+            {/* Sections */}
+            {extDoc.sections.map((sec) => {
+              const isH3 = sec.level === 3;
+              return (
+                <section key={sec.id} id={sec.id} className="mb-10 scroll-mt-32">
+                  {isH3 ? (
+                    <h3 className="group flex items-center text-lg font-semibold text-ink sm:text-xl mb-3">
+                      <a
+                        href={`#${sec.id}`}
+                        onClick={(e) => scrollToAnchor(sec.id, e)}
+                        className="hover:text-pass transition"
+                      >
+                        {sec.heading}
+                      </a>
+                    </h3>
+                  ) : (
+                    <h2 className="group flex items-center text-xl font-bold text-ink sm:text-2xl mb-3">
+                      <a
+                        href={`#${sec.id}`}
+                        onClick={(e) => scrollToAnchor(sec.id, e)}
+                        className="hover:text-pass transition"
+                      >
+                        {sec.heading}
+                      </a>
+                    </h2>
+                  )}
+
+                  {/* Paragraphs */}
+                  {sec.paragraphs.map((p, pIdx) => (
+                    <p key={pIdx} className="text-sm sm:text-base leading-relaxed text-ink/90 mb-3">
+                      {formatDocText(p)}
+                    </p>
+                  ))}
+
+                  {/* Code Blocks */}
+                  {sec.codeBlocks &&
+                    sec.codeBlocks.map((cb, bIdx) => (
+                      <div key={bIdx} className="my-4">
+                        {cb.title && (
+                          <div className="mb-1.5 text-xs font-mono font-medium text-muted">
+                            {cb.title}
+                          </div>
+                        )}
+                        {cb.tabs && cb.tabs.length > 0 ? (
+                          <DocTabs tabs={cb.tabs} />
+                        ) : cb.code ? (
+                          <DocCodeBlock code={cb.code} language={cb.language || "typescript"} />
+                        ) : null}
+                      </div>
+                    ))}
+
+                  {/* Table */}
+                  {sec.table && (
+                    <div className="my-6 overflow-x-auto rounded-lg border border-line bg-card/60 shadow-2xs">
+                      <table className="w-full border-collapse text-left text-xs">
+                        <thead>
+                          <tr className="border-b border-line bg-paper-deep/60">
+                            {sec.table.headers.map((h, hIdx) => (
+                              <th key={hIdx} className="px-4 py-2.5 font-semibold text-ink">
+                                {h}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-line/40">
+                          {sec.table.rows.map((row, rIdx) => (
+                            <tr key={rIdx} className="hover:bg-paper/40 transition-colors">
+                              {row.map((cell, cIdx) => (
+                                <td key={cIdx} className="px-4 py-2.5 text-ink/90 leading-relaxed">
+                                  {formatDocText(cell)}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {/* Callouts */}
+                  {sec.callouts &&
+                    sec.callouts.map((callout, cIdx) => {
+                      const isWarn = callout.type === "warning";
+                      const isTip = callout.type === "tip";
+                      return (
+                        <div
+                          key={cIdx}
+                          className={`my-4 rounded-lg border p-4 text-xs transition-colors ${
+                            isWarn
+                              ? "border-amber-500/30 bg-amber-500/5 text-ink"
+                              : isTip
+                              ? "border-pass/30 bg-pass/5 text-ink"
+                              : "border-blue-500/30 bg-blue-500/5 text-ink"
+                          }`}
+                        >
+                          <div className="font-semibold mb-1 flex items-center gap-1.5">
+                            {isWarn ? (
+                              <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+                            ) : isTip ? (
+                              <Sparkles className="h-3.5 w-3.5 text-pass" />
+                            ) : (
+                              <Info className="h-3.5 w-3.5 text-blue-500" />
+                            )}
+                            <span className="capitalize">{callout.title || callout.type}</span>
+                          </div>
+                          <p className="leading-relaxed text-ink/90">{formatDocText(callout.text)}</p>
+                        </div>
+                      );
+                    })}
+                </section>
+              );
+            })}
+
+            {/* Pagination Footer */}
+            <nav
+              aria-label="Docs pagination"
+              className="mt-16 flex items-center justify-between border-t border-line pt-6"
+            >
+              {prevDoc ? (
+                <button
+                  type="button"
+                  onClick={() => onNavigate(prevDoc.id)}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-pass transition cursor-pointer"
+                >
+                  <ArrowLeft className="h-4 w-4" /> {prevDoc.text}
+                </button>
+              ) : (
+                <div />
+              )}
+              {nextDoc ? (
+                <button
+                  type="button"
+                  onClick={() => onNavigate(nextDoc.id)}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-pass hover:opacity-80 transition cursor-pointer"
+                >
+                  {nextDoc.text} <ArrowRight className="h-4 w-4" />
+                </button>
+              ) : (
+                <div />
+              )}
+            </nav>
+          </article>
+        );
+      }
+
+      // Fallback
+      return (
+        <article className="prose-custom max-w-none font-sans text-ink leading-relaxed">
+          <header className="mb-8 border-b border-line/60 pb-6">
+            <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Documentation</h1>
+            <p className="mt-2 text-sm text-muted">
+              Select any topic from the sidebar index to view its complete guide.
+            </p>
+          </header>
+          <div className="rounded-lg border border-line bg-card/60 p-6 text-center">
+            <p className="text-sm text-ink mb-4">Jump directly into the primary guide:</p>
+            <button
+              type="button"
+              onClick={() => onNavigate("library")}
+              className="rounded-md bg-pass/10 px-4 py-2 text-xs font-semibold text-pass hover:bg-pass/20 transition cursor-pointer"
+            >
+              Playwright Library Guide
+            </button>
+          </div>
+        </article>
+      );
+    }
   }
 }
 

@@ -120,7 +120,12 @@ function LearnPageContent() {
           {/* Left Sidebar (Desktop) */}
           <div className="hidden lg:block w-60 shrink-0">
             <div className="sticky top-36 max-h-[calc(100vh-10rem)] overflow-y-auto pb-8 pr-2">
-              <DocsSidebar activeDocId={activeView === "docs" ? activeDocId : activeView} onSelectDoc={handleNavigate} />
+              <DocsSidebar
+                activeView={activeView}
+                activeDocId={activeDocId}
+                onSelectDoc={handleNavigate}
+                onSelectView={handleSelectView}
+              />
             </div>
           </div>
 
@@ -128,12 +133,17 @@ function LearnPageContent() {
           <main className="min-w-0 flex-1">
             {/* Mobile Controls: Topics drawer */}
             <div className="lg:hidden mb-4 flex items-center justify-between gap-3">
-              <MobileDocsDrawer activeDocId={activeView === "docs" ? activeDocId : activeView} onSelectDoc={handleNavigate} />
+              <MobileDocsDrawer
+                activeView={activeView}
+                activeDocId={activeDocId}
+                onSelectDoc={handleNavigate}
+                onSelectView={handleSelectView}
+              />
             </div>
 
             {/* Mobile TOC */}
             <div className="xl:hidden mb-6">
-              <DocsToc items={activeToc} />
+              <DocsToc items={activeToc} variant="mobile" />
             </div>
 
             {/* Active View Body with theme-matched transition animation */}
@@ -146,6 +156,7 @@ function LearnPageContent() {
                   activeDocId={activeDocId}
                   onNavigate={handleNavigate}
                   onOpenApi={(id) => setActiveApiId(id)}
+                  selectedLanguage={selectedLanguage}
                 />
               )}
 
@@ -160,7 +171,7 @@ function LearnPageContent() {
           {/* Right Table of Contents (Desktop) */}
           <div className="hidden xl:block w-56 shrink-0">
             <div className="sticky top-36 max-h-[calc(100vh-10rem)] overflow-y-auto pb-8 pl-2">
-              <DocsToc items={activeToc} />
+              <DocsToc items={activeToc} variant="desktop" />
             </div>
           </div>
         </div>

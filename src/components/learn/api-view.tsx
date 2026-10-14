@@ -27,6 +27,16 @@ export function getApiToc(): TocHeading[] {
 export function ApiView({ onOpenApi }: ApiViewProps) {
   const classes = [
     {
+      id: "class-playwright",
+      name: "Playwright",
+      description: "Entry point to the Playwright library. Exposes chromium, firefox, webkit browser types and device descriptors.",
+      methods: [
+        { id: "browser-type-launch", name: "playwright.chromium.launch([options])", desc: "Launches a Chromium browser instance." },
+        { id: "browser-type-launch", name: "playwright.devices", desc: "Dictionary of simulated mobile and desktop device descriptors." },
+        { id: "browser-type-launch", name: "playwright.selectors", desc: "Custom selector engines registration and configuration." },
+      ],
+    },
+    {
       id: "class-browser",
       name: "Browser",
       description: "A Browser instance created via browserType.launch(). Owns multiple isolated BrowserContexts.",

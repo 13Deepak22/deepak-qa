@@ -1,19 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  ChevronRight,
-  Menu,
-  Search,
-  X,
-  Sparkles,
-  Bot,
-  Terminal,
-  Layers,
-  BookOpen,
-  ArrowLeft,
-} from "lucide-react";
+import { ChevronRight, Menu, Search, X } from "lucide-react";
 import { DOC_CATEGORIES, type DocCategory } from "@/data/learn-docs-data";
+import { MCP_CATEGORIES } from "@/data/learn-mcp-data";
+import { CLI_CATEGORIES } from "@/data/learn-cli-data";
+import { API_CATEGORIES } from "@/data/learn-api-data";
 import type { LearnViewType } from "./docs-header-bar";
 
 export interface DocsSidebarProps {
@@ -24,37 +16,6 @@ export interface DocsSidebarProps {
   className?: string;
 }
 
-const MCP_SECTIONS = [
-  { id: "overview", text: "Overview & Architecture" },
-  { id: "key-features", text: "Key Features" },
-  { id: "quick-start", text: "Quick Start & Setup" },
-  { id: "capabilities", text: "Capabilities & Flags (--caps)" },
-  { id: "available-tools", text: "Available MCP Tools" },
-  { id: "example-workflow", text: "AI Agent Workflow Example" },
-];
-
-const CLI_SECTIONS = [
-  { id: "overview", text: "Playwright CLI Overview" },
-  { id: "test-runner-cli", text: "Test Runner CLI Commands" },
-  { id: "agent-cli", text: "Playwright Agent CLI" },
-  { id: "codegen-cli", text: "Codegen & Recording" },
-  { id: "diagnostics-cli", text: "Inspect, Trace & Reports" },
-  { id: "browser-management", text: "Browser Binary Management" },
-];
-
-const API_SECTIONS = [
-  { id: "core-classes", text: "Core Browser Classes" },
-  { id: "class-playwright", text: "Playwright Library" },
-  { id: "class-browser", text: "Browser" },
-  { id: "class-browser-context", text: "BrowserContext" },
-  { id: "class-page", text: "Page" },
-  { id: "class-locator", text: "Locator" },
-  { id: "class-assertions", text: "Web-First Assertions" },
-  { id: "network-classes", text: "Network & API Testing" },
-  { id: "class-request", text: "APIRequestContext" },
-  { id: "class-route", text: "Route & Interception" },
-];
-
 export function DocsSidebar({
   activeView = "docs",
   activeDocId,
@@ -62,26 +23,33 @@ export function DocsSidebar({
   onSelectView,
   className = "",
 }: DocsSidebarProps) {
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    "Getting Started": true,
-    Guides: true,
-    "Playwright Test": false,
-    Migration: false,
-    Integrations: false,
-  });
+  const categories =
+    activeView === "mcp"
+      ? MCP_CATEGORIES
+      : activeView === "cli"
+      ? CLI_CATEGORIES
+      : activeView === "api"
+      ? API_CATEGORIES
+      : DOC_CATEGORIES;
+
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [filter, setFilter] = useState("");
 
-  // Automatically expand category if active doc belongs to it
+  // Initialize and auto-expand category containing activeDocId
   useEffect(() => {
-    for (const cat of DOC_CATEGORIES) {
-      if (!cat.isDirectLink && cat.items.some((item) => item.id === activeDocId)) {
-        setOpenSections((prev) => ({
-          ...prev,
-          [cat.title]: true,
-        }));
+    setOpenSections((prev) => {
+      const next: Record<string, boolean> = { ...prev };
+      for (const cat of categories) {
+        if (cat.defaultOpen && next[cat.title] === undefined) {
+          next[cat.title] = true;
+        }
+        if (!cat.isDirectLink && cat.items.some((item) => item.id === activeDocId)) {
+          next[cat.title] = true;
+        }
       }
-    }
-  }, [activeDocId]);
+      return next;
+    });
+  }, [activeView, activeDocId, categories]);
 
   const toggleSection = (title: string) => {
     setOpenSections((prev) => ({
@@ -90,189 +58,35 @@ export function DocsSidebar({
     }));
   };
 
-  const handleAnchorScroll = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      const offset = 128;
-      const elementPosition = el.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-      window.history.pushState(null, "", `#${id}`);
-    }
-  };
-
-  // 1. MCP SIDEBAR
-  if (activeView === "mcp") {
-    return (
-      <aside className={`flex flex-col space-y-3 font-sans text-xs text-ink ${className}`} aria-label="MCP sidebar">
-        <div className="rounded-lg border border-pass/30 bg-pass/10 p-3">
-          <div className="flex items-center gap-2 mb-1">
-            <Bot className="h-4 w-4 text-pass" />
-            <span className="font-semibold text-ink text-xs">Playwright MCP</span>
-          </div>
-          <p className="text-[11px] text-muted leading-tight">
-            Official Model Context Protocol server for AI agents and test automation.
-          </p>
-        </div>
-
-        <nav className="flex-1 space-y-1 overflow-y-auto pr-2">
-          <p className="text-[11px] font-mono uppercase text-muted tracking-wider px-2 py-1">Sections</p>
-          {MCP_SECTIONS.map((sec) => (
-            <button
-              key={sec.id}
-              type="button"
-              onClick={() => handleAnchorScroll(sec.id)}
-              className="flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-xs text-ink hover:bg-card hover:text-pass transition cursor-pointer"
-            >
-              <span>{sec.text}</span>
-            </button>
-          ))}
-        </nav>
-
-        {onSelectView && (
-          <div className="border-t border-line/60 pt-3">
-            <button
-              type="button"
-              onClick={() => onSelectView("docs")}
-              className="flex w-full items-center justify-between rounded-md border border-line bg-card/60 px-2.5 py-1.5 text-xs text-muted hover:text-pass hover:border-pass/40 transition cursor-pointer"
-            >
-              <span className="flex items-center gap-1.5">
-                <BookOpen className="h-3.5 w-3.5" />
-                <span>Browse All Docs</span>
-              </span>
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        )}
-      </aside>
-    );
-  }
-
-  // 2. CLI SIDEBAR
-  if (activeView === "cli") {
-    return (
-      <aside className={`flex flex-col space-y-3 font-sans text-xs text-ink ${className}`} aria-label="CLI sidebar">
-        <div className="rounded-lg border border-line bg-card/80 p-3">
-          <div className="flex items-center gap-2 mb-1">
-            <Terminal className="h-4 w-4 text-pass" />
-            <span className="font-semibold text-ink text-xs">Playwright CLI</span>
-          </div>
-          <p className="text-[11px] text-muted leading-tight">
-            Complete command line interface for test execution, codegen, and reports.
-          </p>
-        </div>
-
-        <nav className="flex-1 space-y-1 overflow-y-auto pr-2">
-          <p className="text-[11px] font-mono uppercase text-muted tracking-wider px-2 py-1">Commands</p>
-          {CLI_SECTIONS.map((sec) => (
-            <button
-              key={sec.id}
-              type="button"
-              onClick={() => handleAnchorScroll(sec.id)}
-              className="flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-xs text-ink hover:bg-card hover:text-pass transition cursor-pointer"
-            >
-              <span>{sec.text}</span>
-            </button>
-          ))}
-        </nav>
-
-        {onSelectView && (
-          <div className="border-t border-line/60 pt-3">
-            <button
-              type="button"
-              onClick={() => onSelectView("docs")}
-              className="flex w-full items-center justify-between rounded-md border border-line bg-card/60 px-2.5 py-1.5 text-xs text-muted hover:text-pass hover:border-pass/40 transition cursor-pointer"
-            >
-              <span className="flex items-center gap-1.5">
-                <BookOpen className="h-3.5 w-3.5" />
-                <span>Browse All Docs</span>
-              </span>
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        )}
-      </aside>
-    );
-  }
-
-  // 3. API SIDEBAR
-  if (activeView === "api") {
-    return (
-      <aside className={`flex flex-col space-y-3 font-sans text-xs text-ink ${className}`} aria-label="API sidebar">
-        <div className="rounded-lg border border-line bg-card/80 p-3">
-          <div className="flex items-center gap-2 mb-1">
-            <Layers className="h-4 w-4 text-pass" />
-            <span className="font-semibold text-ink text-xs">Playwright API</span>
-          </div>
-          <p className="text-[11px] text-muted leading-tight">
-            Object-oriented class reference for Browser, Context, Page, and Locators.
-          </p>
-        </div>
-
-        <nav className="flex-1 space-y-1 overflow-y-auto pr-2">
-          <p className="text-[11px] font-mono uppercase text-muted tracking-wider px-2 py-1">Classes</p>
-          {API_SECTIONS.map((sec) => (
-            <button
-              key={sec.id}
-              type="button"
-              onClick={() => handleAnchorScroll(sec.id)}
-              className="flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-xs text-ink hover:bg-card hover:text-pass transition cursor-pointer"
-            >
-              <span>{sec.text}</span>
-            </button>
-          ))}
-        </nav>
-
-        {onSelectView && (
-          <div className="border-t border-line/60 pt-3">
-            <button
-              type="button"
-              onClick={() => onSelectView("docs")}
-              className="flex w-full items-center justify-between rounded-md border border-line bg-card/60 px-2.5 py-1.5 text-xs text-muted hover:text-pass hover:border-pass/40 transition cursor-pointer"
-            >
-              <span className="flex items-center gap-1.5">
-                <BookOpen className="h-3.5 w-3.5" />
-                <span>Browse All Docs</span>
-              </span>
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        )}
-      </aside>
-    );
-  }
-
-  // 4. DOCS SIDEBAR (All 8 Categories)
-  const filteredCategories = DOC_CATEGORIES.map((cat) => {
-    if (!filter) return cat;
-    const matchCat = cat.title.toLowerCase().includes(filter.toLowerCase());
-    const matchedItems = cat.items.filter((item) =>
-      item.text.toLowerCase().includes(filter.toLowerCase())
-    );
-    if (matchCat || matchedItems.length > 0) {
-      return {
-        ...cat,
-        items: matchedItems.length > 0 ? matchedItems : cat.items,
-        defaultOpen: true,
-      };
-    }
-    return null;
-  }).filter(Boolean) as DocCategory[];
+  const filteredCategories = categories
+    .map((cat) => {
+      if (!filter) return cat;
+      const matchCat = cat.title.toLowerCase().includes(filter.toLowerCase());
+      const matchedItems = cat.items.filter((item) =>
+        item.text.toLowerCase().includes(filter.toLowerCase())
+      );
+      if (matchCat || matchedItems.length > 0) {
+        return {
+          ...cat,
+          items: matchedItems.length > 0 ? matchedItems : cat.items,
+          defaultOpen: true,
+        };
+      }
+      return null;
+    })
+    .filter(Boolean) as DocCategory[];
 
   return (
     <aside
       className={`flex flex-col space-y-3 font-sans text-xs text-ink ${className}`}
       aria-label="Docs sidebar"
     >
-      {/* Search / Filter input with subtle focus glow */}
+      {/* Search / Filter input */}
       <div className="relative">
         <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted/60 transition-colors group-focus-within:text-pass" />
         <input
           type="text"
-          placeholder="Filter docs..."
+          placeholder={`Filter ${activeView.toUpperCase()} docs...`}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="w-full rounded-md border border-line bg-paper/60 pl-8 pr-3 py-1.5 text-xs text-ink placeholder:text-muted/60 transition-all duration-200 focus:border-pass focus:bg-card focus:outline-none focus:ring-1 focus:ring-pass/30"
@@ -281,7 +95,7 @@ export function DocsSidebar({
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto pr-2 scrollbar-thin">
         {filteredCategories.map((cat) => {
-          // Direct Link (Release notes, Canary releases, Supported languages)
+          // Direct Link (Introduction, Video Recording, Configuration, Release notes, etc.)
           if (cat.isDirectLink) {
             const targetId = cat.items[0]?.id || cat.id!;
             const isActive = targetId === activeDocId;
@@ -303,7 +117,7 @@ export function DocsSidebar({
             );
           }
 
-          // Expandable Category (Getting Started, Playwright Test, Guides, Migration, Integrations)
+          // Expandable Category with Chevron
           const hasActiveChild = cat.items.some((item) => item.id === activeDocId);
           const isOpen = filter ? true : (openSections[cat.title] ?? cat.defaultOpen ?? false);
 
@@ -384,21 +198,25 @@ export function MobileDocsDrawer({
 }: MobileDocsDrawerProps) {
   const [open, setOpen] = useState(false);
 
+  const categories =
+    activeView === "mcp"
+      ? MCP_CATEGORIES
+      : activeView === "cli"
+      ? CLI_CATEGORIES
+      : activeView === "api"
+      ? API_CATEGORIES
+      : DOC_CATEGORIES;
+
   let activeTitle = "Documentation Menu";
-  if (activeView === "mcp") {
+  const matchedItem = categories.flatMap((c) => c.items).find((i) => i.id === activeDocId);
+  if (matchedItem) {
+    activeTitle = matchedItem.text;
+  } else if (activeView === "mcp") {
     activeTitle = "Playwright MCP";
   } else if (activeView === "cli") {
     activeTitle = "Playwright CLI";
   } else if (activeView === "api") {
     activeTitle = "API Reference";
-  } else {
-    for (const cat of DOC_CATEGORIES) {
-      const item = cat.items.find((i) => i.id === activeDocId);
-      if (item) {
-        activeTitle = item.text;
-        break;
-      }
-    }
   }
 
   const handleSelect = (id: string, anchorId?: string) => {

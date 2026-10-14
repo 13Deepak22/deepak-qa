@@ -6,10 +6,10 @@ import { DocViewer, getDocToc } from "@/components/learn/doc-viewer";
 import { DocsToc } from "@/components/learn/docs-toc";
 import { ApiDrawer } from "@/components/learn/api-drawer";
 import { DocsHeaderBar, type LearnViewType, type LanguageType } from "@/components/learn/docs-header-bar";
-import { McpView, getMcpToc } from "@/components/learn/mcp-view";
-import { CliView, getCliToc } from "@/components/learn/cli-view";
-import { ApiView, getApiToc } from "@/components/learn/api-view";
 import { DOC_CATEGORIES, type TocHeading } from "@/data/learn-docs-data";
+import { MCP_DOCS } from "@/data/learn-mcp-data";
+import { CLI_DOCS } from "@/data/learn-cli-data";
+import { API_DOCS_DETAILED } from "@/data/learn-api-data";
 
 function LearnPageContent() {
   const [activeView, setActiveView] = useState<LearnViewType>("docs");
@@ -25,26 +25,55 @@ function LearnPageContent() {
 
       if (hash === "mcp") {
         setActiveView("mcp");
+        setActiveDocId("mcp-intro");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (hash.startsWith("mcp-") || MCP_DOCS[hash]) {
+        setActiveView("mcp");
+        setActiveDocId(hash);
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
 
       if (hash === "cli") {
         setActiveView("cli");
+        setActiveDocId("cli-overview");
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
 
-      if (hash === "api" || hash.startsWith("class-")) {
+      if (hash.startsWith("cli-") || CLI_DOCS[hash]) {
+        setActiveView("cli");
+        setActiveDocId(hash);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (hash === "api") {
         setActiveView("api");
-        if (hash.startsWith("class-")) {
-          setTimeout(() => {
-            const el = document.getElementById(hash);
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-          }, 50);
+        setActiveDocId("api-overview");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (hash.startsWith("api-") || API_DOCS_DETAILED[hash]) {
+        setActiveView("api");
+        setActiveDocId(hash);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (hash.startsWith("class-")) {
+        setActiveView("api");
+        const apiDocKey = `api-${hash}`;
+        if (API_DOCS_DETAILED[apiDocKey]) {
+          setActiveDocId(apiDocKey);
         } else {
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          setActiveDocId("api-overview");
         }
+        window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
 
@@ -54,6 +83,7 @@ function LearnPageContent() {
       if (allKnownDocIds.includes(hash)) {
         setActiveView("docs");
         setActiveDocId(hash);
+        window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
         // In-page section anchor
         const el = document.getElementById(hash);
@@ -70,12 +100,29 @@ function LearnPageContent() {
 
   const handleSelectView = (view: LearnViewType) => {
     setActiveView(view);
-    window.history.pushState(null, "", `#${view}`);
+    let targetDocId = "library";
+    if (view === "mcp") targetDocId = "mcp-intro";
+    else if (view === "cli") targetDocId = "cli-overview";
+    else if (view === "api") targetDocId = "api-overview";
+    else if (view === "docs") targetDocId = "library";
+
+    setActiveDocId(targetDocId);
+    window.history.pushState(null, "", `#${targetDocId}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleNavigate = (docId: string, anchorId?: string) => {
-    setActiveView("docs");
+    // Determine view from docId
+    if (docId.startsWith("mcp-") || docId === "mcp") {
+      setActiveView("mcp");
+    } else if (docId.startsWith("cli-") || docId === "cli") {
+      setActiveView("cli");
+    } else if (docId.startsWith("api-") || docId === "api") {
+      setActiveView("api");
+    } else {
+      setActiveView("docs");
+    }
+
     setActiveDocId(docId);
 
     if (anchorId) {
@@ -92,17 +139,8 @@ function LearnPageContent() {
     }
   };
 
-  // Determine active Table of Contents based on activeView
-  let activeToc: TocHeading[] = [];
-  if (activeView === "mcp") {
-    activeToc = getMcpToc();
-  } else if (activeView === "cli") {
-    activeToc = getCliToc();
-  } else if (activeView === "api") {
-    activeToc = getApiToc();
-  } else {
-    activeToc = getDocToc(activeDocId);
-  }
+  // Determine active Table of Contents dynamically for the active document
+  const activeToc: TocHeading[] = getDocToc(activeDocId, activeView);
 
   return (
     <div className="min-h-screen bg-paper pb-16">
@@ -151,20 +189,20 @@ function LearnPageContent() {
               key={`${activeView}-${activeDocId}`}
               className="page-transition min-h-[60vh]"
             >
-              {activeView === "docs" && (
-                <DocViewer
-                  activeDocId={activeDocId}
-                  onNavigate={handleNavigate}
-                  onOpenApi={(id) => setActiveApiId(id)}
-                  selectedLanguage={selectedLanguage}
-                />
-              )}
-
-              {activeView === "mcp" && <McpView />}
-
-              {activeView === "cli" && <CliView />}
-
-              {activeView === "api" && <ApiView onOpenApi={(id) => setActiveApiId(id)} />}
+              <DocViewer
+                activeView={activeView}
+                activeDocId={activeDocId}
+                onNavigate={handleNavigate}
+                onOpenApi={(id) => {
+                  const apiDocKey = id.startsWith("api-") ? id : `api-${id}`;
+                  if (API_DOCS_DETAILED[apiDocKey]) {
+                    handleNavigate(apiDocKey);
+                  } else {
+                    setActiveApiId(id);
+                  }
+                }}
+                selectedLanguage={selectedLanguage}
+              />
             </div>
           </main>
 

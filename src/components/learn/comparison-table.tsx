@@ -1,4 +1,15 @@
-export function ComparisonTable() {
+"use client";
+
+interface ComparisonTableProps {
+  onOpenApi?: (apiId: string) => void;
+}
+
+export function ComparisonTable({ onOpenApi }: ComparisonTableProps) {
+  const triggerApi = (apiId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (onOpenApi) onOpenApi(apiId);
+  };
+
   const rows = [
     {
       aspect: "Installation",
@@ -38,9 +49,37 @@ export function ComparisonTable() {
           <p className="font-medium text-ink">Explicitly need to:</p>
           <ol className="list-decimal pl-4 space-y-1 text-muted">
             <li>Pick a browser to use, e.g. <code>chromium</code></li>
-            <li>Launch browser with <code>browserType.launch()</code></li>
-            <li>Create a context with <code>browser.newContext()</code>, <em>and</em> pass any context options explicitly, e.g. <code>devices['iPhone 11']</code></li>
-            <li>Create a page with <code>browserContext.newPage()</code></li>
+            <li>
+              Launch browser with{" "}
+              <button
+                type="button"
+                onClick={(e) => triggerApi("browser-type-launch", e)}
+                className="text-pass underline hover:opacity-80 font-mono font-medium"
+              >
+                browserType.launch()
+              </button>
+            </li>
+            <li>
+              Create a context with{" "}
+              <button
+                type="button"
+                onClick={(e) => triggerApi("browser-new-context", e)}
+                className="text-pass underline hover:opacity-80 font-mono font-medium"
+              >
+                browser.newContext()
+              </button>
+              , <em>and</em> pass any context options explicitly, e.g. <code>devices[&apos;iPhone 11&apos;]</code>
+            </li>
+            <li>
+              Create a page with{" "}
+              <button
+                type="button"
+                onClick={(e) => triggerApi("browser-context-new-page", e)}
+                className="text-pass underline hover:opacity-80 font-mono font-medium"
+              >
+                browserContext.newPage()
+              </button>
+            </li>
           </ol>
         </div>
       ),
@@ -59,8 +98,24 @@ export function ComparisonTable() {
             <span className="font-semibold text-pass">Web-First assertions</span> like:
           </p>
           <ul className="list-disc pl-4 space-y-0.5 text-muted">
-            <li><code>expect(page).toHaveTitle()</code></li>
-            <li><code>expect(page).toHaveScreenshot()</code></li>
+            <li>
+              <button
+                type="button"
+                onClick={(e) => triggerApi("page-assertions-to-have-title", e)}
+                className="text-pass underline hover:opacity-80 font-mono font-medium"
+              >
+                expect(page).toHaveTitle()
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={(e) => triggerApi("page-assertions-to-have-screenshot", e)}
+                className="text-pass underline hover:opacity-80 font-mono font-medium"
+              >
+                expect(page).toHaveScreenshot()
+              </button>
+            </li>
           </ul>
           <p className="text-muted/80 pt-1">which auto-wait and retry for the condition to be met.</p>
         </div>
@@ -81,8 +136,26 @@ export function ComparisonTable() {
         <div className="space-y-1 text-xs">
           <p className="font-medium text-ink">Explicitly need to:</p>
           <ol className="list-decimal pl-4 space-y-0.5 text-muted">
-            <li>Close context with <code>browserContext.close()</code></li>
-            <li>Close browser with <code>browser.close()</code></li>
+            <li>
+              Close context with{" "}
+              <button
+                type="button"
+                onClick={(e) => triggerApi("browser-context-close", e)}
+                className="text-pass underline hover:opacity-80 font-mono font-medium"
+              >
+                browserContext.close()
+              </button>
+            </li>
+            <li>
+              Close browser with{" "}
+              <button
+                type="button"
+                onClick={(e) => triggerApi("browser-close", e)}
+                className="text-pass underline hover:opacity-80 font-mono font-medium"
+              >
+                browser.close()
+              </button>
+            </li>
           </ol>
         </div>
       ),
@@ -138,4 +211,3 @@ export function ComparisonTable() {
     </div>
   );
 }
-

@@ -2,14 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
+import type { TocHeading } from "@/data/learn-docs-data";
 
-interface TocItem {
-  id: string;
-  text: string;
-  level: number;
-}
-
-const TOC_ITEMS: TocItem[] = [
+const DEFAULT_TOC: TocHeading[] = [
   { id: "introduction", text: "Introduction", level: 2 },
   { id: "differences-when-using-library", text: "Differences when using library", level: 2 },
   { id: "library-example", text: "Library Example", level: 3 },
@@ -24,16 +19,27 @@ const TOC_ITEMS: TocItem[] = [
   { id: "in-typescript", text: "In TypeScript", level: 3 },
 ];
 
-export function DocsToc({ className = "" }: { className?: string }) {
-  const [activeId, setActiveId] = useState<string>("introduction");
+interface DocsTocProps {
+  items?: TocHeading[];
+  className?: string;
+}
+
+export function DocsToc({ items = DEFAULT_TOC, className = "" }: DocsTocProps) {
+  const [activeId, setActiveId] = useState<string>(items[0]?.id || "");
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (items.length > 0) {
+      setActiveId(items[0].id);
+    }
+  }, [items]);
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 140;
 
-      for (let i = TOC_ITEMS.length - 1; i >= 0; i--) {
-        const item = TOC_ITEMS[i];
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
         const el = document.getElementById(item.id);
         if (el) {
           const top = el.offsetTop;
@@ -48,7 +54,7 @@ export function DocsToc({ className = "" }: { className?: string }) {
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [items]);
 
   const scrollTo = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -67,6 +73,8 @@ export function DocsToc({ className = "" }: { className?: string }) {
     }
   };
 
+  if (!items || items.length === 0) return null;
+
   return (
     <>
       {/* Mobile Accordion */}
@@ -84,7 +92,7 @@ export function DocsToc({ className = "" }: { className?: string }) {
         </button>
         {mobileOpen && (
           <div className="border-t border-line/60 px-4 py-3 space-y-1">
-            {TOC_ITEMS.map((item) => (
+            {items.map((item) => (
               <a
                 key={item.id}
                 href={`#${item.id}`}
@@ -113,7 +121,7 @@ export function DocsToc({ className = "" }: { className?: string }) {
           On this page
         </p>
         <ul className="space-y-1.5 border-l border-line/60">
-          {TOC_ITEMS.map((item) => {
+          {items.map((item) => {
             const isActive = activeId === item.id;
             return (
               <li key={item.id}>
@@ -138,4 +146,3 @@ export function DocsToc({ className = "" }: { className?: string }) {
     </>
   );
 }
-

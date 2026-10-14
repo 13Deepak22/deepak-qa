@@ -1,124 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronRight, Search } from "lucide-react";
+import { ChevronDown, ChevronRight, Search, Sparkles } from "lucide-react";
+import { DOC_CATEGORIES, type DocCategory } from "@/data/learn-docs-data";
 
-interface SidebarCategory {
-  title: string;
-  items?: { text: string; href: string; active?: boolean }[];
-  href?: string;
-  defaultOpen?: boolean;
+interface DocsSidebarProps {
+  activeDocId: string;
+  onSelectDoc: (id: string, anchorId?: string) => void;
+  className?: string;
 }
 
-const SIDEBAR_CATEGORIES: SidebarCategory[] = [
-  {
-    title: "Getting Started",
-    defaultOpen: false,
-    items: [
-      { text: "Installation", href: "#" },
-      { text: "Writing tests", href: "#" },
-      { text: "Generating tests", href: "#" },
-      { text: "Running and debugging tests", href: "#" },
-      { text: "Trace viewer", href: "#" },
-      { text: "Setting up CI", href: "#" },
-      { text: "VS Code", href: "#" },
-    ],
-  },
-  {
-    title: "Release notes",
-    href: "#",
-  },
-  {
-    title: "Canary releases",
-    href: "#",
-  },
-  {
-    title: "Playwright Test",
-    defaultOpen: false,
-    items: [
-      { text: "Agents", href: "#" },
-      { text: "Annotations", href: "#" },
-      { text: "Command line", href: "#" },
-      { text: "Configuration", href: "#" },
-      { text: "Configuration (use)", href: "#" },
-      { text: "Emulation", href: "#" },
-      { text: "Fixtures", href: "#" },
-      { text: "Global setup and teardown", href: "#" },
-      { text: "Parallelism", href: "#" },
-      { text: "Parameterize tests", href: "#" },
-      { text: "Projects", href: "#" },
-      { text: "Reporters", href: "#" },
-      { text: "Retries", href: "#" },
-      { text: "Sharding", href: "#" },
-      { text: "Timeouts", href: "#" },
-      { text: "TypeScript", href: "#" },
-      { text: "UI Mode", href: "#" },
-      { text: "Web server", href: "#" },
-    ],
-  },
-  {
-    title: "Guides",
-    defaultOpen: true,
-    items: [
-      { text: "Library", href: "#", active: true },
-      { text: "Accessibility testing", href: "#" },
-      { text: "Actions", href: "#" },
-      { text: "Assertions", href: "#" },
-      { text: "API testing", href: "#" },
-      { text: "Authentication", href: "#" },
-      { text: "Auto-waiting", href: "#" },
-      { text: "Best Practices", href: "#" },
-      { text: "Browsers", href: "#" },
-      { text: "Chrome extensions", href: "#" },
-      { text: "Clock", href: "#" },
-      { text: "Component testing", href: "#" },
-      { text: "Debugging Tests", href: "#" },
-      { text: "Dialogs", href: "#" },
-      { text: "Downloads", href: "#" },
-      { text: "Evaluating JavaScript", href: "#" },
-      { text: "Events", href: "#" },
-      { text: "Extensibility", href: "#" },
-      { text: "Frames", href: "#" },
-      { text: "Handles", href: "#" },
-      { text: "Isolation", href: "#" },
-      { text: "Locators", href: "#" },
-      { text: "Mock APIs", href: "#" },
-      { text: "Mock browser APIs", href: "#" },
-      { text: "Navigations", href: "#" },
-      { text: "Network", href: "#" },
-      { text: "Other locators", href: "#" },
-      { text: "Pages", href: "#" },
-      { text: "Page object models", href: "#" },
-      { text: "Screenshots", href: "#" },
-      { text: "Service Workers", href: "#" },
-      { text: "Snapshot testing", href: "#" },
-      { text: "Test generator", href: "#" },
-      { text: "Touch events (legacy)", href: "#" },
-      { text: "Trace viewer", href: "#" },
-      { text: "Videos", href: "#" },
-      { text: "Visual comparisons", href: "#" },
-      { text: "WebView2", href: "#" },
-    ],
-  },
-  {
-    title: "Migration",
-    href: "#",
-  },
-  {
-    title: "Integrations",
-    href: "#",
-  },
-  {
-    title: "Supported languages",
-    href: "#",
-  },
-];
-
-export function DocsSidebar({ className = "" }: { className?: string }) {
+export function DocsSidebar({ activeDocId, onSelectDoc, className = "" }: DocsSidebarProps) {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    "Getting Started": true,
     Guides: true,
-    "Getting Started": false,
-    "Playwright Test": false,
+    "Release notes": false,
   });
   const [filter, setFilter] = useState("");
 
@@ -129,21 +25,21 @@ export function DocsSidebar({ className = "" }: { className?: string }) {
     }));
   };
 
-  const filteredCategories = SIDEBAR_CATEGORIES.map((cat) => {
+  const filteredCategories = DOC_CATEGORIES.map((cat) => {
     if (!filter) return cat;
     const matchCat = cat.title.toLowerCase().includes(filter.toLowerCase());
-    const matchedItems = cat.items?.filter((item) =>
+    const matchedItems = cat.items.filter((item) =>
       item.text.toLowerCase().includes(filter.toLowerCase())
     );
-    if (matchCat || (matchedItems && matchedItems.length > 0)) {
+    if (matchCat || matchedItems.length > 0) {
       return {
         ...cat,
-        items: matchedItems || cat.items,
+        items: matchedItems.length > 0 ? matchedItems : cat.items,
         defaultOpen: true,
       };
     }
     return null;
-  }).filter(Boolean) as SidebarCategory[];
+  }).filter(Boolean) as DocCategory[];
 
   return (
     <aside
@@ -165,20 +61,6 @@ export function DocsSidebar({ className = "" }: { className?: string }) {
       <nav className="flex-1 space-y-1 overflow-y-auto pr-2 scrollbar-thin">
         {filteredCategories.map((cat) => {
           const isOpen = filter ? true : (openSections[cat.title] ?? cat.defaultOpen ?? false);
-          const hasChildren = cat.items && cat.items.length > 0;
-
-          if (!hasChildren) {
-            return (
-              <div key={cat.title}>
-                <a
-                  href={cat.href || "#"}
-                  className="flex items-center px-2 py-1.5 font-medium text-muted transition hover:bg-card hover:text-ink rounded-md"
-                >
-                  {cat.title}
-                </a>
-              </div>
-            );
-          }
 
           return (
             <div key={cat.title} className="space-y-0.5">
@@ -197,22 +79,28 @@ export function DocsSidebar({ className = "" }: { className?: string }) {
 
               {isOpen && cat.items && (
                 <div className="ml-2 border-l border-line/60 pl-2 space-y-0.5">
-                  {cat.items.map((item) => (
-                    <a
-                      key={item.text}
-                      href={item.href}
-                      onClick={(e) => {
-                        if (item.href === "#") e.preventDefault();
-                      }}
-                      className={`block rounded-sm px-2 py-1 text-[11.5px] transition ${
-                        item.active
-                          ? "bg-pass/15 font-semibold text-pass"
-                          : "text-muted hover:bg-card hover:text-ink"
-                      }`}
-                    >
-                      {item.text}
-                    </a>
-                  ))}
+                  {cat.items.map((item) => {
+                    const isActive = item.id === activeDocId;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => onSelectDoc(item.id)}
+                        className={`group flex w-full items-center justify-between rounded-md px-2 py-1 text-left text-[11.5px] transition ${
+                          isActive
+                            ? "bg-pass/15 font-semibold text-pass"
+                            : "text-muted hover:bg-card hover:text-ink"
+                        }`}
+                      >
+                        <span className="truncate">{item.text}</span>
+                        {item.badge && (
+                          <span className="ml-1 rounded bg-pass/20 px-1 py-0.2 text-[9px] font-mono uppercase text-pass">
+                            {item.badge}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -223,8 +111,18 @@ export function DocsSidebar({ className = "" }: { className?: string }) {
   );
 }
 
-export function MobileDocsDrawer() {
+interface MobileDocsDrawerProps {
+  activeDocId: string;
+  onSelectDoc: (id: string, anchorId?: string) => void;
+}
+
+export function MobileDocsDrawer({ activeDocId, onSelectDoc }: MobileDocsDrawerProps) {
   const [open, setOpen] = useState(false);
+
+  const handleSelect = (id: string, anchorId?: string) => {
+    onSelectDoc(id, anchorId);
+    setOpen(false);
+  };
 
   return (
     <>
@@ -255,7 +153,7 @@ export function MobileDocsDrawer() {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto pr-1">
-              <DocsSidebar />
+              <DocsSidebar activeDocId={activeDocId} onSelectDoc={handleSelect} />
             </div>
           </div>
         </div>
@@ -263,4 +161,3 @@ export function MobileDocsDrawer() {
     </>
   );
 }
-

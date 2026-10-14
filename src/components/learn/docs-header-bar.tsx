@@ -32,7 +32,7 @@ export function DocsHeaderBar({
 
   return (
     <div className="sticky top-20 z-30 border-b border-line/60 bg-paper/95 backdrop-blur-md">
-      <div className="mx-auto flex h-11 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
+      <div className="mx-auto flex h-11 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
         {/* Left: Playwright Brand & Top Navigation Items (Docs, MCP, CLI, API, Node.js) */}
         <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto no-scrollbar">
           {/* Playwright Brand Link */}

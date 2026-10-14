@@ -133,7 +133,8 @@ export function DocsToc({ items = [], variant = "both", className = "" }: DocsTo
                   <a
                     href={`#${item.id}`}
                     onClick={(e) => scrollTo(item.id, e)}
-                    className={`block transition-all duration-200 ease-out ${
+                    title={item.text}
+                    className={`block truncate transition-all duration-200 ease-out ${
                       item.level === 3 ? "pl-5 text-[11.5px]" : "pl-3 text-xs"
                     } -ml-[1px] border-l-2 py-0.5 cursor-pointer ${
                       isActive

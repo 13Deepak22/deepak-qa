@@ -143,19 +143,19 @@ function LearnPageContent() {
   const activeToc: TocHeading[] = getDocToc(activeDocId, activeView);
 
   return (
-    <div className="min-h-screen bg-paper pb-16">
+    <main id="content" tabIndex={-1} className="outline-none min-h-screen bg-paper pb-16">
       {/* Playwright Sub-Header Bar (Docs | MCP | CLI | API | Node.js) */}
       <DocsHeaderBar
         activeView={activeView}
         onSelectView={handleSelectView}
       />
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 pt-4 sm:pt-6">
-        {/* 3-Column Documentation Layout */}
-        <div className="flex gap-8 lg:gap-10">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-6 sm:pt-8">
+        {/* Responsive Documentation Layout with wide main section */}
+        <div className="flex gap-6 lg:gap-8 xl:gap-10">
           {/* Left Sidebar (Desktop) */}
-          <div className="hidden lg:block w-60 shrink-0">
-            <div className="sticky top-36 max-h-[calc(100vh-10rem)] overflow-y-auto pb-8 pr-2">
+          <div className="hidden lg:block w-56 shrink-0">
+            <div className="sticky top-32 max-h-[calc(100vh-9rem)] flex flex-col pb-6 pr-1 overflow-hidden">
               <DocsSidebar
                 activeView={activeView}
                 activeDocId={activeDocId}
@@ -165,8 +165,8 @@ function LearnPageContent() {
             </div>
           </div>
 
-          {/* Center Main Content */}
-          <main className="min-w-0 flex-1">
+          {/* Center Main Content - Spacious, properly aligned, unconstrained */}
+          <div className="min-w-0 flex-1">
             {/* Mobile Controls: Topics drawer */}
             <div className="lg:hidden mb-4 flex items-center justify-between gap-3">
               <MobileDocsDrawer
@@ -175,11 +175,6 @@ function LearnPageContent() {
                 onSelectDoc={handleNavigate}
                 onSelectView={handleSelectView}
               />
-            </div>
-
-            {/* Mobile TOC */}
-            <div className="xl:hidden mb-6">
-              <DocsToc items={activeToc} variant="mobile" />
             </div>
 
             {/* Active View Body with theme-matched transition animation */}
@@ -202,11 +197,11 @@ function LearnPageContent() {
                 selectedLanguage={selectedLanguage}
               />
             </div>
-          </main>
+          </div>
 
-          {/* Right Table of Contents (Desktop) */}
-          <div className="hidden xl:block w-56 shrink-0">
-            <div className="sticky top-36 max-h-[calc(100vh-10rem)] overflow-y-auto pb-8 pl-2">
+          {/* Right Table of Contents (Desktop - only on extra wide 2xl to never shrink main content) */}
+          <div className="hidden 2xl:block w-48 shrink-0">
+            <div className="sticky top-32 max-h-[calc(100vh-9rem)] overflow-y-auto overflow-x-hidden pb-8 pl-1">
               <DocsToc items={activeToc} variant="desktop" />
             </div>
           </div>
@@ -215,7 +210,7 @@ function LearnPageContent() {
 
       {/* In-page API Reference Drawer */}
       <ApiDrawer apiId={activeApiId} onClose={() => setActiveApiId(null)} />
-    </div>
+    </main>
   );
 }
 

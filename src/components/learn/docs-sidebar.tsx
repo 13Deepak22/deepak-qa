@@ -93,7 +93,7 @@ export function DocsSidebar({
         />
       </div>
 
-      <nav className="flex-1 space-y-0.5 overflow-y-auto pr-2 scrollbar-thin">
+      <nav className="flex-1 space-y-0.5 overflow-y-auto overflow-x-hidden pr-2 scrollbar-thin">
         {filteredCategories.map((cat) => {
           // Direct Link (Introduction, Video Recording, Configuration, Release notes, etc.)
           if (cat.isDirectLink) {

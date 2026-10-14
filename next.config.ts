@@ -9,6 +9,15 @@ const nextConfig: NextConfig = {
       "./node_modules/@fontsource/fraunces/files/fraunces-latin-400-normal.woff",
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/rca",
+        destination: "/services#rca",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

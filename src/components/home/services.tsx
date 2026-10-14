@@ -14,6 +14,11 @@ const logoSize: Record<ToolLogoName, { large: string; small: string }> = {
   trello: { large: "h-7 w-7", small: "h-5 w-5" },
   razorpay: { large: "w-10", small: "w-7" },
   paytm: { large: "w-12", small: "w-9" },
+  manual: { large: "h-8 w-8", small: "h-6 w-6" },
+  automation: { large: "h-8 w-8", small: "h-6 w-6" },
+  java: { large: "h-8 w-8", small: "h-6 w-6" },
+  javascript: { large: "h-8 w-8", small: "h-6 w-6" },
+  typescript: { large: "h-8 w-8", small: "h-6 w-6" },
 };
 
 const typeIcons: Record<TestingTypeIcon, LucideIcon> = {
@@ -27,6 +32,8 @@ const logoName = (name: ToolLogoName) => {
   if (name === "jmeter") return "JMeter";
   if (name === "paytm") return "Paytm";
   if (name === "razorpay") return "Razorpay";
+  if (name === "javascript") return "JavaScript";
+  if (name === "typescript") return "TypeScript";
   return name[0].toUpperCase() + name.slice(1);
 };
 

@@ -69,6 +69,19 @@ html {
   height: 8px;
 }
 
+.no-scrollbar::-webkit-scrollbar,
+[data-no-scrollbar]::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.no-scrollbar,
+[data-no-scrollbar] {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
 ::-webkit-scrollbar-track {
   background: var(--paper-deep);
 }
@@ -110,6 +123,43 @@ pre::-webkit-scrollbar-thumb:hover,
 .bg-band::-webkit-scrollbar-thumb:hover,
 .bg-band ::-webkit-scrollbar-thumb:hover {
   background: var(--pass);
+}
+
+/* Custom theme-matching scrollbar for docs sidebars & navigations */
+.docs-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.docs-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.docs-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.docs-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+.docs-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--pass) 45%, var(--line));
+}
+
+.docs-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--pass);
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 :focus-visible {

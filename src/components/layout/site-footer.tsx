@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { BookOpen } from "lucide-react";
 import { ContactPanel } from "@/components/layout/contact-panel";
 import { profile } from "@/data";
 
@@ -25,19 +23,6 @@ export function SiteFooter() {
                 Evidence before release
               </span>
             </p>
-
-            <div className="flex items-center gap-3">
-              <Link
-                href="/learn"
-                className="group inline-flex items-center gap-2 rounded-md border border-on-band/15 bg-on-band/5 px-2.5 py-1 text-xs text-on-band/80 transition-all hover:border-pass/40 hover:bg-pass/10 hover:text-pass"
-              >
-                <BookOpen className="h-3.5 w-3.5 text-pass transition-transform group-hover:scale-110" />
-                <span className="font-medium">Learn</span>
-                <span className="rounded bg-pass/20 px-1 py-0.2 font-mono text-[10px] text-pass uppercase">
-                  Playwright Docs
-                </span>
-              </Link>
-            </div>
           </div>
         </div>
       </div>

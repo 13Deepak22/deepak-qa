@@ -2,7 +2,8 @@ export interface DocSection {
   id: string;
   heading: string;
   level?: 2 | 3;
-  paragraphs: string[];
+  paragraphs?: string[];
+  subsections?: DocSection[];
   codeBlocks?: Array<{
     title?: string;
     language?: string;

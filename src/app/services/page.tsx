@@ -12,17 +12,19 @@ import {
 import { InteractiveDeliverables } from "@/components/services/interactive-deliverables";
 import { MobileDeviceMatrix } from "@/components/services/mobile-device-matrix";
 import { ServicesSection } from "@/components/home/services";
+import { RcaCaseStudy } from "@/components/home/rca-case-study";
+import { InteractiveRaceTimeline } from "@/components/rca/interactive-race-timeline";
 import { services } from "@/data";
 import { siteTitleSuffix } from "@/lib/site";
 
 export function generateMetadata(): Metadata {
   return {
-    title: "Testing Services & Quality Engineering",
+    title: "Testing Services, Quality Engineering & RCA",
     description:
-      "Professional QA testing services by Deepak Gupta: Manual exploratory testing, automated regression in Playwright & Appium, fintech payment verification (UPI, Razorpay, Cashfree), and defect root cause analysis.",
+      "Professional QA testing services by Deepak Gupta: Manual exploratory testing, automated regression in Playwright & Appium, fintech payment verification (UPI, Razorpay, Cashfree), and defect root cause analysis (RCA).",
     alternates: { canonical: "/services" },
     openGraph: {
-      title: `Testing Services & Quality Engineering — ${siteTitleSuffix}`,
+      title: `Testing Services & Defect RCA — ${siteTitleSuffix}`,
       description:
         "Specialized QA services: Manual exploratory passes, automated regression suites in Playwright & Appium, fintech payment gatekeeper checks, and root cause analysis.",
       url: "/services",
@@ -207,6 +209,56 @@ export default function ServicesPage() {
         </div>
       </section>
 
+      {/* Defect Investigation & Root Cause Analysis (RCA) */}
+      <RcaCaseStudy id="rca" />
+
+      {/* Deep-dive Concurrency Timeline Simulator & RCA Pillars */}
+      <section className="border-t border-line bg-paper py-16 sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mb-12">
+            <InteractiveRaceTimeline />
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 border-t border-line pt-12">
+            <div className="border border-line bg-card p-5">
+              <span className="font-mono text-[0.65rem] tracking-[0.16em] text-pass uppercase block">
+                01 · Discovery Method
+              </span>
+              <h3 className="mt-2 font-serif text-lg font-medium text-ink">
+                Exploratory Latency Conditioning
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-ink-soft">
+                Tested on 2G/3G throttled network profiles with 4,500ms artificial gateway response delays, reproducing asynchronous webhook vs. client tap overlaps.
+              </p>
+            </div>
+
+            <div className="border border-line bg-card p-5">
+              <span className="font-mono text-[0.65rem] tracking-[0.16em] text-pass uppercase block">
+                02 · Root Cause
+              </span>
+              <h3 className="mt-2 font-serif text-lg font-medium text-ink">
+                Application Memory Race
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-ink-soft">
+                Backend verified idempotency in application RAM rather than holding a row-level database lock, allowing concurrent worker threads to both evaluate state as PENDING.
+              </p>
+            </div>
+
+            <div className="border border-line bg-card p-5">
+              <span className="font-mono text-[0.65rem] tracking-[0.16em] text-pass uppercase block">
+                03 · Automated Prevention
+              </span>
+              <h3 className="mt-2 font-serif text-lg font-medium text-ink">
+                Release Gate Concurrency Suite
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-ink-soft">
+                Automated POM suite dispatches 5 simultaneous duplicate webhook payloads to enforce database UNIQUE constraints before release sign-off.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Navigation CTA Bar */}
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24 border-t border-line">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-paper border border-line p-6 sm:p-8">
@@ -215,10 +267,10 @@ export default function ServicesPage() {
               Next in Portfolio
             </p>
             <h3 className="mt-1 font-serif text-2xl sm:text-3xl text-ink">
-              Ready to see the tools, code &amp; investigations?
+              Ready to explore test code, docs &amp; tooling?
             </h3>
             <p className="mt-1 text-sm text-ink-soft">
-              Explore the full technical skills list, read a live defect investigation, or reach out directly.
+              Explore the interactive QA learning workbench, full technical skills list, or reach out directly.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -231,11 +283,11 @@ export default function ServicesPage() {
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
             <Link
-              href="/rca"
+              href="/learn"
               className="press inline-flex items-center gap-2 border border-line bg-card px-4 py-2.5 text-xs font-mono uppercase tracking-wider text-ink hover:border-pass hover:text-pass transition-colors"
-              data-cursor="Race condition investigation"
+              data-cursor="Playwright, Selenium & QA Docs"
             >
-              <span>RCA Case Study</span>
+              <span>Learn QA Docs</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
             <Link

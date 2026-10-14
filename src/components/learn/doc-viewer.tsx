@@ -12,6 +12,15 @@ import { EXTENDED_DOCS, type DetailedDoc } from "@/data/learn-extended-docs";
 import { MCP_CATEGORIES, MCP_DOCS } from "@/data/learn-mcp-data";
 import { CLI_CATEGORIES, CLI_DOCS } from "@/data/learn-cli-data";
 import { API_CATEGORIES, API_DOCS_DETAILED } from "@/data/learn-api-data";
+import { SELENIUM_CATEGORIES, SELENIUM_DOCS } from "@/data/learn-selenium-data";
+import { APPIUM_CATEGORIES, APPIUM_DOCS } from "@/data/learn-appium-data";
+import { POSTMAN_CATEGORIES, POSTMAN_DOCS } from "@/data/learn-postman-data";
+import { JMETER_CATEGORIES, JMETER_DOCS } from "@/data/learn-jmeter-data";
+import { MANUAL_CATEGORIES, MANUAL_DOCS } from "@/data/learn-manual-data";
+import { AUTOMATION_CATEGORIES, AUTOMATION_DOCS } from "@/data/learn-automation-data";
+import { JAVA_CATEGORIES, JAVA_DOCS } from "@/data/learn-java-data";
+import { JS_CATEGORIES, JS_DOCS } from "@/data/learn-js-data";
+import { TS_CATEGORIES, TS_DOCS } from "@/data/learn-ts-data";
 import type { LearnViewType, LanguageType } from "./docs-header-bar";
 
 export interface DocViewerProps {
@@ -138,28 +147,6 @@ function renderDetailedDocArticle(
         )}
       </header>
 
-      {/* Quick Jump Anchor Pills */}
-      {doc.sections && doc.sections.length > 1 && (
-        <nav aria-label="On this page quick jump" className="mb-8 rounded-lg border border-line/70 bg-card/50 p-3 sm:p-4 shadow-2xs">
-          <div className="flex items-center gap-1.5 mb-2 font-mono text-[10px] sm:text-[11px] font-semibold text-muted uppercase tracking-wider">
-            <span className="h-1.5 w-1.5 rounded-full bg-pass animate-pulse" />
-            <span>On this page:</span>
-          </div>
-          <div className="flex flex-wrap gap-1.5 sm:gap-2">
-            {doc.sections.map((sec) => (
-              <a
-                key={sec.id}
-                href={`#${sec.id}`}
-                onClick={(e) => scrollToAnchor(sec.id, e)}
-                className="inline-flex items-center rounded-md border border-line/60 bg-paper px-2.5 py-1 text-xs text-muted hover:border-pass/60 hover:text-pass hover:bg-pass/5 transition cursor-pointer"
-              >
-                {sec.heading}
-              </a>
-            ))}
-          </div>
-        </nav>
-      )}
-
       {/* Sections */}
       {doc.sections.map((sec) => {
         const isH3 = sec.level === 3;
@@ -188,7 +175,7 @@ function renderDetailedDocArticle(
             )}
 
             {/* Paragraphs */}
-            {sec.paragraphs.map((p, pIdx) => (
+            {sec.paragraphs?.map((p, pIdx) => (
               <p key={pIdx} className="text-sm sm:text-base leading-relaxed text-ink/90 mb-3">
                 {formatDocText(p)}
               </p>
@@ -269,6 +256,78 @@ function renderDetailedDocArticle(
                   </div>
                 );
               })}
+
+            {/* Subsections */}
+            {sec.subsections &&
+              sec.subsections.map((sub) => (
+                <div key={sub.id} id={sub.id} className="mt-6 mb-4 scroll-mt-32 pl-1 border-l-2 border-line/40 ml-1">
+                  <h3 className="group flex items-center font-serif text-lg font-semibold text-ink sm:text-xl mb-2">
+                    <a
+                      href={`#${sub.id}`}
+                      onClick={(e) => scrollToAnchor(sub.id, e)}
+                      className="hover:text-pass transition"
+                    >
+                      {sub.heading}
+                    </a>
+                  </h3>
+                  {sub.paragraphs?.map((p, pIdx) => (
+                    <p key={pIdx} className="text-sm sm:text-base leading-relaxed text-ink/90 mb-3">
+                      {formatDocText(p)}
+                    </p>
+                  ))}
+                  {sub.codeBlocks &&
+                    sub.codeBlocks.map((cb, bIdx) => (
+                      <div key={bIdx} className="my-4">
+                        {cb.title && (
+                          <div className="mb-1.5 text-xs font-mono font-medium text-muted">
+                            {cb.title}
+                          </div>
+                        )}
+                        {cb.tabs && cb.tabs.length > 0 ? (
+                          <DocTabs tabs={cb.tabs} />
+                        ) : cb.code ? (
+                          <DocCodeBlock code={cb.code} language={cb.language || "typescript"} />
+                        ) : null}
+                      </div>
+                    ))}
+                  {sub.table && (
+                    <div className="my-6 overflow-x-auto rounded-lg border border-line bg-card/60 shadow-2xs">
+                      <table className="w-full border-collapse text-left text-xs">
+                        <thead>
+                          <tr className="border-b border-line bg-paper-deep/60">
+                            {sub.table.headers.map((h, hIdx) => (
+                              <th key={hIdx} className="px-4 py-2.5 font-semibold text-ink">
+                                {h}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-line/40">
+                          {sub.table.rows.map((row, rIdx) => (
+                            <tr key={rIdx} className="hover:bg-paper/40 transition-colors">
+                              {row.map((cell, cIdx) => (
+                                <td key={cIdx} className="px-4 py-2.5 text-ink/90 leading-relaxed">
+                                  {formatDocText(cell)}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                  {sub.callouts &&
+                    sub.callouts.map((callout, cIdx) => (
+                      <div
+                        key={cIdx}
+                        className="my-4 rounded-lg border border-pass/30 bg-pass/5 p-4 text-xs sm:text-sm text-ink leading-relaxed"
+                      >
+                        {callout.title && <strong className="block font-semibold mb-1">{callout.title}</strong>}
+                        {callout.text}
+                      </div>
+                    ))}
+                </div>
+              ))}
           </section>
         );
       })}
@@ -327,6 +386,123 @@ export function getDocToc(docId: string, activeView: LearnViewType = "docs"): To
     const doc = API_DOCS_DETAILED[docKey] || API_DOCS_DETAILED["api-overview"];
     if (doc?.sections) {
       return doc.sections.map((s) => ({ id: s.id, text: s.heading, level: s.level || 2 }));
+    }
+  }
+
+  if (activeView === "selenium" || docId.startsWith("selenium-") || docId === "selenium") {
+    const docKey = docId === "selenium" ? "selenium-overview" : docId;
+    const doc = SELENIUM_DOCS[docKey] || SELENIUM_DOCS["selenium-overview"];
+    if (doc?.sections) {
+      return doc.sections.map((s) => ({ id: s.id, text: s.heading, level: s.level || 2 }));
+    }
+  }
+
+  if (activeView === "appium" || docId.startsWith("appium-") || docId === "appium") {
+    const docKey = docId === "appium" ? "appium-overview" : docId;
+    const doc = APPIUM_DOCS[docKey] || APPIUM_DOCS["appium-overview"];
+    if (doc?.sections) {
+      return doc.sections.map((s) => ({ id: s.id, text: s.heading, level: s.level || 2 }));
+    }
+  }
+
+  if (activeView === "postman" || docId.startsWith("postman-") || docId === "postman") {
+    const docKey = docId === "postman" ? "postman-overview" : docId;
+    const doc = POSTMAN_DOCS[docKey] || POSTMAN_DOCS["postman-overview"];
+    if (doc?.sections) {
+      return doc.sections.map((s) => ({ id: s.id, text: s.heading, level: s.level || 2 }));
+    }
+  }
+
+  if (activeView === "jmeter" || docId.startsWith("jmeter-") || docId === "jmeter") {
+    const docKey = docId === "jmeter" ? "jmeter-overview" : docId;
+    const doc = JMETER_DOCS[docKey] || JMETER_DOCS["jmeter-overview"];
+    if (doc?.sections) {
+      return doc.sections.map((s) => ({ id: s.id, text: s.heading, level: s.level || 2 }));
+    }
+  }
+
+  if (activeView === "manual" || docId.startsWith("manual-") || docId === "manual") {
+    const docKey = docId === "manual" ? "manual-overview" : docId;
+    const doc = MANUAL_DOCS[docKey] || MANUAL_DOCS["manual-overview"];
+    if (doc?.sections) {
+      const headings: TocHeading[] = [];
+      for (const s of doc.sections) {
+        headings.push({ id: s.id, text: s.heading, level: s.level || 2 });
+        if (s.subsections) {
+          for (const sub of s.subsections) {
+            headings.push({ id: sub.id, text: sub.heading, level: 3 });
+          }
+        }
+      }
+      return headings;
+    }
+  }
+
+  if (activeView === "automation" || docId.startsWith("automation-") || docId === "automation") {
+    const docKey = docId === "automation" ? "automation-overview" : docId;
+    const doc = AUTOMATION_DOCS[docKey] || AUTOMATION_DOCS["automation-overview"];
+    if (doc?.sections) {
+      const headings: TocHeading[] = [];
+      for (const s of doc.sections) {
+        headings.push({ id: s.id, text: s.heading, level: s.level || 2 });
+        if (s.subsections) {
+          for (const sub of s.subsections) {
+            headings.push({ id: sub.id, text: sub.heading, level: 3 });
+          }
+        }
+      }
+      return headings;
+    }
+  }
+
+  if (activeView === "java" || docId.startsWith("java-") || docId === "java") {
+    const docKey = docId === "java" ? "java-getting-started" : docId;
+    const doc = JAVA_DOCS[docKey] || JAVA_DOCS["java-getting-started"];
+    if (doc?.sections) {
+      const headings: TocHeading[] = [];
+      for (const s of doc.sections) {
+        headings.push({ id: s.id, text: s.heading, level: s.level || 2 });
+        if (s.subsections) {
+          for (const sub of s.subsections) {
+            headings.push({ id: sub.id, text: sub.heading, level: 3 });
+          }
+        }
+      }
+      return headings;
+    }
+  }
+
+  if (activeView === "javascript" || docId.startsWith("javascript-") || docId === "javascript") {
+    const docKey = docId === "javascript" ? "javascript-getting-started" : docId;
+    const doc = JS_DOCS[docKey] || JS_DOCS["javascript-getting-started"];
+    if (doc?.sections) {
+      const headings: TocHeading[] = [];
+      for (const s of doc.sections) {
+        headings.push({ id: s.id, text: s.heading, level: s.level || 2 });
+        if (s.subsections) {
+          for (const sub of s.subsections) {
+            headings.push({ id: sub.id, text: sub.heading, level: 3 });
+          }
+        }
+      }
+      return headings;
+    }
+  }
+
+  if (activeView === "typescript" || docId.startsWith("typescript-") || docId === "typescript") {
+    const docKey = docId === "typescript" ? "typescript-getting-started" : docId;
+    const doc = TS_DOCS[docKey] || TS_DOCS["typescript-getting-started"];
+    if (doc?.sections) {
+      const headings: TocHeading[] = [];
+      for (const s of doc.sections) {
+        headings.push({ id: s.id, text: s.heading, level: s.level || 2 });
+        if (s.subsections) {
+          for (const sub of s.subsections) {
+            headings.push({ id: sub.id, text: sub.heading, level: 3 });
+          }
+        }
+      }
+      return headings;
     }
   }
 
@@ -728,6 +904,141 @@ npm install`,
       const nextDoc =
         currentIndex >= 0 && currentIndex < allApiItems.length - 1
           ? allApiItems[currentIndex + 1]
+          : null;
+      return renderDetailedDocArticle(doc, prevDoc, nextDoc, selectedLanguage, onNavigate, scrollToAnchor);
+    }
+  }
+
+  if (activeView === "selenium" || activeDocId.startsWith("selenium-") || activeDocId === "selenium") {
+    const docKey = activeDocId === "selenium" ? "selenium-overview" : activeDocId;
+    const doc = SELENIUM_DOCS[docKey] || SELENIUM_DOCS["selenium-overview"];
+    if (doc) {
+      const allSeleniumItems = SELENIUM_CATEGORIES.flatMap((c) => c.items);
+      const currentIndex = allSeleniumItems.findIndex((item) => item.id === docKey);
+      const prevDoc = currentIndex > 0 ? allSeleniumItems[currentIndex - 1] : null;
+      const nextDoc =
+        currentIndex >= 0 && currentIndex < allSeleniumItems.length - 1
+          ? allSeleniumItems[currentIndex + 1]
+          : null;
+      return renderDetailedDocArticle(doc, prevDoc, nextDoc, selectedLanguage, onNavigate, scrollToAnchor);
+    }
+  }
+
+  if (activeView === "appium" || activeDocId.startsWith("appium-") || activeDocId === "appium") {
+    const docKey = activeDocId === "appium" ? "appium-overview" : activeDocId;
+    const doc = APPIUM_DOCS[docKey] || APPIUM_DOCS["appium-overview"];
+    if (doc) {
+      const allAppiumItems = APPIUM_CATEGORIES.flatMap((c) => c.items);
+      const currentIndex = allAppiumItems.findIndex((item) => item.id === docKey);
+      const prevDoc = currentIndex > 0 ? allAppiumItems[currentIndex - 1] : null;
+      const nextDoc =
+        currentIndex >= 0 && currentIndex < allAppiumItems.length - 1
+          ? allAppiumItems[currentIndex + 1]
+          : null;
+      return renderDetailedDocArticle(doc, prevDoc, nextDoc, selectedLanguage, onNavigate, scrollToAnchor);
+    }
+  }
+
+  if (activeView === "postman" || activeDocId.startsWith("postman-") || activeDocId === "postman") {
+    const docKey = activeDocId === "postman" ? "postman-overview" : activeDocId;
+    const doc = POSTMAN_DOCS[docKey] || POSTMAN_DOCS["postman-overview"];
+    if (doc) {
+      const allPostmanItems = POSTMAN_CATEGORIES.flatMap((c) => c.items);
+      const currentIndex = allPostmanItems.findIndex((item) => item.id === docKey);
+      const prevDoc = currentIndex > 0 ? allPostmanItems[currentIndex - 1] : null;
+      const nextDoc =
+        currentIndex >= 0 && currentIndex < allPostmanItems.length - 1
+          ? allPostmanItems[currentIndex + 1]
+          : null;
+      return renderDetailedDocArticle(doc, prevDoc, nextDoc, selectedLanguage, onNavigate, scrollToAnchor);
+    }
+  }
+
+  if (activeView === "jmeter" || activeDocId.startsWith("jmeter-") || activeDocId === "jmeter") {
+    const docKey = activeDocId === "jmeter" ? "jmeter-overview" : activeDocId;
+    const doc = JMETER_DOCS[docKey] || JMETER_DOCS["jmeter-overview"];
+    if (doc) {
+      const allJMeterItems = JMETER_CATEGORIES.flatMap((c) => c.items);
+      const currentIndex = allJMeterItems.findIndex((item) => item.id === docKey);
+      const prevDoc = currentIndex > 0 ? allJMeterItems[currentIndex - 1] : null;
+      const nextDoc =
+        currentIndex >= 0 && currentIndex < allJMeterItems.length - 1
+          ? allJMeterItems[currentIndex + 1]
+          : null;
+      return renderDetailedDocArticle(doc, prevDoc, nextDoc, selectedLanguage, onNavigate, scrollToAnchor);
+    }
+  }
+
+  if (activeView === "manual" || activeDocId.startsWith("manual-") || activeDocId === "manual") {
+    const docKey = activeDocId === "manual" ? "manual-overview" : activeDocId;
+    const doc = MANUAL_DOCS[docKey] || MANUAL_DOCS["manual-overview"];
+    if (doc) {
+      const allManualItems = MANUAL_CATEGORIES.flatMap((c) => c.items);
+      const currentIndex = allManualItems.findIndex((item) => item.id === docKey);
+      const prevDoc = currentIndex > 0 ? allManualItems[currentIndex - 1] : null;
+      const nextDoc =
+        currentIndex >= 0 && currentIndex < allManualItems.length - 1
+          ? allManualItems[currentIndex + 1]
+          : null;
+      return renderDetailedDocArticle(doc, prevDoc, nextDoc, selectedLanguage, onNavigate, scrollToAnchor);
+    }
+  }
+
+  if (activeView === "automation" || activeDocId.startsWith("automation-") || activeDocId === "automation") {
+    const docKey = activeDocId === "automation" ? "automation-overview" : activeDocId;
+    const doc = AUTOMATION_DOCS[docKey] || AUTOMATION_DOCS["automation-overview"];
+    if (doc) {
+      const allAutomationItems = AUTOMATION_CATEGORIES.flatMap((c) => c.items);
+      const currentIndex = allAutomationItems.findIndex((item) => item.id === docKey);
+      const prevDoc = currentIndex > 0 ? allAutomationItems[currentIndex - 1] : null;
+      const nextDoc =
+        currentIndex >= 0 && currentIndex < allAutomationItems.length - 1
+          ? allAutomationItems[currentIndex + 1]
+          : null;
+      return renderDetailedDocArticle(doc, prevDoc, nextDoc, selectedLanguage, onNavigate, scrollToAnchor);
+    }
+  }
+
+  if (activeView === "java" || activeDocId.startsWith("java-") || activeDocId === "java") {
+    const docKey = activeDocId === "java" ? "java-getting-started" : activeDocId;
+    const doc = JAVA_DOCS[docKey] || JAVA_DOCS["java-getting-started"];
+    if (doc) {
+      const allJavaItems = JAVA_CATEGORIES.flatMap((c) => c.items);
+      const currentIndex = allJavaItems.findIndex((item) => item.id === docKey);
+      const prevDoc = currentIndex > 0 ? allJavaItems[currentIndex - 1] : null;
+      const nextDoc =
+        currentIndex >= 0 && currentIndex < allJavaItems.length - 1
+          ? allJavaItems[currentIndex + 1]
+          : null;
+      return renderDetailedDocArticle(doc, prevDoc, nextDoc, selectedLanguage, onNavigate, scrollToAnchor);
+    }
+  }
+
+  if (activeView === "javascript" || activeDocId.startsWith("javascript-") || activeDocId === "javascript") {
+    const docKey = activeDocId === "javascript" ? "javascript-getting-started" : activeDocId;
+    const doc = JS_DOCS[docKey] || JS_DOCS["javascript-getting-started"];
+    if (doc) {
+      const allJsItems = JS_CATEGORIES.flatMap((c) => c.items);
+      const currentIndex = allJsItems.findIndex((item) => item.id === docKey);
+      const prevDoc = currentIndex > 0 ? allJsItems[currentIndex - 1] : null;
+      const nextDoc =
+        currentIndex >= 0 && currentIndex < allJsItems.length - 1
+          ? allJsItems[currentIndex + 1]
+          : null;
+      return renderDetailedDocArticle(doc, prevDoc, nextDoc, selectedLanguage, onNavigate, scrollToAnchor);
+    }
+  }
+
+  if (activeView === "typescript" || activeDocId.startsWith("typescript-") || activeDocId === "typescript") {
+    const docKey = activeDocId === "typescript" ? "typescript-getting-started" : activeDocId;
+    const doc = TS_DOCS[docKey] || TS_DOCS["typescript-getting-started"];
+    if (doc) {
+      const allTsItems = TS_CATEGORIES.flatMap((c) => c.items);
+      const currentIndex = allTsItems.findIndex((item) => item.id === docKey);
+      const prevDoc = currentIndex > 0 ? allTsItems[currentIndex - 1] : null;
+      const nextDoc =
+        currentIndex >= 0 && currentIndex < allTsItems.length - 1
+          ? allTsItems[currentIndex + 1]
           : null;
       return renderDetailedDocArticle(doc, prevDoc, nextDoc, selectedLanguage, onNavigate, scrollToAnchor);
     }

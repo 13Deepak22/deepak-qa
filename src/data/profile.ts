@@ -75,6 +75,6 @@ export const nav = [
   },
   { href: "/work", label: "Work", hint: "15+ apps & portals" },
   { href: "/skills", label: "Skills", hint: "Full toolkit & ATS keywords" },
-  { href: "/rca", label: "RCA", hint: "Defect investigation & race condition" },
+  { href: "/learn", label: "Learn with me", hint: "QA, Playwright & automation guides" },
   { href: "/resume", label: "Resume", hint: "Plain resume, ATS-ready" },
 ];

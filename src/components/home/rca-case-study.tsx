@@ -4,7 +4,7 @@ import { AlertTriangle, CheckCircle2, Play, RefreshCw, ShieldAlert, Terminal, XC
 import { useCallback, useEffect, useRef, useState } from "react";
 import { rcaCaseStudy } from "@/data";
 
-export function RcaCaseStudy() {
+export function RcaCaseStudy({ id = "rca" }: { id?: string } = {}) {
   const [activeStep, setActiveStep] = useState(0);
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulatedCount, setSimulatedCount] = useState(
@@ -51,7 +51,7 @@ export function RcaCaseStudy() {
   };
 
   return (
-    <section id="investigation" className="scroll-mt-20 border-t border-line bg-paper-deep">
+    <section id={id} className="scroll-mt-20 border-t border-line bg-paper-deep">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-28">
         {/* Section Heading */}
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end lg:gap-12">

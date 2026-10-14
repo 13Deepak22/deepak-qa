@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Mark } from "@/components/ui/mark";
-import { LearnSubHeader } from "@/components/learn/tool-banner";
 import { nav, profile } from "@/data";
 
 export function SiteHeader() {
@@ -134,9 +133,6 @@ export function SiteHeader() {
         </div>
       </div>
       <ThemeToggle />
-
-      {/* Small area bottom of header for /learn */}
-      {pathname.startsWith("/learn") && <LearnSubHeader />}
 
       {panel ? (
         <nav

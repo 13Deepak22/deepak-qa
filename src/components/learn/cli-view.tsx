@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Home, Terminal, Sparkles, Command, ShieldCheck, Play } from "lucide-react";
+import { Home, Terminal, Sparkles, Command, ShieldCheck, Play } from "lucide-react";
 import Link from "next/link";
 import { DocTabs } from "./doc-tabs";
 import { DocCodeBlock } from "./doc-code-block";
@@ -106,20 +106,11 @@ npx playwright show-report`;
 
       {/* Main Title Header */}
       <header className="mb-8 border-b border-line/60 pb-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+        <div className="mb-2">
           <div className="inline-flex items-center gap-2 rounded-full border border-pass/30 bg-pass/10 px-3 py-1 text-xs font-mono font-medium text-pass">
             <Terminal className="h-3.5 w-3.5 text-pass" />
             Command Line Tools
           </div>
-          <a
-            href="https://playwright.dev/agent-cli/introduction"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-pass transition"
-          >
-            <span>Original source</span>
-            <ExternalLink className="h-3.5 w-3.5" />
-          </a>
         </div>
         <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl mb-2">Playwright CLI</h1>
         <p className="text-sm sm:text-base text-muted">

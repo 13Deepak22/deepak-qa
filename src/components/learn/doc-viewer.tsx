@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, ArrowLeft, ArrowRight, ExternalLink, Home, Info, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, Home, Info, Sparkles } from "lucide-react";
 import { DocTabs } from "./doc-tabs";
 import { DocCodeBlock } from "./doc-code-block";
 import { ComparisonTable } from "./comparison-table";
@@ -115,28 +115,15 @@ function renderDetailedDocArticle(
 
       {/* Header */}
       <header className="mb-8 border-b border-line/60 pb-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-pass/30 bg-pass/10 px-3 py-1 text-xs font-mono font-medium text-pass">
-              <span className="h-2 w-2 rounded-full bg-pass animate-pulse" />
-              {doc.category}
+        <div className="flex items-center gap-2 mb-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-pass/30 bg-pass/10 px-3 py-1 text-xs font-mono font-medium text-pass">
+            <span className="h-2 w-2 rounded-full bg-pass animate-pulse" />
+            {doc.category}
+          </span>
+          {selectedLanguage && selectedLanguage !== "node" && (
+            <span className="inline-flex items-center rounded-md border border-line bg-paper-deep px-2 py-0.5 text-[11px] font-mono text-muted">
+              {langLabels[selectedLanguage] || selectedLanguage}
             </span>
-            {selectedLanguage && selectedLanguage !== "node" && (
-              <span className="inline-flex items-center rounded-md border border-line bg-paper-deep px-2 py-0.5 text-[11px] font-mono text-muted">
-                {langLabels[selectedLanguage] || selectedLanguage}
-              </span>
-            )}
-          </div>
-          {doc.sourceUrl && (
-            <a
-              href={doc.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-muted hover:text-pass transition"
-            >
-              <span>Original source</span>
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
           )}
         </div>
         <h1 className="font-serif text-3xl font-bold tracking-tight text-ink sm:text-4xl lg:text-5xl">{doc.title}</h1>
@@ -1062,20 +1049,11 @@ npm install`,
           </nav>
 
           <header className="mb-8 border-b border-line/60 pb-6">
-            <div className="flex items-center justify-between mb-2">
+            <div className="mb-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-pass/30 bg-pass/10 px-3 py-1 text-xs font-mono font-medium text-pass">
                 <span className="h-2 w-2 rounded-full bg-pass animate-pulse" />
                 Getting Started
               </span>
-              <a
-                href="https://playwright.dev/docs/intro"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-muted hover:text-pass transition"
-              >
-                <span>Original source</span>
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
             </div>
             <h1 className="font-serif text-3xl font-bold tracking-tight text-ink sm:text-4xl">Installation</h1>
           </header>
@@ -1913,20 +1891,11 @@ export default defineConfig({
 
           {/* Main Title Header */}
           <header className="mb-8 border-b border-line/60 pb-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+            <div className="mb-2">
               <div className="inline-flex items-center gap-2 rounded-full border border-pass/30 bg-pass/10 px-3 py-1 text-xs font-mono font-medium text-pass">
                 <span className="h-2 w-2 rounded-full bg-pass animate-pulse" />
                 Playwright Automation Reference
               </div>
-              <a
-                href="https://playwright.dev/docs/library"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-pass transition"
-              >
-                <span>Original source</span>
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
             </div>
             <h1 className="font-serif text-3xl font-bold tracking-tight text-ink sm:text-4xl">Library</h1>
           </header>

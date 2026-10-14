@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { DocsSidebar, MobileDocsDrawer } from "@/components/learn/docs-sidebar";
 import { DocViewer, getDocToc } from "@/components/learn/doc-viewer";
 import { DocsToc } from "@/components/learn/docs-toc";
@@ -20,6 +20,7 @@ export function LearnPageClient({ initialSlug = [] }: LearnPageClientProps) {
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageType>("node");
   const [activeDocId, setActiveDocId] = useState<string>(initial.docId);
   const [activeApiId, setActiveApiId] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
 
   // Sync state with URL pathname & browser history navigation
   useEffect(() => {
@@ -81,7 +82,9 @@ export function LearnPageClient({ initialSlug = [] }: LearnPageClientProps) {
     else if (view === "api") targetDocId = "api-overview";
     else if (view === "docs") targetDocId = "library";
 
-    setActiveDocId(targetDocId);
+    startTransition(() => {
+      setActiveDocId(targetDocId);
+    });
     const aestheticUrl = getAestheticUrl(view, targetDocId);
     window.history.pushState(null, "", aestheticUrl);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -107,7 +110,9 @@ export function LearnPageClient({ initialSlug = [] }: LearnPageClientProps) {
     }
 
     setActiveView(nextView);
-    setActiveDocId(docId);
+    startTransition(() => {
+      setActiveDocId(docId);
+    });
 
     const baseAestheticUrl = getAestheticUrl(nextView, docId);
 

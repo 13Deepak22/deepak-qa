@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronRight, Menu, Search, X } from "lucide-react";
 import { DOC_CATEGORIES, type DocCategory } from "@/data/learn-docs-data";
 import { MCP_CATEGORIES } from "@/data/learn-mcp-data";
@@ -32,38 +32,45 @@ export function DocsSidebar({
   onSelectView,
   className = "",
 }: DocsSidebarProps) {
-  const categories =
-    activeView === "manual"
-      ? MANUAL_CATEGORIES
-      : activeView === "automation"
-      ? AUTOMATION_CATEGORIES
-      : activeView === "java"
-      ? JAVA_CATEGORIES
-      : activeView === "javascript"
-      ? JS_CATEGORIES
-      : activeView === "typescript"
-      ? TS_CATEGORIES
-      : activeView === "jmeter"
-      ? JMETER_CATEGORIES
-      : activeView === "postman"
-      ? POSTMAN_CATEGORIES
-      : activeView === "appium"
-      ? APPIUM_CATEGORIES
-      : activeView === "selenium"
-      ? SELENIUM_CATEGORIES
-      : activeView === "mcp"
-      ? MCP_CATEGORIES
-      : activeView === "cli"
-      ? CLI_CATEGORIES
-      : activeView === "api"
-      ? API_CATEGORIES
-      : DOC_CATEGORIES;
+  const categories = useMemo(() => {
+    switch (activeView) {
+      case "manual": return MANUAL_CATEGORIES;
+      case "automation": return AUTOMATION_CATEGORIES;
+      case "java": return JAVA_CATEGORIES;
+      case "javascript": return JS_CATEGORIES;
+      case "typescript": return TS_CATEGORIES;
+      case "jmeter": return JMETER_CATEGORIES;
+      case "postman": return POSTMAN_CATEGORIES;
+      case "appium": return APPIUM_CATEGORIES;
+      case "selenium": return SELENIUM_CATEGORIES;
+      case "mcp": return MCP_CATEGORIES;
+      case "cli": return CLI_CATEGORIES;
+      case "api": return API_CATEGORIES;
+      default: return DOC_CATEGORIES;
+    }
+  }, [activeView]);
 
-  const [openSection, setOpenSection] = useState<string | null>(null);
+  // Initial state: automatically open category containing activeDocId
+  const [openSection, setOpenSection] = useState<string | null>(() => {
+    const activeCat = categories.find(
+      (cat) => !cat.isDirectLink && cat.items.some((item) => item.id === activeDocId)
+    );
+    if (activeCat) return activeCat.title;
+    const defaultCat = categories.find((cat) => cat.defaultOpen && !cat.isDirectLink);
+    return defaultCat ? defaultCat.title : null;
+  });
+
   const [filter, setFilter] = useState("");
+  const prevDocRef = useRef({ docId: activeDocId, view: activeView });
 
-  // Initialize and auto-expand category containing activeDocId (single dropdown open at a time)
+  // Only auto-expand category if activeDocId or activeView actually changed to a new doc
+  // (Prevents interrupting or fighting user manual accordion clicks)
   useEffect(() => {
+    if (prevDocRef.current.docId === activeDocId && prevDocRef.current.view === activeView) {
+      return;
+    }
+    prevDocRef.current = { docId: activeDocId, view: activeView };
+
     const activeCat = categories.find(
       (cat) => !cat.isDirectLink && cat.items.some((item) => item.id === activeDocId)
     );
@@ -71,15 +78,12 @@ export function DocsSidebar({
       setOpenSection(activeCat.title);
       return;
     }
-    // If current openSection is still valid in these categories, preserve it
-    setOpenSection((current) => {
-      if (current && categories.some((c) => c.title === current && !c.isDirectLink)) {
-        return current;
-      }
-      const defaultCat = categories.find((cat) => cat.defaultOpen && !cat.isDirectLink);
-      return defaultCat ? defaultCat.title : null;
-    });
-  }, [activeView, activeDocId, categories]);
+
+    const defaultCat = categories.find((cat) => cat.defaultOpen && !cat.isDirectLink);
+    if (defaultCat) {
+      setOpenSection(defaultCat.title);
+    }
+  }, [activeDocId, activeView, categories]);
 
   const toggleSection = (title: string) => {
     setOpenSection((current) => (current === title ? null : title));
@@ -116,7 +120,7 @@ export function DocsSidebar({
           placeholder={`Filter ${activeView.toUpperCase()} docs...`}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="w-full rounded-md border border-line bg-paper/60 pl-8 pr-3 py-1.5 text-xs text-ink placeholder:text-muted/60 transition-all duration-200 focus:border-pass focus:bg-card focus:outline-none focus:ring-1 focus:ring-pass/30"
+          className="w-full rounded-md border border-line bg-paper/60 pl-8 pr-3 py-1.5 text-xs text-ink placeholder:text-muted/60 transition-colors duration-150 focus:border-pass focus:bg-card focus:outline-none focus:ring-1 focus:ring-pass/30"
         />
       </div>
 
@@ -132,7 +136,7 @@ export function DocsSidebar({
                 <button
                   type="button"
                   onClick={() => onSelectDoc(targetId)}
-                  className={`flex w-full items-center justify-between px-3 py-1.5 font-medium transition-all duration-200 ease-out rounded-lg cursor-pointer ${
+                  className={`flex w-full items-center justify-between px-3 py-1.5 font-medium transition-colors duration-150 rounded-lg cursor-pointer ${
                     isActive
                       ? "bg-pass/15 font-semibold text-pass ring-1 ring-pass/30 shadow-xs"
                       : "text-ink hover:bg-card hover:text-pass"
@@ -153,7 +157,7 @@ export function DocsSidebar({
               <button
                 type="button"
                 onClick={() => toggleSection(cat.title)}
-                className={`group flex w-full items-center justify-between px-3 py-1.5 font-medium transition-all duration-200 ease-out rounded-lg cursor-pointer ${
+                className={`group flex w-full items-center justify-between px-3 py-1.5 font-medium transition-colors duration-150 rounded-lg cursor-pointer ${
                   hasActiveChild
                     ? "text-pass font-semibold bg-pass/10 ring-1 ring-pass/20"
                     : isOpen
@@ -169,15 +173,14 @@ export function DocsSidebar({
                 />
               </button>
 
-              {/* Animated Accordion Height with Grid */}
+              {/* Hardware-Accelerated Smooth Sidebar Accordion */}
               <div
-                className={`grid transition-all duration-300 ease-in-out ${
-                  isOpen ? "grid-rows-[1fr] opacity-100 mt-1" : "grid-rows-[0fr] opacity-0 mt-0"
-                }`}
+                data-state={isOpen ? "open" : "closed"}
+                className="sidebar-accordion-grid"
               >
                 <div className="overflow-hidden">
                   {cat.items && (
-                    <div className="ml-2.5 mr-0.5 border-l border-line/60 pl-2.5 space-y-0.5 pb-1">
+                    <div className="mt-1 ml-2.5 mr-0.5 border-l border-line/60 pl-2.5 space-y-0.5 pb-1">
                       {cat.items.map((item) => {
                         const isActive = item.id === activeDocId;
                         return (
@@ -185,7 +188,7 @@ export function DocsSidebar({
                             key={item.id}
                             type="button"
                             onClick={() => onSelectDoc(item.id)}
-                            className={`group flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-[11.5px] transition-all duration-200 ease-out cursor-pointer ${
+                            className={`group flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-[11.5px] transition-colors duration-150 cursor-pointer ${
                               isActive
                                 ? "bg-pass/15 font-semibold text-pass ring-1 ring-pass/30 shadow-xs"
                                 : "text-muted hover:bg-card hover:text-ink"
@@ -193,7 +196,7 @@ export function DocsSidebar({
                           >
                             <span className="truncate mr-2">{item.text}</span>
                             {item.badge && (
-                              <span className="shrink-0 rounded bg-pass/20 px-1.5 py-0.5 text-[9px] font-mono uppercase text-pass animate-pulse">
+                              <span className="shrink-0 rounded bg-pass/20 px-1.5 py-0.5 text-[9px] font-mono uppercase text-pass">
                                 {item.badge}
                               </span>
                             )}

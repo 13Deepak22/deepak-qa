@@ -45,5 +45,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     },
     { url: `${base}/resume`, lastModified: updated, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${base}/learn`, lastModified: updated, changeFrequency: "monthly", priority: 0.85 },
   ];
 }

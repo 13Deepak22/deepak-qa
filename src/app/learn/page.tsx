@@ -150,7 +150,7 @@ function LearnPageContent() {
         onSelectView={handleSelectView}
       />
 
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-6 sm:pt-8">
+      <div className="w-full px-4 sm:px-6 lg:pl-6 lg:pr-24 pt-6 sm:pt-8">
         {/* Responsive Documentation Layout with wide main section */}
         <div className="flex gap-6 lg:gap-8 xl:gap-10">
           {/* Left Sidebar (Desktop) */}
@@ -199,8 +199,8 @@ function LearnPageContent() {
             </div>
           </div>
 
-          {/* Right Table of Contents (Desktop - only on extra wide 2xl to never shrink main content) */}
-          <div className="hidden 2xl:block w-48 shrink-0">
+          {/* Right Table of Contents (Desktop - ends right before goto top icon) */}
+          <div className="hidden xl:block w-52 shrink-0">
             <div className="sticky top-32 max-h-[calc(100vh-9rem)] overflow-y-auto overflow-x-hidden pb-8 pl-1">
               <DocsToc items={activeToc} variant="desktop" />
             </div>

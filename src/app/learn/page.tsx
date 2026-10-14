@@ -144,12 +144,10 @@ function LearnPageContent() {
 
   return (
     <div className="min-h-screen bg-paper pb-16">
-      {/* Playwright Sub-Header Bar (Docs | MCP | CLI | API | Node.js v) */}
+      {/* Playwright Sub-Header Bar (Docs | MCP | CLI | API | Node.js) */}
       <DocsHeaderBar
         activeView={activeView}
         onSelectView={handleSelectView}
-        selectedLanguage={selectedLanguage}
-        onSelectLanguage={setSelectedLanguage}
       />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 pt-4 sm:pt-6">

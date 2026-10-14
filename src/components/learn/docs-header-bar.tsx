@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, ExternalLink, Sparkles } from "lucide-react";
 import { ToolLogo } from "@/components/home/tool-logo";
 
 export type LearnViewType = "docs" | "mcp" | "cli" | "api";
@@ -10,37 +8,14 @@ export type LanguageType = "node" | "python" | "java" | "dotnet";
 interface DocsHeaderBarProps {
   activeView: LearnViewType;
   onSelectView: (view: LearnViewType) => void;
-  selectedLanguage: LanguageType;
-  onSelectLanguage: (lang: LanguageType) => void;
+  selectedLanguage?: LanguageType;
+  onSelectLanguage?: (lang: LanguageType) => void;
 }
 
 export function DocsHeaderBar({
   activeView,
   onSelectView,
-  selectedLanguage,
-  onSelectLanguage,
 }: DocsHeaderBarProps) {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const languageLabels: Record<LanguageType, string> = {
-    node: "Node.js",
-    python: "Python",
-    java: "Java",
-    dotnet: ".NET",
-  };
-
   const navItems: { id: LearnViewType; label: string }[] = [
     { id: "docs", label: "Docs" },
     { id: "mcp", label: "MCP" },
@@ -58,13 +33,13 @@ export function DocsHeaderBar({
   return (
     <div className="sticky top-20 z-30 border-b border-line/60 bg-paper/95 backdrop-blur-md">
       <div className="mx-auto flex h-11 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
-        {/* Left: Playwright Brand & Top Navigation Items (Docs, MCP, CLI, API, Node.js v) */}
+        {/* Left: Playwright Brand & Top Navigation Items (Docs, MCP, CLI, API, Node.js) */}
         <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto no-scrollbar">
           {/* Playwright Brand Link */}
           <button
             type="button"
             onClick={() => onSelectView("docs")}
-            className="flex items-center gap-1.5 shrink-0 font-medium text-ink hover:text-pass transition"
+            className="flex items-center gap-1.5 shrink-0 font-medium text-ink hover:text-pass transition cursor-pointer"
           >
             <ToolLogo name="playwright" className="h-4 w-4 shrink-0" />
             <span className="font-semibold text-xs tracking-tight">Playwright</span>
@@ -92,45 +67,11 @@ export function DocsHeaderBar({
               );
             })}
 
-            {/* Language dropdown (Node.js v, Python, Java, .NET) */}
-            <div className="relative" ref={dropdownRef}>
-              <button
-                type="button"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-1 rounded-md px-2 py-1 font-medium text-ink/80 hover:text-ink hover:bg-card transition cursor-pointer text-xs"
-                aria-expanded={dropdownOpen}
-                aria-haspopup="true"
-              >
-                <span>{languageLabels[selectedLanguage]}</span>
-                <ChevronDown className="h-3 w-3 opacity-70" />
-              </button>
-
-              {dropdownOpen && (
-                <div className="absolute left-0 mt-1.5 w-32 rounded-lg border border-line bg-paper p-1 shadow-lg z-50 font-sans text-xs">
-                  {(Object.keys(languageLabels) as LanguageType[]).map((lang) => {
-                    const isSelected = selectedLanguage === lang;
-                    return (
-                      <button
-                        key={lang}
-                        type="button"
-                        onClick={() => {
-                          onSelectLanguage(lang);
-                          setDropdownOpen(false);
-                        }}
-                        className={`flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left transition ${
-                          isSelected
-                            ? "bg-pass/15 font-semibold text-pass"
-                            : "text-ink hover:bg-card"
-                        }`}
-                      >
-                        <span>{languageLabels[lang]}</span>
-                        {isSelected && <Check className="h-3.5 w-3.5 text-pass" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            {/* Node.js Static Badge (dropdown removed per user request) */}
+            <span className="inline-flex items-center gap-1.5 rounded-md border border-line/60 bg-paper-deep/60 px-2 py-0.5 text-[11px] font-mono font-medium text-ink/80 ml-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-pass" />
+              Node.js
+            </span>
           </nav>
         </div>
 
@@ -162,4 +103,3 @@ export function DocsHeaderBar({
     </div>
   );
 }
-

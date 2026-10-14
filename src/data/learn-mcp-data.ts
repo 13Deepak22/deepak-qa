@@ -814,3 +814,4 @@ export const MCP_DOCS: Record<string, DetailedDoc> = {
     ],
   },
 };
+

@@ -3,49 +3,29 @@ import type { DetailedDoc } from "./learn-extended-docs";
 
 export const JAVA_CATEGORIES: DocCategory[] = [
   {
-    title: "Getting Started (Zero to Hello World)",
+    title: "Basics",
     defaultOpen: true,
     items: [
       { id: "java-getting-started", text: "Java Setup & First Program" },
-      { id: "java-keywords-types", text: "50+ Keywords & Variables" },
+      { id: "java-keywords-types", text: "Keywords, Variables & Data Types" },
       { id: "java-operators-expressions", text: "Operators & Expressions" },
-    ],
-  },
-  {
-    title: "Control Flow & Decision Making",
-    defaultOpen: true,
-    items: [
       { id: "java-control-flow", text: "If-Else & Modern Switch" },
       { id: "java-loops-iteration", text: "Loops & Dynamic Polling" },
-    ],
-  },
-  {
-    title: "Methods, Arrays & Strings",
-    defaultOpen: true,
-    items: [
       { id: "java-methods", text: "Methods, Overloading & Varargs" },
       { id: "java-arrays", text: "Arrays & Array Utilities" },
       { id: "java-strings-regex", text: "Strings, StringBuilder & Regex" },
     ],
   },
   {
-    title: "Object-Oriented Programming (OOP)",
-    defaultOpen: true,
-    items: [
-      { id: "java-oops-fundamentals", text: "Classes, Objects & Constructors" },
-      { id: "java-oops-pillars", text: "The 4 OOP Pillars in POM" },
-    ],
-  },
-  {
-    title: "Exceptions & File I/O",
+    title: "OOP & Interface",
     defaultOpen: false,
     items: [
-      { id: "java-exception-handling", text: "Exception Handling & Retries" },
-      { id: "java-file-io-properties", text: "File I/O & Config Properties" },
+      { id: "java-oops-fundamentals", text: "Classes, Objects & Constructors" },
+      { id: "java-oops-pillars", text: "4 OOP Pillars & Interfaces in POM" },
     ],
   },
   {
-    title: "Generics & Collections",
+    title: "Collections",
     defaultOpen: false,
     items: [
       { id: "java-generics", text: "Generics & Type Safety" },
@@ -53,22 +33,18 @@ export const JAVA_CATEGORIES: DocCategory[] = [
     ],
   },
   {
-    title: "Modern Java 8+ Features",
+    title: "Advance Java Concepts",
     defaultOpen: false,
     items: [
+      { id: "java-exception-handling", text: "Exception Handling & Retries" },
+      { id: "java-file-io-properties", text: "File Handling & Config Properties" },
       { id: "java-streams-lambdas", text: "Lambdas, Streams & Optional" },
-    ],
-  },
-  {
-    title: "Multithreading & JDBC",
-    defaultOpen: false,
-    items: [
       { id: "java-multithreading", text: "Multithreading & Synchronization" },
       { id: "java-jdbc", text: "JDBC Database Connectivity" },
     ],
   },
   {
-    title: "Test Frameworks & Parallelism",
+    title: "Practice Java",
     defaultOpen: false,
     items: [
       { id: "java-testng-framework", text: "TestNG Annotations & DataProvider" },
@@ -84,7 +60,7 @@ export const JAVA_DOCS: Record<string, DetailedDoc> = {
   "java-getting-started": {
     id: "java-getting-started",
     title: "Java Getting Started: Architecture & Your First Program",
-    category: "Getting Started (Zero to Hello World)",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/java/java/",
     description: "Start Java from absolute zero: history, core features, JDK vs JRE vs JVM architecture, environment setup, and the complete line-by-line anatomy of a Java program.",
     sections: [
@@ -176,7 +152,7 @@ export const JAVA_DOCS: Record<string, DetailedDoc> = {
   "java-keywords-types": {
     id: "java-keywords-types",
     title: "Java 50+ Reserved Keywords, Data Types & Variables Directory",
-    category: "Getting Started (Zero to Hello World)",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/java-keywords/",
     description: "Complete encyclopedia of all 50+ Java reserved keywords categorized by purpose, along with primitive vs wrapper types, memory sizes, and variable scoping.",
     sections: [
@@ -254,7 +230,7 @@ export const JAVA_DOCS: Record<string, DetailedDoc> = {
   "java-operators-expressions": {
     id: "java-operators-expressions",
     title: "Java Operators, Expressions & Precedence Hierarchy",
-    category: "Getting Started (Zero to Hello World)",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/operators-in-java/",
     description: "Master arithmetic, relational, logical, assignment, bitwise, and ternary operators with complete evaluation precedence tables used in test assertions.",
     sections: [
@@ -305,7 +281,7 @@ export const JAVA_DOCS: Record<string, DetailedDoc> = {
   "java-control-flow": {
     id: "java-control-flow",
     title: "Decision Making: If-Else & Modern Java 14+ Switch Expressions",
-    category: "Control Flow & Decision Making",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/decision-making-javaif-else-switch-break-continue-jump/",
     description: "Master if, if-else ladders, classic switch fallthrough, and modern Java 14+ switch expressions with arrow syntax (->) and yield for multi-browser drivers.",
     sections: [
@@ -364,7 +340,7 @@ public class DriverFactory {
   "java-loops-iteration": {
     id: "java-loops-iteration",
     title: "Loops & Dynamic Polling: for, enhanced for-each, while & do-while",
-    category: "Control Flow & Decision Making",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/loops-in-java/",
     description: "Master classic indexed for loops, enhanced for-each for WebElement collections, while loops for polling dynamic DOM states, and do-while retries.",
     sections: [
@@ -390,7 +366,7 @@ public class DriverFactory {
   "java-methods": {
     id: "java-methods",
     title: "Methods, Parameters, Method Overloading & Varargs",
-    category: "Methods, Arrays & Strings",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/methods-in-java/",
     description: "Understand method declarations, pass-by-value semantics, method overloading, return types, static vs instance methods, and varargs (Type... args).",
     sections: [
@@ -438,7 +414,7 @@ public class DriverFactory {
   "java-arrays": {
     id: "java-arrays",
     title: "Java Arrays: 1D, 2D Matrices & java.util.Arrays Utilities",
-    category: "Methods, Arrays & Strings",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/arrays-in-java/",
     description: "Master array creation, fixed memory allocation, multi-dimensional test data matrices for TestNG DataProviders, and java.util.Arrays helper methods.",
     sections: [
@@ -491,7 +467,7 @@ public class ArrayTestDemo {
   "java-strings-regex": {
     id: "java-strings-regex",
     title: "Strings, StringBuilder, Immutability & Regex in Java",
-    category: "Methods, Arrays & Strings",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/strings-in-java/",
     description: "Master String immutability, String Constant Pool vs Heap, StringBuilder vs StringBuffer for dynamic payloads, and Regular Expressions (Pattern & Matcher).",
     sections: [
@@ -523,7 +499,7 @@ public class ArrayTestDemo {
   "java-oops-fundamentals": {
     id: "java-oops-fundamentals",
     title: "Classes, Objects, Constructors & this/super Keywords",
-    category: "Object-Oriented Programming (OOP)",
+    category: "OOP & Interface",
     sourceUrl: "https://www.geeksforgeeks.org/classes-objects-java/",
     description: "Master class definitions, object instantiation, constructor types (default, parameterized, constructor overloading), and the this and super reference keywords.",
     sections: [
@@ -577,7 +553,7 @@ public class LoginPage extends BasePage {
   "java-oops-pillars": {
     id: "java-oops-pillars",
     title: "The 4 OOP Pillars in Page Object Model: Encapsulation, Inheritance, Polymorphism & Abstraction",
-    category: "Object-Oriented Programming (OOP)",
+    category: "OOP & Interface",
     sourceUrl: "https://www.geeksforgeeks.org/object-oriented-programming-oops-concept-in-java/",
     description: "Learn how the four pillars of Object-Oriented Programming—Encapsulation, Inheritance, Polymorphism, and Abstraction—form the foundation of Page Object Model architectures.",
     sections: [
@@ -603,7 +579,7 @@ public class LoginPage extends BasePage {
   "java-exception-handling": {
     id: "java-exception-handling",
     title: "Exception Handling: Checked vs Unchecked & Selenium Retries",
-    category: "Exceptions & File I/O",
+    category: "Advance Java Concepts",
     sourceUrl: "https://www.geeksforgeeks.org/exceptions-in-java/",
     description: "Master the Throwable hierarchy (Error vs Exception), Checked vs Unchecked exceptions, try-catch-finally, try-with-resources, and resilient recovery from Selenium exceptions.",
     sections: [
@@ -626,7 +602,7 @@ public class LoginPage extends BasePage {
   "java-file-io-properties": {
     id: "java-file-io-properties",
     title: "File I/O, Properties Reader & JSON Test Data",
-    category: "Exceptions & File I/O",
+    category: "Advance Java Concepts",
     sourceUrl: "https://www.geeksforgeeks.org/file-handling-in-java/",
     description: "Read config.properties for multi-environment test runs, manage CLI system overrides (-Denv=prod), and parse JSON test fixtures.",
     sections: [
@@ -674,7 +650,7 @@ public class ConfigReader {
   "java-generics": {
     id: "java-generics",
     title: "Java Generics: Generic Classes, Methods & Wildcards (? extends T)",
-    category: "Generics & Collections",
+    category: "Collections",
     sourceUrl: "https://www.geeksforgeeks.org/generics-in-java/",
     description: "Write type-safe, reusable test utilities using Java Generics: generic Page Object factories, API response deserializers, and wildcard bounds.",
     sections: [
@@ -711,7 +687,7 @@ public class PageFactoryHelper {
   "java-collections": {
     id: "java-collections",
     title: "Collections Framework: List, Set, Map & Iterators in QA",
-    category: "Generics & Collections",
+    category: "Collections",
     sourceUrl: "https://www.geeksforgeeks.org/collections-in-java-2/",
     description: "Master ArrayList vs LinkedList, HashSet vs TreeSet for window handles, and HashMap vs ConcurrentHashMap for thread-safe test headers and fixtures.",
     sections: [
@@ -737,7 +713,7 @@ public class PageFactoryHelper {
   "java-streams-lambdas": {
     id: "java-streams-lambdas",
     title: "Java 8+ Streams API, Lambdas & Optional Class for QA",
-    category: "Modern Java 8+ Features",
+    category: "Advance Java Concepts",
     sourceUrl: "https://www.geeksforgeeks.org/stream-in-java/",
     description: "Write clean, declarative test assertions using Java Streams to filter element lists, extract text, and validate sort orders.",
     sections: [
@@ -781,7 +757,7 @@ public class StreamsInQA {
   "java-multithreading": {
     id: "java-multithreading",
     title: "Multithreading, Synchronization & Thread Pools in Java",
-    category: "Multithreading & JDBC",
+    category: "Advance Java Concepts",
     sourceUrl: "https://www.geeksforgeeks.org/multithreading-in-java/",
     description: "Understand thread lifecycle (New, Runnable, Blocked, Terminated), Thread class vs Runnable, synchronization blocks, and Thread Pools (ExecutorService).",
     sections: [
@@ -801,7 +777,7 @@ public class StreamsInQA {
   "java-jdbc": {
     id: "java-jdbc",
     title: "Java Database Connectivity (JDBC) for QA Assertions",
-    category: "Multithreading & JDBC",
+    category: "Advance Java Concepts",
     sourceUrl: "https://www.geeksforgeeks.org/introduction-to-jdbc/",
     description: "Connect to relational databases (PostgreSQL, MySQL, Oracle), execute parameterized queries with PreparedStatement, and validate UI actions against the DB.",
     sections: [
@@ -852,7 +828,7 @@ public class DatabaseAssertUtils {
   "java-testng-framework": {
     id: "java-testng-framework",
     title: "TestNG Framework: Annotations & DataProvider",
-    category: "Test Frameworks & Parallelism",
+    category: "Practice Java",
     sourceUrl: "https://testng.org/doc/",
     description: "Master the industry-standard TestNG test runner: execution lifecycle annotations, SoftAssert vs HardAssert, and data-driven testing with @DataProvider.",
     sections: [
@@ -880,7 +856,7 @@ public class DatabaseAssertUtils {
   "java-parallel-threadlocal": {
     id: "java-parallel-threadlocal",
     title: "Parallel Execution & ThreadLocal WebDriver Management",
-    category: "Test Frameworks & Parallelism",
+    category: "Practice Java",
     sourceUrl: "https://testng.org/doc/documentation-main.html#parallel-running",
     description: "Guarantee 100% thread safety during concurrent multi-browser test execution using Java ThreadLocal encapsulation and TestNG parallel XML suites.",
     sections: [

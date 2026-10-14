@@ -3,59 +3,41 @@ import type { DetailedDoc } from "./learn-extended-docs";
 
 export const JS_CATEGORIES: DocCategory[] = [
   {
-    title: "Getting Started (Zero to First Script)",
+    title: "Basics",
     defaultOpen: true,
     items: [
       { id: "javascript-getting-started", text: "JS Setup, V8 & First Script" },
       { id: "javascript-keywords-syntax", text: "Keywords Directory & Tokens" },
       { id: "javascript-variables-types", text: "Variables, Scopes & Equality" },
-    ],
-  },
-  {
-    title: "Control Flow & Decision Making",
-    defaultOpen: true,
-    items: [
       { id: "javascript-operators-control-flow", text: "Operators, Switch & Short-Circuit" },
       { id: "javascript-loops-iteration", text: "Loops & Playwright Locators" },
-    ],
-  },
-  {
-    title: "Functions, Scopes & Closures",
-    defaultOpen: true,
-    items: [
       { id: "javascript-functions", text: "Functions, Arrow & Rest/Spread" },
-    ],
-  },
-  {
-    title: "Data Structures & Objects",
-    defaultOpen: true,
-    items: [
       { id: "javascript-arrays-methods", text: "Arrays & Array Methods" },
       { id: "javascript-strings-regex", text: "Strings, Regex & Template Literals" },
-      { id: "javascript-objects-json", text: "Objects, JSON & Cloning" },
     ],
   },
   {
-    title: "Object-Oriented JavaScript",
+    title: "OOP & Objects",
     defaultOpen: false,
     items: [
+      { id: "javascript-objects-json", text: "Objects, JSON & Prototype Cloning" },
       { id: "javascript-classes-oop", text: "ES6 Classes & POM Architecture" },
     ],
   },
   {
-    title: "Asynchronous JavaScript",
+    title: "Advance JS Concepts",
     defaultOpen: false,
     items: [
       { id: "javascript-async-await", text: "Promises & Async/Await Deep Dive" },
       { id: "javascript-event-loop", text: "Event Loop & Execution Timing" },
+      { id: "javascript-error-handling", text: "Error Handling & Resilient Retries" },
+      { id: "javascript-nodejs-npm", text: "Node.js, npm & Environment Config" },
     ],
   },
   {
-    title: "Error Handling & Tooling",
+    title: "Practice JavaScript",
     defaultOpen: false,
     items: [
-      { id: "javascript-error-handling", text: "Error Handling & Resilient Retries" },
-      { id: "javascript-nodejs-npm", text: "Node.js, npm & Environment Config" },
       { id: "javascript-test-assertions", text: "Assertions & Matchers (Playwright/Jest)" },
     ],
   },
@@ -68,7 +50,7 @@ export const JS_DOCS: Record<string, DetailedDoc> = {
   "javascript-getting-started": {
     id: "javascript-getting-started",
     title: "JavaScript Getting Started: V8 Engine, Node.js & Your First Script",
-    category: "Getting Started (Zero to First Script)",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/javascript/",
     description: "Start JavaScript from absolute zero: ECMAScript standards, V8 execution engine, Browser vs Node.js runtime, setting up npm, and executing your first script.",
     sections: [
@@ -116,7 +98,7 @@ console.log(\`Total test budget: \${timeout * retries} seconds.\`);`,
   "javascript-keywords-syntax": {
     id: "javascript-keywords-syntax",
     title: "JavaScript Reserved Keywords & Syntax Directory",
-    category: "Getting Started (Zero to First Script)",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/javascript-keywords-complete-reference/",
     description: "Complete directory of JavaScript reserved keywords categorized by functional role, with direct relevance and examples for test automation.",
     sections: [
@@ -164,7 +146,7 @@ console.log(\`Total test budget: \${timeout * retries} seconds.\`);`,
   "javascript-variables-types": {
     id: "javascript-variables-types",
     title: "Variables, Scope, Primitive Types & Equality Pitfalls",
-    category: "Getting Started (Zero to First Script)",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/variables-datatypes-javascript/",
     description: "Deep dive into let vs const vs var, block scoping, Temporal Dead Zone, JavaScript primitives vs reference types, truthy/falsy values, and strict equality in QA.",
     sections: [
@@ -214,7 +196,7 @@ null === undefined; // false
   "javascript-operators-control-flow": {
     id: "javascript-operators-control-flow",
     title: "Operators, Switch Statements & Short-Circuit Operators (??, ?.)",
-    category: "Control Flow & Decision Making",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/javascript-operators/",
     description: "Master arithmetic, logical, and ternary operators, optional chaining (?.), nullish coalescing (??), and switch-case structures for multi-browser and multi-env runners.",
     sections: [
@@ -255,7 +237,7 @@ export async function launchTargetBrowser(browserName = "chromium", isHeadless =
   "javascript-loops-iteration": {
     id: "javascript-loops-iteration",
     title: "Loops, Iteration & Playwright Locator Sweeps",
-    category: "Control Flow & Decision Making",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/loops-in-javascript/",
     description: "Master for, for...of, for...in, while polling, and why for...of is the single most important loop for iterating Playwright locator elements.",
     sections: [
@@ -298,7 +280,7 @@ test("Verify all active products", async ({ page }) => {
   "javascript-functions": {
     id: "javascript-functions",
     title: "Functions, Arrow Functions, Closures & Rest/Spread Syntax",
-    category: "Functions, Scopes & Closures",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/javascript-functions/",
     description: "Understand function declarations vs arrow functions, lexical this, default parameters, rest (...args) and spread (...obj) operators for test data fixtures.",
     sections: [
@@ -332,7 +314,7 @@ const adminUser = {
   "javascript-arrays-methods": {
     id: "javascript-arrays-methods",
     title: "JavaScript Arrays & Modern Transformation Methods",
-    category: "Data Structures & Objects",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/arrays-in-javascript/",
     description: "Master array manipulation and high-order methods for test assertions: map, filter, reduce, find, some, every, slice, and splice.",
     sections: [
@@ -369,7 +351,7 @@ const hasPending = orders.some(o => o.status === "PENDING"); // true`,
   "javascript-strings-regex": {
     id: "javascript-strings-regex",
     title: "Strings, Template Literals & Regular Expressions (RegExp)",
-    category: "Data Structures & Objects",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/javascript-strings/",
     description: "Master template literals for dynamic XPath/CSS locators, string sanitization methods (trim, split, replaceAll), and RegExp pattern matching.",
     sections: [
@@ -400,7 +382,7 @@ console.log("Extracted OTP:", otpMatch ? otpMatch[0] : null); // "849201"`,
   "javascript-objects-json": {
     id: "javascript-objects-json",
     title: "Objects, JSON Serialization & Deep Cloning in Test Automation",
-    category: "Data Structures & Objects",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/objects-in-javascript/",
     description: "Master JSON serialization (stringify, parse), structuredClone() for test fixtures, and Object inspection methods (keys, values, entries).",
     sections: [
@@ -431,7 +413,7 @@ console.log(cloned.items.length);  // 3`,
   "javascript-classes-oop": {
     id: "javascript-classes-oop",
     title: "ES6 Classes, Inheritance & Page Object Model Architecture",
-    category: "Object-Oriented JavaScript",
+    category: "OOP & Objects",
     sourceUrl: "https://www.geeksforgeeks.org/classes-in-javascript/",
     description: "Write production-grade Page Objects using ES6 class syntax, constructors, extends, super, and private class fields (#field).",
     sections: [
@@ -472,7 +454,7 @@ console.log(cloned.items.length);  // 3`,
   "javascript-async-await": {
     id: "javascript-async-await",
     title: "Promises & Async/Await Deep Dive for Testers",
-    category: "Asynchronous JavaScript",
+    category: "Advance JS Concepts",
     sourceUrl: "https://www.geeksforgeeks.org/async-await-in-javascript/",
     description: "Demystify asynchronous operations in JavaScript: Promise states, avoiding unhandled rejections, Promise.all concurrent execution, and resilient async/await patterns.",
     sections: [
@@ -506,7 +488,7 @@ expect(ordersRes.status()).toBe(200);`,
   "javascript-event-loop": {
     id: "javascript-event-loop",
     title: "The JavaScript Event Loop & Execution Timing",
-    category: "Asynchronous JavaScript",
+    category: "Advance JS Concepts",
     sourceUrl: "https://www.geeksforgeeks.org/event-loop-in-javascript/",
     description: "Understand the single-threaded Node.js and browser event loop, call stack, microtasks (Promises) vs macrotasks (setTimeout), and how timing affects test automation.",
     sections: [
@@ -526,7 +508,7 @@ expect(ordersRes.status()).toBe(200);`,
   "javascript-error-handling": {
     id: "javascript-error-handling",
     title: "Error Handling, Try/Catch & Resilient Retries",
-    category: "Error Handling & Tooling",
+    category: "Advance JS Concepts",
     sourceUrl: "https://www.geeksforgeeks.org/error-handling-in-javascript/",
     description: "Handle synchronous and asynchronous runtime exceptions, create custom Error types, and build self-healing retry wrappers for flaky steps.",
     sections: [
@@ -563,7 +545,7 @@ expect(ordersRes.status()).toBe(200);`,
   "javascript-nodejs-npm": {
     id: "javascript-nodejs-npm",
     title: "Node.js, npm & Environment Configuration",
-    category: "Error Handling & Tooling",
+    category: "Advance JS Concepts",
     sourceUrl: "https://www.geeksforgeeks.org/nodejs/",
     description: "Manage test dependencies via package.json, run tests with npm scripts, and read secure environment secrets using dotenv and process.env.",
     sections: [
@@ -593,7 +575,7 @@ expect(ordersRes.status()).toBe(200);`,
   "javascript-test-assertions": {
     id: "javascript-test-assertions",
     title: "Assertions & Assertion Libraries (Playwright / Jest)",
-    category: "Error Handling & Tooling",
+    category: "Practice JavaScript",
     sourceUrl: "https://playwright.dev/docs/test-assertions",
     description: "Master web-first auto-retrying assertions in Playwright vs standard synchronous matchers to eradicate flaky test failures.",
     sections: [

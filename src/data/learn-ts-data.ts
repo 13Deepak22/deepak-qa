@@ -3,51 +3,39 @@ import type { DetailedDoc } from "./learn-extended-docs";
 
 export const TS_CATEGORIES: DocCategory[] = [
   {
-    title: "Getting Started (Zero to Typed Code)",
+    title: "Basics",
     defaultOpen: true,
     items: [
       { id: "typescript-getting-started", text: "TS Setup, tsc Compiler & First Program" },
       { id: "typescript-keywords-syntax", text: "Keywords & Type Operators" },
       { id: "typescript-types-basics", text: "Primitives, Any vs Unknown & Never" },
+      { id: "typescript-functions", text: "Function Signatures & Overloading" },
     ],
   },
   {
-    title: "Interfaces, Types & Enums",
-    defaultOpen: true,
+    title: "OOP & Interface",
+    defaultOpen: false,
     items: [
       { id: "typescript-interfaces-aliases", text: "Interfaces vs Type Aliases" },
       { id: "typescript-enums-tuples", text: "Enums, Const Enums & Tuples" },
-    ],
-  },
-  {
-    title: "Control Flow & Type Narrowing",
-    defaultOpen: true,
-    items: [
-      { id: "typescript-narrowing-guards", text: "Type Guards & Discriminated Switch" },
-    ],
-  },
-  {
-    title: "Functions & Strongly Typed OOP",
-    defaultOpen: true,
-    items: [
-      { id: "typescript-functions", text: "Function Signatures & Overloading" },
       { id: "typescript-classes-pom", text: "Classes & Strongly Typed POM" },
     ],
   },
   {
-    title: "Generics & Utility Types",
+    title: "Advance TypeScript Concepts",
     defaultOpen: false,
     items: [
+      { id: "typescript-narrowing-guards", text: "Type Guards & Discriminated Switch" },
       { id: "typescript-generics", text: "Generics in Test Automation" },
       { id: "typescript-utility-types", text: "Utility Types for Test Fixtures" },
+      { id: "typescript-advanced-types", text: "Template Literal Types & Satisfies" },
     ],
   },
   {
-    title: "Playwright Fixtures & Configuration",
+    title: "Practice TypeScript",
     defaultOpen: false,
     items: [
       { id: "typescript-fixtures-custom", text: "Custom Typed Fixtures (test.extend)" },
-      { id: "typescript-advanced-types", text: "Template Literal Types & Satisfies" },
       { id: "typescript-tsconfig-setup", text: "tsconfig.json & Path Aliases" },
     ],
   },
@@ -60,7 +48,7 @@ export const TS_DOCS: Record<string, DetailedDoc> = {
   "typescript-getting-started": {
     id: "typescript-getting-started",
     title: "TypeScript Getting Started: tsc Compiler, tsconfig & First Program",
-    category: "Getting Started (Zero to Typed Code)",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/typescript/",
     description: "Start TypeScript from absolute zero: why Microsoft developed TS, how the tsc compiler compiles to clean JavaScript, setting up tsconfig.json, and writing your first typed program.",
     sections: [
@@ -112,7 +100,7 @@ console.log(\`Running \${frameworkName} with \${totalBudget}ms budget (Headless:
   "typescript-keywords-syntax": {
     id: "typescript-keywords-syntax",
     title: "TypeScript Keywords & Type Operators Directory",
-    category: "Getting Started (Zero to Typed Code)",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/typescript-keywords/",
     description: "Complete guide to TypeScript-specific keywords, type operators (keyof, typeof, is, as, satisfies, infer), and access modifiers in test automation frameworks.",
     sections: [
@@ -145,7 +133,7 @@ console.log(\`Running \${frameworkName} with \${totalBudget}ms budget (Headless:
   "typescript-types-basics": {
     id: "typescript-types-basics",
     title: "Primitives, Special Types (any vs unknown vs never)",
-    category: "Getting Started (Zero to Typed Code)",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/typescript-types/",
     description: "Master TypeScript primitive annotations, why 'any' is an anti-pattern in test suites, safe narrowing with 'unknown', and exhaustive verification using 'never'.",
     sections: [
@@ -171,7 +159,7 @@ console.log(\`Running \${frameworkName} with \${totalBudget}ms budget (Headless:
   "typescript-interfaces-aliases": {
     id: "typescript-interfaces-aliases",
     title: "Interfaces vs Type Aliases for Test Data Contracts",
-    category: "Interfaces, Types & Enums",
+    category: "OOP & Interface",
     sourceUrl: "https://www.geeksforgeeks.org/typescript-interfaces/",
     description: "Learn when to choose interface vs type alias in test frameworks, declaration merging, extending schemas, and defining strict test data fixtures.",
     sections: [
@@ -197,7 +185,7 @@ console.log(\`Running \${frameworkName} with \${totalBudget}ms budget (Headless:
   "typescript-enums-tuples": {
     id: "typescript-enums-tuples",
     title: "TypeScript Enums, Const Enums & Tuples in QA",
-    category: "Interfaces, Types & Enums",
+    category: "OOP & Interface",
     sourceUrl: "https://www.geeksforgeeks.org/typescript-enums/",
     description: "Master numeric and string enums, zero-overhead const enums, and tuples for parameterized test datasets and coordinates.",
     sections: [
@@ -235,7 +223,7 @@ const testCases: TestCredentialTuple[] = [
   "typescript-narrowing-guards": {
     id: "typescript-narrowing-guards",
     title: "Type Guards & Exhaustive Discriminated Unions with Switch",
-    category: "Control Flow & Type Narrowing",
+    category: "Advance TypeScript Concepts",
     sourceUrl: "https://www.geeksforgeeks.org/typescript-type-guards/",
     description: "Master type narrowing with typeof, instanceof, in operator, user-defined type predicates (value is T), and exhaustive switch checks for complex API responses.",
     sections: [
@@ -277,7 +265,7 @@ export function processOrderResponse(res: OrderResponse) {
   "typescript-functions": {
     id: "typescript-functions",
     title: "Typed Functions, Optional Parameters & Function Overloading",
-    category: "Functions & Strongly Typed OOP",
+    category: "Basics",
     sourceUrl: "https://www.geeksforgeeks.org/typescript-functions/",
     description: "Master parameter typing, return type annotations, optional/default parameters, and TypeScript function overloading for wait and assertion helpers.",
     sections: [
@@ -311,7 +299,7 @@ export function findElement(page: Page, selector: string, timeout?: number): Loc
   "typescript-classes-pom": {
     id: "typescript-classes-pom",
     title: "Classes & Strongly Typed Page Object Model (POM)",
-    category: "Functions & Strongly Typed OOP",
+    category: "OOP & Interface",
     sourceUrl: "https://playwright.dev/docs/pom",
     description: "Write production-grade, typed Page Objects using TypeScript access modifiers (private, readonly), dependency injection, and fluent return types.",
     sections: [
@@ -358,7 +346,7 @@ export class CheckoutPage {
   "typescript-generics": {
     id: "typescript-generics",
     title: "Generics in Test Frameworks: API Clients & Utilities",
-    category: "Generics & Utility Types",
+    category: "Advance TypeScript Concepts",
     sourceUrl: "https://www.geeksforgeeks.org/typescript-generics/",
     description: "Build flexible, reusable test utilities using TypeScript generics: strongly typed REST API clients, resilient polling helpers, and generic page factories.",
     sections: [
@@ -392,7 +380,7 @@ export class ApiClient {
   "typescript-utility-types": {
     id: "typescript-utility-types",
     title: "Utility Types (Partial, Required, Pick, Omit, Record) in QA",
-    category: "Generics & Utility Types",
+    category: "Advance TypeScript Concepts",
     sourceUrl: "https://www.geeksforgeeks.org/typescript-utility-types/",
     description: "Harness TypeScript built-in utility types to create flexible mock fixtures, customize API schemas, and prevent redundant interface boilerplate.",
     sections: [
@@ -420,7 +408,7 @@ export class ApiClient {
   "typescript-fixtures-custom": {
     id: "typescript-fixtures-custom",
     title: "Custom Typed Fixtures in Playwright (`test.extend`)",
-    category: "Playwright Fixtures & Configuration",
+    category: "Practice TypeScript",
     sourceUrl: "https://playwright.dev/docs/test-fixtures",
     description: "Write clean, dependency-injected Playwright tests by creating custom typed fixtures, automated page manager containers, and automatic teardown hooks.",
     sections: [
@@ -458,7 +446,7 @@ export { expect } from "@playwright/test";`,
   "typescript-advanced-types": {
     id: "typescript-advanced-types",
     title: "Advanced Types: Template Literals, Mapped Types & Satisfies",
-    category: "Playwright Fixtures & Configuration",
+    category: "Advance TypeScript Concepts",
     sourceUrl: "https://www.geeksforgeeks.org/advanced-types-in-typescript/",
     description: "Master modern TypeScript operators: satisfies for config validation without type widening, template literal types for dynamic data-testid selectors, and mapped types.",
     sections: [
@@ -489,7 +477,7 @@ export function getByTestId(selector: TestIdSelector) {
   "typescript-tsconfig-setup": {
     id: "typescript-tsconfig-setup",
     title: "tsconfig.json Best Practices & Clean Path Aliases for QA",
-    category: "Playwright Fixtures & Configuration",
+    category: "Practice TypeScript",
     sourceUrl: "https://www.typescriptlang.org/tsconfig",
     description: "Eliminate messy relative imports (../../..) using tsconfig path aliases, and configure strict compiler settings for maximum bug prevention.",
     sections: [

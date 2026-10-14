@@ -395,7 +395,7 @@ npm install`,
             <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Installation</h1>
           </header>
 
-          <section id="introduction" className="mb-10 scroll-mt-24">
+          <section id="introduction" className="mb-10 scroll-mt-32">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Introduction</h2>
             <p className="text-sm sm:text-base leading-relaxed text-ink/90 mb-3">
               Playwright Test is an end-to-end test framework for modern web apps. It bundles test
@@ -442,13 +442,13 @@ npm install`,
             </div>
           </section>
 
-          <section id="installing-playwright" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="installing-playwright" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Installing Playwright</h2>
             <p className="text-sm text-ink/90 mb-4">
               Get started by installing Playwright using npm, yarn or pnpm:
             </p>
 
-            <div id="using-npm-yarn-or-pnpm" className="scroll-mt-24 mb-6">
+            <div id="using-npm-yarn-or-pnpm" className="scroll-mt-32 mb-6">
               <DocTabs tabs={packageManagerTabs} />
             </div>
 
@@ -460,7 +460,7 @@ npm install`,
               <li>Install Playwright browsers (default: yes)</li>
             </ul>
 
-            <div id="using-the-vs-code-extension" className="mt-6 rounded-lg border border-line bg-card/60 p-4 scroll-mt-24">
+            <div id="using-the-vs-code-extension" className="mt-6 rounded-lg border border-line bg-card/60 p-4 scroll-mt-32">
               <h3 className="text-sm font-bold text-ink mb-1">Using the VS Code Extension</h3>
               <p className="text-xs text-muted">
                 You can also create, record, and run tests directly inside Visual Studio Code using the official{" "}
@@ -469,7 +469,7 @@ npm install`,
             </div>
           </section>
 
-          <section id="whats-installed" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="whats-installed" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">What&apos;s Installed</h2>
             <p className="text-sm text-ink/90 mb-3">
               Playwright downloads required browser binaries and creates the project scaffold below:
@@ -487,7 +487,7 @@ tests/
             </p>
           </section>
 
-          <section id="running-the-example-test" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="running-the-example-test" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Running the Example Test</h2>
             <p className="text-sm text-ink/90 mb-3">
               By default tests run headless in parallel across Chromium, Firefox and WebKit:
@@ -495,7 +495,7 @@ tests/
             <DocTabs tabs={runTestTabs} />
           </section>
 
-          <section id="html-test-reports" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="html-test-reports" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">HTML Test Reports</h2>
             <p className="text-sm text-ink/90 mb-3">
               After a test run, the HTML Reporter provides a dashboard filterable by the browser, passed, failed, skipped, and flaky tests:
@@ -503,7 +503,7 @@ tests/
             <DocTabs tabs={showReportTabs} />
           </section>
 
-          <section id="running-the-example-test-in-ui-mode" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="running-the-example-test-in-ui-mode" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Running the Example Test in UI Mode</h2>
             <p className="text-sm text-ink/90 mb-3">
               Run tests with UI Mode for watch mode, live step view, and time travel debugging:
@@ -511,7 +511,7 @@ tests/
             <DocTabs tabs={uiModeTabs} />
           </section>
 
-          <section id="updating-playwright" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="updating-playwright" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Updating Playwright</h2>
             <p className="text-sm text-ink/90 mb-3">
               Update Playwright and download new browser binaries and their dependencies:
@@ -519,7 +519,7 @@ tests/
             <DocTabs tabs={updateTabs} />
           </section>
 
-          <section id="system-requirements" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="system-requirements" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">System requirements</h2>
             <ul className="list-disc pl-5 space-y-1 text-xs text-muted">
               <li>Node.js: 20.x, 22.x, or later.</li>
@@ -569,7 +569,7 @@ tests/
             <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Writing tests</h1>
           </header>
 
-          <section id="introduction" className="mb-10 scroll-mt-24">
+          <section id="introduction" className="mb-10 scroll-mt-32">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Introduction</h2>
             <p className="text-sm text-ink/90 leading-relaxed">
               Playwright tests are designed to be resilient, hermetic, and fast. Tests use{" "}
@@ -580,7 +580,7 @@ tests/
             </p>
           </section>
 
-          <section id="first-test" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="first-test" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">First test</h2>
             <p className="text-sm text-ink/90 mb-3">
               Here is a full example test navigating to a website and verifying its title and links:
@@ -623,7 +623,7 @@ test('has title', async ({ page }) => {
             />
           </section>
 
-          <section id="test-hooks" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="test-hooks" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Test hooks (beforeEach & afterEach)</h2>
             <p className="text-sm text-ink/90 mb-3">
               You can use <code className="text-pass font-mono text-xs">test.beforeEach</code> and{" "}
@@ -637,7 +637,7 @@ test('has title', async ({ page }) => {
             />
           </section>
 
-          <section id="test-fixtures" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="test-fixtures" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Using Test Fixtures</h2>
             <p className="text-sm text-ink/90 mb-2">
               Playwright tests receive built-in fixtures like <code className="text-pass font-mono text-xs">page</code> and{" "}
@@ -685,27 +685,27 @@ test('has title', async ({ page }) => {
             <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Generating tests (Codegen)</h1>
           </header>
 
-          <section id="introduction" className="mb-10 scroll-mt-24">
+          <section id="introduction" className="mb-10 scroll-mt-32">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Introduction</h2>
             <p className="text-sm text-ink/90 leading-relaxed">
               Playwright comes with Codegen to record your browser interactions and automatically generate readable test scripts using resilient locators.
             </p>
           </section>
 
-          <section id="running-codegen" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="running-codegen" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Running Codegen</h2>
             <p className="text-sm text-ink/90 mb-3">Run the codegen tool pointing to your target website:</p>
             <DocCodeBlock code="npx playwright codegen demo.playwright.dev/todomvc" language="bash" />
           </section>
 
-          <section id="recording-actions" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="recording-actions" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Recording user actions</h2>
             <p className="text-sm text-ink/90 mb-2">
               As you click, type, and navigate, Playwright records locators prioritized by user-facing roles (<code className="text-pass font-mono">getByRole</code>, <code className="text-pass font-mono">getByText</code>).
             </p>
           </section>
 
-          <section id="emulating-devices" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="emulating-devices" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Emulating devices & viewports</h2>
             <DocCodeBlock code="npx playwright codegen --device='iPhone 13' wikipedia.org" language="bash" />
           </section>
@@ -749,7 +749,7 @@ test('has title', async ({ page }) => {
             </h1>
           </header>
 
-          <section id="running-tests" className="mb-10 scroll-mt-24">
+          <section id="running-tests" className="mb-10 scroll-mt-32">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Command line options</h2>
             <DocCodeBlock
               code={`# Run all tests
@@ -767,7 +767,7 @@ npx playwright test tests/todo.spec.ts`}
             />
           </section>
 
-          <section id="debugging-tests" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="debugging-tests" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Debugging with Playwright Inspector</h2>
             <p className="text-sm text-ink/90 mb-3">
               Step through tests line by line with live DOM inspection and locator picker:
@@ -812,7 +812,7 @@ npx playwright test tests/todo.spec.ts`}
             <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Trace viewer</h1>
           </header>
 
-          <section id="introduction" className="mb-10 scroll-mt-24">
+          <section id="introduction" className="mb-10 scroll-mt-32">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Introduction</h2>
             <p className="text-sm text-ink/90 leading-relaxed mb-4">
               Playwright Trace Viewer is a post-mortem GUI tool that lets you explore recorded test runs with full DOM snapshots, action logs, console entries, and network waterfalls.
@@ -859,7 +859,7 @@ npx playwright test tests/todo.spec.ts`}
             </h1>
           </header>
 
-          <section id="introduction" className="mb-10 scroll-mt-24">
+          <section id="introduction" className="mb-10 scroll-mt-32">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Introduction</h2>
             <p className="text-sm text-ink/90 leading-relaxed mb-4">
               Playwright integrates with Deque&apos;s <code className="text-pass font-mono text-xs">@axe-core/playwright</code> engine to scan websites for WCAG compliance and accessibility violations.
@@ -867,7 +867,7 @@ npx playwright test tests/todo.spec.ts`}
             <DocCodeBlock code="npm install @axe-core/playwright -D" language="bash" />
           </section>
 
-          <section id="scanning-entire-page" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="scanning-entire-page" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Scanning an entire page</h2>
             <DocCodeBlock
               code={`import { test, expect } from '@playwright/test';
@@ -921,14 +921,14 @@ test('page should not have any automatically detectable accessibility issues', a
             <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Locators</h1>
           </header>
 
-          <section id="introduction" className="mb-10 scroll-mt-24">
+          <section id="introduction" className="mb-10 scroll-mt-32">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Introduction</h2>
             <p className="text-sm text-ink/90 leading-relaxed mb-4">
               Locators represent a way to find elements on the page at any moment. Playwright automatically waits for elements to be actionable before performing actions.
             </p>
           </section>
 
-          <section id="recommended-built-in-locators" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="recommended-built-in-locators" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Recommended built-in locators</h2>
             <div className="space-y-4 text-xs">
               <div className="rounded-lg border border-line bg-card/60 p-3">
@@ -986,14 +986,14 @@ test('page should not have any automatically detectable accessibility issues', a
             <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Assertions</h1>
           </header>
 
-          <section id="introduction" className="mb-10 scroll-mt-24">
+          <section id="introduction" className="mb-10 scroll-mt-32">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Introduction</h2>
             <p className="text-sm text-ink/90 leading-relaxed mb-4">
               Playwright includes test assertions in the form of <code className="text-pass font-mono text-xs">expect</code> function. Web-First assertions will wait until the expected condition is met, eliminating artificial sleep calls.
             </p>
           </section>
 
-          <section id="list-of-assertions" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="list-of-assertions" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">List of Web-First assertions</h2>
             <div className="overflow-x-auto rounded-lg border border-line bg-card/60">
               <table className="w-full text-left text-xs border-collapse">
@@ -1074,12 +1074,12 @@ test('page should not have any automatically detectable accessibility issues', a
             <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Browsers & Binaries</h1>
           </header>
 
-          <section id="browser-downloads" className="mb-10 scroll-mt-24">
+          <section id="browser-downloads" className="mb-10 scroll-mt-32">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Managing browser binaries</h2>
             <DocCodeBlock code="npx playwright install" language="bash" />
           </section>
 
-          <section id="firewall-proxy" className="mb-10 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="firewall-proxy" className="mb-10 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Download behind firewall / proxy</h2>
             <DocTabs tabs={proxyTabs} />
           </section>
@@ -1121,7 +1121,7 @@ test('page should not have any automatically detectable accessibility issues', a
             <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Configuration</h1>
           </header>
 
-          <section id="configuration-matrix" className="mb-10 scroll-mt-24">
+          <section id="configuration-matrix" className="mb-10 scroll-mt-32">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Configuration matrix & projects</h2>
             <DocCodeBlock
               code={`import { defineConfig, devices } from '@playwright/test';
@@ -1185,7 +1185,7 @@ export default defineConfig({
             <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Release notes</h1>
           </header>
 
-          <section id="v1-50" className="mb-10 scroll-mt-24">
+          <section id="v1-50" className="mb-10 scroll-mt-32">
             <h2 className="text-xl font-bold text-ink sm:text-2xl mb-3">Playwright v1.50+ Highlights</h2>
             <ul className="list-disc pl-5 space-y-2 text-xs text-muted">
               <li>Upgraded Chromium 133, Firefox 134, and WebKit 18.2 engine builds.</li>
@@ -1250,7 +1250,7 @@ export default defineConfig({
           </header>
 
           {/* Section 1: Introduction */}
-          <section id="introduction" className="mb-12 scroll-mt-24">
+          <section id="introduction" className="mb-12 scroll-mt-32">
             <h2 className="group flex items-center text-xl font-bold text-ink sm:text-2xl mb-4">
               <a href="#introduction" onClick={(e) => scrollToAnchor("introduction", e)} className="hover:text-pass transition">
                 Introduction
@@ -1283,7 +1283,7 @@ export default defineConfig({
           </section>
 
           {/* Section 2: Differences when using library */}
-          <section id="differences-when-using-library" className="mb-12 scroll-mt-24">
+          <section id="differences-when-using-library" className="mb-12 scroll-mt-32">
             <h2 className="group flex items-center text-xl font-bold text-ink sm:text-2xl mb-4">
               <a href="#differences-when-using-library" onClick={(e) => scrollToAnchor("differences-when-using-library", e)} className="hover:text-pass transition">
                 Differences when using library
@@ -1291,7 +1291,7 @@ export default defineConfig({
             </h2>
 
             {/* Library Example */}
-            <div id="library-example" className="mb-8 scroll-mt-24">
+            <div id="library-example" className="mb-8 scroll-mt-32">
               <h3 className="text-lg font-semibold text-ink mb-2">
                 <a href="#library-example" onClick={(e) => scrollToAnchor("library-example", e)} className="hover:text-pass transition">
                   Library Example
@@ -1314,7 +1314,7 @@ export default defineConfig({
             </div>
 
             {/* Test Example */}
-            <div id="test-example" className="mb-8 scroll-mt-24">
+            <div id="test-example" className="mb-8 scroll-mt-32">
               <h3 className="text-lg font-semibold text-ink mb-2">
                 <a href="#test-example" onClick={(e) => scrollToAnchor("test-example", e)} className="hover:text-pass transition">
                   Test Example
@@ -1336,7 +1336,7 @@ export default defineConfig({
             </div>
 
             {/* Key Differences Table */}
-            <div id="key-differences" className="scroll-mt-24">
+            <div id="key-differences" className="scroll-mt-32">
               <h3 className="text-lg font-semibold text-ink mb-2">
                 <a href="#key-differences" onClick={(e) => scrollToAnchor("key-differences", e)} className="hover:text-pass transition">
                   Key Differences
@@ -1415,7 +1415,7 @@ export default defineConfig({
           </section>
 
           {/* Section 3: Usage */}
-          <section id="usage" className="mb-12 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="usage" className="mb-12 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="group flex items-center text-xl font-bold text-ink sm:text-2xl mb-4">
               <a href="#usage" onClick={(e) => scrollToAnchor("usage", e)} className="hover:text-pass transition">
                 Usage
@@ -1482,7 +1482,7 @@ export default defineConfig({
           </section>
 
           {/* Section 4: First script */}
-          <section id="first-script" className="mb-12 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="first-script" className="mb-12 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="group flex items-center text-xl font-bold text-ink sm:text-2xl mb-4">
               <a href="#first-script" onClick={(e) => scrollToAnchor("first-script", e)} className="hover:text-pass transition">
                 First script
@@ -1522,7 +1522,7 @@ export default defineConfig({
           </section>
 
           {/* Section 5: Record scripts */}
-          <section id="record-scripts" className="mb-12 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="record-scripts" className="mb-12 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="group flex items-center text-xl font-bold text-ink sm:text-2xl mb-4">
               <a href="#record-scripts" onClick={(e) => scrollToAnchor("record-scripts", e)} className="hover:text-pass transition">
                 Record scripts
@@ -1543,7 +1543,7 @@ export default defineConfig({
           </section>
 
           {/* Section 6: Browser downloads */}
-          <section id="browser-downloads" className="mb-12 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="browser-downloads" className="mb-12 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="group flex items-center text-xl font-bold text-ink sm:text-2xl mb-4">
               <a href="#browser-downloads" onClick={(e) => scrollToAnchor("browser-downloads", e)} className="hover:text-pass transition">
                 Browser downloads
@@ -1599,7 +1599,7 @@ export default defineConfig({
           </section>
 
           {/* Section 7: TypeScript support */}
-          <section id="typescript-support" className="mb-12 scroll-mt-24 border-t border-line/60 pt-8">
+          <section id="typescript-support" className="mb-12 scroll-mt-32 border-t border-line/60 pt-8">
             <h2 className="group flex items-center text-xl font-bold text-ink sm:text-2xl mb-4">
               <a href="#typescript-support" onClick={(e) => scrollToAnchor("typescript-support", e)} className="hover:text-pass transition">
                 TypeScript support
@@ -1610,7 +1610,7 @@ export default defineConfig({
             </p>
 
             {/* In JavaScript */}
-            <div id="in-javascript" className="mb-6 scroll-mt-24">
+            <div id="in-javascript" className="mb-6 scroll-mt-32">
               <h3 className="text-lg font-semibold text-ink mb-2">
                 <a href="#in-javascript" onClick={(e) => scrollToAnchor("in-javascript", e)} className="hover:text-pass transition">
                   In JavaScript
@@ -1628,7 +1628,7 @@ export default defineConfig({
             </div>
 
             {/* In TypeScript */}
-            <div id="in-typescript" className="scroll-mt-24">
+            <div id="in-typescript" className="scroll-mt-32">
               <h3 className="text-lg font-semibold text-ink mb-2">
                 <a href="#in-typescript" onClick={(e) => scrollToAnchor("in-typescript", e)} className="hover:text-pass transition">
                   In TypeScript
@@ -1660,3 +1660,4 @@ export default defineConfig({
       );
   }
 }
+

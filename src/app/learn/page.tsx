@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { ToolBanner } from "@/components/learn/tool-banner";
 import { DocsSidebar, MobileDocsDrawer } from "@/components/learn/docs-sidebar";
 import { DocViewer, getDocToc } from "@/components/learn/doc-viewer";
 import { DocsToc } from "@/components/learn/docs-toc";
@@ -71,14 +70,11 @@ function LearnPageContent() {
   return (
     <div className="min-h-screen bg-paper pb-16 pt-4 sm:pt-6">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        {/* Top Tool Hub Banner */}
-        <ToolBanner />
-
         {/* 3-Column Documentation Layout */}
         <div className="flex gap-8 lg:gap-10">
           {/* Left Sidebar (Desktop) */}
           <div className="hidden lg:block w-60 shrink-0">
-            <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pb-8 pr-2">
+            <div className="sticky top-32 max-h-[calc(100vh-9rem)] overflow-y-auto pb-8 pr-2">
               <DocsSidebar activeDocId={activeDocId} onSelectDoc={handleNavigate} />
             </div>
           </div>
@@ -103,7 +99,7 @@ function LearnPageContent() {
 
           {/* Right Table of Contents (Desktop) */}
           <div className="hidden xl:block w-56 shrink-0">
-            <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pb-8 pl-2">
+            <div className="sticky top-32 max-h-[calc(100vh-9rem)] overflow-y-auto pb-8 pl-2">
               <DocsToc items={activeToc} />
             </div>
           </div>

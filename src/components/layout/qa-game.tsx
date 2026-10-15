@@ -284,6 +284,21 @@ export function QaGame() {
   const [defects, setDefects] = useState<Defect[]>([]);
   const [particles, setParticles] = useState<{ id: string; x: number; y: number; color: string }[]>([]);
 
+  // Coordinate header space when QA game is active in top-left corner
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (isOpen) {
+      document.documentElement.setAttribute("data-qa-game-open", "true");
+      window.dispatchEvent(new CustomEvent("qa-game-state-change", { detail: { open: true } }));
+    } else {
+      document.documentElement.removeAttribute("data-qa-game-open");
+      window.dispatchEvent(new CustomEvent("qa-game-state-change", { detail: { open: false } }));
+    }
+    return () => {
+      document.documentElement.removeAttribute("data-qa-game-open");
+    };
+  }, [isOpen]);
+
   const [terminalLogs, setTerminalLogs] = useState<TerminalLog[]>([]);
 
   const requestRef = useRef<number>(null);
@@ -1138,50 +1153,36 @@ export function QaGame() {
       {isOpen && (
         <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden selection:bg-transparent" data-game-ui="true">
           
-          {/* QA Defect Hunter Stat HUD - Professional, minimal, brand-aligned */}
+          {/* QA Defect Hunter Stat HUD - Relocated to top-left corner along header, compact & brand-aligned */}
           <aside 
             aria-label="QA Game Stats"
-            className="fixed z-[60] flex flex-col gap-2 bg-paper/95 backdrop-blur-md p-2.5 rounded-2xl border border-pass text-ink shadow-[3px_3px_0_var(--ink)] font-mono select-none pointer-events-auto animate-fade-in w-[132px] max-w-[calc(100vw-1.5rem)] top-20 right-4 sm:top-20 sm:right-6 lg:top-[4.5rem] lg:right-6"
+            className="fixed z-[60] flex flex-col gap-1 bg-paper/95 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-pass text-ink shadow-[2.5px_2.5px_0_var(--ink)] font-mono select-none pointer-events-auto animate-fade-in w-[126px] sm:w-[130px] top-3 left-3 sm:top-3.5 sm:left-4"
           >
-            {/* Row 1: Header + Tier Badge */}
+            {/* Row 1: Header QA + Tier Badge + Score */}
             <div className="flex items-center justify-between gap-1 pb-1 border-b border-line">
               <div className="flex items-center gap-1 font-bold text-pass text-[10px] tracking-tight">
-                <ShieldCheck size={12} className="text-pass animate-pulse shrink-0" />
+                <ShieldCheck size={11} className="text-pass animate-pulse shrink-0" />
                 <span>QA</span>
+                <span 
+                  className="px-1 py-0.2 rounded bg-pass/10 text-pass font-bold text-[8px] border border-pass/30 shrink-0 cursor-help" 
+                  title={currentRank.title}
+                >
+                  {currentRank.badge}
+                </span>
               </div>
-              <span 
-                className="px-1.5 py-0.2 rounded bg-pass/10 text-pass font-bold text-[8px] border border-pass/30 shrink-0 cursor-help" 
-                title={currentRank.title}
-              >
-                {currentRank.badge}
-              </span>
-            </div>
-
-            {/* Row 2: Fixed Count & Integrity % (Clean metrics without 'HEALTH' or 'FIXED' text) */}
-            <div className="flex items-center justify-between px-0.5">
               <div className="flex items-baseline gap-1">
-                <Bug size={13} className="text-pass shrink-0 self-center" />
-                <span className="text-lg font-black text-pass leading-none">{score}</span>
+                <Bug size={11} className="text-pass shrink-0 self-center" />
+                <span className="text-sm font-black text-pass leading-none">{score}</span>
                 {combo > 1 && (
                   <span className="text-[7.5px] font-bold text-amber-500 animate-pulse leading-none">
                     x{combo}
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-1">
-                <AlertTriangle size={10} className={systemIntegrity < 40 ? "text-red-500 animate-pulse shrink-0" : "text-pass shrink-0"} />
-                <span 
-                  className={`text-xs font-extrabold leading-none ${
-                    systemIntegrity < 30 ? "text-red-500 animate-pulse" : systemIntegrity < 65 ? "text-amber-500" : "text-pass"
-                  }`}
-                >
-                  {systemIntegrity}%
-                </span>
-              </div>
             </div>
 
-            {/* Row 3: Reactive Micro Integrity Bar */}
-            <div className="w-full h-1 bg-line rounded-full overflow-hidden">
+            {/* Row 2: Micro Integrity Bar */}
+            <div className="w-full h-1 bg-line rounded-full overflow-hidden my-0.2">
               <div 
                 className={`h-full transition-all duration-300 rounded-full ${
                   systemIntegrity < 30 ? "bg-red-500" : systemIntegrity < 65 ? "bg-amber-500" : "bg-pass"
@@ -1190,37 +1191,48 @@ export function QaGame() {
               />
             </div>
 
-            {/* Row 4: Action Controls (Breakpoint, Sound, Reset) */}
+            {/* Row 3: Integrity % + Action Controls (Breakpoint, Sound, Reset) */}
             <div className="flex items-center justify-between gap-1 pt-0.5 border-t border-line">
-              {/* Breakpoint Powerup */}
-              <button
-                type="button"
-                onClick={triggerBreakpoint}
-                disabled={breakpoints <= 0 || isFrozen}
-                title="Debugger Breakpoint (Spacebar)"
-                aria-label="Freeze Bugs"
-                className={`flex items-center gap-1 px-2 py-0.5 rounded-full font-bold transition-all text-[8px] ${
-                  isFrozen 
-                    ? "bg-blue-600 text-white animate-pulse" 
-                    : breakpoints > 0 
-                      ? "bg-blue-500/15 text-blue-600 border border-blue-500/30 hover:bg-blue-500/25 active:scale-95" 
-                      : "opacity-40 cursor-not-allowed border border-line text-muted"
-                }`}
-              >
-                {isFrozen ? <Pause size={7} /> : <Play size={7} className="fill-current" />}
-                <span>{breakpoints}</span>
-              </button>
+              <div className="flex items-center gap-0.5">
+                <AlertTriangle size={8} className={systemIntegrity < 40 ? "text-red-500 animate-pulse shrink-0" : "text-pass shrink-0"} />
+                <span 
+                  className={`text-[9.5px] font-extrabold leading-none ${
+                    systemIntegrity < 30 ? "text-red-500 animate-pulse" : systemIntegrity < 65 ? "text-amber-500" : "text-pass"
+                  }`}
+                >
+                  {systemIntegrity}%
+                </span>
+              </div>
 
               <div className="flex items-center gap-1">
+                {/* Breakpoint Powerup */}
+                <button
+                  type="button"
+                  onClick={triggerBreakpoint}
+                  disabled={breakpoints <= 0 || isFrozen}
+                  title="Debugger Breakpoint (Spacebar)"
+                  aria-label="Freeze Bugs"
+                  className={`flex items-center gap-0.5 px-1 py-0.5 rounded font-bold transition-all text-[8px] ${
+                    isFrozen 
+                      ? "bg-blue-600 text-white animate-pulse" 
+                      : breakpoints > 0 
+                        ? "bg-blue-500/15 text-blue-600 border border-blue-500/30 hover:bg-blue-500/25 active:scale-95" 
+                        : "opacity-40 cursor-not-allowed border border-line text-muted"
+                  }`}
+                >
+                  {isFrozen ? <Pause size={7} /> : <Play size={7} className="fill-current" />}
+                  <span>{breakpoints}</span>
+                </button>
+
                 {/* Audio toggle */}
                 <button
                   type="button"
                   onClick={() => setIsMuted(!isMuted)}
-                  className="text-muted hover:text-ink hover:border-pass transition-colors p-1 rounded-full border border-line"
+                  className="text-muted hover:text-ink hover:border-pass transition-colors p-0.5 rounded border border-line"
                   title={isMuted ? "Unmute Sound" : "Mute Sound"}
                   aria-label={isMuted ? "Unmute Sound" : "Mute Sound"}
                 >
-                  {isMuted ? <VolumeX size={10} /> : <Volume2 size={10} />}
+                  {isMuted ? <VolumeX size={9} /> : <Volume2 size={9} />}
                 </button>
 
                 {/* Reset */}
@@ -1235,13 +1247,14 @@ export function QaGame() {
                     setBreakpoints(1);
                     setIsFrozen(false);
                     setHasCrashed(false);
+                    setSystemIntegrity(100);
                     spawnDefect();
                   }}
-                  className="text-muted hover:text-amber-500 hover:border-amber-500 transition-colors p-1 rounded-full border border-line"
+                  className="text-muted hover:text-amber-500 hover:border-amber-500 transition-colors p-0.5 rounded border border-line"
                   title="Reboot Environment"
                   aria-label="Reboot Environment"
                 >
-                  <RefreshCw size={9} />
+                  <RefreshCw size={8} />
                 </button>
               </div>
             </div>
@@ -1442,6 +1455,7 @@ export function QaGame() {
                       setCombo(0);
                       setMaxCombo(0);
                       setBreakpoints(1);
+                      setSystemIntegrity(100);
                       setDefects([]);
                       spawnDefect();
                     }}

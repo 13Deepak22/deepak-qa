@@ -14,8 +14,21 @@ export function SiteHeader() {
   const [panel, setPanel] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isGameOpen, setIsGameOpen] = useState(false);
   const closeTimer = useRef<number | null>(null);
   const menuToken = useRef(0);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const custom = e as CustomEvent<{ open: boolean }>;
+      setIsGameOpen(Boolean(custom.detail?.open));
+    };
+    window.addEventListener("qa-game-state-change", handler);
+    if (document.documentElement.getAttribute("data-qa-game-open") === "true") {
+      setIsGameOpen(true);
+    }
+    return () => window.removeEventListener("qa-game-state-change", handler);
+  }, []);
 
   function clearCloseTimer() {
     if (closeTimer.current === null) return;
@@ -80,7 +93,11 @@ export function SiteHeader() {
         scrolled ? "header-shadow" : ""
       }`}
     >
-      <div className="mx-auto flex h-20 max-w-6xl items-center justify-between gap-3 pt-2 pr-16 pl-4 sm:gap-4 sm:pl-6">
+      <div
+        className={`mx-auto flex h-20 max-w-6xl items-center justify-between gap-3 pt-2 pr-16 sm:gap-4 transition-[padding] duration-300 ease-out ${
+          isGameOpen ? "pl-[142px] sm:pl-[152px]" : "pl-4 sm:pl-6"
+        }`}
+      >
         <Link
           href="/"
           className="flex min-w-0 items-center gap-3 text-ink"

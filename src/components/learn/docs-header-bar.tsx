@@ -59,10 +59,10 @@ export function DocsHeaderBar({
         <Link
           href="/learn"
           className="flex items-center gap-1.5 text-xs font-mono text-muted hover:text-pass transition cursor-pointer shrink-0"
-          title="Return to Learning Hub"
+          title="Return to Guides Hub"
         >
           <ArrowLeft className="h-3.5 w-3.5 text-pass" />
-          <span className="hidden xs:inline">All Tracks</span>
+          <span className="hidden xs:inline">All Guides</span>
         </Link>
 
         {/* Center: Track Context / Sub-nav */}

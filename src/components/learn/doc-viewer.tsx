@@ -179,6 +179,194 @@ function renderDocParagraph(p: string, pIdx: number) {
   );
 }
 
+interface QAGroup {
+  num: string;
+  question: string;
+  answers: string[];
+}
+
+function parseSectionToQA(paragraphs: string[]): { intro: string[]; questions: QAGroup[] } {
+  if (!paragraphs || paragraphs.length === 0) return { intro: [], questions: [] };
+
+  const questions: QAGroup[] = [];
+  const intro: string[] = [];
+  let currentQ: QAGroup | null = null;
+  let lastQNum = 0;
+
+  for (const p of paragraphs) {
+    const match = p.match(/^(\d+)\.\s+(.*)$/);
+
+    if (match) {
+      const num = parseInt(match[1], 10);
+      const text = match[2].trim();
+
+      const hasQuestionMark = text.includes("?");
+      const startsWithQuestionWord =
+        /^(what|why|how|explain|difference|diff\b|compare|when|which|can|could|should|define|write|reverse|check|count|swap|name|list|give|is\b|are\b|do\b|does\b|in\b|scenario|if\b|suppose|assume|describe|discuss|illustrate|mention|state)\b/i.test(
+          text
+        );
+      const isCodeOrAlgorithm =
+        /^(reverse|check|count|swap|find|print|sort|palindrome|factorial|fibonacci|armstrong|anagram|prime|bubble|binary|duplicate|remove|second\s+largest|matrix|two\s+sum|pyramid|pattern|vowel)\b/i.test(
+          text
+        );
+
+      let isTopLevel = false;
+
+      if (currentQ === null) {
+        if (
+          num === 1 ||
+          num === lastQNum + 1 ||
+          hasQuestionMark ||
+          startsWithQuestionWord ||
+          isCodeOrAlgorithm ||
+          text.length > 20
+        ) {
+          isTopLevel = true;
+        }
+      } else {
+        if (num > lastQNum) {
+          if (hasQuestionMark || startsWithQuestionWord || isCodeOrAlgorithm || num === lastQNum + 1) {
+            isTopLevel = true;
+          }
+        } else if (num === 1 && (hasQuestionMark || startsWithQuestionWord || isCodeOrAlgorithm)) {
+          isTopLevel = true;
+        }
+      }
+
+      if (isTopLevel) {
+        lastQNum = num;
+        currentQ = {
+          num: String(num),
+          question: text,
+          answers: [],
+        };
+        questions.push(currentQ);
+        continue;
+      }
+    }
+
+    if (currentQ) {
+      currentQ.answers.push(p);
+    } else {
+      intro.push(p);
+    }
+  }
+
+  return { intro, questions };
+}
+
+function renderAnswerItem(ans: string, aIdx: number) {
+  // Check for bullet list item: "- Item" or "• Item" or "* Item"
+  const bulletMatch = ans.match(/^[-•*]\s+(.*)$/);
+  if (bulletMatch) {
+    const rest = bulletMatch[1];
+    const colonIdx = rest.indexOf(":");
+    let title = "";
+    let desc = rest;
+
+    if (colonIdx > 0 && colonIdx < 80) {
+      title = rest.substring(0, colonIdx).trim();
+      desc = rest.substring(colonIdx + 1).trim();
+    }
+
+    return (
+      <div
+        key={aIdx}
+        className="my-1.5 flex items-start gap-2.5 pl-1 text-sm sm:text-base leading-relaxed text-ink/90"
+      >
+        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-pass" />
+        <div className="flex-1">
+          {title ? (
+            <>
+              <strong className="font-semibold text-ink">{formatDocText(title)}</strong>
+              {desc ? <span className="text-ink/80">: {formatDocText(desc)}</span> : null}
+            </>
+          ) : (
+            formatDocText(rest)
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Check for numbered sub-step: "1. Step" or "1. Title: Description"
+  const numberedMatch = ans.match(/^(\d+)\.\s+(.*)$/);
+  if (numberedMatch) {
+    const subNum = numberedMatch[1];
+    const rest = numberedMatch[2];
+    const colonIdx = rest.indexOf(":");
+    let title = "";
+    let desc = rest;
+
+    if (colonIdx > 0 && colonIdx < 80) {
+      title = rest.substring(0, colonIdx).trim();
+      desc = rest.substring(colonIdx + 1).trim();
+    }
+
+    return (
+      <div
+        key={aIdx}
+        className="my-2 flex items-start gap-2.5 rounded-lg border border-line/60 bg-paper-deep/40 px-3 py-2 text-sm sm:text-base leading-relaxed text-ink/90"
+      >
+        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-pass/10 text-pass font-mono text-xs font-bold border border-pass/30 mt-0.5">
+          {subNum}
+        </span>
+        <div className="flex-1 min-w-0">
+          {title ? (
+            <>
+              <strong className="font-semibold text-ink">{formatDocText(title)}</strong>
+              {desc ? <span className="text-ink/80">: {formatDocText(desc)}</span> : null}
+            </>
+          ) : (
+            formatDocText(rest)
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Check for Callout/Example/Key point: "Example: ...", "Note: ...", "Key point: ..."
+  const calloutMatch = ans.match(/^(example|note|key\s*point|pro\s*tip|tip|caution|warning):\s*(.*)$/i);
+  if (calloutMatch) {
+    const label = calloutMatch[1];
+    const rest = calloutMatch[2];
+    return (
+      <div
+        key={aIdx}
+        className="my-3 flex items-start gap-2.5 rounded-xl border border-pass/25 bg-pass/5 p-3 sm:p-3.5 text-xs sm:text-sm text-ink/90 leading-relaxed"
+      >
+        <span className="text-pass text-base shrink-0 select-none">💡</span>
+        <div className="flex-1">
+          <strong className="font-semibold text-pass uppercase tracking-wider text-[11px] block mb-0.5">
+            {label}
+          </strong>
+          <span>{formatDocText(rest)}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Check for blockquote: "> Quote"
+  const quoteMatch = ans.match(/^>\s*(.*)$/);
+  if (quoteMatch) {
+    return (
+      <blockquote
+        key={aIdx}
+        className="my-3 pl-4 border-l-2 border-pass bg-pass/5 py-2.5 pr-4 rounded-r-lg text-sm sm:text-base italic text-ink/85 leading-relaxed"
+      >
+        {formatDocText(quoteMatch[1])}
+      </blockquote>
+    );
+  }
+
+  // Standard paragraph
+  return (
+    <p key={aIdx} className="text-sm sm:text-base leading-relaxed text-ink/90 my-2">
+      {formatDocText(ans)}
+    </p>
+  );
+}
+
 function renderDetailedDocArticle(
   doc: DetailedDoc,
   prevDoc: { id: string; text: string } | null,
@@ -193,6 +381,10 @@ function renderDetailedDocArticle(
     java: "Java",
     dotnet: ".NET",
   };
+
+  const isInterviewDoc =
+    doc.id.startsWith("interview-") ||
+    doc.category.toLowerCase().includes("interview");
 
   return (
     <article key={doc.id} className="prose-custom max-w-none font-sans text-ink leading-relaxed doc-article-enter">
@@ -231,6 +423,11 @@ function renderDetailedDocArticle(
       {/* Sections */}
       {doc.sections.map((sec) => {
         const isH3 = sec.level === 3;
+        const { intro, questions } = isInterviewDoc
+          ? parseSectionToQA(sec.paragraphs || [])
+          : { intro: [], questions: [] };
+        const hasStructuredQA = isInterviewDoc && questions.length > 0;
+
         return (
           <section key={sec.id} id={sec.id} className="mb-10 scroll-mt-32">
             {isH3 ? (
@@ -244,19 +441,56 @@ function renderDetailedDocArticle(
                 </a>
               </h3>
             ) : (
-              <h2 className="group flex items-center font-serif text-xl font-bold text-ink sm:text-2xl mb-3">
+              <h2 className="group flex items-center font-serif text-xl font-bold text-ink sm:text-2xl mb-4 pt-2">
                 <a
                   href={`#${sec.id}`}
                   onClick={(e) => scrollToAnchor(sec.id, e)}
-                  className="hover:text-pass transition"
+                  className="hover:text-pass transition flex items-center gap-2.5"
                 >
-                  {sec.heading}
+                  <span className="h-2 w-2 rounded-full bg-pass" />
+                  <span>{sec.heading}</span>
                 </a>
               </h2>
             )}
 
-            {/* Paragraphs */}
-            {sec.paragraphs?.map((p, pIdx) => renderDocParagraph(p, pIdx))}
+            {/* Paragraphs / Q&A Content */}
+            {hasStructuredQA ? (
+              <>
+                {/* Intro paragraphs before questions if any */}
+                {intro.length > 0 && (
+                  <div className="mb-5 space-y-2">
+                    {intro.map((p, pIdx) => renderDocParagraph(p, pIdx))}
+                  </div>
+                )}
+
+                {/* Unified Question & Answer Cards */}
+                <div className="space-y-4.5 my-5">
+                  {questions.map((q, qIdx) => (
+                    <div
+                      key={`qa-${sec.id}-${qIdx}`}
+                      className="rounded-2xl border border-line/80 bg-card/60 hover:border-pass/45 hover:bg-card/90 transition-all duration-200 overflow-hidden shadow-2xs group"
+                    >
+                      {/* Question Header Bar */}
+                      <div className="flex items-start gap-3 p-4 sm:p-4.5 bg-paper-deep/60 border-b border-line/50 transition-colors">
+                        <span className="inline-flex items-center justify-center h-6 sm:h-6.5 px-2.5 rounded-md bg-pass/15 text-pass font-mono text-xs font-bold border border-pass/30 shrink-0 select-none shadow-2xs mt-0.5">
+                          Q{q.num.padStart(2, "0")}
+                        </span>
+                        <h4 className="flex-1 font-serif text-base sm:text-[17px] font-semibold text-ink leading-snug">
+                          {formatDocText(q.question)}
+                        </h4>
+                      </div>
+
+                      {/* Answer Body Container */}
+                      <div className="p-4 sm:p-5 text-sm sm:text-base text-ink/90 leading-relaxed bg-card/25 space-y-2.5">
+                        {q.answers.map((ans, aIdx) => renderAnswerItem(ans, aIdx))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              sec.paragraphs?.map((p, pIdx) => renderDocParagraph(p, pIdx))
+            )}
 
             {/* Key Takeaways */}
             {sec.keyTakeaways && sec.keyTakeaways.length > 0 && (

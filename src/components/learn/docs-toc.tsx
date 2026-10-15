@@ -134,11 +134,11 @@ export function DocsToc({ items = [], variant = "both", className = "" }: DocsTo
                     href={`#${item.id}`}
                     onClick={(e) => scrollTo(item.id, e)}
                     title={item.text}
-                    className={`block truncate transition-all duration-200 ease-out ${
+                    className={`block break-words leading-snug py-1 transition-all duration-200 ease-out ${
                       item.level === 3 ? "pl-5 text-[11.5px]" : "pl-3 text-xs"
-                    } -ml-[1px] border-l-2 py-0.5 cursor-pointer ${
+                    } -ml-[1px] border-l-2 cursor-pointer ${
                       isActive
-                        ? "border-pass font-semibold text-pass translate-x-1"
+                        ? "border-pass font-semibold text-pass translate-x-0.5"
                         : "border-transparent text-muted hover:border-line hover:text-ink hover:translate-x-0.5"
                     }`}
                   >

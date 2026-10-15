@@ -31,13 +31,12 @@
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
 
 .page-transition {
-  animation: page-enter 280ms var(--ease) both;
-  will-change: opacity, transform;
+  animation: page-enter 240ms var(--ease);
 }
 
 .nav-link {

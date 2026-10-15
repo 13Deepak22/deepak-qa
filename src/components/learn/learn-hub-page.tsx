@@ -41,7 +41,7 @@ export interface InterviewModuleItem {
   highlights: string[];
 }
 
-export const COURSE_TRACKS: LearningTrack[] = [
+export const GUIDE_TRACKS: LearningTrack[] = [
   {
     id: "manual",
     slug: "manual",
@@ -174,14 +174,15 @@ export const COURSE_TRACKS: LearningTrack[] = [
   },
 ];
 
-export const LEARNING_TRACKS = COURSE_TRACKS;
+export const COURSE_TRACKS = GUIDE_TRACKS;
+export const LEARNING_TRACKS = GUIDE_TRACKS;
 
 export const INTERVIEW_MODULES: InterviewModuleItem[] = [
   {
     id: "interview-manual-testing",
     slug: "interview/interview-manual-testing",
-    title: "Manual Testing Q&A",
-    shortTitle: "Manual QA",
+    title: "Manual Q&A",
+    shortTitle: "Manual",
     tagline: "130+ questions: SDLC, STLC, Defect Life Cycle, ISTQB principles & BVA.",
     description: "Sequence-wise interview questions covering testing fundamentals, 7 ISTQB principles, verification vs validation, severity vs priority, boundary value analysis, decision tables, defect triage, and root cause analysis.",
     qCount: "130+ Q&As",
@@ -193,15 +194,28 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
   {
     id: "interview-selenium-java",
     slug: "interview/interview-selenium-java",
-    title: "Selenium with Java & Cucumber",
+    title: "Selenium with Java",
     shortTitle: "Selenium Java",
-    tagline: "144+ questions: WebDriver, dynamic locators, waits, TestNG & BDD.",
-    description: "Complete Selenium with Java interview questions: Selenium 3 vs 4, StaleElementReferenceException handling, FluentWait vs WebDriverWait, JavaScriptExecutor, Page Object Model, and Cucumber BDD step definitions.",
-    qCount: "144+ Q&As",
+    tagline: "159 questions: WebDriver, dynamic locators, waits, TestNG & POM.",
+    description: "Complete Selenium with Java interview questions: Selenium 3 vs 4, StaleElementReferenceException handling, FluentWait vs WebDriverWait, JavaScriptExecutor, Page Object Model, and TestNG framework.",
+    qCount: "153 Q&As",
     categoryLabel: "Web Automation",
     logo: "selenium",
     level: "Intermediate",
-    highlights: ["WebDriver Core", "Locators", "Waits", "Cucumber BDD"],
+    highlights: ["WebDriver Core", "Locators", "Waits", "TestNG & POM"],
+  },
+  {
+    id: "interview-playwright-mcp",
+    slug: "interview/interview-playwright-mcp",
+    title: "Playwright + MCP Automation",
+    shortTitle: "Playwright + MCP",
+    tagline: "33 questions: MCP server architecture, AI test generation, self-healing & CI/CD.",
+    description: "Deep dive into Microsoft Playwright and Model Context Protocol (MCP) testing: CDP engine, live locators, Planner/Generator/Healer agents, MCP server tools, self-healing mechanics, and enterprise CI/CD governance.",
+    qCount: "37 Q&As",
+    categoryLabel: "AI Automation",
+    logo: "playwright",
+    level: "Advanced",
+    highlights: ["Engine Architecture", "MCP Protocol", "Self-Healing QA", "CI/CD Governance"],
   },
   {
     id: "interview-api-postman",
@@ -210,7 +224,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     shortTitle: "Postman API",
     tagline: "143+ questions: REST architecture, HTTP methods, scripts & Newman.",
     description: "Complete API testing interview questions: REST architecture, idempotency, pre-request scripts, test assertions, Newman headless CLI suites, environment scopes, and mock servers.",
-    qCount: "143+ Q&As",
+    qCount: "107+ Q&As",
     categoryLabel: "API Testing",
     logo: "postman",
     level: "All Levels",
@@ -236,7 +250,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     shortTitle: "Core Java",
     tagline: "52+ questions: OOP concepts, Collections, Exceptions & ThreadLocal.",
     description: "Essential Java interview questions for QA: OOP principles, method overriding vs overloading, Collections (List, Set, Map), exceptions hierarchy, garbage collection, and ThreadLocal safety.",
-    qCount: "52+ Q&As",
+    qCount: "55+ Q&As",
     categoryLabel: "Core Java",
     logo: "java",
     level: "Intermediate",
@@ -256,13 +270,26 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     highlights: ["String Reverse", "Palindrome", "Fibonacci", "Sorting"],
   },
   {
+    id: "interview-git",
+    slug: "interview/interview-git",
+    title: "Git & Version Control",
+    shortTitle: "Git & GitHub",
+    tagline: "25 questions: Repositories, branching, remotes, git revert & reset.",
+    description: "Master essential Git commands and workflows for QA: git init, staging, commits, branch management, merge, remote GitHub workflow, git revert, reset, and commit --amend.",
+    qCount: "25 Q&As",
+    categoryLabel: "Version Control",
+    logo: "automation",
+    level: "All Levels",
+    highlights: ["Git vs GitHub", "Branching & Merging", "Remote Workflow", "Revert & Reset"],
+  },
+  {
     id: "interview-git-cicd-jenkins",
     slug: "interview/interview-git-cicd-jenkins",
-    title: "Git, CI/CD, Jenkins & Docker",
+    title: "CI/CD, Jenkins & Docker",
     shortTitle: "DevOps QA",
-    tagline: "214+ questions: Branching, merge conflicts, Jenkinsfile & Docker grids.",
-    description: "DevOps & CI/CD interview questions for QA: Git branching, merge conflicts, Jenkins declarative pipelines, webhook triggers, Docker containers, and Selenium Grid execution.",
-    qCount: "214+ Q&As",
+    tagline: "106 questions: Jenkinsfile, webhook triggers, Docker & Linux.",
+    description: "DevOps & CI/CD interview questions for QA: Jenkins declarative pipelines, webhook triggers, Docker test containers, Linux commands, and CI test execution.",
+    qCount: "106 Q&As",
     categoryLabel: "DevOps & CI/CD",
     logo: "automation",
     level: "DevOps QA",
@@ -275,7 +302,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     shortTitle: "100 Scenarios",
     tagline: "106 scenario-based questions: e-commerce, payment timeouts & hotfixes.",
     description: "100 practical real-world QA engineering scenarios: concurrency conflicts, payment gateway timeouts, cart drop-offs, flakiness mitigation, production escalations, and cross-team disputes.",
-    qCount: "106 Scenarios",
+    qCount: "105 Scenarios",
     categoryLabel: "Scenarios",
     logo: "interview",
     level: "Real-World",
@@ -283,7 +310,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
   },
 ];
 
-const COURSE_CATEGORY_TABS = [
+const GUIDE_CATEGORY_TABS = [
   { id: "all", label: "All", count: 10 },
   { id: "fundamentals", label: "Fundamentals", count: 1 },
   { id: "automation", label: "Automation", count: 4 },
@@ -291,121 +318,127 @@ const COURSE_CATEGORY_TABS = [
   { id: "languages", label: "Languages", count: 3 },
 ] as const;
 
-type HubSection = "all" | "courses" | "interviews";
+export const COURSE_CATEGORY_TABS = GUIDE_CATEGORY_TABS;
+
+type HubSection = "all" | "guides" | "interviews";
 
 export function LearnHubPage() {
   const [activeSection, setActiveSection] = useState<HubSection>("all");
-  const [activeCourseCategory, setActiveCourseCategory] = useState<string>("all");
+  const [activeGuideCategory, setActiveGuideCategory] = useState<string>("all");
 
-  const filteredCourses = useMemo(() => {
-    if (activeCourseCategory === "all") return COURSE_TRACKS;
-    return COURSE_TRACKS.filter((track) => track.category === activeCourseCategory);
-  }, [activeCourseCategory]);
+  const filteredGuides = useMemo(() => {
+    if (activeGuideCategory === "all") return GUIDE_TRACKS;
+    return GUIDE_TRACKS.filter((track) => track.category === activeGuideCategory);
+  }, [activeGuideCategory]);
 
   return (
     <main id="content" tabIndex={-1} className="outline-none">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
-        {/* Compact Hub Header */}
-        <div className="enter enter-1 pb-4 sm:pb-5 border-b border-line">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <p className="font-mono text-[11px] tracking-wider text-muted uppercase">
-                <span className="text-pass">06</span> / Knowledge Base &amp; Learning Hub
-              </p>
-              <h1 className="mt-1 font-serif text-2xl sm:text-3xl lg:text-4xl tracking-tight text-ink font-medium">
-                Choose what you want to learn.
-              </h1>
-              <p className="mt-1 text-xs sm:text-sm text-ink-soft max-w-2xl">
-                10 engineering courses and 8 sequential interview Q&amp;A modules from <em>QA Interview.pdf</em>.
-              </p>
-            </div>
-
-            {/* Compact Metrics */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0 font-mono text-xs">
-              <div className="border border-line rounded-md px-2.5 py-1.5 bg-card shadow-2xs">
-                <span className="text-muted block text-[9.5px] uppercase tracking-wider">Courses</span>
-                <span className="text-sm sm:text-base font-bold text-ink">10</span>
-              </div>
-              <div className="border border-line rounded-md px-2.5 py-1.5 bg-card shadow-2xs">
-                <span className="text-muted block text-[9.5px] uppercase tracking-wider">Interviews</span>
-                <span className="text-sm sm:text-base font-bold text-pass">8 Topics</span>
-              </div>
-              <div className="border border-line rounded-md px-2.5 py-1.5 bg-card shadow-2xs">
-                <span className="text-muted block text-[9.5px] uppercase tracking-wider">Total Q&amp;A</span>
-                <span className="text-sm sm:text-base font-bold text-ink">860+</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Primary Two-Section Switcher */}
-          <div className="mt-4 flex flex-wrap items-center gap-1.5 p-1 rounded-lg border border-line bg-card shadow-2xs max-w-fit">
-            <button
-              type="button"
-              onClick={() => setActiveSection("all")}
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md font-mono text-xs transition cursor-pointer ${
-                activeSection === "all"
-                  ? "bg-ink text-paper font-semibold shadow-2xs"
-                  : "text-muted hover:text-ink hover:bg-paper"
-              }`}
-            >
-              <Layers className="h-3 w-3" />
-              <span>All</span>
-              <span className="text-[10px] opacity-75">18</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveSection("courses")}
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md font-mono text-xs transition cursor-pointer ${
-                activeSection === "courses"
-                  ? "bg-pass text-paper font-semibold shadow-2xs"
-                  : "text-muted hover:text-ink hover:bg-paper"
-              }`}
-            >
-              <GraduationCap className="h-3 w-3" />
-              <span>1. Courses</span>
-              <span className="text-[10px] opacity-75">10</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveSection("interviews")}
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md font-mono text-xs transition cursor-pointer ${
-                activeSection === "interviews"
-                  ? "bg-pass text-paper font-semibold shadow-2xs"
-                  : "text-muted hover:text-ink hover:bg-paper"
-              }`}
-            >
-              <HelpCircle className="h-3 w-3" />
-              <span>2. Interviews Q&amp;A</span>
-              <span className="text-[10px] opacity-75">8</span>
-            </button>
+      <div className="mx-auto max-w-6xl px-4 pt-10 pb-16 sm:px-6 sm:pt-14 sm:pb-20">
+        {/* Eyebrow & Header - On-theme editorial typography */}
+        <div className="enter enter-1">
+          <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
+            <span className="text-pass">06</span> / Knowledge Base &amp; Engineering Guides
+          </p>
+          <div className="mt-2 grid gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,22rem)] lg:items-end lg:gap-12">
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink">
+              Choose what you want to learn.
+            </h1>
+            <p className="leading-relaxed text-ink-soft text-sm sm:text-base">
+              10 comprehensive engineering guides and 8 sequential interview Q&amp;A modules from <em>QA Interview.pdf</em>.
+            </p>
           </div>
         </div>
 
+        {/* Minimal On-Theme Stats Ribbon */}
+        <div className="enter enter-2 mt-8 grid grid-cols-3 gap-3 sm:gap-6 border-t border-b border-line py-4 sm:py-5">
+          <div>
+            <span className="font-mono text-xs tracking-[0.14em] text-muted uppercase">Guides</span>
+            <div className="mt-1 font-serif text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+              10 <span className="font-mono text-xs font-normal text-muted uppercase">Tracks</span>
+            </div>
+          </div>
+          <div>
+            <span className="font-mono text-xs tracking-[0.14em] text-muted uppercase">Interviews</span>
+            <div className="mt-1 font-serif text-2xl sm:text-3xl font-bold tracking-tight text-pass">
+              8 <span className="font-mono text-xs font-normal text-muted uppercase">Topics</span>
+            </div>
+          </div>
+          <div>
+            <span className="font-mono text-xs tracking-[0.14em] text-muted uppercase">Master Q&amp;As</span>
+            <div className="mt-1 font-serif text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+              860+ <span className="font-mono text-xs font-normal text-muted uppercase">Verified</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Minimal Segmented Section Switcher */}
+        <div className="enter enter-2 mt-6 flex items-center gap-1.5 border-b border-line pb-3 overflow-x-auto scrollbar-none">
+          <button
+            type="button"
+            onClick={() => setActiveSection("all")}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-xs transition cursor-pointer shrink-0 ${
+              activeSection === "all"
+                ? "bg-ink text-paper font-semibold shadow-2xs"
+                : "text-muted hover:text-ink hover:bg-card"
+            }`}
+          >
+            <Layers className="h-3.5 w-3.5" />
+            <span>All Resources</span>
+            <span className="text-[10px] opacity-75">(18)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveSection("guides")}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-xs transition cursor-pointer shrink-0 ${
+              activeSection === "guides"
+                ? "bg-pass text-paper font-semibold shadow-2xs"
+                : "text-muted hover:text-ink hover:bg-card"
+            }`}
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+            <span>1. Guides</span>
+            <span className="text-[10px] opacity-75">(10)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveSection("interviews")}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-xs transition cursor-pointer shrink-0 ${
+              activeSection === "interviews"
+                ? "bg-pass text-paper font-semibold shadow-2xs"
+                : "text-muted hover:text-ink hover:bg-card"
+            }`}
+          >
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span>2. Interview Q&amp;As</span>
+            <span className="text-[10px] opacity-75">(8)</span>
+          </button>
+        </div>
+
         {/* ========================================================= */}
-        {/* SECTION 1: COURSES                                        */}
+        {/* SECTION 1: GUIDES                                         */}
         {/* ========================================================= */}
-        {(activeSection === "all" || activeSection === "courses") && (
-          <section className="enter enter-2 mt-6 sm:mt-8">
+        {(activeSection === "all" || activeSection === "guides") && (
+          <section className="enter enter-2 mt-7 sm:mt-9">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-line">
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 font-mono text-[10.5px] font-semibold text-pass uppercase tracking-wider px-2 py-0.5 rounded border border-pass/20 bg-pass/10">
-                  <GraduationCap className="h-3 w-3" />
-                  Section 01 · Courses
+                <span className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-pass uppercase tracking-wider">
+                  <BookOpen className="h-3.5 w-3.5" />
+                  Section 01 · Engineering Guides
                 </span>
-                <span className="text-xs text-muted hidden sm:inline">10 Curriculums</span>
+                <span className="text-xs font-mono text-muted">/ 10 Guides</span>
               </div>
 
-              {/* Course Category Filter Pills */}
-              <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-none shrink-0">
-                {COURSE_CATEGORY_TABS.map((tab) => {
-                  const isActive = activeCourseCategory === tab.id;
+              {/* Minimal Category Filter Pills */}
+              <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-none shrink-0 font-mono text-xs">
+                {GUIDE_CATEGORY_TABS.map((tab) => {
+                  const isActive = activeGuideCategory === tab.id;
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveCourseCategory(tab.id)}
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-mono text-[11px] transition shrink-0 cursor-pointer ${
+                      onClick={() => setActiveGuideCategory(tab.id)}
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded transition shrink-0 cursor-pointer text-[11px] ${
                         isActive
                           ? "bg-ink text-paper font-semibold shadow-2xs"
                           : "border border-line bg-card text-muted hover:text-ink hover:border-pass/40"
@@ -419,15 +452,15 @@ export function LearnHubPage() {
               </div>
             </div>
 
-            {/* Smaller 4-Column Courses Grid */}
-            <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-3.5">
-              {filteredCourses.map((track) => {
-                const originalIndex = COURSE_TRACKS.findIndex((t) => t.id === track.id) + 1;
+            {/* Responsive 4-Column Guides Grid */}
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-3.5">
+              {filteredGuides.map((track) => {
+                const originalIndex = GUIDE_TRACKS.findIndex((t) => t.id === track.id) + 1;
                 return (
                   <Link
                     key={track.id}
                     href={`/learn/${track.slug}`}
-                    className="group relative flex flex-col justify-between rounded-lg border border-line bg-card p-3 sm:p-3.5 shadow-2xs hover:border-pass/60 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200 overflow-hidden cursor-pointer"
+                    className="group relative flex flex-col justify-between rounded-lg border border-line bg-card p-3.5 sm:p-4 shadow-2xs hover:border-pass/60 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200 overflow-hidden cursor-pointer"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2">
@@ -436,16 +469,16 @@ export function LearnHubPage() {
                         </div>
 
                         <div className="flex items-center gap-1.5 font-mono text-[10px]">
-                          <span className="px-1.5 py-0.2 rounded border border-line bg-paper text-muted">
+                          <span className="px-1.5 py-0.5 rounded border border-line bg-paper text-muted">
                             {track.level}
                           </span>
-                          <span className="text-muted/70 font-semibold">
+                          <span className="text-muted/60 font-semibold">
                             #{String(originalIndex).padStart(2, "0")}
                           </span>
                         </div>
                       </div>
 
-                      <h3 className="mt-2.5 font-serif text-[14.5px] sm:text-[15px] font-medium tracking-tight text-ink group-hover:text-pass transition-colors leading-snug">
+                      <h3 className="mt-2.5 font-serif text-[15px] font-medium tracking-tight text-ink group-hover:text-pass transition-colors leading-snug">
                         {track.title}
                       </h3>
 
@@ -454,12 +487,12 @@ export function LearnHubPage() {
                       </p>
                     </div>
 
-                    <div className="mt-3 pt-2 border-t border-line/60 flex items-center justify-between text-[11px] font-mono">
+                    <div className="mt-3.5 pt-2.5 border-t border-line/60 flex items-center justify-between text-[11px] font-mono">
                       <span className="text-muted">
                         <strong className="text-ink font-semibold">{track.docCount}</strong> Chapters
                       </span>
                       <span className="inline-flex items-center gap-1 text-pass font-medium group-hover:translate-x-0.5 transition-transform">
-                        <span>Read</span>
+                        <span>Read Guide</span>
                         <ArrowRight className="h-3 w-3" />
                       </span>
                     </div>
@@ -474,30 +507,30 @@ export function LearnHubPage() {
         {/* SECTION 2: INTERVIEWS (FROM QA Interview.pdf)              */}
         {/* ========================================================= */}
         {(activeSection === "all" || activeSection === "interviews") && (
-          <section className={`enter enter-3 ${activeSection === "all" ? "mt-8 sm:mt-10 pt-5 border-t border-line" : "mt-6 sm:mt-8"}`}>
+          <section className={`enter enter-3 ${activeSection === "all" ? "mt-9 sm:mt-11 pt-6 border-t border-line" : "mt-7 sm:mt-9"}`}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-line">
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 font-mono text-[10.5px] font-semibold text-pass uppercase tracking-wider px-2 py-0.5 rounded border border-pass/20 bg-pass/10">
-                  <HelpCircle className="h-3 w-3" />
-                  Section 02 · Interviews Q&amp;A
+                <span className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-pass uppercase tracking-wider">
+                  <HelpCircle className="h-3.5 w-3.5" />
+                  Section 02 · Interview Q&amp;A Modules
                 </span>
-                <span className="text-xs text-muted hidden sm:inline">From QA Interview.pdf · 860+ Questions</span>
+                <span className="text-xs font-mono text-muted hidden sm:inline">/ 8 Topics · 860+ Questions</span>
               </div>
 
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-line bg-card text-[11px] font-mono text-muted self-start sm:self-auto">
                 <FileText className="h-3 w-3 text-pass" />
-                <span>165 Pages Sequenced</span>
+                <span>Sequenced from QA Interview.pdf</span>
               </span>
             </div>
 
-            {/* Smaller 4-Column Interviews Grid */}
-            <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-3.5">
+            {/* Responsive 4-Column Interviews Grid */}
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-3.5">
               {INTERVIEW_MODULES.map((item, idx) => {
                 return (
                   <Link
                     key={item.id}
                     href={`/learn/${item.slug}`}
-                    className="group relative flex flex-col justify-between rounded-lg border border-line bg-card p-3 sm:p-3.5 shadow-2xs hover:border-pass/60 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200 overflow-hidden cursor-pointer"
+                    className="group relative flex flex-col justify-between rounded-lg border border-line bg-card p-3.5 sm:p-4 shadow-2xs hover:border-pass/60 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200 overflow-hidden cursor-pointer"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2">
@@ -506,16 +539,16 @@ export function LearnHubPage() {
                         </div>
 
                         <div className="flex items-center gap-1.5 font-mono text-[10px]">
-                          <span className="px-1.5 py-0.2 rounded border border-pass/30 bg-pass/10 text-pass font-semibold">
+                          <span className="px-1.5 py-0.5 rounded border border-pass/30 bg-pass/10 text-pass font-semibold">
                             {item.qCount}
                           </span>
-                          <span className="text-muted/70 font-semibold">
+                          <span className="text-muted/60 font-semibold">
                             #{String(idx + 1).padStart(2, "0")}
                           </span>
                         </div>
                       </div>
 
-                      <h3 className="mt-2.5 font-serif text-[14.5px] sm:text-[15px] font-medium tracking-tight text-ink group-hover:text-pass transition-colors leading-snug">
+                      <h3 className="mt-2.5 font-serif text-[15px] font-medium tracking-tight text-ink group-hover:text-pass transition-colors leading-snug">
                         {item.title}
                       </h3>
 
@@ -524,11 +557,11 @@ export function LearnHubPage() {
                       </p>
 
                       {/* Compact Chips */}
-                      <div className="mt-2 flex flex-wrap gap-1">
+                      <div className="mt-2.5 flex flex-wrap gap-1">
                         {item.highlights.slice(0, 3).map((h) => (
                           <span
                             key={h}
-                            className="font-mono text-[9.5px] px-1.5 py-0.2 rounded border border-line/60 bg-paper/60 text-ink/75"
+                            className="font-mono text-[9.5px] px-1.5 py-0.5 rounded border border-line/60 bg-paper/60 text-muted"
                           >
                             {h}
                           </span>
@@ -536,7 +569,7 @@ export function LearnHubPage() {
                       </div>
                     </div>
 
-                    <div className="mt-3 pt-2 border-t border-line/60 flex items-center justify-between text-[11px] font-mono">
+                    <div className="mt-3.5 pt-2.5 border-t border-line/60 flex items-center justify-between text-[11px] font-mono">
                       <span className="text-muted">
                         <strong className="text-ink font-semibold">{item.qCount}</strong> in sequence
                       </span>

@@ -6,6 +6,7 @@ import { DocViewer, getDocToc } from "@/components/learn/doc-viewer";
 import { DocsToc } from "@/components/learn/docs-toc";
 import { ApiDrawer } from "@/components/learn/api-drawer";
 import { DocsHeaderBar, type LearnViewType, type LanguageType } from "@/components/learn/docs-header-bar";
+import { InterviewQAView } from "@/components/learn/interview-qa-view";
 import { type TocHeading } from "@/data/learn-docs-data";
 import { API_DOCS_DETAILED } from "@/data/learn-api-data";
 import { resolveTrackAndDoc, getAestheticUrl } from "./learn-url-utils";
@@ -151,72 +152,89 @@ export function LearnPageClient({ initialSlug = [] }: LearnPageClientProps) {
         <div className="h-full w-full bg-pass skeleton-shimmer" />
       </div>
 
-      {/* 2-Tier Header Bar: Tools Switcher Top Middle, Subs Down */}
-      <DocsHeaderBar
-        activeView={activeView}
-        onSelectView={handleSelectView}
-      />
+      {/* 2-Tier Header Bar: Tools Switcher Top Middle, Subs Down (for docs courses) */}
+      {activeView !== "interview" && (
+        <DocsHeaderBar
+          activeView={activeView}
+          onSelectView={handleSelectView}
+        />
+      )}
 
-      <div className="w-full px-4 sm:px-6 lg:px-[88px] 2xl:px-[96px] pt-6 sm:pt-8">
-        {/* Responsive Documentation Layout with wide main section */}
-        <div className="flex gap-6 lg:gap-8">
-          {/* Left Sidebar (Desktop) */}
-          <div className="hidden lg:block w-64 shrink-0">
-            <div className="sticky top-36 h-[calc(100vh-10.5rem)] max-h-[calc(100vh-10.5rem)] flex flex-col pb-2">
-              <DocsSidebar
-                activeView={activeView}
-                activeDocId={activeDocId}
-                onSelectDoc={handleNavigate}
-                onSelectView={handleSelectView}
-                className="h-full min-h-0"
-              />
+      {/* If Interview Q&A, render bespoke Q&A Masterclass View */}
+      {activeView === "interview" ? (
+        <div
+          key={`interview-${activeDocId}`}
+          className={`page-transition min-h-[60vh] transition-opacity duration-200 ${
+            isPending ? "opacity-60 pointer-events-none" : "opacity-100"
+          }`}
+        >
+          <InterviewQAView
+            activeDocId={activeDocId}
+            onSelectDoc={(id) => handleNavigate(id)}
+          />
+        </div>
+      ) : (
+        <div className="w-full px-4 sm:px-6 lg:px-[88px] 2xl:px-[96px] pt-6 sm:pt-8">
+          {/* Responsive Documentation Layout with wide main section */}
+          <div className="flex gap-6 lg:gap-8">
+            {/* Left Sidebar (Desktop) */}
+            <div className="hidden lg:block w-64 shrink-0">
+              <div className="sticky top-36 h-[calc(100vh-10.5rem)] max-h-[calc(100vh-10.5rem)] flex flex-col pb-2">
+                <DocsSidebar
+                  activeView={activeView}
+                  activeDocId={activeDocId}
+                  onSelectDoc={handleNavigate}
+                  onSelectView={handleSelectView}
+                  className="h-full min-h-0"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Center Main Content - Spacious, properly aligned, unconstrained */}
-          <div className="min-w-0 flex-1">
-            {/* Mobile Controls: Topics drawer */}
-            <div className="lg:hidden mb-4 flex items-center justify-between gap-3">
-              <MobileDocsDrawer
-                activeView={activeView}
-                activeDocId={activeDocId}
-                onSelectDoc={handleNavigate}
-                onSelectView={handleSelectView}
-              />
+            {/* Center Main Content - Spacious, properly aligned, unconstrained */}
+            <div className="min-w-0 flex-1">
+              {/* Mobile Controls: Topics drawer */}
+              <div className="lg:hidden mb-4 flex items-center justify-between gap-3">
+                <MobileDocsDrawer
+                  activeView={activeView}
+                  activeDocId={activeDocId}
+                  onSelectDoc={handleNavigate}
+                  onSelectView={handleSelectView}
+                />
+              </div>
+
+              {/* Active View Body with theme-matched transition animation */}
+              <div
+                key={`${activeView}-${activeDocId}`}
+                className={`page-transition min-h-[60vh] transition-opacity duration-200 ${
+                  isPending ? "opacity-60 pointer-events-none" : "opacity-100"
+                }`}
+              >
+                <DocViewer
+                  activeView={activeView}
+                  activeDocId={activeDocId}
+                  onNavigate={handleNavigate}
+                  onOpenApi={(id) => {
+                    const apiDocKey = id.startsWith("api-") ? id : `api-${id}`;
+                    if (API_DOCS_DETAILED[apiDocKey]) {
+                      handleNavigate(apiDocKey);
+                    } else {
+                      setActiveApiId(id);
+                    }
+                  }}
+                  selectedLanguage={selectedLanguage}
+                />
+              </div>
             </div>
 
-            {/* Active View Body with theme-matched transition animation */}
-            <div
-              key={`${activeView}-${activeDocId}`}
-              className={`page-transition min-h-[60vh] transition-opacity duration-200 ${
-                isPending ? "opacity-60 pointer-events-none" : "opacity-100"
-              }`}
-            >
-              <DocViewer
-                activeView={activeView}
-                activeDocId={activeDocId}
-                onNavigate={handleNavigate}
-                onOpenApi={(id) => {
-                  const apiDocKey = id.startsWith("api-") ? id : `api-${id}`;
-                  if (API_DOCS_DETAILED[apiDocKey]) {
-                    handleNavigate(apiDocKey);
-                  } else {
-                    setActiveApiId(id);
-                  }
-                }}
-                selectedLanguage={selectedLanguage}
-              />
-            </div>
-          </div>
-
-          {/* Right Table of Contents (Desktop - ends right before goto top icon) */}
-          <div className="hidden xl:block w-48 shrink-0">
-            <div className="sticky top-36 h-[calc(100vh-10.5rem)] max-h-[calc(100vh-10.5rem)] overflow-y-auto overflow-x-hidden pb-8 pl-1 pr-1 docs-scrollbar">
-              <DocsToc items={activeToc} variant="desktop" />
+            {/* Right Table of Contents (Desktop - ends right before goto top icon) */}
+            <div className="hidden xl:block w-56 2xl:w-64 shrink-0">
+              <div className="sticky top-36 h-[calc(100vh-10.5rem)] max-h-[calc(100vh-10.5rem)] overflow-y-auto overflow-x-hidden pb-8 pl-1 pr-1 docs-scrollbar">
+                <DocsToc items={activeToc} variant="desktop" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* In-page API Reference Drawer */}
       <ApiDrawer apiId={activeApiId} onClose={() => setActiveApiId(null)} />

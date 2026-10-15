@@ -21,6 +21,7 @@ import { AUTOMATION_CATEGORIES, AUTOMATION_DOCS } from "@/data/learn-automation-
 import { JAVA_CATEGORIES, JAVA_DOCS } from "@/data/learn-java-data";
 import { JS_CATEGORIES, JS_DOCS } from "@/data/learn-js-data";
 import { TS_CATEGORIES, TS_DOCS } from "@/data/learn-ts-data";
+import { INTERVIEW_CATEGORIES, INTERVIEW_DOCS } from "@/data/learn-interview-data";
 import type { LearnViewType, LanguageType } from "./docs-header-bar";
 
 export interface DocViewerProps {
@@ -646,6 +647,23 @@ export function getDocToc(docId: string, activeView: LearnViewType = "docs"): To
     }
   }
 
+  if (activeView === "interview" || docId.startsWith("interview-") || docId === "interview") {
+    const docKey = docId === "interview" ? "interview-manual-testing" : docId;
+    const doc = INTERVIEW_DOCS[docKey] || INTERVIEW_DOCS["interview-manual-testing"];
+    if (doc?.sections) {
+      const headings: TocHeading[] = [];
+      for (const s of doc.sections) {
+        headings.push({ id: s.id, text: s.heading, level: s.level || 2 });
+        if (s.subsections) {
+          for (const sub of s.subsections) {
+            headings.push({ id: sub.id, text: sub.heading, level: 3 });
+          }
+        }
+      }
+      return headings;
+    }
+  }
+
   switch (docId) {
     case "intro":
       return [
@@ -1179,6 +1197,21 @@ npm install`,
       const nextDoc =
         currentIndex >= 0 && currentIndex < allTsItems.length - 1
           ? allTsItems[currentIndex + 1]
+          : null;
+      return renderDetailedDocArticle(doc, prevDoc, nextDoc, selectedLanguage, onNavigate, scrollToAnchor);
+    }
+  }
+
+  if (activeView === "interview" || activeDocId.startsWith("interview-") || activeDocId === "interview") {
+    const docKey = activeDocId === "interview" ? "interview-manual-testing" : activeDocId;
+    const doc = INTERVIEW_DOCS[docKey] || INTERVIEW_DOCS["interview-manual-testing"];
+    if (doc) {
+      const allInterviewItems = INTERVIEW_CATEGORIES.flatMap((c) => c.items);
+      const currentIndex = allInterviewItems.findIndex((item) => item.id === docKey);
+      const prevDoc = currentIndex > 0 ? allInterviewItems[currentIndex - 1] : null;
+      const nextDoc =
+        currentIndex >= 0 && currentIndex < allInterviewItems.length - 1
+          ? allInterviewItems[currentIndex + 1]
           : null;
       return renderDetailedDocArticle(doc, prevDoc, nextDoc, selectedLanguage, onNavigate, scrollToAnchor);
     }

@@ -19,6 +19,7 @@ const logoSize: Record<ToolLogoName, { large: string; small: string }> = {
   java: { large: "h-8 w-8", small: "h-6 w-6" },
   javascript: { large: "h-8 w-8", small: "h-6 w-6" },
   typescript: { large: "h-8 w-8", small: "h-6 w-6" },
+  interview: { large: "h-8 w-8", small: "h-6 w-6" },
 };
 
 const typeIcons: Record<TestingTypeIcon, LucideIcon> = {
@@ -34,6 +35,7 @@ const logoName = (name: ToolLogoName) => {
   if (name === "razorpay") return "Razorpay";
   if (name === "javascript") return "JavaScript";
   if (name === "typescript") return "TypeScript";
+  if (name === "interview") return "Interview Q&A";
   return name[0].toUpperCase() + name.slice(1);
 };
 

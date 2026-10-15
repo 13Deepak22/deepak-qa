@@ -13,7 +13,7 @@ export interface LearningTrack {
   shortTitle: string;
   tagline: string;
   description: string;
-  category: "fundamentals" | "automation" | "api-perf" | "languages";
+  category: "fundamentals" | "automation" | "api-perf" | "languages" | "career";
   categoryLabel: string;
   logo: ToolLogoName;
   level: "Beginner" | "Intermediate" | "Advanced" | "All Levels";
@@ -151,10 +151,24 @@ export const LEARNING_TRACKS: LearningTrack[] = [
     level: "Intermediate",
     docCount: 16,
   },
+  {
+    id: "interview",
+    slug: "interview",
+    title: "QA Interview Master Questions & Answers",
+    shortTitle: "QA Interview Q&A",
+    tagline: "165-page master guide: Manual, Selenium, Postman, SQL, Java & 100 Scenarios",
+    description: "Extracted sequence-by-sequence from QA Interview.pdf: 70+ Manual Testing Q&A, 85+ Selenium with Java & Cucumber, 85+ Postman API, 50+ SQL queries, 50+ Core Java, Top 20 Java Programs, Git/CI/CD, and 100 Real-Time QA Scenarios.",
+    category: "career",
+    categoryLabel: "Interview & Career",
+    logo: "interview",
+    level: "All Levels",
+    docCount: 8,
+  },
 ];
 
 const CATEGORY_TABS = [
-  { id: "all", label: "All Tracks", count: 10 },
+  { id: "all", label: "All Tracks", count: 11 },
+  { id: "career", label: "Interview Q&A", count: 1 },
   { id: "fundamentals", label: "Fundamentals", count: 1 },
   { id: "automation", label: "Automation", count: 4 },
   { id: "api-perf", label: "API & Perf", count: 2 },
@@ -191,11 +205,11 @@ export function LearnHubPage() {
             <div className="flex items-center gap-4 sm:gap-6 shrink-0 font-mono text-xs">
               <div className="border border-line rounded-lg px-3.5 py-2.5 bg-card shadow-2xs">
                 <span className="text-muted block text-[10px] uppercase tracking-wider">Tracks</span>
-                <span className="text-lg font-bold text-ink">10</span>
+                <span className="text-lg font-bold text-ink">11</span>
               </div>
               <div className="border border-line rounded-lg px-3.5 py-2.5 bg-card shadow-2xs">
                 <span className="text-muted block text-[10px] uppercase tracking-wider">Chapters</span>
-                <span className="text-lg font-bold text-pass">237+</span>
+                <span className="text-lg font-bold text-pass">245+</span>
               </div>
               <div className="border border-line rounded-lg px-3.5 py-2.5 bg-card shadow-2xs">
                 <span className="text-muted block text-[10px] uppercase tracking-wider">Access</span>

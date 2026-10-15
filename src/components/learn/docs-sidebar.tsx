@@ -15,6 +15,7 @@ import { AUTOMATION_CATEGORIES } from "@/data/learn-automation-data";
 import { JAVA_CATEGORIES } from "@/data/learn-java-data";
 import { JS_CATEGORIES } from "@/data/learn-js-data";
 import { TS_CATEGORIES } from "@/data/learn-ts-data";
+import { INTERVIEW_CATEGORIES } from "@/data/learn-interview-data";
 import type { LearnViewType } from "./docs-header-bar";
 
 export interface DocsSidebarProps {
@@ -34,6 +35,7 @@ export function DocsSidebar({
 }: DocsSidebarProps) {
   const categories = useMemo(() => {
     switch (activeView) {
+      case "interview": return INTERVIEW_CATEGORIES;
       case "manual": return MANUAL_CATEGORIES;
       case "automation": return AUTOMATION_CATEGORIES;
       case "java": return JAVA_CATEGORIES;
@@ -252,7 +254,9 @@ export function MobileDocsDrawer({
   const [open, setOpen] = useState(false);
 
   const categories =
-    activeView === "manual"
+    activeView === "interview"
+      ? INTERVIEW_CATEGORIES
+      : activeView === "manual"
       ? MANUAL_CATEGORIES
       : activeView === "automation"
       ? AUTOMATION_CATEGORIES
@@ -282,6 +286,8 @@ export function MobileDocsDrawer({
   const matchedItem = categories.flatMap((c) => c.items).find((i) => i.id === activeDocId);
   if (matchedItem) {
     activeTitle = matchedItem.text;
+  } else if (activeView === "interview") {
+    activeTitle = "Interview Q&A";
   } else if (activeView === "manual") {
     activeTitle = "Manual Testing";
   } else if (activeView === "automation") {
@@ -329,6 +335,7 @@ export function MobileDocsDrawer({
     { id: "java", label: "Java" },
     { id: "javascript", label: "JS" },
     { id: "typescript", label: "TS" },
+    { id: "interview", label: "Interview Q&A" },
   ];
 
   return (

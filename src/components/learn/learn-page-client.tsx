@@ -30,7 +30,7 @@ export function LearnPageClient({ initialSlug = [] }: LearnPageClientProps) {
       const hash = window.location.hash.replace("#", "").trim();
 
       // If accessing via old hash like #manual or #jmeter, upgrade to aesthetic path
-      if (hash && (hash.startsWith("manual") || hash.startsWith("automation") || hash.startsWith("java") || hash.startsWith("jmeter") || hash.startsWith("postman") || hash.startsWith("appium") || hash.startsWith("selenium") || hash.startsWith("mcp") || hash.startsWith("cli") || hash.startsWith("api"))) {
+      if (hash && (hash.startsWith("manual") || hash.startsWith("automation") || hash.startsWith("java") || hash.startsWith("jmeter") || hash.startsWith("postman") || hash.startsWith("appium") || hash.startsWith("selenium") || hash.startsWith("interview") || hash.startsWith("mcp") || hash.startsWith("cli") || hash.startsWith("api"))) {
         const resolvedFromHash = resolveTrackAndDoc([hash]);
         setActiveView(resolvedFromHash.view);
         setActiveDocId(resolvedFromHash.docId);
@@ -73,6 +73,7 @@ export function LearnPageClient({ initialSlug = [] }: LearnPageClientProps) {
     else if (view === "java") targetDocId = "java-getting-started";
     else if (view === "javascript") targetDocId = "javascript-getting-started";
     else if (view === "typescript") targetDocId = "typescript-getting-started";
+    else if (view === "interview") targetDocId = "interview-manual-testing";
     else if (view === "jmeter") targetDocId = "jmeter-overview";
     else if (view === "postman") targetDocId = "postman-overview";
     else if (view === "appium") targetDocId = "appium-overview";
@@ -100,6 +101,7 @@ export function LearnPageClient({ initialSlug = [] }: LearnPageClientProps) {
     else if (docId.startsWith("java-") || docId === "java") nextView = "java";
     else if (docId.startsWith("javascript-") || docId === "javascript" || docId === "js") nextView = "javascript";
     else if (docId.startsWith("typescript-") || docId === "typescript" || docId === "ts") nextView = "typescript";
+    else if (docId.startsWith("interview-") || docId === "interview") nextView = "interview";
     else if (docId.startsWith("jmeter-") || docId === "jmeter") nextView = "jmeter";
     else if (docId.startsWith("postman-") || docId === "postman") nextView = "postman";
     else if (docId.startsWith("appium-") || docId === "appium") nextView = "appium";
@@ -107,7 +109,7 @@ export function LearnPageClient({ initialSlug = [] }: LearnPageClientProps) {
     else if (docId.startsWith("mcp-") || docId === "mcp") nextView = "mcp";
     else if (docId.startsWith("cli-") || docId === "cli") nextView = "cli";
     else if (docId.startsWith("api-") || docId === "api") nextView = "api";
-    else if (!["selenium", "appium", "postman", "jmeter", "manual", "automation", "java", "javascript", "typescript"].includes(activeView)) {
+    else if (!["selenium", "appium", "postman", "jmeter", "manual", "automation", "java", "javascript", "typescript", "interview"].includes(activeView)) {
       nextView = "docs";
     }
 

@@ -26,6 +26,7 @@ const trackTitles: Record<string, string> = {
   java: "Java for QA & Test Automation",
   javascript: "JavaScript for Test Automation",
   typescript: "TypeScript for QA Engineers",
+  interview: "QA Interview Questions & Answers Master Guide",
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,11 +36,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (slug.length === 0) {
     return {
       title: "Learn with me — Software Testing & Automation Hub — Deepak Gupta",
-      description: "Choose what you want to learn: Manual Testing, Automation Architecture, Postman, JMeter, Selenium, Appium, Playwright, Java, JavaScript, and TypeScript.",
+      description: "Choose what you want to learn: QA Interview Master Q&A, Manual Testing, Automation Architecture, Postman, JMeter, Selenium, Appium, Playwright, Java, JavaScript, and TypeScript.",
       alternates: { canonical: "/learn" },
       openGraph: {
         title: `Learn with me — Software Testing & Automation Hub — ${siteTitleSuffix}`,
-        description: "Choose what you want to learn: Manual Testing, Automation Architecture, Postman, JMeter, Selenium, Appium, Playwright, Java, JavaScript, and TypeScript.",
+        description: "Choose what you want to learn: QA Interview Master Q&A, Manual Testing, Automation Architecture, Postman, JMeter, Selenium, Appium, Playwright, Java, JavaScript, and TypeScript.",
         url: "/learn",
         type: "website",
         images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Learn Software Testing & Automation with Deepak Gupta" }],
@@ -47,7 +48,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       twitter: {
         card: "summary_large_image",
         title: `Learn with me — Software Testing & Automation Hub — ${siteTitleSuffix}`,
-        description: "Choose what you want to learn: Manual Testing, Automation Architecture, Postman, JMeter, Selenium, Appium, Playwright, Java, JavaScript, and TypeScript.",
+        description: "Choose what you want to learn: QA Interview Master Q&A, Manual Testing, Automation Architecture, Postman, JMeter, Selenium, Appium, Playwright, Java, JavaScript, and TypeScript.",
         images: ["/opengraph-image"],
       },
     };

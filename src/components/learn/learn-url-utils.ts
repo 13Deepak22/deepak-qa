@@ -12,6 +12,7 @@ import { AUTOMATION_DOCS } from "@/data/learn-automation-data";
 import { JAVA_DOCS } from "@/data/learn-java-data";
 import { JS_DOCS } from "@/data/learn-js-data";
 import { TS_DOCS } from "@/data/learn-ts-data";
+import { INTERVIEW_DOCS } from "@/data/learn-interview-data";
 
 export interface ResolvedLearnLocation {
   view: LearnViewType;
@@ -85,7 +86,18 @@ export function resolveTrackAndDoc(slug?: string[]): ResolvedLearnLocation {
     return { view: "typescript", docId: second || "typescript-getting-started" };
   }
 
+  // 11. QA Interview Master Q&A
+  if (
+    first === "interview" ||
+    first === "interviews" ||
+    first === "interview-qa" ||
+    first === "qa-interview"
+  ) {
+    return { view: "interview", docId: second || "interview-manual-testing" };
+  }
+
   // Direct doc identifier fallback across all collections
+  if (INTERVIEW_DOCS[first]) return { view: "interview", docId: first };
   if (SELENIUM_DOCS[first]) return { view: "selenium", docId: first };
   if (APPIUM_DOCS[first]) return { view: "appium", docId: first };
   if (POSTMAN_DOCS[first]) return { view: "postman", docId: first };
@@ -118,6 +130,7 @@ export function getAestheticUrl(view: LearnViewType, docId?: string): string {
   else if (view === "java") trackSlug = "java";
   else if (view === "javascript") trackSlug = "javascript";
   else if (view === "typescript") trackSlug = "typescript";
+  else if (view === "interview") trackSlug = "interview";
   else if (view === "mcp") trackSlug = "playwright/mcp";
   else if (view === "cli") trackSlug = "playwright/cli";
   else if (view === "api") trackSlug = "playwright/api";
@@ -134,6 +147,7 @@ export function getAestheticUrl(view: LearnViewType, docId?: string): string {
     (view === "java" && docId === "java-getting-started") ||
     (view === "javascript" && docId === "javascript-getting-started") ||
     (view === "typescript" && docId === "typescript-getting-started") ||
+    (view === "interview" && docId === "interview-manual-testing") ||
     (view === "mcp" && docId === "mcp-intro") ||
     (view === "cli" && docId === "cli-overview") ||
     (view === "api" && docId === "api-overview");
@@ -158,6 +172,7 @@ export function getAllStaticLearnParams(): { slug?: string[] }[] {
     { slug: ["java"] },
     { slug: ["javascript"] },
     { slug: ["typescript"] },
+    { slug: ["interview"] },
     { slug: ["playwright", "mcp"] },
     { slug: ["playwright", "cli"] },
     { slug: ["playwright", "api"] },
@@ -178,6 +193,7 @@ export function getAllStaticLearnParams(): { slug?: string[] }[] {
   Object.keys(JAVA_DOCS).forEach((id) => params.push({ slug: ["java", id] }));
   Object.keys(JS_DOCS).forEach((id) => params.push({ slug: ["javascript", id] }));
   Object.keys(TS_DOCS).forEach((id) => params.push({ slug: ["typescript", id] }));
+  Object.keys(INTERVIEW_DOCS).forEach((id) => params.push({ slug: ["interview", id] }));
 
   return params;
 }

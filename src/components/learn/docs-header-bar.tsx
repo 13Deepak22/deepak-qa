@@ -17,7 +17,8 @@ export type LearnViewType =
   | "automation"
   | "java"
   | "javascript"
-  | "typescript";
+  | "typescript"
+  | "interview";
 
 export type LanguageType = "node" | "python" | "java" | "dotnet";
 
@@ -42,6 +43,7 @@ export function DocsHeaderBar({
   const isJava = activeView === "java";
   const isJavaScript = activeView === "javascript";
   const isTypeScript = activeView === "typescript";
+  const isInterview = activeView === "interview";
 
   const playwrightNavItems: { id: LearnViewType; label: string }[] = [
     { id: "docs", label: "Docs" },
@@ -190,6 +192,17 @@ export function DocsHeaderBar({
                 <span className="inline-flex items-center gap-1.5 rounded border border-line/60 bg-paper-deep/60 px-2 py-0.5 text-[10.5px] font-mono font-medium text-ink/80">
                   <span className="h-1.5 w-1.5 rounded-full bg-pass" />
                   Static Types • Interfaces • Typed POM • Generics
+                </span>
+              </>
+            ) : isInterview ? (
+              <>
+                <span className="rounded px-2.5 py-0.5 text-[11px] font-semibold text-pass bg-pass/10 border border-pass/20">
+                  QA Interview Master Q&amp;A
+                </span>
+                <span className="text-line/60 mx-1">|</span>
+                <span className="inline-flex items-center gap-1.5 rounded border border-line/60 bg-paper-deep/60 px-2 py-0.5 text-[10.5px] font-mono font-medium text-ink/80">
+                  <span className="h-1.5 w-1.5 rounded-full bg-pass" />
+                  Manual • Selenium • Postman • SQL • Java Programs • CI/CD • 100 Scenarios
                 </span>
               </>
             ) : null}

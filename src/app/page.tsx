@@ -33,14 +33,25 @@ export default function HomePage() {
             {/* Quick Navigation 2-Column Grid (Borders align symmetrically) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <Link
-                href="/work"
-                aria-label="View selected work and applications"
+                href="/experience"
+                aria-label="View career experience, skills, and work"
+                title="View career experience"
+                data-testid="hero-experience-link"
+                className="press flex items-center justify-between border border-pass bg-card px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shadow-2xs"
+                data-cursor={`${years} years experience`}
+              >
+                <span>Experience &amp; Skills</span>
+                <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+              </Link>
+              <Link
+                href="/experience#work"
+                aria-label="View selected work and tested products"
                 title="View selected work"
                 data-testid="hero-work-link"
                 className="press flex items-center justify-between border border-pass bg-card px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shadow-2xs"
                 data-cursor="15+ apps & portals"
               >
-                <span>Selected work</span>
+                <span>Selected Work</span>
                 <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
               </Link>
               <Link
@@ -51,29 +62,18 @@ export default function HomePage() {
                 className="press flex items-center justify-between border border-pass bg-card px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shadow-2xs"
                 data-cursor="Services & methodology"
               >
-                <span>Testing services</span>
+                <span>Testing Services</span>
                 <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
               </Link>
               <Link
-                href="/skills"
-                aria-label="View verified skills directory"
-                title="View skills directory"
-                data-testid="hero-skills-link"
+                href="/learn"
+                aria-label="Explore QA learning guides and automation docs"
+                title="Explore QA guides"
+                data-testid="hero-learn-link"
                 className="press flex items-center justify-between border border-pass bg-card px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shadow-2xs"
-                data-cursor="97+ verified skills"
+                data-cursor="Automation guides & interview Q&A"
               >
-                <span>Skills directory</span>
-                <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-              </Link>
-              <Link
-                href="/experience"
-                aria-label="View experience timeline"
-                title="View experience timeline"
-                data-testid="hero-experience-link"
-                className="press flex items-center justify-between border border-pass bg-card px-3.5 py-2.5 font-mono text-xs uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors shadow-2xs"
-                data-cursor={`${years} years experience`}
-              >
-                <span>Experience timeline</span>
+                <span>Guides &amp; Q&amp;A</span>
                 <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
               </Link>
             </div>

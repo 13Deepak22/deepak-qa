@@ -15,12 +15,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       images: [`${base}/portrait.png`],
     },
     {
-      url: `${base}/skills`,
-      lastModified: updated,
-      changeFrequency: "monthly",
-      priority: 0.85,
-    },
-    {
       url: `${base}/services`,
       lastModified: updated,
       changeFrequency: "monthly",
@@ -30,13 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${base}/experience`,
       lastModified: updated,
       changeFrequency: "monthly",
-      priority: 0.85,
-    },
-    {
-      url: `${base}/work`,
-      lastModified: updated,
-      changeFrequency: "monthly",
-      priority: 0.85,
+      priority: 0.9,
     },
     { url: `${base}/resume`, lastModified: updated, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/learn`, lastModified: updated, changeFrequency: "monthly", priority: 0.9 },

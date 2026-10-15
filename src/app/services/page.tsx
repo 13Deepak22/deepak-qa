@@ -275,7 +275,7 @@ export default function ServicesPage() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Link
-              href="/skills"
+              href="/experience#skills"
               className="press inline-flex items-center gap-2 border border-line bg-card px-4 py-2.5 text-xs font-mono uppercase tracking-wider text-ink hover:border-pass hover:text-pass transition-colors"
               data-cursor="ATS keywords & stack"
             >

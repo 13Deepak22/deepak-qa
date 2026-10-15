@@ -16,6 +16,16 @@ const nextConfig: NextConfig = {
         destination: "/services#rca",
         permanent: true,
       },
+      {
+        source: "/work",
+        destination: "/experience#work",
+        permanent: true,
+      },
+      {
+        source: "/skills",
+        destination: "/experience#skills",
+        permanent: true,
+      },
     ];
   },
 };

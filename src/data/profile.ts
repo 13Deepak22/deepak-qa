@@ -70,11 +70,9 @@ export const nav = [
     href: "/experience",
     label: "Experience",
     get hint() {
-      return `Two teams, ${experienceLabel()} years`;
+      return `Career, Skills & Work (${experienceLabel()} yrs)`;
     },
   },
-  { href: "/work", label: "Work", hint: "15+ apps & portals" },
-  { href: "/skills", label: "Skills", hint: "Full toolkit & ATS keywords" },
   { href: "/learn", label: "Learn with me", hint: "QA, Playwright & automation guides" },
   { href: "/resume", label: "Resume", hint: "Plain resume, ATS-ready" },
 ];

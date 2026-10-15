@@ -2,21 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
-  Award,
-  Building2,
   Clock,
   Download,
-  FileText,
   Layers,
-  ShieldCheck,
   Wrench,
 } from "lucide-react";
 import { ExperienceLog } from "@/components/home/experience-log";
-import { InteractiveCareerMetrics } from "@/components/experience/interactive-career-metrics";
-import { SkillsSection } from "@/components/home/skills-section";
-import { InteractiveJobMatcher } from "@/components/skills/interactive-job-matcher";
 import { PublicApps } from "@/components/home/public-apps";
-import { InteractiveEnterprisePortals } from "@/components/work/interactive-enterprise-portals";
+import { CoolSkillsShowcase } from "@/components/experience/cool-skills-showcase";
 import { profile, publicApps, toolkit } from "@/data";
 import { experienceLabel } from "@/lib/career";
 import { siteTitleSuffix } from "@/lib/site";
@@ -52,7 +45,7 @@ export default function ExperiencePage() {
   const milestones = [
     { label: "Total Career", value: `${years} Years`, hint: "Continuous QA focus" },
     { label: "Companies", value: "2 Teams", hint: "Exude Vincom & Paul Merchants" },
-    { label: "Products Guarded", value: "15+", hint: "7 Public Apps + 8+ Portals" },
+    { label: "Public Apps", value: `${publicApps.length} Apps`, hint: "Consumer Fintech & Utility" },
     { label: "Verified Skills", value: `${totalSkills}+`, hint: "Automation, API & Manual" },
   ];
 
@@ -71,7 +64,7 @@ export default function ExperiencePage() {
               </h1>
             </div>
             <p className="leading-relaxed text-ink-soft text-base sm:text-lg">
-              Two fintech-driven product organizations, {years} years in quality assurance. Guarding financial transactions, maintaining regression suites, and clearing production release gates across 15+ applications and enterprise portals.
+              Two fintech-driven product organizations, {years} years in quality assurance. Guarding financial transactions, maintaining regression suites, and clearing production release gates across live consumer products and payment flows.
             </p>
           </div>
         </div>
@@ -100,13 +93,6 @@ export default function ExperiencePage() {
             <span>Timeline</span>
           </a>
           <a
-            href="#skills"
-            className="press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-line bg-card text-xs font-mono text-ink-soft hover:text-ink hover:border-pass transition-colors"
-          >
-            <Wrench className="h-3 w-3 text-pass" />
-            <span>Skills &amp; Toolkit</span>
-          </a>
-          <a
             href="#work"
             className="press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-line bg-card text-xs font-mono text-ink-soft hover:text-ink hover:border-pass transition-colors"
           >
@@ -114,25 +100,18 @@ export default function ExperiencePage() {
             <span>Public Apps ({publicApps.length})</span>
           </a>
           <a
-            href="#enterprise"
+            href="#skills"
             className="press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-line bg-card text-xs font-mono text-ink-soft hover:text-ink hover:border-pass transition-colors"
           >
-            <Building2 className="h-3 w-3 text-pass" />
-            <span>Enterprise Portals</span>
-          </a>
-          <a
-            href="#milestones"
-            className="press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-line bg-card text-xs font-mono text-ink-soft hover:text-ink hover:border-pass transition-colors"
-          >
-            <Award className="h-3 w-3 text-pass" />
-            <span>Milestones &amp; ROI</span>
+            <Wrench className="h-3 w-3 text-pass" />
+            <span>Technical Skills ({totalSkills}+)</span>
           </a>
         </div>
       </div>
 
-      {/* 01: Interactive Experience Timeline Rail */}
+      {/* 01: Employment Chronicle (Timeline) */}
       <section id="timeline" className="scroll-mt-24 mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
-        <div className="border border-line bg-card p-6 sm:p-10 lg:p-12">
+        <div className="border border-line bg-card p-6 sm:p-10 lg:p-12 rounded-xl shadow-xs">
           <div className="flex items-center justify-between border-b border-line pb-6">
             <div>
               <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">01 / Employment Chronicle</p>
@@ -145,80 +124,12 @@ export default function ExperiencePage() {
         </div>
       </section>
 
-      {/* 02: Technical Skills & Competencies */}
-      <section id="skills" className="scroll-mt-24 border-t border-line bg-paper py-14 sm:py-18 lg:py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-line pb-6">
-            <div>
-              <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">02 / Technical Toolkit &amp; Domains</p>
-              <h2 className="mt-1 font-serif text-2xl sm:text-3xl text-ink">Verified Skills, Tools &amp; Frameworks</h2>
-            </div>
-            <p className="max-w-md text-xs leading-relaxed text-muted sm:text-right">
-              {totalSkills}+ QA competencies across web, mobile, API, and lending infrastructure. Derived directly from live releases.
-            </p>
-          </div>
-
-          {/* Interactive Skills Filter & Search */}
-          <div className="mt-6">
-            <SkillsSection />
-          </div>
-
-          {/* Recruiter Role Fit Analyzer */}
-          <div className="mt-16 border-t border-line pt-12">
-            <InteractiveJobMatcher />
-          </div>
-
-          {/* ATS Keywords & Recruiter Reference Matrix */}
-          <div className="mt-16 border-t border-line pt-12">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-8">
-              <div>
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-pass" />
-                  <h3 className="font-mono text-[0.72rem] tracking-[0.16em] text-pass uppercase">
-                    ATS Keyword Index &amp; Reference
-                  </h3>
-                </div>
-                <p className="mt-2 font-serif text-2xl tracking-tight text-ink sm:text-3xl">
-                  Automated parsing &amp; hiring filters
-                </p>
-              </div>
-              <Link
-                href="/resume"
-                className="press inline-flex items-center gap-2 border border-line bg-card px-4 py-2 font-mono text-xs text-ink hover:border-pass hover:text-pass self-start sm:self-auto"
-              >
-                <FileText className="h-3.5 w-3.5 text-pass" />
-                <span>View ATS Resume</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {toolkit.map((group) => (
-                <div key={group.label} className="border border-line bg-card p-5">
-                  <div className="flex items-center justify-between border-b border-line/60 pb-3">
-                    <h4 className="font-mono text-xs font-semibold tracking-wider text-ink uppercase">
-                      {group.label}
-                    </h4>
-                    <span className="font-mono text-[0.65rem] text-muted">
-                      {group.items.length} keywords
-                    </span>
-                  </div>
-                  <p className="mt-3 text-xs leading-relaxed text-ink-soft">
-                    {group.items.join(" · ")}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 03: Selected Work - 7 Public Consumer Products */}
+      {/* 02: Selected Work — 7 Public Consumer Products */}
       <section id="work" className="scroll-mt-24 border-t border-line bg-paper-deep py-14 sm:py-18 lg:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-line pb-6">
             <div>
-              <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">03 / Delivered Work &amp; Consumer Apps</p>
+              <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">02 / Delivered Work &amp; Consumer Apps</p>
               <h2 className="mt-1 font-serif text-2xl sm:text-3xl text-ink">7 Public Consumer Products Tested</h2>
             </div>
             <p className="max-w-md text-xs leading-relaxed text-muted sm:text-right">
@@ -232,33 +143,28 @@ export default function ExperiencePage() {
         </div>
       </section>
 
-      {/* 04: Confidential & Enterprise Portals with Simulator */}
-      <section id="enterprise" className="scroll-mt-24 border-t border-line bg-paper py-14 sm:py-18 lg:py-20">
+      {/* 03: Technical Skills & Toolkit (LAST SECTION!) */}
+      <section id="skills" className="scroll-mt-24 border-t border-line bg-paper py-14 sm:py-18 lg:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-line pb-6">
             <div>
-              <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">04 / Confidential Architecture</p>
-              <h2 className="mt-1 font-serif text-2xl sm:text-3xl text-ink">8+ Enterprise Portals &amp; Lending Engines</h2>
+              <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">03 / Technical Arsenal &amp; Toolkit</p>
+              <h2 className="mt-1 font-serif text-2xl sm:text-3xl text-ink">Core Frameworks &amp; Verified Skills</h2>
             </div>
             <p className="max-w-md text-xs leading-relaxed text-muted sm:text-right">
-              Confidential internal banking, merchant split-settlement, and loan origination portals tested under NDA.
+              {totalSkills}+ QA competencies across web, mobile, API, and lending infrastructure. Derived directly from live releases.
             </p>
           </div>
 
-          <InteractiveEnterprisePortals />
-        </div>
-      </section>
-
-      {/* 05: Interactive Career Metrics & Defect Hall of Fame */}
-      <section id="milestones" className="scroll-mt-24 border-t border-line bg-paper py-14 sm:py-18">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <InteractiveCareerMetrics />
+          <div className="mt-8">
+            <CoolSkillsShowcase />
+          </div>
         </div>
       </section>
 
       {/* Bottom CTA Bar */}
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 border-t border-line">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-paper border border-line p-6 sm:p-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-paper border border-line p-6 sm:p-8 rounded-xl shadow-xs">
           <div>
             <span className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">Next Steps</span>
             <h3 className="mt-1 font-serif text-2xl sm:text-3xl text-ink">

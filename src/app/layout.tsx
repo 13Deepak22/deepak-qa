@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Fraunces, IBM_Plex_Mono, Source_Sans_3 } from "next/font/google";
 import { BackToTop } from "@/components/layout/back-to-top";
 import { HashScrollHandler } from "@/components/layout/hash-scroll-handler";
+import { PageTransitionProvider } from "@/components/layout/page-transition-provider";
 import { SiteCursor } from "@/components/layout/site-cursor";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -105,7 +107,9 @@ export default function RootLayout({
           Skip to content
         </a>
         <SiteHeader />
-        {children}
+        <Suspense fallback={null}>
+          <PageTransitionProvider>{children}</PageTransitionProvider>
+        </Suspense>
         <SiteFooter />
         <BackToTop />
         <QaGame />

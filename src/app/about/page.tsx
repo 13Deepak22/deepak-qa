@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { Metadata } from "next";
-import Image from "next/image";
+import { SkeletonImage } from "@/components/ui/skeleton-image";
 import { AboutChapters } from "@/components/about/about-chapters";
 import { AboutMarks } from "@/components/about/about-marks";
 import { InteractiveQaPrinciples } from "@/components/about/interactive-qa-principles";
@@ -80,12 +80,12 @@ export default function AboutPage() {
       <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 sm:py-14 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-x-10 lg:gap-x-16 lg:py-20">
         <figure className="enter enter-1 w-full max-w-sm md:max-w-none">
           <div className="about-portrait">
-            <Image
+            <SkeletonImage
               src={portrait}
               alt="Portrait of Deepak Gupta"
               sizes="(min-width: 1152px) 420px, (min-width: 768px) 38vw, min(calc(100vw - 2rem), 24rem)"
               placeholder="blur"
-              preload
+              priority
               className="relative block h-auto w-full"
             />
             <span className="about-scan" aria-hidden="true" />

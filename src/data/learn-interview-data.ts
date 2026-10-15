@@ -8,15 +8,15 @@ export const INTERVIEW_CATEGORIES: DocCategory[] = [
     "items": [
       {
         "id": "interview-manual-testing",
-        "text": "Manual Testing Q&A (Q1 - Q70+)"
+        "text": "Manual Testing (130 Q&As)"
       },
       {
         "id": "interview-selenium-java",
-        "text": "Selenium with Java & Cucumber (Q1 - Q85+)"
+        "text": "Selenium with Java & Cucumber (144 Q&As)"
       },
       {
         "id": "interview-api-postman",
-        "text": "API Testing with Postman (Q1 - Q85+)"
+        "text": "API Testing with Postman (143 Q&As)"
       }
     ]
   },
@@ -26,15 +26,15 @@ export const INTERVIEW_CATEGORIES: DocCategory[] = [
     "items": [
       {
         "id": "interview-sql-database",
-        "text": "SQL & Database Testing (Q1 - Q50+)"
+        "text": "SQL & Database Testing (52 Q&As)"
       },
       {
         "id": "interview-core-java",
-        "text": "Core Java for Automation (Q1 - Q50+)"
+        "text": "Core Java for Automation (52 Q&As)"
       },
       {
         "id": "interview-java-coding-programs",
-        "text": "Top 20 Java Coding Programs"
+        "text": "Top 20 Java Coding Programs (20 Solved)"
       }
     ]
   },
@@ -44,11 +44,11 @@ export const INTERVIEW_CATEGORIES: DocCategory[] = [
     "items": [
       {
         "id": "interview-git-cicd-jenkins",
-        "text": "Git, CI/CD, Jenkins & Docker (Q1 - Q50+)"
+        "text": "Git, CI/CD, Jenkins & Docker (214 Q&As)"
       },
       {
         "id": "interview-100-real-time-scenarios",
-        "text": "100 Real-Time QA Scenarios (1 - 100)"
+        "text": "100 Real-Time QA Scenarios (106 Scenarios)"
       }
     ]
   }

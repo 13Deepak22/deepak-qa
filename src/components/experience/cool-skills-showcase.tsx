@@ -475,3 +475,4 @@ export function CoolSkillsShowcase() {
     </div>
   );
 }
+

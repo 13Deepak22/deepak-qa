@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import Link from "next/link";
-import { ArrowRight, BookOpen } from "lucide-react";
+import { ArrowRight, BookOpen, Layers, Sparkles, CheckCircle2 } from "lucide-react";
 import { ToolLogo } from "@/components/home/tool-logo";
 import type { ToolLogo as ToolLogoName } from "@/data";
 
@@ -122,7 +123,7 @@ export const LEARNING_TRACKS: LearningTrack[] = [
     categoryLabel: "Programming Languages",
     logo: "java",
     level: "All Levels",
-    docCount: 19,
+    docCount: 64,
   },
   {
     id: "javascript",
@@ -152,71 +153,152 @@ export const LEARNING_TRACKS: LearningTrack[] = [
   },
 ];
 
+const CATEGORY_TABS = [
+  { id: "all", label: "All Tracks", count: 10 },
+  { id: "fundamentals", label: "Fundamentals", count: 1 },
+  { id: "automation", label: "Automation", count: 4 },
+  { id: "api-perf", label: "API & Perf", count: 2 },
+  { id: "languages", label: "Languages", count: 3 },
+] as const;
+
 export function LearnHubPage() {
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+
+  const filteredTracks = useMemo(() => {
+    if (activeCategory === "all") return LEARNING_TRACKS;
+    return LEARNING_TRACKS.filter((track) => track.category === activeCategory);
+  }, [activeCategory]);
+
   return (
     <main id="content" tabIndex={-1} className="outline-none">
-      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         {/* Header */}
         <div className="enter enter-1 pb-8 sm:pb-10 border-b border-line">
-          <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-            <span className="text-pass">06</span> / Knowledge Base &amp; Learning Hub
-          </p>
-          <h1 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink">
-            Choose what you want to learn.
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm sm:text-base leading-relaxed text-ink-soft">
-            Production-grade test engineering curriculums, comprehensive syntax directories, architecture blueprints, and real-world testing lifecycles by Deepak Gupta.
-          </p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="max-w-3xl">
+              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
+                <span className="text-pass">06</span> / Knowledge Base &amp; Learning Hub
+              </p>
+              <h1 className="mt-3 font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink font-medium">
+                Choose what you want to learn.
+              </h1>
+              <p className="mt-3 text-sm sm:text-base leading-relaxed text-ink-soft">
+                Production-grade test engineering curriculums, comprehensive syntax directories, architecture blueprints, and real-world testing lifecycles by Deepak Gupta.
+              </p>
+            </div>
+
+            {/* Quick Metrics */}
+            <div className="flex items-center gap-4 sm:gap-6 shrink-0 font-mono text-xs">
+              <div className="border border-line rounded-lg px-3.5 py-2.5 bg-card shadow-2xs">
+                <span className="text-muted block text-[10px] uppercase tracking-wider">Tracks</span>
+                <span className="text-lg font-bold text-ink">10</span>
+              </div>
+              <div className="border border-line rounded-lg px-3.5 py-2.5 bg-card shadow-2xs">
+                <span className="text-muted block text-[10px] uppercase tracking-wider">Chapters</span>
+                <span className="text-lg font-bold text-pass">216+</span>
+              </div>
+              <div className="border border-line rounded-lg px-3.5 py-2.5 bg-card shadow-2xs">
+                <span className="text-muted block text-[10px] uppercase tracking-wider">Access</span>
+                <span className="text-lg font-bold text-ink">Free</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Interactive Category Filter Pills */}
+          <div className="mt-8 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {CATEGORY_TABS.map((tab) => {
+              const isActive = activeCategory === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveCategory(tab.id)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-xs transition-all duration-150 shrink-0 cursor-pointer ${
+                    isActive
+                      ? "bg-ink text-paper font-semibold shadow-2xs"
+                      : "border border-line bg-card text-muted hover:text-ink hover:border-pass/40"
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-semibold ${
+                      isActive ? "bg-paper/20 text-paper" : "bg-paper text-muted"
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Sober List of Learning Tracks */}
-        <div className="enter enter-2 mt-2">
-          <ol className="divide-y divide-line">
-            {LEARNING_TRACKS.map((track, idx) => (
-              <li key={track.id}>
+        {/* Attractive Responsive Cards Grid */}
+        <div className="enter enter-2 mt-8 sm:mt-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            {filteredTracks.map((track) => {
+              const originalIndex = LEARNING_TRACKS.findIndex((t) => t.id === track.id) + 1;
+              return (
                 <Link
+                  key={track.id}
                   href={`/learn/${track.slug}`}
-                  className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-5 sm:py-6 px-3 sm:px-4 -mx-3 sm:-mx-4 rounded-lg hover:bg-paper-deep/60 transition-colors duration-150 cursor-pointer"
+                  className="group relative flex flex-col justify-between rounded-xl border border-line bg-card p-5 sm:p-6 shadow-xs hover:border-pass/60 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
                 >
-                  {/* Left: Number, Logo, Title, and Tagline */}
-                  <div className="flex items-start sm:items-center gap-4 sm:gap-5 min-w-0">
-                    <span className="font-mono text-sm text-pass font-semibold shrink-0 w-6 pt-0.5 sm:pt-0">
-                      {String(idx + 1).padStart(2, "0")}
-                    </span>
+                  {/* Subtle hover gradient glow */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-pass/[0.04] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-                    <div className="h-10 w-10 sm:h-11 sm:w-11 shrink-0 rounded-lg border border-line bg-card flex items-center justify-center p-2 group-hover:border-pass/50 group-hover:bg-pass/5 transition shadow-2xs">
-                      <ToolLogo name={track.logo} className="h-full w-full object-contain" />
-                    </div>
+                  {/* Top: Icon + Number & Level */}
+                  <div>
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="h-12 w-12 rounded-xl border border-line bg-paper/90 flex items-center justify-center p-2.5 group-hover:scale-105 group-hover:border-pass/40 group-hover:bg-pass/5 transition-all duration-200 shadow-2xs">
+                        <ToolLogo name={track.logo} className="h-full w-full object-contain" />
+                      </div>
 
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2.5 flex-wrap">
-                        <h2 className="font-serif text-xl sm:text-2xl text-ink group-hover:text-pass transition tracking-tight font-medium">
-                          {track.title}
-                        </h2>
-                        <span className="font-mono text-[10px] tracking-wider uppercase px-2 py-0.5 rounded border border-line bg-paper text-muted shrink-0">
-                          {track.docCount} Docs
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded border border-line bg-paper text-muted font-medium">
+                          {track.level}
+                        </span>
+                        <span className="font-mono text-xs font-semibold text-pass/80 group-hover:text-pass transition-colors">
+                          #{String(originalIndex).padStart(2, "0")}
                         </span>
                       </div>
-                      <p className="mt-1 text-xs sm:text-sm text-ink-soft leading-relaxed line-clamp-1">
-                        {track.tagline}
-                      </p>
                     </div>
+
+                    {/* Category Tag */}
+                    <span className="mt-4 font-mono text-[11px] uppercase tracking-wider text-muted block">
+                      {track.categoryLabel}
+                    </span>
+
+                    {/* Title */}
+                    <h2 className="mt-1 font-serif text-xl sm:text-[1.35rem] font-medium tracking-tight text-ink group-hover:text-pass transition-colors leading-snug">
+                      {track.title}
+                    </h2>
+
+                    {/* Tagline */}
+                    <p className="mt-1 font-mono text-xs text-muted/90 line-clamp-1">
+                      {track.tagline}
+                    </p>
+
+                    {/* Description */}
+                    <p className="mt-3 text-xs sm:text-sm text-ink-soft leading-relaxed line-clamp-3">
+                      {track.description}
+                    </p>
                   </div>
 
-                  {/* Right: Difficulty Level & CTA Arrow */}
-                  <div className="flex items-center gap-4 shrink-0 pl-10 sm:pl-0 font-mono text-xs text-muted group-hover:text-pass transition self-end sm:self-center">
-                    <span className="hidden md:inline-block text-[11px] uppercase tracking-wider text-muted">
-                      {track.level}
+                  {/* Bottom Bar: Docs count + CTA */}
+                  <div className="mt-6 pt-4 border-t border-line/70 flex items-center justify-between text-xs font-mono">
+                    <span className="inline-flex items-center gap-1.5 text-muted">
+                      <BookOpen className="h-3.5 w-3.5 text-pass shrink-0" />
+                      <span className="font-semibold text-ink">{track.docCount}</span> Chapters
                     </span>
-                    <span className="inline-flex items-center gap-1.5 font-medium text-pass">
-                      <span>Explore</span>
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    <span className="inline-flex items-center gap-1 font-medium text-pass group-hover:translate-x-0.5 transition-transform">
+                      <span>Explore Track</span>
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                     </span>
                   </div>
                 </Link>
-              </li>
-            ))}
-          </ol>
+              );
+            })}
+          </div>
         </div>
       </div>
     </main>

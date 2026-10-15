@@ -87,7 +87,9 @@ export function LearnPageClient({ initialSlug = [] }: LearnPageClientProps) {
     });
     const aestheticUrl = getAestheticUrl(view, targetDocId);
     window.history.pushState(null, "", aestheticUrl);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (window.scrollY > 80) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   const handleNavigate = (docId: string, anchorId?: string) => {
@@ -126,7 +128,9 @@ export function LearnPageClient({ initialSlug = [] }: LearnPageClientProps) {
       }, 50);
     } else {
       window.history.pushState(null, "", baseAestheticUrl);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (window.scrollY > 80) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     }
   };
 

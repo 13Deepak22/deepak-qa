@@ -50,21 +50,26 @@ export function DocsSidebar({
     }
   }, [activeView]);
 
-  // Initial state: automatically open category containing activeDocId
-  const [openSection, setOpenSection] = useState<string | null>(() => {
+  // Track open categories using a Set so toggling one section doesn't collapse others
+  // and cause sudden vertical layout jumping
+  const [openSections, setOpenSections] = useState<Set<string>>(() => {
+    const initialSet = new Set<string>();
     const activeCat = categories.find(
       (cat) => !cat.isDirectLink && cat.items.some((item) => item.id === activeDocId)
     );
-    if (activeCat) return activeCat.title;
-    const defaultCat = categories.find((cat) => cat.defaultOpen && !cat.isDirectLink);
-    return defaultCat ? defaultCat.title : null;
+    if (activeCat) {
+      initialSet.add(activeCat.title);
+    } else {
+      const defaultCat = categories.find((cat) => cat.defaultOpen && !cat.isDirectLink);
+      if (defaultCat) initialSet.add(defaultCat.title);
+    }
+    return initialSet;
   });
 
   const [filter, setFilter] = useState("");
   const prevDocRef = useRef({ docId: activeDocId, view: activeView });
 
   // Only auto-expand category if activeDocId or activeView actually changed to a new doc
-  // (Prevents interrupting or fighting user manual accordion clicks)
   useEffect(() => {
     if (prevDocRef.current.docId === activeDocId && prevDocRef.current.view === activeView) {
       return;
@@ -75,18 +80,34 @@ export function DocsSidebar({
       (cat) => !cat.isDirectLink && cat.items.some((item) => item.id === activeDocId)
     );
     if (activeCat) {
-      setOpenSection(activeCat.title);
+      setOpenSections((prev) => {
+        const next = new Set(prev);
+        next.add(activeCat.title);
+        return next;
+      });
       return;
     }
 
     const defaultCat = categories.find((cat) => cat.defaultOpen && !cat.isDirectLink);
     if (defaultCat) {
-      setOpenSection(defaultCat.title);
+      setOpenSections((prev) => {
+        const next = new Set(prev);
+        next.add(defaultCat.title);
+        return next;
+      });
     }
   }, [activeDocId, activeView, categories]);
 
   const toggleSection = (title: string) => {
-    setOpenSection((current) => (current === title ? null : title));
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(title)) {
+        next.delete(title);
+      } else {
+        next.add(title);
+      }
+      return next;
+    });
   };
 
   const filteredCategories = categories
@@ -150,16 +171,16 @@ export function DocsSidebar({
 
           // Expandable Category with Chevron
           const hasActiveChild = cat.items.some((item) => item.id === activeDocId);
-          const isOpen = filter ? true : openSection === cat.title;
+          const isOpen = filter ? true : openSections.has(cat.title);
 
           return (
             <div key={cat.title} className="py-0.5 pr-0.5">
               <button
                 type="button"
                 onClick={() => toggleSection(cat.title)}
-                className={`group flex w-full items-center justify-between px-3 py-1.5 font-medium transition-colors duration-150 rounded-lg cursor-pointer ${
+                className={`group flex w-full items-center justify-between px-3 py-1.5 font-medium transition-all duration-200 rounded-lg cursor-pointer active:scale-[0.99] ${
                   hasActiveChild
-                    ? "text-pass font-semibold bg-pass/10 ring-1 ring-pass/20"
+                    ? "text-pass font-semibold bg-pass/10 ring-1 ring-pass/20 shadow-2xs"
                     : isOpen
                     ? "text-ink font-semibold bg-card/90"
                     : "text-ink hover:bg-card hover:text-pass"
@@ -167,7 +188,7 @@ export function DocsSidebar({
               >
                 <span className="truncate mr-2">{cat.title}</span>
                 <ChevronRight
-                  className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ease-out ${
+                  className={`h-3.5 w-3.5 shrink-0 transition-transform duration-260 ease-out ${
                     isOpen ? "rotate-90 text-pass" : "text-muted/60 group-hover:text-ink"
                   }`}
                 />
@@ -178,7 +199,7 @@ export function DocsSidebar({
                 data-state={isOpen ? "open" : "closed"}
                 className="sidebar-accordion-grid"
               >
-                <div className="overflow-hidden">
+                <div className="sidebar-accordion-inner">
                   {cat.items && (
                     <div className="mt-1 ml-2.5 mr-0.5 border-l border-line/60 pl-2.5 space-y-0.5 pb-1">
                       {cat.items.map((item) => {
@@ -188,10 +209,10 @@ export function DocsSidebar({
                             key={item.id}
                             type="button"
                             onClick={() => onSelectDoc(item.id)}
-                            className={`group flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-[11.5px] transition-colors duration-150 cursor-pointer ${
+                            className={`group flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-[11.5px] transition-all duration-150 cursor-pointer active:scale-[0.99] ${
                               isActive
                                 ? "bg-pass/15 font-semibold text-pass ring-1 ring-pass/30 shadow-xs"
-                                : "text-muted hover:bg-card hover:text-ink"
+                                : "text-muted hover:bg-card hover:text-ink hover:translate-x-0.5"
                             }`}
                           >
                             <span className="truncate mr-2">{item.text}</span>

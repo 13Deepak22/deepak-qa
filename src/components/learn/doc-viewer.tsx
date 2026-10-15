@@ -101,7 +101,7 @@ function renderDetailedDocArticle(
   };
 
   return (
-    <article className="prose-custom max-w-none font-sans text-ink leading-relaxed">
+    <article key={doc.id} className="prose-custom max-w-none font-sans text-ink leading-relaxed doc-article-enter">
       {/* Breadcrumbs */}
       <nav aria-label="Breadcrumbs" className="mb-6 flex items-center gap-2 text-xs text-muted">
         <Link href="/" className="flex items-center hover:text-ink transition-colors" aria-label="Home page">

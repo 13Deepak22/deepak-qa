@@ -155,8 +155,68 @@
   .about-mark-rule,
   .practice-icon path,
   .practice-icon rect,
-  .page-transition {
+  .page-transition,
+  .skeleton-shimmer,
+  .skeleton-pulse {
     animation: none;
+    background-position: 0 0;
+    opacity: 0.65;
     stroke-dashoffset: 0;
   }
 }
+
+/* Skeleton Loading & Content Shimmer Animations */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.skeleton-box {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--line);
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--line) 0%,
+    var(--paper-deep) 35%,
+    var(--card) 50%,
+    var(--paper-deep) 65%,
+    var(--line) 100%
+  );
+  background-size: 250% 100%;
+  animation: skeleton-shimmer 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+[data-theme="dark"] .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--line) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    var(--line) 100%
+  );
+  background-size: 250% 100%;
+}
+
+.skeleton-pulse {
+  animation: skeleton-pulse 1.8s ease-in-out infinite;
+}
+

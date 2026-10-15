@@ -20,7 +20,7 @@ export function LearnPageClient({ initialSlug = [] }: LearnPageClientProps) {
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageType>("node");
   const [activeDocId, setActiveDocId] = useState<string>(initial.docId);
   const [activeApiId, setActiveApiId] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
 
   // Sync state with URL pathname & browser history navigation
   useEffect(() => {
@@ -139,6 +139,16 @@ export function LearnPageClient({ initialSlug = [] }: LearnPageClientProps) {
 
   return (
     <main id="content" tabIndex={-1} className="outline-none min-h-screen bg-paper pb-16">
+      {/* Subtle transition progress bar */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 h-[2.5px] transition-opacity duration-200 ${
+          isPending ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        aria-hidden="true"
+      >
+        <div className="h-full w-full bg-pass skeleton-shimmer" />
+      </div>
+
       {/* 2-Tier Header Bar: Tools Switcher Top Middle, Subs Down */}
       <DocsHeaderBar
         activeView={activeView}
@@ -176,7 +186,9 @@ export function LearnPageClient({ initialSlug = [] }: LearnPageClientProps) {
             {/* Active View Body with theme-matched transition animation */}
             <div
               key={`${activeView}-${activeDocId}`}
-              className="page-transition min-h-[60vh]"
+              className={`page-transition min-h-[60vh] transition-opacity duration-200 ${
+                isPending ? "opacity-60 pointer-events-none" : "opacity-100"
+              }`}
             >
               <DocViewer
                 activeView={activeView}

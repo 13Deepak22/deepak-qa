@@ -19,6 +19,14 @@ export interface DocSection {
     title?: string;
     text: string;
   }>;
+  keyTakeaways?: string[];
+  checklist?: string[];
+  steps?: Array<{
+    step: number | string;
+    title: string;
+    description: string;
+    badge?: string;
+  }>;
 }
 
 export interface DetailedDoc {

@@ -26,13 +26,13 @@ export const LEARNING_TRACKS: LearningTrack[] = [
     slug: "manual",
     title: "Manual Software Testing & QA",
     shortTitle: "Manual Testing",
-    tagline: "Zero-to-Hero master curriculum: 29 chapters from basic to advance",
+    tagline: "Zero-to-Hero master curriculum: 31 chapters from basic to advance",
     description: "Start from absolute zero: 7 ISTQB principles, SDLC models, STLC 6 phases, BVA & ECP, decision tables, state machines, IEEE 829 test plans, defect lifecycle, and FinTech payment QA.",
     category: "fundamentals",
     categoryLabel: "Testing Fundamentals",
     logo: "manual",
     level: "All Levels",
-    docCount: 29,
+    docCount: 31,
   },
   {
     id: "automation",
@@ -195,7 +195,7 @@ export function LearnHubPage() {
               </div>
               <div className="border border-line rounded-lg px-3.5 py-2.5 bg-card shadow-2xs">
                 <span className="text-muted block text-[10px] uppercase tracking-wider">Chapters</span>
-                <span className="text-lg font-bold text-pass">235+</span>
+                <span className="text-lg font-bold text-pass">237+</span>
               </div>
               <div className="border border-line rounded-lg px-3.5 py-2.5 bg-card shadow-2xs">
                 <span className="text-muted block text-[10px] uppercase tracking-wider">Access</span>

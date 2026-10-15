@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, ArrowLeft, ArrowRight, Home, Info, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, CheckCircle2, Home, Info, Sparkles } from "lucide-react";
 import { DocTabs } from "./doc-tabs";
 import { DocCodeBlock } from "./doc-code-block";
 import { ComparisonTable } from "./comparison-table";
@@ -85,6 +85,99 @@ function formatDocText(text: string): React.ReactNode[] {
   return parts;
 }
 
+function renderDocParagraph(p: string, pIdx: number) {
+  // Check for ordered list: "1. Title: Description" or "1. Description"
+  const numberedMatch = p.match(/^(\d+)\.\s+(.*)$/);
+  if (numberedMatch) {
+    const num = numberedMatch[1];
+    const rest = numberedMatch[2];
+    const colonIdx = rest.indexOf(":");
+    let title = "";
+    let desc = rest;
+
+    if (colonIdx > 0 && colonIdx < 80) {
+      title = rest.substring(0, colonIdx).trim();
+      desc = rest.substring(colonIdx + 1).trim();
+    }
+
+    return (
+      <div
+        key={pIdx}
+        className="my-3 flex items-start gap-3 rounded-lg border border-line/60 bg-card/60 p-3 sm:p-3.5 shadow-2xs hover:border-pass/40 transition-all"
+      >
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-pass/10 text-pass font-mono text-xs font-bold border border-pass/20">
+          {num.padStart(2, "0")}
+        </span>
+        <div className="min-w-0 flex-1 text-sm sm:text-base leading-relaxed text-ink/90">
+          {title ? (
+            <>
+              <strong className="font-semibold text-ink text-[15px] sm:text-base">
+                {formatDocText(title)}
+              </strong>
+              {desc ? <span className="text-ink/80 block mt-0.5">{formatDocText(desc)}</span> : null}
+            </>
+          ) : (
+            formatDocText(rest)
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Check for bullet list item: "- Item" or "• Item" or "* Item"
+  const bulletMatch = p.match(/^[-•*]\s+(.*)$/);
+  if (bulletMatch) {
+    const rest = bulletMatch[1];
+    const colonIdx = rest.indexOf(":");
+    let title = "";
+    let desc = rest;
+
+    if (colonIdx > 0 && colonIdx < 80) {
+      title = rest.substring(0, colonIdx).trim();
+      desc = rest.substring(colonIdx + 1).trim();
+    }
+
+    return (
+      <div
+        key={pIdx}
+        className="my-2 flex items-start gap-2.5 pl-1 text-sm sm:text-base leading-relaxed text-ink/90"
+      >
+        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-pass" />
+        <div className="flex-1">
+          {title ? (
+            <>
+              <strong className="font-semibold text-ink">{formatDocText(title)}</strong>
+              {desc ? <span className="text-ink/80">: {formatDocText(desc)}</span> : null}
+            </>
+          ) : (
+            formatDocText(rest)
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Check for blockquote: "> Quote"
+  const quoteMatch = p.match(/^>\s*(.*)$/);
+  if (quoteMatch) {
+    return (
+      <blockquote
+        key={pIdx}
+        className="my-3.5 pl-4 border-l-2 border-pass bg-pass/5 py-2.5 pr-4 rounded-r-lg text-sm sm:text-base italic text-ink/85 leading-relaxed"
+      >
+        {formatDocText(quoteMatch[1])}
+      </blockquote>
+    );
+  }
+
+  // Standard paragraph
+  return (
+    <p key={pIdx} className="text-sm sm:text-base leading-relaxed text-ink/90 mb-3.5">
+      {formatDocText(p)}
+    </p>
+  );
+}
+
 function renderDetailedDocArticle(
   doc: DetailedDoc,
   prevDoc: { id: string; text: string } | null,
@@ -162,11 +255,75 @@ function renderDetailedDocArticle(
             )}
 
             {/* Paragraphs */}
-            {sec.paragraphs?.map((p, pIdx) => (
-              <p key={pIdx} className="text-sm sm:text-base leading-relaxed text-ink/90 mb-3">
-                {formatDocText(p)}
-              </p>
-            ))}
+            {sec.paragraphs?.map((p, pIdx) => renderDocParagraph(p, pIdx))}
+
+            {/* Key Takeaways */}
+            {sec.keyTakeaways && sec.keyTakeaways.length > 0 && (
+              <div className="my-5 rounded-xl border border-pass/30 bg-pass/5 p-4 sm:p-5">
+                <div className="flex items-center gap-2 mb-2.5 text-pass font-mono text-xs font-bold uppercase tracking-wider">
+                  <Sparkles className="h-4 w-4" />
+                  Key Takeaways
+                </div>
+                <ul className="space-y-1.5">
+                  {sec.keyTakeaways.map((item, ktIdx) => (
+                    <li key={ktIdx} className="flex items-start gap-2 text-xs sm:text-sm text-ink/90">
+                      <span className="text-pass font-bold">✓</span>
+                      <span>{formatDocText(item)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Steps */}
+            {sec.steps && sec.steps.length > 0 && (
+              <div className="my-5 space-y-3">
+                {sec.steps.map((st, sIdx) => (
+                  <div key={sIdx} className="rounded-xl border border-line bg-card/60 p-4 sm:p-5 space-y-1.5 shadow-2xs">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-pass/10 text-pass font-mono text-xs font-bold border border-pass/30">
+                          {String(st.step).padStart(2, "0")}
+                        </span>
+                        <h4 className="font-semibold text-ink text-sm sm:text-base">{st.title}</h4>
+                      </div>
+                      {st.badge && (
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-paper-deep text-muted border border-line">
+                          {st.badge}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs sm:text-sm text-ink/80 pl-8 leading-relaxed">
+                      {formatDocText(st.description)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Checklist */}
+            {sec.checklist && sec.checklist.length > 0 && (
+              <div className="my-5 rounded-xl border border-line bg-card/70 p-4 sm:p-5 shadow-2xs">
+                <div className="flex items-center gap-2 mb-3 text-ink font-mono text-xs font-bold uppercase tracking-wider">
+                  <CheckCircle2 className="h-4 w-4 text-pass" />
+                  QA Practical Checklist
+                </div>
+                <div className="space-y-2">
+                  {sec.checklist.map((item, cIdx) => (
+                    <div key={cIdx} className="flex items-start gap-2.5 p-2 rounded-md hover:bg-paper-deep/40 transition-colors">
+                      <input
+                        type="checkbox"
+                        className="mt-0.5 h-4 w-4 rounded border-line text-pass focus:ring-pass cursor-pointer"
+                        id={`chk-${sec.id}-${cIdx}`}
+                      />
+                      <label htmlFor={`chk-${sec.id}-${cIdx}`} className="text-xs sm:text-sm text-ink/90 cursor-pointer select-none">
+                        {formatDocText(item)}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Code Blocks */}
             {sec.codeBlocks &&
@@ -257,11 +414,7 @@ function renderDetailedDocArticle(
                       {sub.heading}
                     </a>
                   </h3>
-                  {sub.paragraphs?.map((p, pIdx) => (
-                    <p key={pIdx} className="text-sm sm:text-base leading-relaxed text-ink/90 mb-3">
-                      {formatDocText(p)}
-                    </p>
-                  ))}
+                  {sub.paragraphs?.map((p, pIdx) => renderDocParagraph(p, pIdx))}
                   {sub.codeBlocks &&
                     sub.codeBlocks.map((cb, bIdx) => (
                       <div key={bIdx} className="my-4">

@@ -271,3 +271,4 @@ export function SkeletonDocViewer({ className = "" }: { className?: string }) {
     </div>
   );
 }
+

@@ -54,3 +54,4 @@ export default function WorkLoading() {
     </main>
   );
 }
+

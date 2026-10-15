@@ -128,28 +128,28 @@ export const LEARNING_TRACKS: LearningTrack[] = [
   {
     id: "javascript",
     slug: "javascript",
-    title: "Modern JavaScript for QA",
-    shortTitle: "JavaScript for QA",
-    tagline: "ES6+, Async/Await, Playwright Locators & Event Loop",
-    description: "Start JavaScript from absolute zero: let vs const scoping, arrow functions, async/await deep dive, Event Loop microtasks, Playwright locator loops (for..of), and Web-first assertions.",
+    title: "Modern JavaScript for QA & Playwright",
+    shortTitle: "JavaScript for Playwright",
+    tagline: "Playwright-tailored master curriculum: 19 chapters from basic to advance",
+    description: "Start JavaScript from absolute zero: const/let scoping, destructuring fixtures ({ page, request }), async/await event loop, for..of locator iteration, page.evaluate, and network mocking.",
     category: "languages",
     categoryLabel: "Programming Languages",
     logo: "javascript",
     level: "All Levels",
-    docCount: 15,
+    docCount: 19,
   },
   {
     id: "typescript",
     slug: "typescript",
-    title: "TypeScript for QA Engineers",
-    shortTitle: "TypeScript for QE",
-    tagline: "Compile-time safety, strongly typed POM & custom fixtures",
-    description: "Start TypeScript from absolute zero: any vs unknown vs never, discriminated unions with switch statements, generic REST API clients, utility types (Partial, Pick, Omit), and Playwright test.extend fixtures.",
+    title: "TypeScript for QA & Playwright Engineers",
+    shortTitle: "TypeScript for Playwright",
+    tagline: "Playwright-tailored master curriculum: 16 chapters from basic to advance",
+    description: "Start TypeScript from absolute zero: strict typing, strongly typed Page Object Models, generic API clients, utility types (Partial, Pick, Omit), test.extend custom fixtures, and Zod schema validation.",
     category: "languages",
     categoryLabel: "Programming Languages",
     logo: "typescript",
     level: "Intermediate",
-    docCount: 13,
+    docCount: 16,
   },
 ];
 
@@ -195,7 +195,7 @@ export function LearnHubPage() {
               </div>
               <div className="border border-line rounded-lg px-3.5 py-2.5 bg-card shadow-2xs">
                 <span className="text-muted block text-[10px] uppercase tracking-wider">Chapters</span>
-                <span className="text-lg font-bold text-pass">230+</span>
+                <span className="text-lg font-bold text-pass">235+</span>
               </div>
               <div className="border border-line rounded-lg px-3.5 py-2.5 bg-card shadow-2xs">
                 <span className="text-muted block text-[10px] uppercase tracking-wider">Access</span>

@@ -682,6 +682,7 @@ export function QaGame() {
   const comboTimerRef = useRef<NodeJS.Timeout | null>(null);
   const freezeTimerRef = useRef<NodeJS.Timeout | null>(null);
   const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const spawnTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const scoreRef = useRef(0);
   const isMutedRef = useRef(false);
@@ -880,7 +881,7 @@ export function QaGame() {
   // Clean DOM restoration helper
   const restoreAllEatenElements = useCallback(() => {
     if (typeof document === "undefined") return;
-    document.querySelectorAll('[data-eaten="true"], [data-eating-by], [data-targeted-by]').forEach(el => {
+    document.querySelectorAll('[data-eaten], [data-eating-by], [data-targeted-by]').forEach(el => {
       const targetEl = el as HTMLElement;
       targetEl.removeAttribute('data-eaten');
       targetEl.removeAttribute('data-eating-by');
@@ -898,6 +899,14 @@ export function QaGame() {
       targetEl.style.boxShadow = "";
       targetEl.style.backgroundColor = "";
     });
+
+    // Also clear any lingering sectionGlitchCrash animations on containers
+    document.querySelectorAll<HTMLElement>('section, article, [data-section], [id^="section"], .card, div.border, main, header, footer').forEach(container => {
+      if (container.style.animation && container.style.animation.includes('sectionGlitchCrash')) {
+        container.style.animation = "";
+      }
+    });
+
     corruptedCountRef.current = 0;
     setEatenCount(0);
     setSystemIntegrity(100);
@@ -1397,6 +1406,7 @@ export function QaGame() {
           if (integrityLeft <= 0) {
             setHasCrashed(true);
             hasCrashedRef.current = true;
+            requestRef.current = requestAnimationFrame(updatePositions);
             return;
           }
 
@@ -1704,6 +1714,77 @@ export function QaGame() {
     requestRef.current = requestAnimationFrame(updatePositions);
   }, [isFrozen, acquireNewTarget, playGlitchAudio, playCrashAudio, playAlertAudio, playBirthAudio]);
 
+  // Unified clean reboot & reset game handler
+  const rebootGame = useCallback(() => {
+    // 1. Cancel and clear all pending timers and animation frames
+    if (requestRef.current) {
+      cancelAnimationFrame(requestRef.current);
+      requestRef.current = null;
+    }
+    if (spawnTimeoutRef.current) {
+      clearTimeout(spawnTimeoutRef.current);
+      spawnTimeoutRef.current = null;
+    }
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    if (freezeTimerRef.current) {
+      clearTimeout(freezeTimerRef.current);
+      freezeTimerRef.current = null;
+    }
+    if (comboTimerRef.current) {
+      clearTimeout(comboTimerRef.current);
+      comboTimerRef.current = null;
+    }
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = null;
+    }
+
+    // 2. Clean and restore all corrupted DOM elements
+    restoreAllEatenElements();
+
+    // 3. Synchronously clear defect references in BOTH ref and state
+    defectsRef.current = [];
+    setDefects([]);
+
+    // 4. Reset game stats
+    setScore(0);
+    scoreRef.current = 0;
+    setCombo(0);
+    setMaxCombo(0);
+    setBreakpoints(1);
+    setIsFrozen(false);
+    setWave(1);
+    waveRef.current = 1;
+    setSystemIntegrity(100);
+    setEatenCount(0);
+    corruptedCountRef.current = 0;
+    frameDeltasRef.current = [];
+    setTerminalLogs([]);
+
+    // 5. Clear crash & win state synchronously in both state and refs
+    setHasCrashed(false);
+    hasCrashedRef.current = false;
+    setHasWon(false);
+    hasWonRef.current = false;
+    isWaveAdvancingRef.current = false;
+
+    // 6. Reset delta clock to current time to prevent delta spikes
+    lastFrameTimeRef.current = performance.now();
+    lastDynamicAdjustTimeRef.current = Date.now();
+
+    // 7. Restart animation loop cleanly
+    requestRef.current = requestAnimationFrame(updatePositions);
+
+    // 8. Spawn fresh defect immediately
+    spawnDefect();
+
+    // 9. Schedule ongoing spawn cycle
+    scheduleNextRef.current?.(3500);
+  }, [restoreAllEatenElements, spawnDefect, updatePositions]);
+
   // Main game lifecycle
   useEffect(() => {
     if (isOpen) {
@@ -1725,6 +1806,7 @@ export function QaGame() {
       let timeoutId: NodeJS.Timeout | null = null;
       const scheduleNext = (delayOverride?: number) => {
         if (timeoutId) clearTimeout(timeoutId);
+        if (spawnTimeoutRef.current) clearTimeout(spawnTimeoutRef.current);
 
         // Patterned spawn timing:
         // - If NO bugs available on screen (0 bugs): spawn in few seconds (1600ms) so player isn't waiting!
@@ -1763,6 +1845,7 @@ export function QaGame() {
           }
           scheduleNext();
         }, spawnDelay);
+        spawnTimeoutRef.current = timeoutId;
       };
 
       scheduleNextRef.current = scheduleNext;
@@ -1772,10 +1855,15 @@ export function QaGame() {
 
       return () => {
         if (timeoutId) clearTimeout(timeoutId);
+        if (spawnTimeoutRef.current) {
+          clearTimeout(spawnTimeoutRef.current);
+          spawnTimeoutRef.current = null;
+        }
         if (requestRef.current) cancelAnimationFrame(requestRef.current);
         delete document.documentElement.dataset.game;
       };
     } else {
+      defectsRef.current = [];
       setDefects([]);
       setScore(0);
       setCombo(0);
@@ -1786,10 +1874,19 @@ export function QaGame() {
       frameDeltasRef.current = [];
 
       setHasCrashed(false);
+      hasCrashedRef.current = false;
+      setHasWon(false);
+      hasWonRef.current = false;
 
+      if (spawnTimeoutRef.current) {
+        clearTimeout(spawnTimeoutRef.current);
+        spawnTimeoutRef.current = null;
+      }
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
       if (comboTimerRef.current) clearTimeout(comboTimerRef.current);
       if (freezeTimerRef.current) clearTimeout(freezeTimerRef.current);
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
       delete document.documentElement.dataset.game;
       
       restoreAllEatenElements();
@@ -1979,27 +2076,7 @@ export function QaGame() {
                 {/* Reset */}
                 <button
                   type="button"
-                  onClick={() => {
-                    restoreAllEatenElements();
-                    setDefects([]);
-                    setScore(0);
-                    scoreRef.current = 0;
-                    setCombo(0);
-                    setMaxCombo(0);
-                    setBreakpoints(1);
-                    setIsFrozen(false);
-                    setHasCrashed(false);
-                    hasCrashedRef.current = false;
-                    setHasWon(false);
-                    hasWonRef.current = false;
-                    setWave(1);
-                    waveRef.current = 1;
-                    setSystemIntegrity(100);
-                    corruptedCountRef.current = 0;
-                    frameDeltasRef.current = [];
-                    spawnDefect();
-                    scheduleNextRef.current?.(3500);
-                  }}
+                  onClick={rebootGame}
                   className="text-muted hover:text-amber-500 hover:border-amber-500 transition-colors p-0.5 rounded border border-line"
                   title="Reboot Environment"
                   aria-label="Reboot Environment"
@@ -2234,24 +2311,7 @@ export function QaGame() {
                 <div className="flex flex-col sm:flex-row gap-2.5">
                   <button
                     type="button"
-                    onClick={() => {
-                      restoreAllEatenElements();
-                      setHasCrashed(false);
-                      hasCrashedRef.current = false;
-                      setScore(0);
-                      scoreRef.current = 0;
-                      setCombo(0);
-                      setMaxCombo(0);
-                      setBreakpoints(1);
-                      setSystemIntegrity(100);
-                      setDefects([]);
-                      setWave(1);
-                      waveRef.current = 1;
-                      corruptedCountRef.current = 0;
-                      frameDeltasRef.current = [];
-                      spawnDefect();
-                      scheduleNextRef.current?.(3500);
-                    }}
+                    onClick={rebootGame}
                     data-cursor="Deploy hotfix & reboot environment"
                     className="press flex-1 inline-flex items-center justify-center gap-2 border border-pass bg-pass text-on-band hover:bg-pass-fill font-bold py-2.5 px-4 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm tracking-wide transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer whitespace-nowrap"
                   >
@@ -2261,9 +2321,18 @@ export function QaGame() {
                   <button
                     type="button"
                     onClick={() => {
+                      if (requestRef.current) {
+                        cancelAnimationFrame(requestRef.current);
+                        requestRef.current = null;
+                      }
+                      if (spawnTimeoutRef.current) {
+                        clearTimeout(spawnTimeoutRef.current);
+                        spawnTimeoutRef.current = null;
+                      }
                       restoreAllEatenElements();
                       setHasCrashed(false);
                       hasCrashedRef.current = false;
+                      defectsRef.current = [];
                       setDefects([]);
                       setScore(0);
                       scoreRef.current = 0;

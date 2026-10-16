@@ -620,8 +620,8 @@ export function LearnHubPage() {
     <main id="content" tabIndex={-1} className="outline-none">
       <div className="mx-auto max-w-6xl px-4 pt-10 pb-16 sm:px-6 sm:pt-14 sm:pb-20">
         
-        {/* Minimal Theme-Matching Header with Quick Prep & QA Quiz Action Buttons */}
-        <div className="enter enter-1 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        {/* Minimal Theme-Matching Header */}
+        <div className="enter enter-1 flex flex-col md:flex-row md:items-end justify-between gap-5">
           <div>
             <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
               <span className="text-pass">06</span> / Knowledge Base
@@ -634,56 +634,28 @@ export function LearnHubPage() {
             </p>
           </div>
 
-          {/* Interactive Action Buttons: Quick Prep & QA Quiz */}
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Quick Prep Flashcards Button */}
+          {/* Minimal, Theme-Matching Action Controls */}
+          <div className="flex items-center gap-2.5 shrink-0">
             <button
               type="button"
               onClick={() => setIsQuickPrepOpen(true)}
               data-cursor="Open Quick Prep"
-              className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-amber-500/35 bg-card hover:bg-amber-500/10 hover:border-amber-400 transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-[0_4px_20px_-4px_rgba(245,158,11,0.25)] hover:-translate-y-0.5"
+              className="group flex items-center gap-2 px-3.5 py-2 rounded-lg border border-line bg-card hover:border-pass hover:text-pass text-ink font-mono text-xs transition cursor-pointer shadow-2xs hover:-translate-y-0.5"
             >
-              <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
-                <Zap className="w-4 h-4 fill-amber-400/30" />
-              </div>
-              <div className="text-left">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-serif text-sm font-medium text-ink group-hover:text-amber-300 transition-colors">
-                    Quick Prep
-                  </span>
-                  <span className="inline-flex items-center px-1.5 py-0.2 rounded-full border border-amber-500/30 bg-amber-500/15 text-amber-400 font-mono text-[9px] font-semibold">
-                    Random
-                  </span>
-                </div>
-                <p className="font-mono text-[10px] text-muted group-hover:text-ink-soft transition-colors">
-                  1,400+ Q&amp;As across 12 tracks
-                </p>
-              </div>
+              <Zap className="w-3.5 h-3.5 text-pass transition-transform group-hover:scale-110" />
+              <span className="font-medium">Quick Prep</span>
+              <span className="text-[10px] text-muted group-hover:text-pass font-normal">· 1,400+ Q&amp;A</span>
             </button>
 
-            {/* QA Quiz Engine Button */}
             <button
               type="button"
               onClick={() => setIsQuizOpen(true)}
               data-cursor="Start QA Quiz"
-              className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-pass/45 bg-pass/10 hover:bg-pass/20 hover:border-pass transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-[0_4px_20px_-4px_rgba(16,185,129,0.3)] hover:-translate-y-0.5"
+              className="group flex items-center gap-2 px-3.5 py-2 rounded-lg border border-pass/40 bg-pass/10 hover:bg-pass hover:text-paper text-pass font-mono text-xs font-semibold transition cursor-pointer shadow-2xs hover:-translate-y-0.5"
             >
-              <div className="w-8 h-8 rounded-lg bg-pass/20 border border-pass/40 flex items-center justify-center text-pass group-hover:scale-110 transition-transform">
-                <Target className="w-4 h-4" />
-              </div>
-              <div className="text-left">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-serif text-sm font-medium text-ink group-hover:text-pass transition-colors">
-                    QA Quiz
-                  </span>
-                  <span className="inline-flex items-center px-1.5 py-0.2 rounded-full border border-pass/40 bg-pass/20 text-pass font-mono text-[9px] font-semibold">
-                    MCQs
-                  </span>
-                </div>
-                <p className="font-mono text-[10px] text-muted group-hover:text-ink-soft transition-colors">
-                  1,200+ MCQs &amp; scoring
-                </p>
-              </div>
+              <Target className="w-3.5 h-3.5 transition-transform group-hover:scale-110" />
+              <span>QA Quiz</span>
+              <span className="text-[10px] opacity-80 font-normal">· 1,200+ MCQs</span>
             </button>
           </div>
         </div>

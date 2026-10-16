@@ -9,23 +9,14 @@ import {
   CheckCircle2,
   XCircle,
   RotateCcw,
-  SlidersHorizontal,
   ChevronRight,
-  ChevronDown,
-  ChevronUp,
-  Sparkles,
-  CheckSquare,
-  Square,
   ArrowRight,
-  HelpCircle,
-  Award,
   Check,
 } from "lucide-react";
 import {
   QUIZ_SECTIONS,
   QUIZ_QUESTIONS,
   type QuizQuestion,
-  type QuizSectionConfig,
 } from "@/data/learn-quiz-data";
 
 interface QuizModalProps {
@@ -48,7 +39,7 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
   );
 
   const [quizState, setQuizState] = useState<QuizState>("config");
-  const [questionCountLimit, setQuestionCountLimit] = useState<number>(20); // 10, 20, 50, or 100
+  const [questionCountLimit, setQuestionCountLimit] = useState<number>(20);
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
 
   // Active quiz session state
@@ -100,13 +91,12 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
     return pool;
   }, [selectedSectionIds, difficultyFilter]);
 
-  // Start the Quiz with a randomized subset of the available pool
+  // Start Quiz
   const startQuiz = useCallback(
     (customQuestions?: QuizQuestion[]) => {
       let questionsToUse = customQuestions;
       if (!questionsToUse) {
         if (availablePool.length === 0) return;
-        // Fisher-Yates shuffle
         const shuffled = [...availablePool];
         for (let i = shuffled.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -127,7 +117,7 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
     [availablePool, questionCountLimit]
   );
 
-  // Handle selecting an option
+  // Select an option
   const handleSelectOption = (idx: number) => {
     if (isAnswerSubmitted) return;
     const currentQ = activeQuestions[currentIndex];
@@ -151,7 +141,7 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
     ]);
   };
 
-  // Advance to next question or end quiz
+  // Next question
   const handleNextQuestion = () => {
     if (currentIndex < activeQuestions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
@@ -162,7 +152,7 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
     }
   };
 
-  // Retry missed questions
+  // Retry missed
   const handleRetryMissed = () => {
     const missed = answersHistory.filter((a) => !a.isCorrect).map((a) => a.question);
     if (missed.length > 0) {
@@ -202,35 +192,23 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
       : 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl border border-line bg-card shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/55 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-xl border border-line bg-card shadow-xl overflow-hidden">
         
-        {/* ========================================================= */}
-        {/* TOP BAR                                                   */}
-        {/* ========================================================= */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-line bg-paper/60 backdrop-blur-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-pass/15 border border-pass/30 flex items-center justify-center text-pass shadow-2xs">
-              <Target className="w-5 h-5 text-pass" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="font-serif text-lg font-medium text-ink">
-                  QA &amp; SDET Quiz Arena
-                </h2>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-pass/30 bg-pass/10 text-pass font-mono text-[10px] font-semibold">
-                  <Sparkles className="w-2.5 h-2.5" />
-                  {availablePool.length} MCQs Available
-                </span>
-              </div>
-              <p className="text-xs text-muted font-mono mt-0.5">
-                {quizState === "active"
-                  ? `Question ${currentIndex + 1} of ${activeQuestions.length}`
-                  : quizState === "scorecard"
-                  ? "Quiz Completed · Score Breakdown"
-                  : "Configure your practice exam below"}
-              </p>
-            </div>
+        {/* Minimal Top Bar */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-line bg-paper/60">
+          <div className="flex items-center gap-2.5">
+            <span className="font-mono text-[10px] tracking-wider uppercase text-pass font-semibold">
+              02 / QA Quiz
+            </span>
+            <span className="text-muted/40">•</span>
+            <span className="font-mono text-[11px] text-muted">
+              {quizState === "active"
+                ? `Question ${currentIndex + 1} of ${activeQuestions.length}`
+                : quizState === "scorecard"
+                ? "Results"
+                : `${availablePool.length} MCQs ready`}
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -238,28 +216,28 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
               <button
                 type="button"
                 onClick={() => setQuizState("config")}
-                className="px-2.5 py-1 rounded-lg border border-line hover:border-pass/60 text-muted hover:text-ink font-mono text-xs transition cursor-pointer"
+                className="font-mono text-[11px] text-muted hover:text-ink px-2 py-0.5 rounded transition cursor-pointer"
               >
-                Quit Quiz
+                Quit
               </button>
             )}
 
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-lg border border-line hover:border-pass/60 text-muted hover:text-ink transition cursor-pointer"
-              aria-label="Close Quiz"
+              className="p-1 rounded-md text-muted hover:text-ink hover:bg-paper transition cursor-pointer"
+              aria-label="Close"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Progress bar when quiz is active */}
+        {/* Thin progress line for active quiz */}
         {quizState === "active" && (
-          <div className="w-full bg-paper h-1 border-b border-line overflow-hidden">
+          <div className="w-full bg-paper-deep h-0.5 overflow-hidden">
             <div
-              className="bg-pass h-full transition-all duration-300 ease-out"
+              className="bg-pass h-full transition-all duration-200 ease-out"
               style={{
                 width: `${((currentIndex + 1) / activeQuestions.length) * 100}%`,
               }}
@@ -271,115 +249,97 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
         {/* 1. CONFIGURATION VIEW                                      */}
         {/* ========================================================= */}
         {quizState === "config" && (
-          <div className="flex-1 overflow-y-auto p-5 sm:p-7 flex flex-col justify-between">
-            <div className="space-y-6">
+          <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col justify-between">
+            <div className="space-y-5">
               
-              {/* Header explanation */}
               <div>
-                <h3 className="font-serif text-xl text-ink font-normal">
-                  Customize Your Quiz Topics
+                <h3 className="font-serif text-lg sm:text-xl text-ink font-normal">
+                  Customize Practice Exam
                 </h3>
-                <p className="font-sans text-xs sm:text-sm text-ink-soft mt-1 leading-relaxed">
-                  Select which sections you want to be tested on. All 12 QA sections are selected by default.
+                <p className="font-mono text-xs text-muted mt-0.5">
+                  All 12 QA sections are auto-selected. Click any chip to toggle.
                 </p>
               </div>
 
-              {/* Section Checkbox List */}
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between pb-1 border-b border-line/60">
-                  <span className="font-mono text-xs text-muted uppercase tracking-wider">
-                    Included Sections ({selectedSectionIds.size} of {QUIZ_SECTIONS.length} selected)
+              {/* Minimal Section Chips (Auto-selected by default) */}
+              <div>
+                <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-line/50">
+                  <span className="font-mono text-[11px] text-muted">
+                    Selected Sections ({selectedSectionIds.size}/12):
                   </span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 font-mono text-[11px]">
                     <button
                       type="button"
                       onClick={selectAllSections}
-                      className="font-mono text-xs text-pass hover:underline cursor-pointer"
+                      className="text-pass hover:underline cursor-pointer"
                     >
-                      Select All (12)
+                      Select All
                     </button>
                     <span className="text-muted/40">•</span>
                     <button
                       type="button"
                       onClick={deselectAllSections}
-                      className="font-mono text-xs text-muted hover:text-ink cursor-pointer"
+                      className="text-muted hover:text-ink cursor-pointer"
                     >
                       Reset
                     </button>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                <div className="flex flex-wrap gap-1.5">
                   {QUIZ_SECTIONS.map((sec) => {
                     const isSelected = selectedSectionIds.has(sec.id);
                     return (
-                      <label
+                      <button
                         key={sec.id}
-                        className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition cursor-pointer text-left ${
+                        type="button"
+                        onClick={() => toggleSection(sec.id)}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border font-mono text-[11px] transition cursor-pointer ${
                           isSelected
-                            ? "border-pass/50 bg-pass/10 text-ink shadow-2xs"
-                            : "border-line/60 bg-card/60 text-muted hover:border-line hover:text-ink"
+                            ? "border-pass/50 bg-pass/10 text-pass font-medium"
+                            : "border-line/70 bg-card text-muted hover:text-ink hover:border-line"
                         }`}
                       >
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleSection(sec.id)}
-                          className="sr-only"
-                        />
-                        <div className="shrink-0 text-pass">
-                          {isSelected ? (
-                            <CheckSquare className="w-4.5 h-4.5 fill-pass/20" />
-                          ) : (
-                            <Square className="w-4.5 h-4.5 text-muted/60" />
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-serif text-xs font-medium truncate text-ink">
-                            {sec.name}
-                          </p>
-                          <p className="font-mono text-[9px] text-muted truncate">
-                            {sec.questionCount} MCQs Available
-                          </p>
-                        </div>
-                      </label>
+                        <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-pass" : "bg-muted/40"}`} />
+                        <span>{sec.name}</span>
+                      </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Options: Question Count & Difficulty */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              {/* Minimal Length & Difficulty Segmented Controls */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                 <div>
-                  <label className="block font-mono text-xs text-muted uppercase tracking-wider mb-2">
-                    Number of Questions
-                  </label>
-                  <div className="grid grid-cols-4 gap-2">
+                  <span className="block font-mono text-[11px] text-muted mb-1.5 uppercase tracking-wider">
+                    Question Count
+                  </span>
+                  <div className="flex rounded-lg border border-line bg-paper/60 p-0.5">
                     {[10, 20, 50, 100].map((num) => (
                       <button
                         key={num}
                         type="button"
                         onClick={() => setQuestionCountLimit(num)}
-                        className={`py-2 rounded-lg border font-mono text-xs font-semibold transition cursor-pointer ${
+                        className={`flex-1 py-1 rounded-md font-mono text-xs font-medium transition cursor-pointer text-center ${
                           questionCountLimit === num
-                            ? "border-pass bg-pass/20 text-pass shadow-2xs"
-                            : "border-line bg-paper text-muted hover:text-ink"
+                            ? "bg-card text-pass shadow-2xs font-semibold"
+                            : "text-muted hover:text-ink"
                         }`}
                       >
-                        {num} Qs
+                        {num}
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-mono text-xs text-muted uppercase tracking-wider mb-2">
+                  <span className="block font-mono text-[11px] text-muted mb-1.5 uppercase tracking-wider">
                     Difficulty Level
-                  </label>
+                  </span>
                   <select
                     value={difficultyFilter}
                     onChange={(e) => setDifficultyFilter(e.target.value)}
-                    className="w-full py-2 px-3 rounded-lg border border-line bg-paper font-mono text-xs text-ink focus:outline-none focus:border-pass cursor-pointer"
+                    className="w-full py-1.5 px-2.5 rounded-lg border border-line bg-paper/60 font-mono text-xs text-ink focus:outline-none focus:border-pass cursor-pointer"
                   >
                     <option value="all">All Difficulties (Balanced)</option>
                     <option value="Beginner">Beginner Only</option>
@@ -391,20 +351,20 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
 
             </div>
 
-            {/* Launch Button */}
-            <div className="mt-8 pt-4 border-t border-line flex items-center justify-between">
-              <span className="font-mono text-xs text-muted">
-                Pool contains <span className="font-bold text-pass">{availablePool.length}</span> matching questions
+            {/* Launch CTA */}
+            <div className="mt-8 pt-3.5 border-t border-line flex items-center justify-between">
+              <span className="font-mono text-[11px] text-muted">
+                Pool has <span className="font-semibold text-pass">{availablePool.length}</span> questions
               </span>
 
               <button
                 type="button"
                 onClick={() => startQuiz()}
                 disabled={availablePool.length === 0}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-semibold transition disabled:opacity-40 disabled:pointer-events-none cursor-pointer shadow-md shadow-pass/25"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs disabled:opacity-40"
               >
-                <span>Start Practice Quiz</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Start Practice Exam</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -415,69 +375,59 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
         {/* ========================================================= */}
         {quizState === "active" && currentQ && (
           <div className="flex-1 overflow-y-auto p-5 sm:p-7 flex flex-col justify-between">
-            <div className="space-y-5">
+            <div className="space-y-4">
               
               {/* Question metadata & Live Stats */}
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-1 rounded-full border border-pass/30 bg-pass/10 text-pass font-mono text-[11px] font-semibold">
+                  <span className="font-mono text-[11px] text-pass font-medium">
                     {currentQ.sectionTitle}
                   </span>
-                  <span className="px-2 py-0.5 rounded-full border border-line bg-paper text-muted font-mono text-[10px]">
+                  <span className="text-muted/40">•</span>
+                  <span className="font-mono text-[10px] text-muted">
                     {currentQ.category}
-                  </span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full font-mono text-[10px] border ${
-                      currentQ.difficulty === "Advanced"
-                        ? "border-rose-500/30 bg-rose-500/10 text-rose-400"
-                        : currentQ.difficulty === "Intermediate"
-                        ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
-                        : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                    }`}
-                  >
-                    {currentQ.difficulty}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3 font-mono text-xs">
+                <div className="flex items-center gap-2.5 font-mono text-[11px]">
                   {currentStreak > 1 && (
-                    <span className="flex items-center gap-1 text-amber-400 animate-pulse font-semibold">
-                      <Flame className="w-4 h-4 fill-amber-400" />
-                      {currentStreak} Streak!
+                    <span className="flex items-center gap-1 text-amber-500 font-medium">
+                      <Flame className="w-3.5 h-3.5 fill-amber-500" />
+                      {currentStreak}
                     </span>
                   )}
                   <span className="text-muted">
-                    Score: <span className="font-semibold text-pass">{correctCount}</span> / {answersHistory.length}
+                    {correctCount} / {answersHistory.length} correct
                   </span>
                 </div>
               </div>
 
               {/* Big Question Prompt */}
-              <div className="pt-2">
-                <h3 className="font-serif text-xl sm:text-2xl text-ink font-normal leading-relaxed tracking-tight">
+              <div>
+                <h3 className="font-serif text-lg sm:text-xl text-ink font-normal leading-relaxed">
                   {currentQ.question}
                 </h3>
               </div>
 
               {/* 4 Interactive MCQ Options */}
-              <div className="grid grid-cols-1 gap-2.5 pt-2">
+              <div className="grid grid-cols-1 gap-2 pt-1">
                 {currentQ.options.map((option, idx) => {
-                  const letter = String.fromCharCode(65 + idx); // A, B, C, D
+                  const letter = String.fromCharCode(65 + idx);
                   const isSelected = selectedOption === idx;
                   const isCorrect = idx === currentQ.answerIndex;
 
                   let cardStyle =
-                    "border-line bg-paper hover:border-pass/60 hover:bg-pass/5 text-ink";
+                    "border-line bg-paper/50 hover:border-pass/60 hover:bg-pass/5 text-ink";
 
                   if (isAnswerSubmitted) {
                     if (isCorrect) {
                       cardStyle =
-                        "border-emerald-500 bg-emerald-500/15 text-emerald-300 font-medium shadow-[0_0_15px_rgba(16,185,129,0.2)]";
+                        "border-pass bg-pass/10 text-pass font-medium";
                     } else if (isSelected && !isCorrect) {
                       cardStyle =
-                        "border-rose-500 bg-rose-500/15 text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.2)]";
+                        "border-rose-500/70 bg-rose-500/10 text-rose-500";
                     } else {
-                      cardStyle = "border-line/40 bg-card/40 text-muted opacity-50";
+                      cardStyle = "border-line/40 bg-card text-muted opacity-50";
                     }
                   }
 
@@ -487,23 +437,21 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
                       type="button"
                       onClick={() => handleSelectOption(idx)}
                       disabled={isAnswerSubmitted}
-                      className={`w-full text-left p-3.5 sm:p-4 rounded-xl border transition-all flex items-start gap-3.5 group cursor-pointer ${cardStyle}`}
+                      className={`w-full text-left p-3 rounded-lg border transition-all flex items-start gap-3 cursor-pointer ${cardStyle}`}
                     >
                       <div
-                        className={`w-6 h-6 rounded-lg font-mono text-xs font-semibold flex items-center justify-center shrink-0 border transition ${
+                        className={`w-5.5 h-5.5 rounded font-mono text-xs font-semibold flex items-center justify-center shrink-0 border transition ${
                           isAnswerSubmitted && isCorrect
-                            ? "bg-emerald-500 text-white border-emerald-500"
+                            ? "bg-pass text-paper border-pass"
                             : isAnswerSubmitted && isSelected && !isCorrect
                             ? "bg-rose-500 text-white border-rose-500"
                             : isSelected
                             ? "bg-pass text-paper border-pass"
-                            : "bg-card border-line text-muted group-hover:border-pass/60 group-hover:text-pass"
+                            : "bg-paper border-line text-muted"
                         }`}
                       >
                         {isAnswerSubmitted && isCorrect ? (
-                          <Check className="w-3.5 h-3.5 stroke-[3]" />
-                        ) : isAnswerSubmitted && isSelected && !isCorrect ? (
-                          <X className="w-3.5 h-3.5 stroke-[3]" />
+                          <Check className="w-3 h-3 stroke-[3]" />
                         ) : (
                           letter
                         )}
@@ -512,43 +460,26 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
                       <div className="flex-1 font-sans text-xs sm:text-sm leading-relaxed">
                         {option}
                       </div>
-
-                      <span className="font-mono text-[10px] text-muted/60 opacity-0 group-hover:opacity-100 transition shrink-0 hidden sm:inline">
-                        Press [{idx + 1}]
-                      </span>
                     </button>
                   );
                 })}
               </div>
 
-              {/* Technical Explanation Box (Expands when answered) */}
+              {/* Technical Explanation Callout */}
               {isAnswerSubmitted && (
-                <div className="rounded-xl border border-line bg-paper/80 p-4 sm:p-5 animate-in fade-in duration-200">
-                  <div className="flex items-center gap-2 pb-2 mb-2 border-b border-line/60">
-                    {selectedOption === currentQ.answerIndex ? (
-                      <span className="flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                        Correct Answer!
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1.5 text-xs font-mono font-bold text-rose-400 uppercase tracking-wider">
-                        <XCircle className="w-4 h-4 text-rose-400" />
-                        Incorrect · Correct is Option {String.fromCharCode(65 + currentQ.answerIndex)}
-                      </span>
-                    )}
-                  </div>
-
-                  <p className="font-sans text-xs sm:text-sm text-ink-soft leading-relaxed">
-                    {currentQ.explanation}
+                <div className="rounded-lg border-l-2 border-pass bg-paper/60 p-3.5 text-xs text-ink-soft leading-relaxed animate-in fade-in duration-150">
+                  <p className="font-mono text-[10px] text-pass font-semibold uppercase tracking-wider mb-1">
+                    {selectedOption === currentQ.answerIndex ? "Correct" : "Explanation"}
                   </p>
+                  <p>{currentQ.explanation}</p>
                 </div>
               )}
 
             </div>
 
             {/* Bottom Actions */}
-            <div className="mt-8 pt-4 border-t border-line flex items-center justify-between">
-              <span className="font-mono text-xs text-muted">
+            <div className="mt-6 pt-3.5 border-t border-line flex items-center justify-between">
+              <span className="font-mono text-[11px] text-muted">
                 Question {currentIndex + 1} of {activeQuestions.length}
               </span>
 
@@ -556,14 +487,14 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
                 <button
                   type="button"
                   onClick={handleNextQuestion}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-semibold transition cursor-pointer shadow-md shadow-pass/25 animate-in fade-in duration-150"
+                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs animate-in fade-in duration-150"
                 >
                   <span>
                     {currentIndex < activeQuestions.length - 1
                       ? "Next Question"
-                      : "View Scorecard"}
+                      : "Finish Exam"}
                   </span>
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
@@ -574,68 +505,42 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
         {/* 3. SCORECARD & REVIEW                                      */}
         {/* ========================================================= */}
         {quizState === "scorecard" && (
-          <div className="flex-1 overflow-y-auto p-5 sm:p-7 flex flex-col justify-between">
-            <div className="space-y-6">
+          <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col justify-between">
+            <div className="space-y-5">
               
-              {/* Score Banner */}
-              <div className="p-6 rounded-2xl border border-line bg-paper/70 text-center relative overflow-hidden">
-                <div className="inline-flex p-3 rounded-2xl bg-pass/15 border border-pass/30 text-pass mb-3 shadow-sm">
-                  <Trophy className="w-8 h-8" />
+              {/* Score Header */}
+              <div className="p-4 rounded-xl border border-line bg-paper/50 flex items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-serif text-xl sm:text-2xl font-normal text-ink">
+                      {scorePercent}% Accuracy
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full border border-pass/40 bg-pass/10 text-pass font-mono text-[10px] font-semibold">
+                      {scorePercent >= 85 ? "SDET Master" : scorePercent >= 70 ? "Senior QA" : "Needs Review"}
+                    </span>
+                  </div>
+                  <p className="font-mono text-xs text-muted mt-1">
+                    Answered {correctCount} of {answersHistory.length} questions correctly · Max streak: {maxStreak}
+                  </p>
                 </div>
 
-                <h3 className="font-serif text-2xl sm:text-3xl text-ink font-normal">
-                  {scorePercent >= 90
-                    ? "SDET Master Class! 🏆"
-                    : scorePercent >= 75
-                    ? "Senior QA Ready! 🌟"
-                    : scorePercent >= 60
-                    ? "Good Effort! 👍"
-                    : "Keep Practicing! 📚"}
-                </h3>
-
-                <p className="font-sans text-sm text-ink-soft mt-1 max-w-md mx-auto">
-                  You scored <strong className="text-ink">{correctCount}</strong> out of{" "}
-                  <strong className="text-ink">{answersHistory.length}</strong> questions correct (
-                  <strong className="text-pass">{scorePercent}%</strong>).
-                </p>
-
-                {/* Score Stats Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 max-w-lg mx-auto">
-                  <div className="p-3 rounded-xl border border-line bg-card">
-                    <p className="font-mono text-[10px] text-muted uppercase">Accuracy</p>
-                    <p className="font-mono text-lg font-bold text-pass">{scorePercent}%</p>
-                  </div>
-                  <div className="p-3 rounded-xl border border-line bg-card">
-                    <p className="font-mono text-[10px] text-muted uppercase">Correct</p>
-                    <p className="font-mono text-lg font-bold text-emerald-400">{correctCount}</p>
-                  </div>
-                  <div className="p-3 rounded-xl border border-line bg-card">
-                    <p className="font-mono text-[10px] text-muted uppercase">Incorrect</p>
-                    <p className="font-mono text-lg font-bold text-rose-400">
-                      {answersHistory.length - correctCount}
-                    </p>
-                  </div>
-                  <div className="p-3 rounded-xl border border-line bg-card">
-                    <p className="font-mono text-[10px] text-muted uppercase">Best Streak</p>
-                    <p className="font-mono text-lg font-bold text-amber-400">🔥 {maxStreak}</p>
-                  </div>
+                <div className="w-12 h-12 rounded-xl bg-pass/10 border border-pass/30 flex items-center justify-center text-pass shrink-0">
+                  <Trophy className="w-6 h-6" />
                 </div>
               </div>
 
               {/* Review Filter Tabs */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between pb-1 border-b border-line">
-                  <span className="font-mono text-xs font-semibold text-ink uppercase tracking-wider">
-                    Question-by-Question Breakdown
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between pb-1 border-b border-line/60">
+                  <span className="font-mono text-[11px] text-muted uppercase tracking-wider">
+                    Review Questions
                   </span>
-                  <div className="flex items-center gap-1 font-mono text-xs">
+                  <div className="flex items-center gap-1 font-mono text-[11px]">
                     <button
                       type="button"
                       onClick={() => setReviewFilter("all")}
-                      className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
-                        reviewFilter === "all"
-                          ? "bg-pass text-paper font-semibold"
-                          : "text-muted hover:text-ink"
+                      className={`px-2 py-0.5 rounded transition cursor-pointer ${
+                        reviewFilter === "all" ? "bg-pass text-paper font-semibold" : "text-muted hover:text-ink"
                       }`}
                     >
                       All ({answersHistory.length})
@@ -643,21 +548,17 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
                     <button
                       type="button"
                       onClick={() => setReviewFilter("incorrect")}
-                      className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
-                        reviewFilter === "incorrect"
-                          ? "bg-rose-500 text-white font-semibold"
-                          : "text-muted hover:text-ink"
+                      className={`px-2 py-0.5 rounded transition cursor-pointer ${
+                        reviewFilter === "incorrect" ? "bg-rose-500 text-white font-semibold" : "text-muted hover:text-ink"
                       }`}
                     >
-                      Mistakes ({answersHistory.length - correctCount})
+                      Missed ({answersHistory.length - correctCount})
                     </button>
                     <button
                       type="button"
                       onClick={() => setReviewFilter("correct")}
-                      className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
-                        reviewFilter === "correct"
-                          ? "bg-emerald-500 text-white font-semibold"
-                          : "text-muted hover:text-ink"
+                      className={`px-2 py-0.5 rounded transition cursor-pointer ${
+                        reviewFilter === "correct" ? "bg-pass text-paper font-semibold" : "text-muted hover:text-ink"
                       }`}
                     >
                       Correct ({correctCount})
@@ -665,8 +566,8 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
                   </div>
                 </div>
 
-                {/* Review Questions List */}
-                <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                {/* Question List */}
+                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                   {answersHistory
                     .filter((ans) => {
                       if (reviewFilter === "incorrect") return !ans.isCorrect;
@@ -676,53 +577,28 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
                     .map((ans, idx) => (
                       <div
                         key={idx}
-                        className={`p-4 rounded-xl border text-left transition ${
+                        className={`p-3 rounded-lg border text-left text-xs ${
                           ans.isCorrect
-                            ? "border-emerald-500/30 bg-emerald-500/5"
+                            ? "border-pass/30 bg-pass/5"
                             : "border-rose-500/30 bg-rose-500/5"
                         }`}
                       >
-                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <div className="flex items-center justify-between gap-2 mb-1">
                           <span className="font-mono text-[10px] text-muted">
-                            {ans.question.sectionTitle} · {ans.question.category}
+                            {ans.question.sectionTitle}
                           </span>
-                          <span
-                            className={`font-mono text-[10px] font-semibold flex items-center gap-1 ${
-                              ans.isCorrect ? "text-emerald-400" : "text-rose-400"
-                            }`}
-                          >
-                            {ans.isCorrect ? (
-                              <>
-                                <CheckCircle2 className="w-3.5 h-3.5" /> Correct
-                              </>
-                            ) : (
-                              <>
-                                <XCircle className="w-3.5 h-3.5" /> Missed
-                              </>
-                            )}
+                          <span className={`font-mono text-[10px] font-semibold ${ans.isCorrect ? "text-pass" : "text-rose-500"}`}>
+                            {ans.isCorrect ? "Correct" : "Missed"}
                           </span>
                         </div>
 
-                        <p className="font-serif text-sm text-ink font-medium">
+                        <p className="font-serif text-xs sm:text-sm text-ink font-medium">
                           {ans.question.question}
                         </p>
 
-                        <div className="mt-2 text-xs space-y-1 font-sans">
-                          {!ans.isCorrect && (
-                            <p className="text-rose-300">
-                              Your Answer:{" "}
-                              <span className="line-through">
-                                {ans.question.options[ans.selectedIndex]}
-                              </span>
-                            </p>
-                          )}
-                          <p className="text-emerald-300 font-medium">
-                            Correct Answer: {ans.question.options[ans.question.answerIndex]}
-                          </p>
-                          <p className="text-muted text-[11px] pt-1">
-                            {ans.question.explanation}
-                          </p>
-                        </div>
+                        <p className="mt-1.5 text-muted text-[11px] leading-relaxed">
+                          Correct: <span className="text-ink font-medium">{ans.question.options[ans.question.answerIndex]}</span>
+                        </p>
                       </div>
                     ))}
                 </div>
@@ -731,13 +607,13 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
             </div>
 
             {/* Bottom Actions */}
-            <div className="mt-6 pt-4 border-t border-line flex flex-wrap items-center justify-between gap-3">
+            <div className="mt-6 pt-3.5 border-t border-line flex items-center justify-between">
               <button
                 type="button"
                 onClick={() => setQuizState("config")}
-                className="px-4 py-2 rounded-xl border border-line bg-paper hover:border-pass/60 text-ink font-mono text-xs transition cursor-pointer"
+                className="font-mono text-xs text-muted hover:text-ink cursor-pointer"
               >
-                ⚙ Change Topics / Settings
+                ← Change Settings
               </button>
 
               <div className="flex items-center gap-2">
@@ -745,20 +621,20 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
                   <button
                     type="button"
                     onClick={handleRetryMissed}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 font-mono text-xs transition cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-500/40 text-rose-500 hover:bg-rose-500/10 font-mono text-xs transition cursor-pointer"
                   >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Retry Mistakes ({answersHistory.length - correctCount})</span>
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Retry Missed ({answersHistory.length - correctCount})</span>
                   </button>
                 )}
 
                 <button
                   type="button"
                   onClick={() => startQuiz()}
-                  className="flex items-center gap-2 px-5 py-2 rounded-xl bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-semibold transition cursor-pointer shadow-md shadow-pass/25"
+                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Retake Full Quiz</span>
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Retake</span>
                 </button>
               </div>
             </div>
@@ -769,4 +645,3 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
     </div>
   );
 }
-

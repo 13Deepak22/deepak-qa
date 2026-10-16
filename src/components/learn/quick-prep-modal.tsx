@@ -4,8 +4,6 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import {
   X,
   Zap,
-  RotateCcw,
-  Shuffle,
   ChevronRight,
   ChevronLeft,
   Eye,
@@ -15,20 +13,14 @@ import {
   Copy,
   Check,
   Search,
-  CheckSquare,
-  Square,
-  Sparkles,
   SlidersHorizontal,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { ToolLogo } from "@/components/home/tool-logo";
-import type { ToolLogo as ToolLogoName } from "@/data";
 import {
   QUICK_PREP_SECTIONS,
   QUICK_PREP_QUESTIONS,
   type QuickPrepItem,
-  type QuickPrepSectionConfig,
 } from "@/data/learn-quick-prep-data";
 
 interface QuickPrepModalProps {
@@ -104,7 +96,6 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
   };
 
   const deselectAllSections = () => {
-    // Keep at least the first one selected
     setSelectedSectionIds(new Set([QUICK_PREP_SECTIONS[0].id]));
   };
 
@@ -205,44 +196,34 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
   const isCurrentBookmarked = currentQuestion ? bookmarkedIds.has(currentQuestion.id) : false;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl border border-line bg-card shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/55 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-xl border border-line bg-card shadow-xl overflow-hidden">
         
-        {/* Header Bar */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-line bg-paper/60 backdrop-blur-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-pass/15 border border-pass/30 flex items-center justify-center text-pass shadow-2xs">
-              <Zap className="w-5 h-5 fill-pass/30" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="font-serif text-lg font-medium text-ink">
-                  Quick Prep · Random Q&amp;A
-                </h2>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-pass/30 bg-pass/10 text-pass font-mono text-[10px] font-semibold">
-                  <Sparkles className="w-2.5 h-2.5" />
-                  {activePool.length} in Pool
-                </span>
-              </div>
-              <p className="text-xs text-muted font-mono mt-0.5">
-                Press <kbd className="px-1 py-0.5 bg-paper rounded border border-line text-[10px]">Space</kbd> to reveal · <kbd className="px-1 py-0.5 bg-paper rounded border border-line text-[10px]">Right Arrow</kbd> for next
-              </p>
-            </div>
+        {/* Minimal Header */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-line bg-paper/60">
+          <div className="flex items-center gap-2.5">
+            <span className="font-mono text-[10px] tracking-wider uppercase text-pass font-semibold">
+              01 / Quick Prep
+            </span>
+            <span className="text-muted/40">•</span>
+            <span className="font-mono text-[11px] text-muted">
+              {activePool.length} Q&amp;As in pool
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Toggle Section Filter Panel */}
+            {/* Toggle Compact Track Filter */}
             <button
               type="button"
               onClick={() => setShowSectionFilter((prev) => !prev)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-mono text-xs transition cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border font-mono text-[11px] transition cursor-pointer ${
                 showSectionFilter
-                  ? "border-pass bg-pass/15 text-pass"
-                  : "border-line bg-card hover:border-pass/60 text-ink-soft hover:text-ink"
+                  ? "border-pass bg-pass/10 text-pass"
+                  : "border-line bg-paper/60 text-muted hover:text-ink"
               }`}
             >
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span>Sections ({selectedSectionIds.size}/12)</span>
+              <SlidersHorizontal className="w-3 h-3" />
+              <span>Tracks ({selectedSectionIds.size}/12)</span>
               {showSectionFilter ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
 
@@ -250,133 +231,108 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-lg border border-line hover:border-pass/60 text-muted hover:text-ink transition cursor-pointer"
-              aria-label="Close Quick Prep"
+              className="p-1 rounded-md text-muted hover:text-ink hover:bg-paper transition cursor-pointer"
+              aria-label="Close"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Collapsible Section Filter Grid */}
+        {/* Minimalist Collapsible Chip Selector */}
         {showSectionFilter && (
-          <div className="p-4 border-b border-line bg-paper/40 animate-in slide-in-from-top-2 duration-150 max-h-56 overflow-y-auto">
-            <div className="flex items-center justify-between pb-2 mb-2 border-b border-line/60">
-              <span className="font-mono text-xs text-muted">
-                Select sections to include in random Q&amp;A generation:
+          <div className="p-4 border-b border-line bg-paper/30 animate-in slide-in-from-top-1 duration-150">
+            <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-line/50">
+              <span className="font-mono text-[11px] text-muted">
+                Toggle tracks to include in random flashcards:
               </span>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 font-mono text-[11px]">
                 <button
                   type="button"
                   onClick={selectAllSections}
-                  className="font-mono text-[11px] text-pass hover:underline cursor-pointer"
+                  className="text-pass hover:underline cursor-pointer"
                 >
-                  Select All (12)
+                  All
                 </button>
                 <span className="text-muted/40">•</span>
                 <button
                   type="button"
                   onClick={deselectAllSections}
-                  className="font-mono text-[11px] text-muted hover:text-ink cursor-pointer"
+                  className="text-muted hover:text-ink cursor-pointer"
                 >
                   Reset
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+            <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto pr-1">
               {QUICK_PREP_SECTIONS.map((sec) => {
                 const isSelected = selectedSectionIds.has(sec.id);
                 return (
-                  <label
+                  <button
                     key={sec.id}
-                    className={`flex items-center gap-2.5 p-2 rounded-lg border transition cursor-pointer text-left ${
+                    type="button"
+                    onClick={() => toggleSection(sec.id)}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border font-mono text-[11px] transition cursor-pointer ${
                       isSelected
-                        ? "border-pass/50 bg-pass/10 text-ink shadow-2xs"
-                        : "border-line/60 bg-card/60 text-muted hover:border-line hover:text-ink"
+                        ? "border-pass/50 bg-pass/10 text-pass font-medium"
+                        : "border-line/70 bg-card text-muted hover:text-ink hover:border-line"
                     }`}
                   >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => toggleSection(sec.id)}
-                      className="sr-only"
-                    />
-                    <div className="shrink-0 text-pass">
-                      {isSelected ? (
-                        <CheckSquare className="w-4 h-4 fill-pass/20" />
-                      ) : (
-                        <Square className="w-4 h-4 text-muted/60" />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-serif text-xs font-medium truncate text-ink">
-                        {sec.name}
-                      </p>
-                      <p className="font-mono text-[9px] text-muted truncate">
-                        {sec.questionCount} Q&amp;As
-                      </p>
-                    </div>
-                  </label>
+                    <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-pass" : "bg-muted/40"}`} />
+                    <span>{sec.name}</span>
+                  </button>
                 );
               })}
             </div>
           </div>
         )}
 
-        {/* Filter & Search Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-2.5 border-b border-line bg-card/60">
-          <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-            <div className="relative w-full max-w-sm">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search questions or keywords (e.g. MCP, wait, SQL)..."
-                className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-line bg-paper/80 font-mono text-xs text-ink placeholder:text-muted/60 focus:outline-none focus:border-pass"
-              />
-            </div>
+        {/* Search & Difficulty Filter Strip */}
+        <div className="flex items-center justify-between gap-3 px-5 py-2 border-b border-line/60 bg-paper/20">
+          <div className="relative flex-1 max-w-xs">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Filter by keyword..."
+              className="w-full pl-7 pr-2 py-1 rounded-md border border-line/60 bg-paper/60 font-mono text-[11px] text-ink placeholder:text-muted/50 focus:outline-none focus:border-pass"
+            />
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Difficulty Filter */}
             <select
               value={difficultyFilter}
               onChange={(e) => setDifficultyFilter(e.target.value)}
-              className="py-1 px-2.5 rounded-lg border border-line bg-paper/80 font-mono text-xs text-ink focus:outline-none focus:border-pass cursor-pointer"
+              className="py-1 px-2 rounded-md border border-line/60 bg-paper/60 font-mono text-[11px] text-muted focus:outline-none focus:border-pass cursor-pointer"
             >
-              <option value="all">All Difficulties</option>
+              <option value="all">All Levels</option>
               <option value="Beginner">Beginner</option>
               <option value="Intermediate">Intermediate</option>
               <option value="Advanced">Advanced</option>
             </select>
 
-            {/* Bookmarks Toggle */}
             <button
               type="button"
               onClick={() => setOnlyBookmarks((prev) => !prev)}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-mono text-xs transition cursor-pointer ${
+              className={`p-1 rounded-md border transition cursor-pointer ${
                 onlyBookmarks
-                  ? "border-amber-500/60 bg-amber-500/15 text-amber-400"
-                  : "border-line bg-paper/80 text-muted hover:text-ink"
+                  ? "border-amber-500/50 bg-amber-500/10 text-amber-500"
+                  : "border-line/60 text-muted hover:text-ink"
               }`}
-              title="Show only bookmarked questions"
+              title="Show Bookmarked Only"
             >
               <Bookmark className="w-3.5 h-3.5" />
-              <span>Saved ({bookmarkedIds.size})</span>
             </button>
           </div>
         </div>
 
-        {/* Question Flashcard Body */}
-        <div className="flex-1 overflow-y-auto p-5 sm:p-7 flex flex-col justify-between min-h-[340px]">
+        {/* Question Card Content */}
+        <div className="flex-1 overflow-y-auto p-5 sm:p-7 flex flex-col justify-between min-h-[300px]">
           {filteredPool.length === 0 ? (
-            <div className="my-auto text-center py-12">
-              <p className="font-serif text-lg text-ink">No questions match your current filters.</p>
-              <p className="font-mono text-xs text-muted mt-1">
-                Try selecting more sections or clearing the search bar.
-              </p>
+            <div className="my-auto text-center py-10">
+              <p className="font-serif text-base text-ink">No questions match your current filters.</p>
               <button
                 type="button"
                 onClick={() => {
@@ -385,121 +341,100 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
                   setOnlyBookmarks(false);
                   setDifficultyFilter("all");
                 }}
-                className="mt-4 px-3.5 py-1.5 rounded-lg bg-pass text-paper font-mono text-xs cursor-pointer inline-flex items-center gap-1.5"
+                className="mt-3 px-3 py-1 rounded-md border border-line bg-paper font-mono text-xs text-ink hover:border-pass cursor-pointer"
               >
-                Reset All Filters
+                Reset Filters
               </button>
             </div>
           ) : currentQuestion ? (
-            <div className="flex flex-col gap-5">
+            <div className="space-y-4">
               
-              {/* Question Metadata Tags */}
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              {/* Meta pills */}
+              <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-1 rounded-full border border-pass/30 bg-pass/10 text-pass font-mono text-[11px] font-semibold">
+                  <span className="font-mono text-[11px] text-pass font-medium">
                     {currentQuestion.sectionTitle}
                   </span>
-                  <span className="px-2 py-0.5 rounded-full border border-line bg-paper text-muted font-mono text-[10px]">
+                  <span className="text-muted/40">•</span>
+                  <span className="font-mono text-[10px] text-muted">
                     {currentQuestion.category}
                   </span>
-                  {currentQuestion.difficulty && (
-                    <span
-                      className={`px-2 py-0.5 rounded-full font-mono text-[10px] border ${
-                        currentQuestion.difficulty === "Advanced"
-                          ? "border-rose-500/30 bg-rose-500/10 text-rose-400"
-                          : currentQuestion.difficulty === "Intermediate"
-                          ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
-                          : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                      }`}
-                    >
-                      {currentQuestion.difficulty}
-                    </span>
-                  )}
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  {/* Bookmark Button */}
                   <button
                     type="button"
                     onClick={() => toggleBookmark(currentQuestion.id)}
-                    className={`p-1.5 rounded-lg border transition cursor-pointer ${
-                      isCurrentBookmarked
-                        ? "border-amber-500/60 bg-amber-500/20 text-amber-400"
-                        : "border-line bg-paper hover:border-amber-500/40 text-muted hover:text-ink"
-                    }`}
-                    title={isCurrentBookmarked ? "Remove Bookmark" : "Bookmark Question"}
+                    className="p-1 rounded text-muted hover:text-amber-500 transition cursor-pointer"
+                    title="Bookmark"
                   >
                     {isCurrentBookmarked ? (
-                      <BookmarkCheck className="w-4 h-4 fill-amber-400" />
+                      <BookmarkCheck className="w-4 h-4 text-amber-500" />
                     ) : (
                       <Bookmark className="w-4 h-4" />
                     )}
                   </button>
-
-                  {/* Copy Button */}
                   <button
                     type="button"
                     onClick={handleCopy}
-                    className="p-1.5 rounded-lg border border-line bg-paper hover:border-pass/60 text-muted hover:text-ink transition cursor-pointer"
-                    title="Copy Question & Answer"
+                    className="p-1 rounded text-muted hover:text-ink transition cursor-pointer"
+                    title="Copy Q&A"
                   >
                     {copied ? <Check className="w-4 h-4 text-pass" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
-              {/* Big Question Prompt */}
-              <div className="pt-2">
-                <h3 className="font-serif text-xl sm:text-2xl text-ink font-normal leading-relaxed tracking-tight">
+              {/* Question Headline */}
+              <div>
+                <h3 className="font-serif text-lg sm:text-xl text-ink font-normal leading-relaxed">
                   {currentQuestion.question}
                 </h3>
               </div>
 
-              {/* Reveal Answer Banner / Container */}
-              <div className="mt-2">
+              {/* Reveal Answer Section */}
+              <div className="pt-2">
                 {!isAnswerRevealed ? (
                   <button
                     type="button"
                     onClick={() => setIsAnswerRevealed(true)}
-                    className="w-full py-4 px-6 rounded-xl border border-dashed border-pass/40 bg-pass/5 hover:bg-pass/10 hover:border-pass text-pass transition flex items-center justify-center gap-2.5 font-mono text-sm font-semibold cursor-pointer group shadow-2xs"
+                    className="w-full py-3 px-4 rounded-lg border border-dashed border-line hover:border-pass/60 bg-paper/40 hover:bg-pass/5 text-ink-soft hover:text-pass transition flex items-center justify-center gap-2 font-mono text-xs cursor-pointer"
                   >
-                    <Eye className="w-4 h-4 transition-transform group-hover:scale-110" />
+                    <Eye className="w-3.5 h-3.5 text-pass" />
                     <span>Reveal Technical Answer (or press Space)</span>
                   </button>
                 ) : (
-                  <div className="rounded-xl border border-line bg-paper/70 p-5 sm:p-6 animate-in fade-in duration-200">
-                    <div className="flex items-center justify-between pb-3 mb-3 border-b border-line/60">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-semibold text-pass uppercase tracking-wider">
-                          Key Technical Points &amp; Answer
-                        </span>
-                      </div>
+                  <div className="rounded-lg border border-line bg-paper/50 p-4 sm:p-5 animate-in fade-in duration-150">
+                    <div className="flex items-center justify-between pb-2 mb-3 border-b border-line/50">
+                      <span className="font-mono text-[10px] uppercase tracking-wider text-pass font-semibold">
+                        Key Points &amp; Answer
+                      </span>
                       <button
                         type="button"
                         onClick={() => setIsAnswerRevealed(false)}
-                        className="text-xs font-mono text-muted hover:text-ink flex items-center gap-1 cursor-pointer"
+                        className="text-[10px] font-mono text-muted hover:text-ink flex items-center gap-1 cursor-pointer"
                       >
-                        <EyeOff className="w-3.5 h-3.5" />
-                        <span>Hide Answer</span>
+                        <EyeOff className="w-3 h-3" />
+                        <span>Hide</span>
                       </button>
                     </div>
 
-                    <div className="space-y-3 font-sans text-sm text-ink-soft leading-relaxed">
+                    <div className="space-y-2.5 font-sans text-xs sm:text-sm text-ink-soft leading-relaxed">
                       {currentQuestion.answers.map((line, idx) => {
                         const trimmed = line.trim();
                         const isBullet = trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("o ");
                         const isCode =
                           trimmed.includes("(") && trimmed.includes(")") && (trimmed.startsWith("pm.") || trimmed.startsWith("browser_") || trimmed.includes(";"));
-                        
+
                         return (
                           <div
                             key={idx}
-                            className={`flex gap-2.5 ${isCode ? "font-mono text-xs bg-paper-deep text-pass px-3 py-2 rounded-lg border border-line/50" : ""}`}
+                            className={`flex gap-2 ${
+                              isCode ? "font-mono text-xs bg-paper-deep text-pass px-2.5 py-1.5 rounded border border-line/40" : ""
+                            }`}
                           >
                             {isBullet && <span className="text-pass shrink-0">•</span>}
-                            <span className="flex-1">
-                              {line.replace(/^[•\-o]\s*/, "")}
-                            </span>
+                            <span className="flex-1">{line.replace(/^[•\-o]\s*/, "")}</span>
                           </div>
                         );
                       })}
@@ -511,35 +446,28 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
             </div>
           ) : null}
 
-          {/* Bottom Card Navigation Toolbar */}
-          <div className="mt-8 pt-4 border-t border-line flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
+          {/* Minimal Bottom Bar */}
+          <div className="mt-6 pt-3.5 border-t border-line flex items-center justify-between">
+            <div className="flex items-center gap-2 font-mono text-[11px] text-muted">
               <button
                 type="button"
                 onClick={handlePrev}
                 disabled={historyIndex <= 0}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-paper hover:border-pass/60 text-ink-soft hover:text-ink disabled:opacity-40 disabled:pointer-events-none transition font-mono text-xs cursor-pointer"
+                className="px-2 py-1 rounded border border-line bg-paper hover:border-pass/60 text-ink disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer"
               >
-                <ChevronLeft className="w-4 h-4" />
-                <span>Previous</span>
+                <ChevronLeft className="w-3.5 h-3.5" />
               </button>
-
-              <span className="font-mono text-xs text-muted">
-                {historyIndex + 1} of {history.length} explored
-              </span>
+              <span>{historyIndex + 1} explored</span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handleNext}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-pass text-paper hover:bg-pass-fill transition font-mono text-xs font-semibold cursor-pointer shadow-sm shadow-pass/20"
-              >
-                <Shuffle className="w-3.5 h-3.5" />
-                <span>Next Random Question</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleNext}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs"
+            >
+              <span>Next Random</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
         </div>
@@ -548,4 +476,3 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
     </div>
   );
 }
-

@@ -290,12 +290,6 @@ export interface UnifiedToolResource {
     qCount: string;
     label: string;
   };
-  extraResource?: {
-    slug: string;
-    title: string;
-    count: string;
-    label: string;
-  };
 }
 
 export const UNIFIED_TOOLS: UnifiedToolResource[] = [
@@ -365,7 +359,7 @@ export const UNIFIED_TOOLS: UnifiedToolResource[] = [
     },
   },
 
-  // 4. Java: Merged Guide (64 docs) + Interview Q&A (55+ Q&As) + Top 20 Programs
+  // 4. Java: Merged Guide (64 docs) + Interview Q&A (55+ Q&As)
   {
     id: "java",
     name: "Java for QA Engineers",
@@ -384,12 +378,6 @@ export const UNIFIED_TOOLS: UnifiedToolResource[] = [
       title: "Core Java Interview Q&A",
       qCount: "55+ Q&As",
       label: "Interview Q&A",
-    },
-    extraResource: {
-      slug: "interview/interview-java-coding-programs",
-      title: "Top 20 Java Programs",
-      count: "20 Programs",
-      label: "Coding Solutions",
     },
   },
 
@@ -548,22 +536,6 @@ export const UNIFIED_TOOLS: UnifiedToolResource[] = [
       label: "Scenario Q&A",
     },
   },
-
-  // 14. Top 20 Java Programs (Separate - Coding Practice only)
-  {
-    id: "interview-java-coding-programs",
-    name: "Top 20 Java Programs",
-    toolTag: "Java · Coding Solutions",
-    tagline: "Common string, array, and algorithmic interview programs with runnable solutions.",
-    description: "String reverse, palindrome check, Fibonacci sequence, prime numbers, armstrong number, remove duplicates, count characters, and array sorting with full runnable Java solutions.",
-    logo: "java",
-    interview: {
-      slug: "interview/interview-java-coding-programs",
-      title: "Top 20 Java Programs",
-      qCount: "20 Programs",
-      label: "Coding Solutions",
-    },
-  },
 ];
 
 export function LearnHubPage() {
@@ -601,17 +573,13 @@ export function LearnHubPage() {
         tool.interview &&
         (tool.interview.title.toLowerCase().includes(q) ||
           tool.interview.slug.toLowerCase().includes(q));
-      const matchExtra =
-        tool.extraResource &&
-        tool.extraResource.title.toLowerCase().includes(q);
       return (
         matchName ||
         matchTag ||
         matchTagline ||
         matchDesc ||
         matchGuide ||
-        matchInterview ||
-        matchExtra
+        matchInterview
       );
     });
   }, [searchQuery]);
@@ -634,28 +602,52 @@ export function LearnHubPage() {
             </p>
           </div>
 
-          {/* Minimal, Theme-Matching Action Controls */}
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-2.5 shrink-0">
+          {/* High-Impact Interactive Mode Buttons: Quick Prep & QA Quiz */}
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0">
+            {/* Quick Prep Button */}
             <button
               type="button"
               onClick={() => setIsQuickPrepOpen(true)}
-              data-cursor="Open Quick Prep"
-              className="group flex items-center gap-2 px-3.5 py-2 rounded-lg border border-line bg-card hover:border-pass hover:text-pass text-ink font-mono text-xs transition cursor-pointer shadow-2xs hover:-translate-y-0.5"
+              data-cursor="Open Quick Prep Flashcards"
+              className="group relative flex items-center gap-3 px-4 py-2.5 rounded-xl border-2 border-ink/20 dark:border-line bg-paper dark:bg-card hover:border-amber-500 hover:shadow-[0_8px_20px_-4px_rgba(245,158,11,0.25)] hover:-translate-y-0.5 active:translate-y-0 text-ink transition-all duration-200 cursor-pointer shadow-xs"
             >
-              <Zap className="w-3.5 h-3.5 text-pass transition-transform group-hover:scale-110" />
-              <span className="font-medium">Quick Prep</span>
-              <span className="text-[10px] text-muted group-hover:text-pass font-normal">· 1,400+ Q&amp;A</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform shadow-2xs">
+                <Zap className="h-4 w-4 fill-amber-500/40" />
+              </div>
+              <div className="text-left font-mono">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-ink group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                    Quick Prep
+                  </span>
+                  <span className="rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 px-1.5 py-0.2 text-[9px] font-bold">
+                    1,400+ Q&amp;A
+                  </span>
+                </div>
+                <p className="text-[10px] text-muted leading-tight mt-0.5">Rapid Interview Flashcards</p>
+              </div>
             </button>
 
+            {/* QA Quiz Button */}
             <button
               type="button"
               onClick={() => setIsQuizOpen(true)}
-              data-cursor="Start QA Quiz"
-              className="group flex items-center gap-2 px-3.5 py-2 rounded-lg border border-pass/40 bg-pass/10 hover:bg-pass hover:text-paper text-pass font-mono text-xs font-semibold transition cursor-pointer shadow-2xs hover:-translate-y-0.5"
+              data-cursor="Start QA Quiz Engine"
+              className="group relative flex items-center gap-3 px-4 py-2.5 rounded-xl border-2 border-pass bg-pass hover:bg-pass-fill text-paper transition-all duration-200 cursor-pointer shadow-xs hover:shadow-[0_8px_24px_-4px_rgba(18,95,59,0.35)] hover:-translate-y-0.5 active:translate-y-0"
             >
-              <Target className="w-3.5 h-3.5 transition-transform group-hover:scale-110" />
-              <span>QA Quiz</span>
-              <span className="text-[10px] opacity-80 font-normal">· 1,200+ MCQs</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-paper/20 border border-paper/30 text-paper group-hover:scale-110 transition-transform shadow-2xs">
+                <Target className="h-4 w-4" />
+              </div>
+              <div className="text-left font-mono">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-paper">
+                    QA Quiz
+                  </span>
+                  <span className="rounded bg-paper/25 text-paper px-1.5 py-0.2 text-[9px] font-bold">
+                    1,200+ MCQs
+                  </span>
+                </div>
+                <p className="text-[10px] text-paper/85 leading-tight mt-0.5">Timed Practice Arena</p>
+              </div>
             </button>
           </div>
         </div>
@@ -674,19 +666,19 @@ export function LearnHubPage() {
 
           {/* Quick Search */}
           <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted pointer-events-none" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search tools, guides, or interview questions..."
-              className="w-full pl-9 pr-7 py-2 rounded-lg border border-line bg-card font-mono text-xs text-ink placeholder:text-muted/70 focus:outline-none focus:border-pass focus:ring-1 focus:ring-pass/40 transition shadow-2xs"
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-ink/20 dark:border-line bg-paper dark:bg-card font-mono text-xs text-ink placeholder:text-muted focus:outline-none focus:border-pass focus:ring-2 focus:ring-pass/20 transition-all shadow-2xs"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-ink cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink cursor-pointer p-0.5 rounded"
                 aria-label="Clear search"
               >
                 <X className="h-3.5 w-3.5" />
@@ -723,28 +715,28 @@ export function LearnHubPage() {
               return (
                 <article
                   key={tool.id}
-                  className="group relative flex flex-col justify-between rounded-xl border border-line bg-card p-3.5 sm:p-4 shadow-2xs hover:border-pass hover:shadow-[0_8px_25px_-6px_rgba(16,185,129,0.18)] hover:-translate-y-0.5 transition-all duration-200 overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-gradient-to-r before:from-transparent before:via-pass before:to-transparent before:opacity-0 group-hover:before:opacity-100 before:transition-opacity before:duration-300"
+                  className="group relative flex flex-col justify-between rounded-xl border border-ink/15 dark:border-line bg-card p-4 shadow-2xs hover:border-pass/80 hover:shadow-[0_12px_28px_-8px_rgba(18,95,59,0.18)] hover:-translate-y-1 transition-all duration-200 overflow-hidden before:absolute before:inset-x-0 before:top-0 before:h-[2.5px] before:bg-pass before:opacity-0 group-hover:before:opacity-100 before:transition-opacity before:duration-200"
                 >
                   <div>
                     {/* Top Bar: Tool Logo + Availability Pill Badge */}
                     <div className="flex items-center justify-between gap-2.5">
-                      <div className="h-8.5 w-8.5 shrink-0 rounded-lg border border-line bg-paper flex items-center justify-center p-1.5 transition-transform group-hover:scale-105 group-hover:border-pass/60 shadow-2xs">
+                      <div className="h-9 w-9 shrink-0 rounded-lg border border-ink/15 dark:border-line bg-paper dark:bg-card flex items-center justify-center p-1.5 transition-transform group-hover:scale-105 group-hover:border-pass/60 shadow-xs">
                         <ToolLogo name={tool.logo} className="h-full w-full object-contain" />
                       </div>
 
                       {/* Availability Pill Badge */}
                       <div className="shrink-0">
                         {hasBoth ? (
-                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-pass/35 bg-pass/12 text-pass font-mono text-[9px] font-semibold whitespace-nowrap shadow-[0_0_8px_rgba(16,185,129,0.12)]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-pass shadow-[0_0_4px_var(--pass)] animate-pulse" />
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-pass/40 bg-pass/15 text-pass font-mono text-[9px] font-bold whitespace-nowrap shadow-2xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-pass shadow-[0_0_6px_var(--pass)] animate-pulse" />
                             Guide + Q&amp;A
                           </span>
                         ) : tool.guide ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-line bg-paper/80 text-muted font-mono text-[8.5px] font-medium whitespace-nowrap">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-ink/15 dark:border-line bg-paper dark:bg-paper-deep text-muted font-mono text-[9px] font-semibold whitespace-nowrap">
                             Guide
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full border border-line bg-paper/80 text-muted font-mono text-[8.5px] font-medium whitespace-nowrap">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-ink/15 dark:border-line bg-paper dark:bg-paper-deep text-muted font-mono text-[9px] font-semibold whitespace-nowrap">
                             Interview Q&amp;A
                           </span>
                         )}
@@ -756,86 +748,84 @@ export function LearnHubPage() {
                       <span className="font-mono text-[9px] font-bold text-pass uppercase tracking-wider block">
                         {tool.toolTag}
                       </span>
-                      <h2 className="mt-0.5 font-serif text-[15px] sm:text-[15.5px] font-medium tracking-tight text-ink group-hover:text-pass transition-colors leading-snug">
+                      <h2 className="mt-0.5 font-serif text-[15.5px] sm:text-[16px] font-semibold tracking-tight text-ink group-hover:text-pass transition-colors leading-snug">
                         {tool.name}
                       </h2>
                     </div>
 
                     {/* Tool Tagline */}
-                    <p className="mt-1.5 font-sans text-[11.5px] text-ink-soft leading-snug line-clamp-2">
+                    <p className="mt-1.5 font-sans text-[11.5px] text-ink-soft leading-relaxed line-clamp-2">
                       {tool.tagline}
                     </p>
                   </div>
 
-                  {/* Bottom Actions: Guides and Q&A Buttons */}
-                  <div className="mt-3 pt-2.5 border-t border-line/60">
+                  {/* Bottom Actions: Guides and Q&A Buttons (High-Contrast & Distinct) */}
+                  <div className="mt-3.5 pt-3 border-t border-line">
                     {hasBoth && tool.guide && tool.interview ? (
-                      <div className="flex flex-col gap-1.5">
-                        <div className="grid grid-cols-2 gap-1.5">
-                          {/* Guide Button */}
-                          <Link
-                            href={`/learn/${tool.guide.slug}`}
-                            data-cursor={`Read ${tool.name} Guide`}
-                            className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg border border-line bg-paper/90 hover:border-pass hover:bg-pass/10 text-ink hover:text-pass transition-all font-mono text-[11px] font-semibold group/btn shadow-2xs"
-                          >
-                            <BookOpen className="h-3 w-3 text-pass shrink-0" />
-                            <span>Guide</span>
-                            <span className="text-[9px] text-muted font-normal group-hover/btn:text-pass">· {tool.guide.docCount}</span>
-                          </Link>
+                      <div className="grid grid-cols-2 gap-2">
+                        {/* Guide Button */}
+                        <Link
+                          href={`/learn/${tool.guide.slug}`}
+                          data-cursor={`Read ${tool.name} Guide`}
+                          className="group/btn relative flex items-center justify-between py-2 px-2.5 rounded-lg border border-ink/20 dark:border-line bg-paper dark:bg-paper-deep hover:border-pass hover:bg-pass hover:text-paper text-ink transition-all duration-150 font-mono text-[11px] font-semibold shadow-2xs hover:shadow-xs hover:-translate-y-0.5 active:translate-y-0"
+                        >
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <BookOpen className="h-3.5 w-3.5 text-pass group-hover/btn:text-paper shrink-0 transition-colors" />
+                            <span className="truncate">Guide</span>
+                          </div>
+                          <span className="ml-1 shrink-0 px-1.5 py-0.5 rounded bg-pass/10 text-pass group-hover/btn:bg-paper/20 group-hover/btn:text-paper text-[9.5px] font-bold transition-colors">
+                            {tool.guide.docCount}
+                          </span>
+                        </Link>
 
-                          {/* Interview Q&A Button */}
-                          <Link
-                            href={`/learn/${tool.interview.slug}`}
-                            data-cursor={`Study ${tool.name} Interview Q&As`}
-                            className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg border border-line bg-paper/90 hover:border-pass hover:bg-pass/10 text-ink hover:text-pass transition-all font-mono text-[11px] font-semibold group/btn shadow-2xs"
-                          >
-                            <HelpCircle className="h-3 w-3 text-pass shrink-0" />
-                            <span>Q&amp;A</span>
-                            <span className="text-[9px] text-muted font-normal group-hover/btn:text-pass">· {tool.interview.qCount.replace(" Q&As", "")}</span>
-                          </Link>
-                        </div>
-
-                        {/* Extra Resource (e.g. Top 20 Java Programs for Java) */}
-                        {tool.extraResource && (
-                          <Link
-                            href={`/learn/${tool.extraResource.slug}`}
-                            data-cursor={`Practice ${tool.extraResource.title}`}
-                            className="flex items-center justify-center gap-1.5 py-1 px-2 rounded-md border border-line/60 bg-paper/60 hover:border-pass hover:bg-pass/10 text-ink-soft hover:text-pass transition-all font-mono text-[10px]"
-                          >
-                            <span>💻 {tool.extraResource.title}</span>
-                            <span className="text-muted text-[9px]">· {tool.extraResource.count.replace(" Programs", "")}</span>
-                          </Link>
-                        )}
+                        {/* Interview Q&A Button */}
+                        <Link
+                          href={`/learn/${tool.interview.slug}`}
+                          data-cursor={`Study ${tool.name} Interview Q&As`}
+                          className="group/btn relative flex items-center justify-between py-2 px-2.5 rounded-lg border border-ink/20 dark:border-line bg-paper dark:bg-paper-deep hover:border-pass hover:bg-pass hover:text-paper text-ink transition-all duration-150 font-mono text-[11px] font-semibold shadow-2xs hover:shadow-xs hover:-translate-y-0.5 active:translate-y-0"
+                        >
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <HelpCircle className="h-3.5 w-3.5 text-pass group-hover/btn:text-paper shrink-0 transition-colors" />
+                            <span className="truncate">Q&amp;A</span>
+                          </div>
+                          <span className="ml-1 shrink-0 px-1.5 py-0.5 rounded bg-pass/10 text-pass group-hover/btn:bg-paper/20 group-hover/btn:text-paper text-[9.5px] font-bold transition-colors">
+                            {tool.interview.qCount.replace(" Q&As", "")}
+                          </span>
+                        </Link>
                       </div>
                     ) : tool.guide ? (
                       <Link
                         href={`/learn/${tool.guide.slug}`}
                         data-cursor={`Read ${tool.name} Guide`}
-                        className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg border border-line bg-paper/90 hover:border-pass hover:bg-pass/10 text-ink hover:text-pass transition-all group/btn shadow-2xs"
+                        className="group/btn relative flex items-center justify-between w-full py-2 px-3 rounded-lg border border-ink/20 dark:border-line bg-paper dark:bg-paper-deep hover:border-pass hover:bg-pass hover:text-paper text-ink transition-all duration-150 font-mono shadow-2xs hover:shadow-xs hover:-translate-y-0.5 active:translate-y-0"
                       >
-                        <div className="flex items-center gap-1.5">
-                          <BookOpen className="h-3 w-3 text-pass shrink-0" />
-                          <span className="font-mono text-[11px] font-semibold">Engineering Guide</span>
+                        <div className="flex items-center gap-2">
+                          <BookOpen className="h-3.5 w-3.5 text-pass group-hover/btn:text-paper transition-colors shrink-0" />
+                          <span className="text-[11.5px] font-bold">Engineering Guide</span>
                         </div>
-                        <span className="font-mono text-[9.5px] text-muted group-hover/btn:text-pass inline-flex items-center gap-1 font-medium">
-                          <span>{tool.guide.docCount} docs</span>
-                          <ArrowRight className="h-2.5 w-2.5 group-hover/btn:translate-x-0.5 transition-transform" />
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-1.5 py-0.5 rounded bg-pass/10 text-pass group-hover/btn:bg-paper/20 group-hover/btn:text-paper text-[10px] font-bold transition-colors">
+                            {tool.guide.docCount} docs
+                          </span>
+                          <ArrowRight className="h-3 w-3 text-muted group-hover/btn:text-paper group-hover/btn:translate-x-0.5 transition-all" />
+                        </div>
                       </Link>
                     ) : tool.interview ? (
                       <Link
                         href={`/learn/${tool.interview.slug}`}
                         data-cursor={`Study ${tool.name} Interview Questions`}
-                        className="flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg border border-line bg-paper/90 hover:border-pass hover:bg-pass/10 text-ink hover:text-pass transition-all group/btn shadow-2xs"
+                        className="group/btn relative flex items-center justify-between w-full py-2 px-3 rounded-lg border border-ink/20 dark:border-line bg-paper dark:bg-paper-deep hover:border-pass hover:bg-pass hover:text-paper text-ink transition-all duration-150 font-mono shadow-2xs hover:shadow-xs hover:-translate-y-0.5 active:translate-y-0"
                       >
-                        <div className="flex items-center gap-1.5">
-                          <HelpCircle className="h-3 w-3 text-pass shrink-0" />
-                          <span className="font-mono text-[11px] font-semibold">Interview Questions</span>
+                        <div className="flex items-center gap-2">
+                          <HelpCircle className="h-3.5 w-3.5 text-pass group-hover/btn:text-paper transition-colors shrink-0" />
+                          <span className="text-[11.5px] font-bold">Interview Questions</span>
                         </div>
-                        <span className="font-mono text-[9.5px] text-muted group-hover/btn:text-pass inline-flex items-center gap-1 font-medium">
-                          <span>{tool.interview.qCount}</span>
-                          <ArrowRight className="h-2.5 w-2.5 group-hover/btn:translate-x-0.5 transition-transform" />
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-1.5 py-0.5 rounded bg-pass/10 text-pass group-hover/btn:bg-paper/20 group-hover/btn:text-paper text-[10px] font-bold transition-colors">
+                            {tool.interview.qCount}
+                          </span>
+                          <ArrowRight className="h-3 w-3 text-muted group-hover/btn:text-paper group-hover/btn:translate-x-0.5 transition-all" />
+                        </div>
                       </Link>
                     ) : null}
                   </div>

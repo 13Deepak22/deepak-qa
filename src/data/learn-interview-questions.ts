@@ -2108,10 +2108,9 @@ export const MASTER_INTERVIEW_QUESTIONS: Record<string, StructuredInterviewQuest
     {
       "id": "selenium-q43",
       "num": "43",
-      "question": "What is the difference between switchTo() methods and how do you switch between",
+      "question": "What is the difference between switchTo() methods and how do you switch between frames and windows?",
       "category": "Browser Windows, Alerts & JavaScript",
       "answers": [
-        "frames and windows?",
         "// Switch to frame by index",
         "driver.switchTo().frame(0);",
         "// Switch to frame by name/ID",
@@ -3321,10 +3320,9 @@ export const MASTER_INTERVIEW_QUESTIONS: Record<string, StructuredInterviewQuest
     {
       "id": "selenium-q86",
       "num": "86",
-      "question": "What are best practices for creating scalable and maintainable test automation",
+      "question": "What are best practices for creating scalable and maintainable test automation frameworks?",
       "category": "Automation Framework Architecture & CI/CD",
       "answers": [
-        "frameworks?",
         "Best Practices:",
         "1. Modular Architecture: Separate concerns into different layers",
         "// Good structure",
@@ -4409,10 +4407,9 @@ export const MASTER_INTERVIEW_QUESTIONS: Record<string, StructuredInterviewQuest
     {
       "id": "selenium-q120",
       "num": "120",
-      "question": "What are Access Modifiers in Java, and why are they important in Selenium framework",
+      "question": "What are Access Modifiers in Java, and why are they important in Selenium framework design?",
       "category": "Core Java & OOP for Automation",
       "answers": [
-        "design?",
         "\u2022 public: Accessible from anywhere.",
         "\u2022 protected: Accessible within package + subclasses.",
         "\u2022 default: Accessible within package only.",
@@ -7193,10 +7190,9 @@ export const MASTER_INTERVIEW_QUESTIONS: Record<string, StructuredInterviewQuest
     {
       "id": "sql-q31",
       "num": "25",
-      "question": "How do you find employees whose salary is within the top 3 highest salaries in the",
+      "question": "How do you find employees whose salary is within the top 3 highest salaries in the company?",
       "category": "Subqueries, Ranking & Advanced Selects",
       "answers": [
-        "company?",
         "Answer:",
         "You can use DISTINCT with ORDER BY and LIMIT (or TOP in SQL Server):",
         "SELECT DISTINCT salary",
@@ -11137,10 +11133,9 @@ export const MASTER_INTERVIEW_QUESTIONS: Record<string, StructuredInterviewQuest
     {
       "id": "scenario-q3",
       "num": "3",
-      "question": "What if an API request passes but UI fails (e.g., Order API says \"Success\" but UI shows",
+      "question": "What if an API request passes but UI fails (e.g., Order API says \"Success\" but UI shows \"Failed\")?",
       "category": "Real-Time QA Scenarios",
       "answers": [
-        "\"Failed\")?",
         "Answer:",
         "This happens due to UI and backend not being in sync.",
         "Steps:",

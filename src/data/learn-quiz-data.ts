@@ -5877,15 +5877,15 @@ export const QUIZ_QUESTIONS: Record<string, QuizQuestion[]> = {
       "sectionId": "selenium-java",
       "sectionTitle": "Selenium WebDriver & Grid",
       "category": "Browser Windows, Alerts & JavaScript",
-      "question": "What is the difference between switchTo() methods and how do you switch between",
+      "question": "What is the difference between switchTo() methods and how do you switch between frames and windows?",
       "options": [
         "Insert hardcoded 30-second sleeps between every individual page interaction.",
         "Run all tests with browser security sandboxing completely disabled.",
-        "frames and windows? // Switch to frame by index",
+        "Use driver.switchTo().frame() for frames and driver.switchTo().window(handle) for windows.",
         "Execute tests exclusively against production without staging environment validation."
       ],
       "answerIndex": 2,
-      "explanation": "W3C WebDriver compliance and robust synchronization prevent test flakiness in What is the difference between switchTo(.",
+      "explanation": "Use driver.switchTo().frame() to switch browser execution context to an iframe, and driver.switchTo().window(handle) to switch between multiple tabs or windows.",
       "difficulty": "Intermediate"
     },
     {
@@ -6565,15 +6565,15 @@ export const QUIZ_QUESTIONS: Record<string, QuizQuestion[]> = {
       "sectionId": "selenium-java",
       "sectionTitle": "Selenium WebDriver & Grid",
       "category": "Automation Framework Architecture & CI/CD",
-      "question": "What are best practices for creating scalable and maintainable test automation",
+      "question": "What are best practices for creating scalable and maintainable test automation frameworks?",
       "options": [
         "Execute test builds directly on the production host server as root user.",
         "Mark failed pipeline stages as successful to prevent deployment interruptions.",
         "Store production server SSH private keys in unencrypted plain text scripts.",
-        "frameworks? Best Practices:"
+        "Adopt modular layer separation, dynamic test data isolation, and CI/CD parallel execution."
       ],
       "answerIndex": 3,
-      "explanation": "W3C WebDriver compliance and robust synchronization prevent test flakiness in What are best practices for creating sca.",
+      "explanation": "Best practices for scalable automation include modular architecture (Page Object Model), externalized configuration, isolated test data, and parallel CI/CD execution.",
       "difficulty": "Intermediate"
     },
     {
@@ -7109,15 +7109,15 @@ export const QUIZ_QUESTIONS: Record<string, QuizQuestion[]> = {
       "sectionId": "selenium-java",
       "sectionTitle": "Selenium WebDriver & Grid",
       "category": "Core Java & OOP for Automation",
-      "question": "What are Access Modifiers in Java, and why are they important in Selenium framework",
+      "question": "What are Access Modifiers in Java, and why are they important in Selenium framework design?",
       "options": [
         "Bypass standard QA test verification and rely on user bug reports in production.",
-        "design? public: Accessible from anywhere.",
+        "They enforce encapsulation by restricting WebElement visibility to page classes while exposing action methods publicly.",
         "Remove all assertion checks from the automated suite to ensure passing builds.",
         "Mark all failed test cases as non-reproducible without investigating logs."
       ],
       "answerIndex": 1,
-      "explanation": "W3C WebDriver compliance and robust synchronization prevent test flakiness in What are Access Modifiers in Java, and w.",
+      "explanation": "Access modifiers (private, protected, default, public) enforce OOP encapsulation in frameworks by keeping WebElements private within page classes and providing public getter/action methods.",
       "difficulty": "Intermediate"
     },
     {
@@ -9721,15 +9721,15 @@ export const QUIZ_QUESTIONS: Record<string, QuizQuestion[]> = {
       "sectionId": "sql-database",
       "sectionTitle": "SQL & Database Verification",
       "category": "Subqueries, Ranking & Advanced Selects",
-      "question": "How do you find employees whose salary is within the top 3 highest salaries in the",
+      "question": "How do you find employees whose salary is within the top 3 highest salaries in the company?",
       "options": [
-        "company? You can use DISTINCT with ORDER BY and LIMIT (or TOP in SQL Server):",
+        "Query with SELECT DISTINCT salary ORDER BY salary DESC LIMIT 3 and filter with WHERE salary IN (...).",
         "Bypass standard QA test verification and rely on user bug reports in production.",
         "Remove all assertion checks from the automated suite to ensure passing builds.",
         "Mark all failed test cases as non-reproducible without investigating logs."
       ],
       "answerIndex": 0,
-      "explanation": "Database integrity validation and transactional safety protect against data corruption in How do you find employees whose salary i.",
+      "explanation": "Retrieve the top 3 distinct salary values ordered descending, then filter employees using a subquery with WHERE salary IN.",
       "difficulty": "Intermediate"
     },
     {
@@ -14415,7 +14415,7 @@ export const QUIZ_QUESTIONS: Record<string, QuizQuestion[]> = {
       "sectionId": "real-time-scenarios",
       "sectionTitle": "100 Real-Time QA Scenarios",
       "category": "Real-Time QA Scenarios",
-      "question": "What if an API request passes but UI fails (e.g., Order API says \"Success\" but UI shows",
+      "question": "What if an API request passes but UI fails (e.g., Order API says \"Success\" but UI shows \"Failed\")?",
       "options": [
         "Assume the test passed because the backend API returned HTTP 200 OK.",
         "Restart the client computer and mark the test case as blocked.",

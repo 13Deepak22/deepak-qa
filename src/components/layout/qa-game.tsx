@@ -29,6 +29,11 @@ interface Defect {
   isPulsing?: boolean;
   hungerThreshold?: number;
   wobbleSeed: number;
+  bugCode: string;
+  bugLabel: string;
+  bugSeverity: "P0" | "P1" | "P2" | "P3";
+  bugIcon: string;
+  bugCategory: string;
 }
 
 
@@ -98,173 +103,165 @@ const generateBugMessage = (score: number, progress: number = 0) => {
   };
 };
 
-interface AnimatedBugProps {
-  size: number;
+export interface BugTemplate {
+  code: string;
+  label: string;
+  defaultSeverity: "P0" | "P1" | "P2" | "P3";
   color: string;
-  speedScale: number;
+  bgTint: string;
+  icon: string;
+  category: string;
+}
+
+export const UI_BUG_TYPES: BugTemplate[] = [
+  { code: "#404", label: "NOT_FOUND", defaultSeverity: "P2", color: "#f59e0b", bgTint: "rgba(245, 158, 11, 0.16)", icon: "⚠️", category: "HTTP" },
+  { code: "#500", label: "INTERNAL_ERR", defaultSeverity: "P0", color: "#ef4444", bgTint: "rgba(239, 68, 68, 0.22)", icon: "💥", category: "SYS" },
+  { code: "#01", label: "NULL_PTR", defaultSeverity: "P1", color: "#f97316", bgTint: "rgba(249, 115, 22, 0.18)", icon: "🛑", category: "MEM" },
+  { code: "#02", label: "RACE_COND", defaultSeverity: "P0", color: "#dc2626", bgTint: "rgba(220, 38, 38, 0.24)", icon: "⚡", category: "SYNC" },
+  { code: "#502", label: "BAD_GATEWAY", defaultSeverity: "P1", color: "#f97316", bgTint: "rgba(249, 115, 22, 0.18)", icon: "🔌", category: "NET" },
+  { code: "#03", label: "MEM_LEAK", defaultSeverity: "P0", color: "#b91c1c", bgTint: "rgba(185, 28, 28, 0.25)", icon: "🔥", category: "HEAP" },
+  { code: "#429", label: "RATE_LIMIT", defaultSeverity: "P2", color: "#eab308", bgTint: "rgba(234, 179, 8, 0.16)", icon: "⏱️", category: "RATE" },
+  { code: "#04", label: "DEADLOCK", defaultSeverity: "P1", color: "#ea580c", bgTint: "rgba(234, 88, 12, 0.18)", icon: "🔒", category: "LOCK" },
+  { code: "#05", label: "TIMEOUT_ERR", defaultSeverity: "P2", color: "#f59e0b", bgTint: "rgba(245, 158, 11, 0.16)", icon: "⏳", category: "WAIT" },
+  { code: "#403", label: "FORBIDDEN", defaultSeverity: "P2", color: "#eab308", bgTint: "rgba(234, 179, 8, 0.16)", icon: "🚫", category: "AUTH" },
+  { code: "#06", label: "FLAKY_SPEC", defaultSeverity: "P3", color: "#10b981", bgTint: "rgba(16, 185, 129, 0.16)", icon: "🧪", category: "TEST" },
+  { code: "#07", label: "STACK_OFLOW", defaultSeverity: "P1", color: "#f97316", bgTint: "rgba(249, 115, 22, 0.18)", icon: "📉", category: "CALL" },
+  { code: "#08", label: "HYDRATE_FAIL", defaultSeverity: "P2", color: "#06b6d4", bgTint: "rgba(6, 182, 212, 0.16)", icon: "💧", category: "SSR" },
+  { code: "#503", label: "SVC_UNAVAIL", defaultSeverity: "P1", color: "#f97316", bgTint: "rgba(249, 115, 22, 0.18)", icon: "🛑", category: "SRV" },
+];
+
+interface NumberedErrorBugProps {
+  bugCode: string;
+  bugLabel: string;
+  bugSeverity: "P0" | "P1" | "P2" | "P3";
+  bugCategory: string;
+  color: string;
+  size: number;
   isEating?: boolean;
   isPulsing?: boolean;
   isFrozen?: boolean;
+  isScanning?: boolean;
 }
 
-const BUG_LEGS = [
-  { id: "ft", set: "a", x1: 14.6, y1: 9.4, x2: 18.2, y2: 5.4 },
-  { id: "mt", set: "b", x1: 11.2, y1: 8.4, x2: 11.6, y2: 3.6 },
-  { id: "bt", set: "a", x1: 7.8, y1: 9.2, x2: 4.6, y2: 5.2 },
-  { id: "fb", set: "b", x1: 14.6, y1: 14.6, x2: 18.2, y2: 18.6 },
-  { id: "mb", set: "a", x1: 11.2, y1: 15.6, x2: 11.6, y2: 20.4 },
-  { id: "bb", set: "b", x1: 7.8, y1: 14.8, x2: 4.6, y2: 18.8 },
-];
-
-function AnimatedBug({ size, color, speedScale, isEating, isPulsing, isFrozen }: AnimatedBugProps) {
-  // Speed-synchronized leg stride duration (tripod crawling gait)
-  const legCycleDuration = isFrozen 
-    ? '0s' 
-    : isEating 
-      ? '0.07s' 
-      : `${Math.max(0.06, 0.28 / (speedScale || 1))}s`;
+function NumberedErrorBug({
+  bugCode,
+  bugLabel,
+  bugSeverity,
+  bugCategory,
+  color,
+  size,
+  isEating,
+  isPulsing,
+  isFrozen,
+  isScanning,
+}: NumberedErrorBugProps) {
+  const isP0 = bugSeverity === "P0" || isPulsing;
+  const accentColor = isFrozen ? "#38bdf8" : color;
 
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={`${isPulsing ? "animate-pulse" : ""} ${isEating ? "bug-game-eating" : "bug-game-crawling"}`}
+    <div
+      className={`relative select-none font-mono text-left transition-all duration-150 ${
+        isEating ? "chip-corrupting-shake" : ""
+      }`}
       style={{
-        animationDuration: isEating ? "0.1s" : legCycleDuration,
         filter: isFrozen
-          ? "drop-shadow(0 0 6px #38bdf8) brightness(1.2)"
-          : isPulsing
-            ? "drop-shadow(0 2px 6px rgba(185, 28, 28, 0.65))"
-            : "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35))",
+          ? "drop-shadow(0 0 10px #38bdf8) brightness(1.25)"
+          : isP0
+            ? "drop-shadow(0 0 12px rgba(239, 68, 68, 0.75))"
+            : `drop-shadow(0 2px 8px ${accentColor}40)`,
       }}
     >
-      {/* P0 Critical energetic pulse ring */}
-      {isPulsing && (
-        <ellipse
-          cx="11"
-          cy="12"
-          rx="7.4"
-          ry="5.8"
-          fill="none"
-          stroke="#ef4444"
-          strokeWidth="0.9"
-          className="bug-game-pulse-aura"
+      {/* Outer Cyber Chip Container */}
+      <div
+        className="relative flex items-center gap-1.5 px-2 py-1 rounded-[6px] border backdrop-blur-md overflow-hidden whitespace-nowrap shadow-lg"
+        style={{
+          backgroundColor: isFrozen ? "rgba(8, 47, 73, 0.94)" : "rgba(10, 10, 14, 0.94)",
+          borderColor: accentColor,
+          boxShadow: isFrozen
+            ? "0 0 14px rgba(56, 189, 248, 0.5), inset 0 0 8px rgba(56, 189, 248, 0.2)"
+            : `0 0 10px ${accentColor}55, inset 0 0 6px ${accentColor}18`,
+        }}
+      >
+        {/* Tech Corner Reticle Accents */}
+        <span
+          className="absolute top-0 left-0 w-1.5 h-1.5 border-t-2 border-l-2 pointer-events-none"
+          style={{ borderColor: accentColor }}
         />
+        <span
+          className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b-2 border-r-2 pointer-events-none"
+          style={{ borderColor: accentColor }}
+        />
+
+        {/* Scanline overlay effect */}
+        <div className="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.8)_50%)] bg-[length:100%_3px]" />
+
+        {/* Flashing Status LED / Pulse Indicator */}
+        <span className="relative flex h-2 w-2 shrink-0">
+          <span
+            className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${
+              isFrozen ? "" : "animate-ping"
+            }`}
+            style={{ backgroundColor: accentColor }}
+          />
+          <span
+            className="relative inline-flex rounded-full h-2 w-2"
+            style={{ backgroundColor: accentColor }}
+          />
+        </span>
+
+        {/* Number Badge (e.g. #404, #500, #01) */}
+        <span
+          className="px-1.5 py-0.5 rounded text-[10.5px] font-black tracking-wider font-mono shrink-0 leading-none shadow-sm"
+          style={{
+            backgroundColor: accentColor,
+            color: "#050505",
+          }}
+        >
+          {bugCode}
+        </span>
+
+        {/* Error Label (e.g. NOT_FOUND, INTERNAL_ERR) */}
+        <span
+          className="text-[10px] font-bold tracking-tight uppercase whitespace-nowrap font-mono leading-none"
+          style={{
+            color: isFrozen ? "#e0f2fe" : "#f4f4f5",
+          }}
+        >
+          {bugLabel}
+        </span>
+
+        {/* Severity Pill */}
+        <span
+          className="text-[8.5px] font-extrabold tracking-widest px-1 py-0.5 rounded border uppercase font-mono shrink-0 leading-none"
+          style={{
+            color: accentColor,
+            borderColor: `${accentColor}80`,
+            backgroundColor: `${accentColor}18`,
+          }}
+        >
+          {isFrozen ? "FROZEN" : bugSeverity}
+        </span>
+      </div>
+
+      {/* Eating / Corrupting DOM laser overlay */}
+      {isEating && (
+        <div
+          className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-950/95 border border-red-500 text-[8.5px] font-mono font-bold text-red-400 whitespace-nowrap shadow-[0_0_8px_rgba(239,68,68,0.7)] animate-pulse"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+          <span>CORRUPTING DOM...</span>
+        </div>
       )}
 
-      {/* --- Precision Articulated Legs (Tripod Locomotion) --- */}
-      {BUG_LEGS.map((leg) => (
-        <line
-          key={leg.id}
-          className={`bug-game-leg ${leg.set === "a" ? "bug-game-leg-a" : "bug-game-leg-b"}`}
-          x1={leg.x1}
-          y1={leg.y1}
-          x2={leg.x2}
-          y2={leg.y2}
-          stroke="var(--ink)"
-          strokeWidth="1.35"
-          strokeLinecap="round"
-          style={{
-            transformOrigin: `${leg.x1}px ${leg.y1}px`,
-            transformBox: "view-box",
-            animationDuration: legCycleDuration,
-            animationPlayState: isFrozen ? "paused" : "running",
-          }}
-        />
-      ))}
-
-      {/* Twitching Sensory Antennae */}
-      <path
-        className="bug-game-antenna"
-        d="M18.6 10.8 Q20.4 8.6 22.4 8.2 M18.6 13.2 Q20.4 15.4 22.4 15.8"
-        stroke="var(--ink)"
-        strokeWidth="1.1"
-        strokeLinecap="round"
-        fill="none"
-        style={{
-          transformOrigin: "18.6px 12px",
-          transformBox: "view-box",
-          animationDuration: isEating ? "0.4s" : "2.4s",
-          animationPlayState: isFrozen ? "paused" : "running",
-        }}
-      />
-
-      {/* Chewing Mandibles / Pincers */}
-      <g>
-        <path
-          className={isEating ? "bug-game-mandible-upper" : ""}
-          d="M 19.3 11.1 Q 21.3 11.3 20.8 12.0"
-          stroke="var(--ink)"
-          strokeWidth="1.0"
-          strokeLinecap="round"
-          fill="none"
-          style={{
-            transformOrigin: "19.3px 11.1px",
-            transformBox: "view-box",
-          }}
-        />
-        <path
-          className={isEating ? "bug-game-mandible-lower" : ""}
-          d="M 19.3 12.9 Q 21.3 12.7 20.8 12.0"
-          stroke="var(--ink)"
-          strokeWidth="1.0"
-          strokeLinecap="round"
-          fill="none"
-          style={{
-            transformOrigin: "19.3px 12.9px",
-            transformBox: "view-box",
-          }}
-        />
-      </g>
-
-      {/* Elytra Shell (Reactive Priority Color) */}
-      <ellipse
-        cx="11"
-        cy="12"
-        rx="6.2"
-        ry="4.8"
-        fill={color}
-        stroke="rgba(0,0,0,0.2)"
-        strokeWidth="0.4"
-      />
-
-      {/* Chitin Specular Gloss Luster */}
-      <path
-        d="M 7.2 9.6 C 9.0 8.3 12.0 8.3 13.8 9.6"
-        stroke="#ffffff"
-        strokeWidth="0.75"
-        strokeLinecap="round"
-        opacity="0.45"
-        fill="none"
-      />
-
-      {/* Wing Divider Seam */}
-      <line
-        x1="5.6"
-        y1="12"
-        x2="15.4"
-        y2="12"
-        stroke="var(--paper)"
-        strokeWidth="0.8"
-        opacity="0.85"
-      />
-
-      {/* 4 Signature Defect Spots */}
-      <circle cx="9" cy="10.1" r="1" fill="var(--paper)" opacity="0.65" />
-      <circle cx="9" cy="13.9" r="1" fill="var(--paper)" opacity="0.65" />
-      <circle cx="12.6" cy="9.9" r="0.8" fill="var(--paper)" opacity="0.65" />
-      <circle cx="12.6" cy="14.1" r="0.8" fill="var(--paper)" opacity="0.65" />
-
-      {/* Sleek Chitin Head */}
-      <circle cx="17.6" cy="12" r="2.5" fill="var(--ink)" />
-
-      {/* Specular Eye Glints */}
-      <circle cx="18.5" cy="10.9" r="0.48" fill="var(--paper)" opacity="0.9" />
-      <circle cx="18.5" cy="13.1" r="0.48" fill="var(--paper)" opacity="0.9" />
-    </svg>
+      {/* Reticle targeting HUD when hovered */}
+      {isScanning && !isEating && (
+        <div className="absolute -inset-1 border border-pass/60 rounded-[8px] pointer-events-none animate-pulse">
+          <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[8px] font-mono font-bold text-pass bg-ink/90 px-1 py-0.2 rounded border border-pass/50 whitespace-nowrap">
+            [+] LOCK TARGET
+          </span>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -572,12 +569,22 @@ export function QaGame() {
     }, 800);
 
     // Generate procedural QA bug log
-    const bugMsg = generateBugMessage(scoreRef.current + 1, progress);
+    const urgency = progress >= 1.0 
+      ? "prevented production outage!" 
+      : progress >= 0.70 
+        ? "prevented critical data loss." 
+        : progress >= 0.35 
+          ? "system stability preserved." 
+          : "routine maintenance.";
+
+    const action = ACTIONS_CATALOG[(scoreRef.current * 3) % ACTIONS_CATALOG.length];
+    const fullText = `${targetBug.bugIcon} ${targetBug.bugSeverity}: ${action} ${targetBug.bugCode} [${targetBug.bugLabel}] (${urgency})`;
+
     const newLog: TerminalLog = {
       id: Date.now(),
-      text: bugMsg.fullText,
-      priority: bugMsg.priority,
-      icon: bugMsg.icon,
+      text: fullText,
+      priority: `${targetBug.bugSeverity} [${targetBug.bugCategory}]`,
+      icon: targetBug.bugIcon,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     };
     setTerminalLogs(prev => [newLog, ...prev.slice(0, 3)]); // Keep last 4 logs
@@ -607,14 +614,15 @@ export function QaGame() {
   // Spawn Defect
   const spawnDefect = useCallback(() => {
     if (defectsRef.current.length >= 6) return; // max simultaneous defects
-    const margin = 70;
+    const margin = 80;
     const x = margin + Math.random() * (window.innerWidth - margin * 2);
     const y = margin + Math.random() * (window.innerHeight - margin * 2);
     
-    // Low priority when born: big, light yellow, slow crawl
+    // Choose template from technical bug catalog
+    const template = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
     const baseSpeed = 0.95 + Math.random() * 0.35; // 0.95 to 1.3 px/frame
-    const baseSize = 58 + Math.random() * 8; // 58px to 66px
-    const hungerThreshold = 5500 + Math.random() * 3200; // 5.5s to 8.7s before critical
+    const baseSize = 60;
+    const hungerThreshold = 6000 + Math.random() * 3200; // 6s to 9.2s before critical
     
     const newDefect: Defect = {
       id: Math.random().toString(36).substring(7),
@@ -627,11 +635,16 @@ export function QaGame() {
       speed: baseSpeed,
       size: baseSize,
       baseSize,
-      color: "#fde047", // Light yellow
-      isPulsing: false,
+      color: template.color,
+      isPulsing: template.defaultSeverity === "P0",
       direction: Math.random() * Math.PI * 2,
       hungerThreshold,
-      wobbleSeed: Math.random() * 1000
+      wobbleSeed: Math.random() * 1000,
+      bugCode: template.code,
+      bugLabel: template.label,
+      bugSeverity: template.defaultSeverity,
+      bugIcon: template.icon,
+      bugCategory: template.category,
     };
     
     setDefects(prev => [...prev, newDefect]);
@@ -829,38 +842,34 @@ export function QaGame() {
       const progress = Math.min(age / threshold, 1.2);
       
       // Fully reactive state progression:
-      // P3 [Low]: Light yellow (#fde047), big (1.0x), slow (1.0x)
-      // P2 [Medium]: Orange (#f97316), shrinking (0.75x), faster (2.0x)
-      // P1 [High]: Red (#ef4444), small (0.55x), fast (3.2x)
-      // P0 [Critical]: Dark crimson (#b91c1c), smallest (0.40x), frantic fast (4.6x), pulsing
-      let color = "#fde047";
+      let color = bug.color;
       let isPulsing = false;
-      let sizeScale = 1.0;
+      let severity: "P0" | "P1" | "P2" | "P3" = bug.bugSeverity;
       let speedScale = 1.0;
 
       if (progress >= 1.0) {
-        color = "#b91c1c";
+        color = "#dc2626";
         isPulsing = true;
-        sizeScale = 0.40; // ~24px - 27px (smallest)
-        speedScale = 4.6; // super fast darting
+        severity = "P0";
+        speedScale = 4.2; // frantic darting
       } else if (progress >= 0.70) {
         color = "#ef4444";
         isPulsing = false;
-        sizeScale = 0.55; // ~33px - 37px
-        speedScale = 3.2; // fast
+        severity = "P1";
+        speedScale = 3.0; // fast
       } else if (progress >= 0.35) {
-        color = "#f97316";
+        color = bug.color;
         isPulsing = false;
-        sizeScale = 0.75; // ~45px - 51px
-        speedScale = 2.0; // medium
+        severity = bug.bugSeverity === "P0" ? "P0" : "P2";
+        speedScale = 1.9; // medium
       } else {
-        color = "#fde047";
+        color = bug.color;
         isPulsing = false;
-        sizeScale = 1.0;  // 60px - 68px (big)
-        speedScale = 1.0; // slow crawl
+        severity = bug.bugSeverity;
+        speedScale = 1.0; // steady drift
       }
 
-      const currentSize = Math.round(bug.baseSize * sizeScale);
+      const currentSize = bug.baseSize;
       let activeSpeed = isFrozen ? 0 : bug.originalSpeed * speedScale;
       
       // Eating handling
@@ -900,13 +909,14 @@ export function QaGame() {
           // 2. Play crash detonation audio
           playCrashAudio();
 
-          // 3. Child bug logic: Spawn brand new P3 low bug (big, light yellow, slow crawl)
+          // 3. Child bug logic: Spawn brand new defect from catalog
+          const childTemplate = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
           const childSpeed = 0.95 + Math.random() * 0.35;
-          const childSize = 58 + Math.random() * 8;
+          const childSize = 60;
           newBugsToSpawn.push({
             id: Math.random().toString(36).substring(7),
-            x: Math.max(20, Math.min(window.innerWidth - childSize - 20, bug.x + (Math.random() - 0.5) * 50)),
-            y: Math.max(20, Math.min(window.innerHeight - childSize - 20, bug.y + (Math.random() - 0.5) * 50)),
+            x: Math.max(70, Math.min(window.innerWidth - 70, bug.x + (Math.random() - 0.5) * 60)),
+            y: Math.max(70, Math.min(window.innerHeight - 70, bug.y + (Math.random() - 0.5) * 60)),
             squashed: false,
             eating: false,
             eatingTarget: null,
@@ -915,11 +925,16 @@ export function QaGame() {
             speed: childSpeed,
             size: childSize,
             baseSize: childSize,
-            color: "#fde047", // light yellow
-            isPulsing: false,
+            color: childTemplate.color,
+            isPulsing: childTemplate.defaultSeverity === "P0",
             direction: Math.random() * Math.PI * 2,
-            hungerThreshold: 5500 + Math.random() * 3200,
-            wobbleSeed: Math.random() * 1000
+            hungerThreshold: 6000 + Math.random() * 3200,
+            wobbleSeed: Math.random() * 1000,
+            bugCode: childTemplate.code,
+            bugLabel: childTemplate.label,
+            bugSeverity: childTemplate.defaultSeverity,
+            bugIcon: childTemplate.icon,
+            bugCategory: childTemplate.category,
           });
 
           playBirthAudio();
@@ -951,7 +966,7 @@ export function QaGame() {
 
           const newLog: TerminalLog = {
             id: Date.now(),
-            text: "💥 P0 Defect crashed section content and burned out. Spawned child defect.",
+            text: `💥 Critical defect ${bug.bugCode} crashed section content and burned out. Spawned child ${childTemplate.code}.`,
             priority: "P0 [CRASH]",
             icon: "💥",
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -961,7 +976,7 @@ export function QaGame() {
           // 4. Old critical bug DIES! Returning null removes it from defects list.
           return null;
         }
-        return { ...bug, color: "#b91c1c", isPulsing: true, size: currentSize }; // Stay still while chewing
+        return { ...bug, color: "#dc2626", isPulsing: true, size: currentSize }; // Stay still while corrupting
       }
 
       let nextLastHitTest = bug.lastHitTest || 0;
@@ -974,7 +989,7 @@ export function QaGame() {
       if (isSeekingFood && !bug.scanning && !isFrozen) {
         if (now - nextLastHitTest > 260) {
           nextLastHitTest = now;
-          const leafTarget = findContentLeafTarget(bug.x + currentSize / 2, bug.y + currentSize / 2);
+          const leafTarget = findContentLeafTarget(bug.x, bug.y);
           if (leafTarget) {
             leafTarget.setAttribute('data-eating-by', bug.id);
             leafTarget.style.transition = 'color 0.2s ease, text-decoration 0.2s ease, outline 0.2s ease, transform 0.2s ease';
@@ -994,13 +1009,13 @@ export function QaGame() {
               speed: 0,
               speedScale: 0,
               lastHitTest: nextLastHitTest,
-              color: progress >= 1.0 ? '#b91c1c' : bug.color,
+              color: progress >= 1.0 ? '#dc2626' : bug.color,
               isPulsing: progress >= 1.0,
               size: currentSize
             };
           } else {
             // Steer towards nearest leaf in section/viewport
-            const nearby = findNearbyLeafElement(bug.x + currentSize / 2, bug.y + currentSize / 2);
+            const nearby = findNearbyLeafElement(bug.x, bug.y);
             if (nearby) {
               const rect = nearby.getBoundingClientRect();
               const targetAngle = Math.atan2((rect.top + rect.height / 2) - bug.y, (rect.left + rect.width / 2) - bug.x);
@@ -1010,19 +1025,21 @@ export function QaGame() {
         }
       }
 
-      // Natural organic scurrying stride oscillation
-      const scuttleStride = isFrozen ? 0 : nextSpeed * (1 + 0.18 * Math.sin(now * 0.024 + bug.wobbleSeed));
+      // Smooth floating stride oscillation
+      const scuttleStride = isFrozen ? 0 : nextSpeed * (1 + 0.15 * Math.sin(now * 0.02 + bug.wobbleSeed));
       let newX = bug.x + Math.cos(nextDirection) * scuttleStride;
       let newY = bug.y + Math.sin(nextDirection) * scuttleStride;
 
-      // Bounce off viewport boundaries
-      if (newX < 0 || newX > window.innerWidth - currentSize) {
+      // Bounce off viewport boundaries (keeping error chip fully visible on screen)
+      const halfW = 65;
+      const halfH = 20;
+      if (newX < halfW || newX > window.innerWidth - halfW) {
         nextDirection = Math.PI - nextDirection;
-        newX = Math.max(0, Math.min(newX, window.innerWidth - currentSize));
+        newX = Math.max(halfW, Math.min(newX, window.innerWidth - halfW));
       }
-      if (newY < 0 || newY > window.innerHeight - currentSize) {
+      if (newY < halfH || newY > window.innerHeight - halfH) {
         nextDirection = -nextDirection;
-        newY = Math.max(0, Math.min(newY, window.innerHeight - currentSize));
+        newY = Math.max(halfH, Math.min(newY, window.innerHeight - halfH));
       }
 
       // Random gentle wander
@@ -1040,7 +1057,8 @@ export function QaGame() {
         speed: nextSpeed, 
         speedScale,
         color, 
-        isPulsing 
+        isPulsing,
+        bugSeverity: severity,
       };
     });
 
@@ -1275,17 +1293,16 @@ export function QaGame() {
           {/* Bug Entities Game Area */}
           <div className="absolute inset-0">
             {defects.map(bug => {
-              // Crawling leg wobble calculation - frequency scales with speed
-              const isFast = (bug.speedScale || 1) > 2;
-              const wobbleDeg = bug.eating 
-                ? Math.sin(Date.now() / 40) * 8 
-                : Math.sin((Date.now() + bug.wobbleSeed) / (isFast ? 35 : 75)) * (isFast ? 10 : 6);
+              // Floating tilt calculation — upright with gentle banking wobble (never upside-down)
+              const floatTiltDeg = bug.eating 
+                ? Math.sin(Date.now() / 35) * 4 
+                : Math.sin((Date.now() + bug.wobbleSeed) / 220) * 3 + Math.cos(bug.direction) * 4;
 
               return (
                 <button
                   key={bug.id}
                   data-squashed={bug.squashed ? "true" : undefined}
-                  data-cursor="Squash defect!"
+                  data-cursor={`Squash defect ${bug.bugCode}: ${bug.bugLabel}`}
                   onClick={() => squashDefect(bug.id, bug.x, bug.y)}
                   onPointerEnter={() => handlePointerEnter(bug.id)}
                   onPointerLeave={() => handlePointerLeave(bug.id)}
@@ -1295,43 +1312,29 @@ export function QaGame() {
                   style={{
                     left: bug.x,
                     top: bug.y,
-                    width: bug.size,
-                    height: bug.size,
-                    transform: bug.squashed ? "scale(0)" : "scale(1)",
-                    transition: bug.squashed ? "transform 350ms cubic-bezier(0.1, 0.9, 0.2, 1), opacity 350ms ease" : "width 200ms ease, height 200ms ease",
+                    transform: `translate(-50%, -50%) scale(${bug.squashed ? 0 : 1})`,
+                    transition: bug.squashed ? "transform 350ms cubic-bezier(0.1, 0.9, 0.2, 1), opacity 350ms ease" : "opacity 150ms ease",
                     opacity: bug.squashed ? 0 : 1,
-                    color: bug.color,
-                    rotate: `${(bug.direction * 180) / Math.PI + wobbleDeg}deg`,
+                    rotate: `${floatTiltDeg}deg`,
                     cursor: "crosshair",
                     pointerEvents: bug.squashed ? "none" : "auto",
-                    filter: isFrozen ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)" : undefined
                   }}
-                  aria-label={bug.squashed ? undefined : "Squash defect"}
+                  aria-label={bug.squashed ? undefined : `Squash defect ${bug.bugCode} ${bug.bugLabel}`}
                   aria-hidden={bug.squashed ? "true" : undefined}
                   disabled={bug.squashed}
                 >
-                  <AnimatedBug
-                    size={bug.size}
+                  <NumberedErrorBug
+                    bugCode={bug.bugCode}
+                    bugLabel={bug.bugLabel}
+                    bugSeverity={bug.bugSeverity}
+                    bugCategory={bug.bugCategory}
                     color={bug.color}
-                    speedScale={bug.speedScale || 1}
+                    size={bug.size}
                     isEating={bug.eating}
                     isPulsing={bug.isPulsing}
                     isFrozen={isFrozen}
+                    isScanning={bug.scanning}
                   />
-
-                  {/* Threat Indicator Ping for Critical P0 Bugs */}
-                  {bug.isPulsing && !bug.squashed && (
-                    <span 
-                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-600 animate-ping pointer-events-none" 
-                    />
-                  )}
-
-                  {/* Chewing/Eating indicator badge above bug */}
-                  {bug.eating && !bug.squashed && (
-                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 font-mono text-[9px] font-bold text-red-500 bg-black/85 px-1 py-0.2 rounded border border-red-500 animate-pulse whitespace-nowrap pointer-events-none transition-opacity duration-200">
-                      CORRUPTING...
-                    </span>
-                  )}
                 </button>
               );
             })}
@@ -1519,74 +1522,15 @@ export function QaGame() {
             .animate-fade-in {
               animation: fadeIn 0.25s ease-out forwards;
             }
-            @keyframes bugGameLegStepA {
-              0% { transform: rotate(-16deg); }
-              50% { transform: rotate(16deg); }
-              100% { transform: rotate(-16deg); }
+            @keyframes chipCorruptingShake {
+              0% { transform: translate(0, 0); }
+              25% { transform: translate(-1.5px, 1px); }
+              50% { transform: translate(1.5px, -1px); }
+              75% { transform: translate(-1px, -1px); }
+              100% { transform: translate(0, 0); }
             }
-            @keyframes bugGameLegStepB {
-              0% { transform: rotate(16deg); }
-              50% { transform: rotate(-16deg); }
-              100% { transform: rotate(16deg); }
-            }
-            @keyframes bugGameAntennaSniff {
-              0%, 76%, 100% { transform: rotate(0deg); }
-              82% { transform: rotate(-10deg); }
-              88% { transform: rotate(8deg); }
-              94% { transform: rotate(-6deg); }
-            }
-            @keyframes bugGameMandibleUpper {
-              0%, 100% { transform: rotate(0deg); }
-              50% { transform: rotate(24deg); }
-            }
-            @keyframes bugGameMandibleLower {
-              0%, 100% { transform: rotate(0deg); }
-              50% { transform: rotate(-24deg); }
-            }
-            @keyframes bugGameEatingScuttle {
-              0% { transform: scale(1) translateX(0); }
-              50% { transform: scale(1.06, 0.94) translateX(0.6px); }
-              100% { transform: scale(1) translateX(0); }
-            }
-            @keyframes bugGameWaddle {
-              0% { transform: translateY(-0.3px) rotate(-1.5deg); }
-              50% { transform: translateY(0.3px) rotate(1.5deg); }
-              100% { transform: translateY(-0.3px) rotate(-1.5deg); }
-            }
-            @keyframes bugGamePulseRing {
-              0% { transform: scale(0.92); opacity: 0.85; }
-              100% { transform: scale(1.35); opacity: 0; }
-            }
-            .bug-game-leg,
-            .bug-game-antenna,
-            .bug-game-mandible-upper,
-            .bug-game-mandible-lower,
-            .bug-game-pulse-aura {
-              transform-box: view-box;
-            }
-            .bug-game-leg-a {
-              animation: bugGameLegStepA infinite ease-in-out;
-            }
-            .bug-game-leg-b {
-              animation: bugGameLegStepB infinite ease-in-out;
-            }
-            .bug-game-antenna {
-              animation: bugGameAntennaSniff 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-            }
-            .bug-game-mandible-upper {
-              animation: bugGameMandibleUpper 0.12s infinite ease-in-out;
-            }
-            .bug-game-mandible-lower {
-              animation: bugGameMandibleLower 0.12s infinite ease-in-out;
-            }
-            .bug-game-eating {
-              animation: bugGameEatingScuttle 0.1s infinite ease-in-out;
-            }
-            .bug-game-crawling {
-              animation: bugGameWaddle infinite ease-in-out;
-            }
-            .bug-game-pulse-aura {
-              animation: bugGamePulseRing 0.75s ease-out infinite;
+            .chip-corrupting-shake {
+              animation: chipCorruptingShake 0.12s infinite ease-in-out;
             }
           `}} />
         </div>

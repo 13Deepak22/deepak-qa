@@ -43,7 +43,7 @@ export const GUIDE_TRACKS: LearningTrack[] = [
     title: "Microsoft Playwright Automation",
     shortTitle: "Playwright",
     toolTag: "Playwright · Web & MCP",
-    tagline: "Auto-waits, multi-context browser isolation, trace viewer & MCP AI test agents.",
+    tagline: "Auto-waits, multi-context browser isolation, and trace debugging.",
     description: "Next-gen web automation: zero-flakiness auto-waiting, network mocking, HAR capture, Codegen test generator, Trace Viewer debugging, and API testing capabilities.",
     logo: "playwright",
     docCount: 16,
@@ -54,7 +54,7 @@ export const GUIDE_TRACKS: LearningTrack[] = [
     title: "Postman & REST API Automation",
     shortTitle: "Postman API",
     toolTag: "Postman · REST API",
-    tagline: "Dynamic variables, JSON schemas, assertion scripts & Newman headless suites.",
+    tagline: "Variables, assertion scripts, JSON schema validation, and Newman runner.",
     description: "Automate REST APIs with Postman: pre-request scripts, test assertions, environment scopes, JSON schema validation, Newman headless CLI runners, and mock servers.",
     logo: "postman",
     docCount: 10,
@@ -65,7 +65,7 @@ export const GUIDE_TRACKS: LearningTrack[] = [
     title: "Selenium WebDriver & Grid",
     shortTitle: "Selenium 4",
     toolTag: "Selenium 4 · Web Grid",
-    tagline: "W3C WebDriver compliance, dynamic locators, explicit waits & Grid scaling.",
+    tagline: "W3C WebDriver compliance, dynamic locators, and Grid distributed testing.",
     description: "Classic browser automation using modern Selenium 4: W3C WebDriver compliance, dynamic locators, explicit & fluent waits, Actions API, JavaScriptExecutor, and Selenium Grid distributed testing.",
     logo: "selenium",
     docCount: 11,
@@ -76,7 +76,7 @@ export const GUIDE_TRACKS: LearningTrack[] = [
     title: "Appium Mobile Automation",
     shortTitle: "Appium Mobile",
     toolTag: "Appium · iOS & Android",
-    tagline: "Native Android & iOS automation with UiAutomator2, XCUITest & touch gestures.",
+    tagline: "Native mobile automation with UiAutomator2, XCUITest, and touch gestures.",
     description: "Automate native mobile apps: UiAutomator2, XCUITest driver, mobile touch gestures, Appium Inspector, real device testing, and cloud device farm execution.",
     logo: "appium",
     docCount: 11,
@@ -87,7 +87,7 @@ export const GUIDE_TRACKS: LearningTrack[] = [
     title: "Apache JMeter Performance Testing",
     shortTitle: "JMeter Load Testing",
     toolTag: "JMeter · Concurrency Load",
-    tagline: "Virtual user load simulation, Thread Groups, Timers & CLI remote slaves.",
+    tagline: "Thread Groups, load distribution, response assertions, and CLI execution.",
     description: "Simulate thousands of concurrent virtual users: Thread Groups, HTTP Request Defaults, CSV Data Set Config, Timers, Listeners, Response Assertions, and Distributed Remote Slaves.",
     logo: "jmeter",
     docCount: 10,
@@ -98,7 +98,7 @@ export const GUIDE_TRACKS: LearningTrack[] = [
     title: "Java for QA & Test Automation",
     shortTitle: "Java for Testers",
     toolTag: "Java · SDET & Frameworks",
-    tagline: "64 chapters: OOP, 50+ keywords, Collections, Streams & ThreadLocal safety.",
+    tagline: "OOP concepts, Collections framework, exception handling, and ThreadLocal safety.",
     description: "Start Java from absolute zero: JDK architecture, 50+ keywords, modern switch expressions, Collections (List, Set, Map), exception handling, and ThreadLocal safety.",
     logo: "java",
     docCount: 64,
@@ -109,7 +109,7 @@ export const GUIDE_TRACKS: LearningTrack[] = [
     title: "TypeScript for QA Engineers",
     shortTitle: "TS for Playwright",
     toolTag: "TypeScript · Strongly Typed POM",
-    tagline: "Strict typing, typed Page Object Models, generics & Zod schema validation.",
+    tagline: "Strict typing, typed Page Object Models, generics, and Zod validation.",
     description: "Start TypeScript from absolute zero: strict typing, strongly typed Page Object Models, generic API clients, utility types (Partial, Pick, Omit), custom fixtures, and Zod schema validation.",
     logo: "typescript",
     docCount: 16,
@@ -120,7 +120,7 @@ export const GUIDE_TRACKS: LearningTrack[] = [
     title: "Modern JavaScript for Playwright",
     shortTitle: "JS for Playwright",
     toolTag: "JavaScript · Modern ES6+",
-    tagline: "19 Playwright-tailored chapters: ES6+, async/await & fixture destructuring.",
+    tagline: "Modern ES6+, async/await execution, and fixture destructuring.",
     description: "Start JavaScript from absolute zero: const/let scoping, destructuring fixtures ({ page, request }), async/await event loop, for..of locator iteration, page.evaluate, and network mocking.",
     logo: "javascript",
     docCount: 19,
@@ -131,7 +131,7 @@ export const GUIDE_TRACKS: LearningTrack[] = [
     title: "Test Automation Architecture",
     shortTitle: "Architecture & CI/CD",
     toolTag: "DevOps · CI/CD & Docker",
-    tagline: "Production test architecture: POM, Docker grids & GitHub Actions CI/CD.",
+    tagline: "Page Object Model, containerized test execution, and CI/CD pipelines.",
     description: "Design production-grade test automation architecture: Page Object Model (POM), data-driven testing, GitHub Actions CI/CD pipelines, Docker containerized grids, and the test automation pyramid.",
     logo: "docker",
     docCount: 12,
@@ -142,7 +142,7 @@ export const GUIDE_TRACKS: LearningTrack[] = [
     title: "Manual Software Testing & QA",
     shortTitle: "Manual QA",
     toolTag: "Manual QA · STLC & ISTQB",
-    tagline: "31 chapters: 7 ISTQB principles, SDLC, STLC, BVA, ECP & Defect triage.",
+    tagline: "STLC phases, test design techniques, boundary value analysis, and defect triage.",
     description: "Start from absolute zero: 7 ISTQB principles, SDLC models, STLC 6 phases, BVA & ECP, decision tables, state machines, IEEE 829 test plans, defect lifecycle, and FinTech payment QA.",
     logo: "manual",
     docCount: 31,
@@ -159,7 +159,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     title: "Playwright + MCP Automation",
     shortTitle: "Playwright + MCP",
     toolTag: "Playwright · MCP Protocol",
-    tagline: "37 questions: MCP server architecture, AI test generation & self-healing QA.",
+    tagline: "Playwright architecture, live locators, trace debugging, and MCP protocol integration.",
     description: "Deep dive into Microsoft Playwright and Model Context Protocol (MCP) testing: CDP engine, live locators, Planner/Generator/Healer agents, MCP server tools, and CI/CD governance.",
     qCount: "37 Q&As",
     logo: "playwright",
@@ -170,7 +170,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     title: "API Testing with Postman",
     shortTitle: "Postman API",
     toolTag: "Postman · REST & Newman",
-    tagline: "107+ questions: REST architecture, HTTP methods, scripts & Newman CLI.",
+    tagline: "REST architecture, HTTP status codes, pre-request scripts, assertions, and Newman CLI.",
     description: "Complete API testing interview questions: REST architecture, idempotency, pre-request scripts, test assertions, Newman headless CLI suites, environment scopes, and mock servers.",
     qCount: "107+ Q&As",
     logo: "postman",
@@ -181,7 +181,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     title: "Selenium with Java",
     shortTitle: "Selenium Java",
     toolTag: "Selenium · WebDriver & POM",
-    tagline: "153 questions: WebDriver 4, dynamic locators, waits, TestNG & POM.",
+    tagline: "WebDriver 4, dynamic locators, explicit waits, TestNG lifecycle, and Page Object Models.",
     description: "Complete Selenium with Java interview questions: Selenium 3 vs 4, StaleElementReferenceException handling, FluentWait vs WebDriverWait, JavaScriptExecutor, Page Object Model, and TestNG framework.",
     qCount: "153 Q&As",
     logo: "selenium",
@@ -192,7 +192,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     title: "Core Java for SDET / QA",
     shortTitle: "Core Java",
     toolTag: "Java · SDET Fundamentals",
-    tagline: "55+ questions: OOP concepts, Collections, Exceptions & ThreadLocal.",
+    tagline: "OOP principles, Collections, exception handling, and ThreadLocal safety.",
     description: "Essential Java interview questions for QA: OOP principles, method overriding vs overloading, Collections (List, Set, Map), exceptions hierarchy, garbage collection, and ThreadLocal safety.",
     qCount: "55+ Q&As",
     logo: "java",
@@ -203,7 +203,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     title: "Top 20 Java Programs",
     shortTitle: "Java Programs",
     toolTag: "Java · Coding Solutions",
-    tagline: "Top 20 coding interview programs with complete runnable Java code.",
+    tagline: "Common string, array, and algorithmic interview programs with runnable solutions.",
     description: "String reverse, palindrome check, Fibonacci sequence, prime numbers, armstrong number, remove duplicates, count characters, and array sorting with full runnable Java solutions.",
     qCount: "20 Programs",
     logo: "java",
@@ -214,7 +214,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     title: "CI/CD, Jenkins & Docker",
     shortTitle: "DevOps QA",
     toolTag: "Docker · Pipelines & Linux",
-    tagline: "106 questions: Jenkinsfile, webhook triggers, Docker & Linux test runners.",
+    tagline: "Jenkins declarative pipelines, webhook triggers, Docker test containers, and Linux commands.",
     description: "DevOps & CI/CD interview questions for QA: Jenkins declarative pipelines, webhook triggers, Docker test containers, Linux commands, and automated CI test execution.",
     qCount: "106 Q&As",
     logo: "docker",
@@ -225,7 +225,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     title: "Git & Version Control",
     shortTitle: "Git & GitHub",
     toolTag: "Git · Branching & Remotes",
-    tagline: "25 questions: Repositories, branching, remotes, git revert & reset.",
+    tagline: "Branching workflows, merge conflicts, pull requests, git revert, and remote repository commands.",
     description: "Master essential Git commands and workflows for QA: git init, staging, commits, branch management, merge, remote GitHub workflow, git revert, reset, and commit --amend.",
     qCount: "25 Q&As",
     logo: "git",
@@ -236,7 +236,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     title: "SQL & Database Testing",
     shortTitle: "SQL & DB",
     toolTag: "SQL · Data Verification",
-    tagline: "52+ questions: SELECT queries, WHERE, GROUP BY, joins & ACID rules.",
+    tagline: "Complex SELECT queries, JOIN operations, aggregate functions, and database testing for QA.",
     description: "Core SQL interview questions for QA engineers: find second highest salary, eliminate duplicate rows, INNER vs LEFT joins, aggregations, ACID transactions, and database testing for QA.",
     qCount: "52+ Q&As",
     logo: "sql",
@@ -247,7 +247,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     title: "Manual Testing Q&A",
     shortTitle: "Manual QA",
     toolTag: "Manual QA · ISTQB & BVA",
-    tagline: "130+ questions: SDLC, STLC, Defect Life Cycle, ISTQB principles & BVA.",
+    tagline: "STLC phases, test design techniques, severity vs priority, defect triage, and test cases.",
     description: "Sequence-wise interview questions covering testing fundamentals, 7 ISTQB principles, verification vs validation, severity vs priority, boundary value analysis, decision tables, defect triage, and root cause analysis.",
     qCount: "130+ Q&As",
     logo: "manual",
@@ -258,7 +258,7 @@ export const INTERVIEW_MODULES: InterviewModuleItem[] = [
     title: "100 Real-Time QA Scenarios",
     shortTitle: "100 Scenarios",
     toolTag: "Scenarios · Real-World QA",
-    tagline: "105 scenario-based questions: e-commerce, payment timeouts & hotfixes.",
+    tagline: "Practical scenarios: concurrency conflicts, payment timeouts, flakiness mitigation, and triage.",
     description: "100 practical real-world QA engineering scenarios: concurrency conflicts, payment gateway timeouts, cart drop-offs, flakiness mitigation, production escalations, and cross-team disputes.",
     qCount: "105 Scenarios",
     logo: "interview",
@@ -303,27 +303,17 @@ export function LearnHubPage() {
     <main id="content" tabIndex={-1} className="outline-none">
       <div className="mx-auto max-w-6xl px-4 pt-10 pb-16 sm:px-6 sm:pt-14 sm:pb-20">
         
-        {/* Minimal Editorial Header */}
+        {/* Minimal Theme-Matching Header */}
         <div className="enter enter-1">
           <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-            <span className="text-pass">06</span> / Engineering Knowledge Base
+            <span className="text-pass">06</span> / Knowledge Base
           </p>
-          <div className="mt-2 flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink font-normal">
-                Learn with me.
-              </h1>
-              <p className="mt-2 text-sm sm:text-base text-ink-soft max-w-2xl leading-relaxed">
-                Production-grade automation architectures, engineering patterns, and real-world interview Q&amp;As.
-              </p>
-            </div>
-
-            {/* Quick Minimal Stats Indicator */}
-            <div className="font-mono text-xs text-muted shrink-0 pb-1 flex items-center gap-2">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-pass animate-pulse" />
-              <span>10 Engineering Guides · 10 Interview Modules</span>
-            </div>
-          </div>
+          <h1 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink font-normal">
+            Learn with me.
+          </h1>
+          <p className="mt-2 text-sm sm:text-base text-ink-soft max-w-xl leading-relaxed">
+            Personal reference notes, test automation guides, and QA interview prep.
+          </p>
         </div>
 
         {/* ========================================================= */}
@@ -347,9 +337,6 @@ export function LearnHubPage() {
             >
               <BookOpen className="h-4 w-4" />
               <span>1. Engineering Guides</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded ${activeCategory === "guides" ? "bg-paper/25 text-paper" : "bg-paper border border-line text-muted"}`}>
-                10
-              </span>
             </button>
 
             <button
@@ -366,9 +353,6 @@ export function LearnHubPage() {
             >
               <HelpCircle className="h-4 w-4" />
               <span>2. Interview Q&amp;A</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded ${activeCategory === "interviews" ? "bg-paper/25 text-paper" : "bg-paper border border-line text-muted"}`}>
-                10
-              </span>
             </button>
           </div>
 
@@ -394,16 +378,11 @@ export function LearnHubPage() {
           </div>
         </div>
 
-        {/* Active Category Header & Result Counter */}
-        <div className="mt-6 flex items-center justify-between pb-2.5 border-b border-line">
-          <div className="flex items-center gap-2 font-mono text-xs">
-            <span className="font-semibold text-pass uppercase tracking-wider">
-              {isGuides ? "Engineering Guides" : "Interview Q&A Modules"}
-            </span>
-            <span className="text-muted">
-              / Showing {currentCount} of {totalCount} {isGuides ? "Guides" : "Modules"}
-            </span>
-          </div>
+        {/* Active Category Subheader */}
+        <div className="mt-6 flex items-center justify-between pb-2.5 border-b border-line font-mono text-xs">
+          <span className="font-semibold text-pass uppercase tracking-wider">
+            {isGuides ? "Engineering Guides" : "Interview Q&A"}
+          </span>
 
           {searchQuery && (
             <button
@@ -440,7 +419,7 @@ export function LearnHubPage() {
               <Link
                 key={track.id}
                 href={`/learn/${track.slug}`}
-                data-cursor={`Read ${track.shortTitle} guide (${track.docCount} chapters)`}
+                data-cursor={`Read ${track.shortTitle} guide`}
                 className="group relative flex flex-col justify-between rounded-lg border border-line bg-card p-4 shadow-2xs hover:border-pass/70 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200 cursor-pointer overflow-hidden"
               >
                 <div>
@@ -453,8 +432,8 @@ export function LearnHubPage() {
                       <span className="font-mono text-[10.5px] font-semibold text-pass tracking-wide uppercase truncate block">
                         {track.toolTag}
                       </span>
-                      <span className="font-mono text-[11px] text-muted">
-                        {track.docCount} Chapters
+                      <span className="font-mono text-[10.5px] text-muted">
+                        Engineering Guide
                       </span>
                     </div>
                   </div>
@@ -472,7 +451,7 @@ export function LearnHubPage() {
                 {/* Minimal Footer */}
                 <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between font-mono text-xs">
                   <span className="text-muted text-[11px]">
-                    Complete Guide
+                    Guide
                   </span>
                   <span className="inline-flex items-center gap-1 text-pass font-medium group-hover:translate-x-1 transition-transform">
                     <span>Read Guide</span>
@@ -493,7 +472,7 @@ export function LearnHubPage() {
               <Link
                 key={item.id}
                 href={`/learn/${item.slug}`}
-                data-cursor={`Study ${item.shortTitle} interview questions (${item.qCount})`}
+                data-cursor={`Study ${item.shortTitle} interview questions`}
                 className="group relative flex flex-col justify-between rounded-lg border border-line bg-card p-4 shadow-2xs hover:border-pass/70 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200 cursor-pointer overflow-hidden"
               >
                 <div>
@@ -506,8 +485,8 @@ export function LearnHubPage() {
                       <span className="font-mono text-[10.5px] font-semibold text-pass tracking-wide uppercase truncate block">
                         {item.toolTag}
                       </span>
-                      <span className="font-mono text-[11px] text-muted">
-                        {item.qCount}
+                      <span className="font-mono text-[10.5px] text-muted">
+                        Interview Q&amp;A
                       </span>
                     </div>
                   </div>
@@ -525,7 +504,7 @@ export function LearnHubPage() {
                 {/* Minimal Footer */}
                 <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between font-mono text-xs">
                   <span className="text-muted text-[11px]">
-                    Sequential Q&amp;As
+                    Interview Prep
                   </span>
                   <span className="inline-flex items-center gap-1 text-pass font-medium group-hover:translate-x-1 transition-transform">
                     <span>View Q&amp;As</span>

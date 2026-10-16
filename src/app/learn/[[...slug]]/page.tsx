@@ -35,20 +35,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (slug.length === 0) {
     return {
-      title: "Learn with me — Engineering Guides & QA Hub — Deepak Gupta",
-      description: "Choose what you want to learn: 10 Engineering Guides (Manual QA, Automation Architecture, Postman, JMeter, Selenium, Appium, Playwright, Java, JS, TS) and 8 QA Interview Q&A Modules.",
+      title: `Learn with me — QA Engineering Guides & Interview Prep — ${siteTitleSuffix}`,
+      description: "Personal reference notes, test automation guides, and QA interview prep by Deepak Gupta.",
       alternates: { canonical: "/learn" },
       openGraph: {
-        title: `Learn with me — Engineering Guides & QA Hub — ${siteTitleSuffix}`,
-        description: "Choose what you want to learn: 10 Engineering Guides (Manual QA, Automation Architecture, Postman, JMeter, Selenium, Appium, Playwright, Java, JS, TS) and 8 QA Interview Q&A Modules.",
+        title: `Learn with me — QA Engineering Guides & Interview Prep — ${siteTitleSuffix}`,
+        description: "Personal reference notes, test automation guides, and QA interview prep by Deepak Gupta.",
         url: "/learn",
         type: "website",
         images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Learn Software Testing & Automation with Deepak Gupta" }],
       },
       twitter: {
         card: "summary_large_image",
-        title: `Learn with me — Engineering Guides & QA Hub — ${siteTitleSuffix}`,
-        description: "Choose what you want to learn: 10 Engineering Guides (Manual QA, Automation Architecture, Postman, JMeter, Selenium, Appium, Playwright, Java, JS, TS) and 8 QA Interview Q&A Modules.",
+        title: `Learn with me — QA Engineering Guides & Interview Prep — ${siteTitleSuffix}`,
+        description: "Personal reference notes, test automation guides, and QA interview prep by Deepak Gupta.",
         images: ["/opengraph-image"],
       },
     };

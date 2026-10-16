@@ -27,6 +27,10 @@ interface Defect {
   originalSpeed: number;
   spawnTime: number;
   hasAlertedCritical?: boolean;
+  isDying?: boolean;
+  dieStartTime?: number;
+  isBorn?: boolean;
+  birthStartTime?: number;
   size: number;
   baseSize: number;
   speed: number;
@@ -983,8 +987,24 @@ export function QaGame() {
     const now = Date.now();
     const activeDefectsList = defectsRef.current.filter(b => !b.squashed);
 
-    const nextDefects: (Defect | null)[] = defectsRef.current.map(bug => {
-      if (bug.squashed) return bug;
+    const nextDefects: Defect[] = [];
+
+    for (let i = 0; i < defectsRef.current.length; i++) {
+      const bug = defectsRef.current[i];
+      if (bug.squashed) {
+        nextDefects.push(bug);
+        continue;
+      }
+
+      // If the critical bug is currently in its dying animation
+      if (bug.isDying) {
+        if (now - (bug.dieStartTime || 0) > 480) {
+          // Finished dying disintegration animation — fully removed from active game
+          continue;
+        }
+        nextDefects.push(bug);
+        continue;
+      }
       
       const age = now - bug.spawnTime;
       
@@ -1060,7 +1080,7 @@ export function QaGame() {
           playCrashAudio();
 
           // Spawn death debris particles at bug position (the critical bug dies!)
-          const crashParticles = Array.from({ length: 9 }).map(() => ({
+          const crashParticles = Array.from({ length: 10 }).map(() => ({
             id: Math.random().toString(36).substring(7),
             x: bug.x,
             y: bug.y,
@@ -1080,27 +1100,48 @@ export function QaGame() {
           if (integrityLeft <= 0) {
             setHasCrashed(true);
             hasCrashedRef.current = true;
-            return null;
+            return;
           }
 
           const newLog: TerminalLog = {
             id: Date.now(),
-            text: `💥 Defect ${bug.bugCode} breached content. Critical bug terminated & reborn as Low priority. Integrity at ${integrityLeft}%.`,
+            text: `💥 Defect ${bug.bugCode} breached content. Critical bug destroyed & reproduced Low priority defect. Integrity at ${integrityLeft}%.`,
             priority: "P0 [BREACH]",
             icon: "💥",
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
           };
           setTerminalLogs(prev => [newLog, ...prev.slice(0, 2)]);
 
-          // "after atachking the crirtical bug die and born as low proityigy bug then samme with all bugs"
-          // CRITICAL BUG DIES AND IS REBORN AS LOW PRIORITY BUG:
-          const edge = Math.floor(Math.random() * 4);
-          let rx = 0;
-          let ry = 0;
-          if (edge === 0) { rx = 80 + Math.random() * (window.innerWidth - 160); ry = -26; }
-          else if (edge === 1) { rx = window.innerWidth + 26; ry = 80 + Math.random() * (window.innerHeight - 160); }
-          else if (edge === 2) { rx = 80 + Math.random() * (window.innerWidth - 160); ry = window.innerHeight + 26; }
-          else { rx = -26; ry = 80 + Math.random() * (window.innerHeight - 160); }
+          // 1. CRITICAL BUG DIES WITH VISIBLE OVERLOAD & SHOCKWAVE ANIMATION
+          nextDefects.push({
+            ...bug,
+            isDying: true,
+            dieStartTime: now,
+            eating: false,
+            eatingTarget: null,
+            targetElement: null,
+            targetX: undefined,
+            targetY: undefined,
+            speed: 0,
+            speedScale: 0,
+          });
+
+          // 2. AT THE SAME TIME: REPRODUCES A LOW-PRIORITY GREEN BUG RIGHT THERE WITH EMERGENCE ANIMATION!
+          playBirthAudio();
+          const birthParticles = Array.from({ length: 8 }).map(() => ({
+            id: Math.random().toString(36).substring(7),
+            x: bug.x,
+            y: bug.y,
+            color: "#10b981"
+          }));
+          setParticles(prev => [...prev, ...birthParticles]);
+          setTimeout(() => {
+            setParticles(prev => prev.filter(p => !birthParticles.find(bp => bp.id === p.id)));
+          }, 800);
+
+          const angle = Math.random() * Math.PI * 2;
+          const spawnX = Math.max(40, Math.min(window.innerWidth - 40, bug.x + Math.cos(angle) * 24));
+          const spawnY = Math.max(40, Math.min(window.innerHeight - 40, bug.y + Math.sin(angle) * 24));
 
           const template = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
           const lowCfg = BUG_PRIORITY_CONFIG.low;
@@ -1109,13 +1150,15 @@ export function QaGame() {
           const newRoamX = 60 + Math.random() * (window.innerWidth - 120);
           const newRoamY = 60 + Math.random() * (window.innerHeight - 120);
 
-          return {
+          nextDefects.push({
             id: Math.random().toString(36).substring(7),
-            x: rx,
-            y: ry,
+            x: spawnX,
+            y: spawnY,
             squashed: false,
             eating: false,
-            eatingTarget: null,
+            isDying: false,
+            isBorn: true,
+            birthStartTime: now,
             targetElement: null,
             targetX: undefined,
             targetY: undefined,
@@ -1131,24 +1174,27 @@ export function QaGame() {
             speedScale: lowCfg.speedScale,
             color: lowCfg.color,
             isPulsing: false,
-            direction: Math.atan2(newRoamY - ry, newRoamX - rx),
+            direction: Math.atan2(newRoamY - spawnY, newRoamX - spawnX),
             wobbleSeed: Math.random() * 1000,
             bugCode: template.code,
             bugLabel: template.label,
             bugSeverity: "P3",
             bugIcon: template.icon,
             bugCategory: template.category,
-          };
+          });
+
+          continue;
         }
 
-        return { 
+        nextDefects.push({ 
           ...bug, 
           color: targetColor, 
           isPulsing: true, 
           size: smoothSize, 
           speedScale: 0,
           bugSeverity: "P0",
-        };
+        });
+        continue;
       }
 
       // --- TARGET RESOLUTION & ROAMING ---
@@ -1219,7 +1265,7 @@ export function QaGame() {
 
         playGlitchAudio();
 
-        return {
+        nextDefects.push({
           ...bug,
           eating: true,
           eatingTarget: targetEl,
@@ -1230,7 +1276,8 @@ export function QaGame() {
           isPulsing: true,
           size: smoothSize,
           bugSeverity: "P0",
-        };
+        });
+        continue;
       }
 
       // --- DIRECTION & STEERING ---
@@ -1255,7 +1302,7 @@ export function QaGame() {
       let repelY = 0;
       for (let j = 0; j < activeDefectsList.length; j++) {
         const other = activeDefectsList[j];
-        if (other.id === bug.id || other.squashed) continue;
+        if (other.id === bug.id || other.squashed || other.isDying) continue;
         const dx = bug.x - other.x;
         const dy = bug.y - other.y;
         const dist = Math.hypot(dx, dy);
@@ -1283,7 +1330,7 @@ export function QaGame() {
         newY = Math.max(halfH, Math.min(newY, window.innerHeight - halfH));
       }
 
-      return { 
+      nextDefects.push({ 
         ...bug, 
         x: newX, 
         y: newY, 
@@ -1301,13 +1348,12 @@ export function QaGame() {
         color: targetColor, 
         isPulsing,
         bugSeverity: severity,
-      };
-    });
+      });
+    }
 
-    const activeDefects = nextDefects.filter((b): b is Defect => b !== null);
-    setDefects(activeDefects);
+    setDefects(nextDefects);
     requestRef.current = requestAnimationFrame(updatePositions);
-  }, [isFrozen, acquireNewTarget, playGlitchAudio, playCrashAudio, playAlertAudio]);
+  }, [isFrozen, acquireNewTarget, playGlitchAudio, playCrashAudio, playAlertAudio, playBirthAudio]);
 
   // Main game lifecycle
   useEffect(() => {
@@ -1582,16 +1628,21 @@ export function QaGame() {
                 : Math.sin((Date.now() + bug.wobbleSeed) / 200) * 4;
               const totalRotate = headingDeg + wobbleDeg;
 
+              const isDying = Boolean(bug.isDying);
+              const isBorn = Boolean(bug.isBorn && (Date.now() - (bug.birthStartTime || 0) < 750));
+
               return (
                 <button
                   key={bug.id}
                   data-squashed={bug.squashed ? "true" : undefined}
-                  data-cursor={`Squash defect ${bug.bugCode}: ${bug.bugLabel}`}
-                  onClick={() => squashDefect(bug.id, bug.x, bug.y)}
-                  onPointerEnter={() => handlePointerEnter(bug.id)}
-                  onPointerLeave={() => handlePointerLeave(bug.id)}
+                  data-dying={isDying ? "true" : undefined}
+                  data-born={isBorn ? "true" : undefined}
+                  data-cursor={isDying ? undefined : `Squash defect ${bug.bugCode}: ${bug.bugLabel}`}
+                  onClick={() => !isDying && squashDefect(bug.id, bug.x, bug.y)}
+                  onPointerEnter={() => !isDying && handlePointerEnter(bug.id)}
+                  onPointerLeave={() => !isDying && handlePointerLeave(bug.id)}
                   className={`absolute flex items-center justify-center group border-none bg-transparent outline-none ring-0 focus:outline-none focus:ring-0 select-none ${
-                    bug.squashed ? "pointer-events-none" : "pointer-events-auto"
+                    bug.squashed || isDying ? "pointer-events-none" : "pointer-events-auto"
                   }`}
                   style={{
                     left: bug.x,
@@ -1600,18 +1651,49 @@ export function QaGame() {
                     height: `${bug.size}px`,
                     minWidth: "32px",
                     minHeight: "32px",
-                    transform: `translate(-50%, -50%) ${bug.squashed ? "scale(1.45, 0.22)" : "scale(1, 1)"}`,
+                    transform: `translate(-50%, -50%) ${
+                      bug.squashed ? "scale(1.45, 0.22)" : ""
+                    }`,
+                    animation: isDying 
+                      ? "criticalBugDie 0.48s cubic-bezier(0.2, 0.8, 0.2, 1) forwards" 
+                      : isBorn 
+                        ? "bugBirthEmerge 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards" 
+                        : undefined,
                     transition: bug.squashed 
                       ? "transform 320ms cubic-bezier(0.1, 0.9, 0.2, 1), opacity 320ms ease" 
-                      : "width 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 150ms ease",
+                      : isDying || isBorn
+                        ? "none"
+                        : "width 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 150ms ease",
                     opacity: bug.squashed ? 0 : 1,
-                    cursor: "crosshair",
-                    pointerEvents: bug.squashed ? "none" : "auto",
+                    cursor: isDying ? "default" : "crosshair",
+                    pointerEvents: bug.squashed || isDying ? "none" : "auto",
                   }}
-                  aria-label={bug.squashed ? undefined : `Squash defect ${bug.bugCode} ${bug.bugLabel}`}
-                  aria-hidden={bug.squashed ? "true" : undefined}
-                  disabled={bug.squashed}
+                  aria-label={bug.squashed || isDying ? undefined : `Squash defect ${bug.bugCode} ${bug.bugLabel}`}
+                  aria-hidden={bug.squashed || isDying ? "true" : undefined}
+                  disabled={bug.squashed || isDying}
                 >
+                  {/* Glowing Green Reproduction Ripple Ring for Newborn Bug */}
+                  {isBorn && (
+                    <div 
+                      className="absolute inset-[-6px] rounded-full border border-emerald-400 pointer-events-none"
+                      style={{
+                        animation: "birthRipple 0.65s ease-out forwards",
+                        boxShadow: "0 0 14px rgba(16, 185, 129, 0.8)",
+                      }}
+                    />
+                  )}
+
+                  {/* Expanding Red Death Shockwave for Dying Critical Bug */}
+                  {isDying && (
+                    <div 
+                      className="absolute inset-[-8px] rounded-full border border-red-500 pointer-events-none"
+                      style={{
+                        animation: "deathShockwave 0.48s ease-out forwards",
+                        boxShadow: "0 0 18px rgba(239, 68, 68, 0.9)",
+                      }}
+                    />
+                  )}
+
                   {/* Rotated Bug Model Body */}
                   <div 
                     className="relative flex items-center justify-center"
@@ -1625,12 +1707,12 @@ export function QaGame() {
                       color={bug.color}
                       speedScale={bug.speedScale || 1}
                       isEating={bug.eating}
-                      isPulsing={bug.isPulsing}
+                      isPulsing={bug.isPulsing || isDying}
                       isFrozen={isFrozen}
                     />
 
                     {/* Active Corrupting Laser Emitter when Eating */}
-                    {bug.eating && !bug.squashed && (
+                    {bug.eating && !bug.squashed && !isDying && (
                       <div 
                         className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full w-0.5 pointer-events-none"
                         style={{
@@ -2012,6 +2094,80 @@ export function QaGame() {
             @keyframes laserPulse {
               0% { opacity: 0.6; height: 16px; }
               100% { opacity: 1; height: 26px; }
+            }
+
+            /* --- Critical Defect Overload Death Keyframes --- */
+            @keyframes criticalBugDie {
+              0% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                filter: drop-shadow(0 0 16px #ef4444) brightness(1.8);
+                opacity: 1;
+              }
+              30% {
+                transform: translate(-50%, -50%) scale(1.35) rotate(-8deg);
+                filter: drop-shadow(0 0 26px #ef4444) brightness(2.4);
+                opacity: 1;
+              }
+              65% {
+                transform: translate(-50%, -50%) scale(0.85) rotate(14deg);
+                filter: drop-shadow(0 0 34px #ef4444) brightness(1.6);
+                opacity: 0.75;
+              }
+              100% {
+                transform: translate(-50%, -50%) scale(0.08) rotate(24deg);
+                filter: drop-shadow(0 0 40px #ef4444) brightness(0.2);
+                opacity: 0;
+              }
+            }
+
+            @keyframes deathShockwave {
+              0% {
+                transform: scale(0.4);
+                opacity: 1;
+                border-color: #ef4444;
+              }
+              100% {
+                transform: scale(2.8);
+                opacity: 0;
+                border-color: #f87171;
+              }
+            }
+
+            /* --- Newborn Low Defect Reproduction & Birth Keyframes --- */
+            @keyframes bugBirthEmerge {
+              0% {
+                transform: translate(-50%, -50%) scale(0.15);
+                filter: drop-shadow(0 0 24px #10b981) brightness(2.2);
+                opacity: 0.2;
+              }
+              45% {
+                transform: translate(-50%, -50%) scale(1.24);
+                filter: drop-shadow(0 0 18px #10b981) brightness(1.7);
+                opacity: 1;
+              }
+              75% {
+                transform: translate(-50%, -50%) scale(0.92);
+                filter: drop-shadow(0 0 12px #10b981) brightness(1.2);
+                opacity: 1;
+              }
+              100% {
+                transform: translate(-50%, -50%) scale(1);
+                filter: drop-shadow(0 2px 7px #10b98177) brightness(1);
+                opacity: 1;
+              }
+            }
+
+            @keyframes birthRipple {
+              0% {
+                transform: scale(0.3);
+                opacity: 1;
+                border-color: #10b981;
+              }
+              100% {
+                transform: scale(2.6);
+                opacity: 0;
+                border-color: #34d399;
+              }
             }
           `}} />
         </div>

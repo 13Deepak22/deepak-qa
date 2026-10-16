@@ -3,19 +3,14 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import {
   X,
-  Zap,
   ChevronRight,
   ChevronLeft,
   Eye,
   EyeOff,
-  Bookmark,
-  BookmarkCheck,
   Copy,
   Check,
-  Search,
+  ArrowRight,
   SlidersHorizontal,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
 import {
   QUICK_PREP_SECTIONS,
@@ -28,53 +23,22 @@ interface QuickPrepModalProps {
   onClose: () => void;
 }
 
+type PrepViewState = "config" | "active";
+
 export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
-  // All sections auto-selected (checked) by default
+  // All 12 sections auto-selected by default
   const [selectedSectionIds, setSelectedSectionIds] = useState<Set<string>>(
     () => new Set(QUICK_PREP_SECTIONS.map((s) => s.id))
   );
 
-  const [showSectionFilter, setShowSectionFilter] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
+  // First page shows only the filter to select; "active" shows Q&A on Start
+  const [viewState, setViewState] = useState<PrepViewState>("config");
   const [isAnswerRevealed, setIsAnswerRevealed] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
-  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(() => new Set());
-  const [onlyBookmarks, setOnlyBookmarks] = useState<boolean>(false);
 
   // History tracking for Next/Previous random navigation
   const [history, setHistory] = useState<QuickPrepItem[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
-
-  // Load bookmarks from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("deepak_qa_quickprep_bookmarks");
-      if (saved) {
-        setBookmarkedIds(new Set(JSON.parse(saved)));
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  // Save bookmarks
-  const toggleBookmark = (id: string) => {
-    setBookmarkedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      try {
-        localStorage.setItem("deepak_qa_quickprep_bookmarks", JSON.stringify(Array.from(next)));
-      } catch {
-        // ignore
-      }
-      return next;
-    });
-  };
 
   // Section toggle handlers
   const toggleSection = (id: string) => {
@@ -109,41 +73,30 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
     return pool;
   }, [selectedSectionIds]);
 
-  // Filtered pool based on search query, difficulty, bookmarks
-  const filteredPool = useMemo(() => {
-    return activePool.filter((item) => {
-      if (onlyBookmarks && !bookmarkedIds.has(item.id)) return false;
-      if (difficultyFilter !== "all" && item.difficulty !== difficultyFilter) return false;
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const matchQ = item.question.toLowerCase().includes(q);
-        const matchCat = item.category.toLowerCase().includes(q);
-        const matchAns = item.answers.some((a) => a.toLowerCase().includes(q));
-        if (!matchQ && !matchCat && !matchAns) return false;
-      }
-      return true;
-    });
-  }, [activePool, onlyBookmarks, bookmarkedIds, difficultyFilter, searchQuery]);
-
-  // Function to pick a new random question
+  // Function to pick a new random question from selected pool
   const pickRandomQuestion = useCallback(() => {
-    if (filteredPool.length === 0) return;
-    const randomIndex = Math.floor(Math.random() * filteredPool.length);
-    const chosen = filteredPool[randomIndex];
+    if (activePool.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * activePool.length);
+    const chosen = activePool[randomIndex];
     setHistory((prev) => [...prev.slice(0, historyIndex + 1), chosen]);
     setHistoryIndex((prev) => prev + 1);
     setIsAnswerRevealed(false);
-  }, [filteredPool, historyIndex]);
+  }, [activePool, historyIndex]);
 
-  // Initial pick when modal opens or pool changes
-  useEffect(() => {
-    if (isOpen && history.length === 0 && filteredPool.length > 0) {
-      pickRandomQuestion();
-    }
-  }, [isOpen, history.length, filteredPool.length, pickRandomQuestion]);
+  // Handler to start Quick Prep
+  const handleStartPrep = () => {
+    if (activePool.length === 0) return;
+    const randomIndex = Math.floor(Math.random() * activePool.length);
+    const chosen = activePool[randomIndex];
+    setHistory([chosen]);
+    setHistoryIndex(0);
+    setIsAnswerRevealed(false);
+    setViewState("active");
+  };
 
   // Current active question
-  const currentQuestion = historyIndex >= 0 && historyIndex < history.length ? history[historyIndex] : null;
+  const currentQuestion =
+    historyIndex >= 0 && historyIndex < history.length ? history[historyIndex] : null;
 
   // Handlers for Next and Prev
   const handleNext = () => {
@@ -170,21 +123,31 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // Reset to config state when modal closes
+  const handleClose = () => {
+    onClose();
+  };
+
   // Keyboard shortcut listener
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        onClose();
-      } else if (e.key === " " && (e.target as HTMLElement).tagName !== "INPUT") {
+        handleClose();
+      } else if (viewState === "active") {
+        if (e.key === " " && (e.target as HTMLElement).tagName !== "INPUT") {
+          e.preventDefault();
+          setIsAnswerRevealed((prev) => !prev);
+        } else if (e.key === "ArrowRight" && (e.target as HTMLElement).tagName !== "INPUT") {
+          e.preventDefault();
+          handleNext();
+        } else if (e.key === "ArrowLeft" && (e.target as HTMLElement).tagName !== "INPUT") {
+          e.preventDefault();
+          handlePrev();
+        }
+      } else if (viewState === "config" && e.key === "Enter") {
         e.preventDefault();
-        setIsAnswerRevealed((prev) => !prev);
-      } else if (e.key === "ArrowRight" && (e.target as HTMLElement).tagName !== "INPUT") {
-        e.preventDefault();
-        handleNext();
-      } else if (e.key === "ArrowLeft" && (e.target as HTMLElement).tagName !== "INPUT") {
-        e.preventDefault();
-        handlePrev();
+        handleStartPrep();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -192,8 +155,6 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
   });
 
   if (!isOpen) return null;
-
-  const isCurrentBookmarked = currentQuestion ? bookmarkedIds.has(currentQuestion.id) : false;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/55 backdrop-blur-xs animate-in fade-in duration-150">
@@ -207,30 +168,27 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
             </span>
             <span className="text-muted/40">•</span>
             <span className="font-mono text-[11px] text-muted">
-              {activePool.length} Q&amp;As in pool
+              {viewState === "config"
+                ? `${activePool.length} Q&As in pool`
+                : `${historyIndex + 1} explored`}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Toggle Compact Track Filter */}
-            <button
-              type="button"
-              onClick={() => setShowSectionFilter((prev) => !prev)}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border font-mono text-[11px] transition cursor-pointer ${
-                showSectionFilter
-                  ? "border-pass bg-pass/10 text-pass"
-                  : "border-line bg-paper/60 text-muted hover:text-ink"
-              }`}
-            >
-              <SlidersHorizontal className="w-3 h-3" />
-              <span>Tracks ({selectedSectionIds.size}/12)</span>
-              {showSectionFilter ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-            </button>
+            {viewState === "active" && (
+              <button
+                type="button"
+                onClick={() => setViewState("config")}
+                className="flex items-center gap-1 font-mono text-[11px] text-muted hover:text-ink px-2 py-0.5 rounded transition cursor-pointer"
+              >
+                <SlidersHorizontal className="w-3 h-3" />
+                <span>Change Tracks</span>
+              </button>
+            )}
 
-            {/* Close Button */}
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="p-1 rounded-md text-muted hover:text-ink hover:bg-paper transition cursor-pointer"
               aria-label="Close"
             >
@@ -239,141 +197,112 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
           </div>
         </div>
 
-        {/* Minimalist Collapsible Chip Selector */}
-        {showSectionFilter && (
-          <div className="p-4 border-b border-line bg-paper/30 animate-in slide-in-from-top-1 duration-150">
-            <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-line/50">
-              <span className="font-mono text-[11px] text-muted">
-                Toggle tracks to include in random flashcards:
-              </span>
-              <div className="flex items-center gap-2 font-mono text-[11px]">
-                <button
-                  type="button"
-                  onClick={selectAllSections}
-                  className="text-pass hover:underline cursor-pointer"
-                >
-                  All
-                </button>
-                <span className="text-muted/40">•</span>
-                <button
-                  type="button"
-                  onClick={deselectAllSections}
-                  className="text-muted hover:text-ink cursor-pointer"
-                >
-                  Reset
-                </button>
+        {/* ========================================================= */}
+        {/* 1. FIRST PAGE: ONLY FILTER SECTIONS TO SELECT THEN START  */}
+        {/* ========================================================= */}
+        {viewState === "config" && (
+          <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col justify-between">
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-serif text-lg sm:text-xl text-ink font-normal">
+                  Select Quick Prep Tracks
+                </h3>
+                <p className="font-mono text-xs text-muted mt-0.5">
+                  Choose which sections to include in random Q&amp;A. All 12 tracks are auto-selected.
+                </p>
+              </div>
+
+              {/* Section Checkbox Chips (All 12 auto-selected by default) */}
+              <div className="pt-1">
+                <div className="flex items-center justify-between pb-1.5 mb-2.5 border-b border-line/50">
+                  <span className="font-mono text-[11px] text-muted">
+                    Selected Tracks ({selectedSectionIds.size} of {QUICK_PREP_SECTIONS.length}):
+                  </span>
+                  <div className="flex items-center gap-2 font-mono text-[11px]">
+                    <button
+                      type="button"
+                      onClick={selectAllSections}
+                      className="text-pass hover:underline cursor-pointer"
+                    >
+                      Select All
+                    </button>
+                    <span className="text-muted/40">•</span>
+                    <button
+                      type="button"
+                      onClick={deselectAllSections}
+                      className="text-muted hover:text-ink cursor-pointer"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5">
+                  {QUICK_PREP_SECTIONS.map((sec) => {
+                    const isSelected = selectedSectionIds.has(sec.id);
+                    return (
+                      <button
+                        key={sec.id}
+                        type="button"
+                        onClick={() => toggleSection(sec.id)}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border font-mono text-[11px] transition cursor-pointer ${
+                          isSelected
+                            ? "border-pass/50 bg-pass/10 text-pass font-medium"
+                            : "border-line/70 bg-card text-muted hover:text-ink hover:border-line"
+                        }`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            isSelected ? "bg-pass" : "bg-muted/40"
+                          }`}
+                        />
+                        <span>{sec.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto pr-1">
-              {QUICK_PREP_SECTIONS.map((sec) => {
-                const isSelected = selectedSectionIds.has(sec.id);
-                return (
-                  <button
-                    key={sec.id}
-                    type="button"
-                    onClick={() => toggleSection(sec.id)}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border font-mono text-[11px] transition cursor-pointer ${
-                      isSelected
-                        ? "border-pass/50 bg-pass/10 text-pass font-medium"
-                        : "border-line/70 bg-card text-muted hover:text-ink hover:border-line"
-                    }`}
-                  >
-                    <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-pass" : "bg-muted/40"}`} />
-                    <span>{sec.name}</span>
-                  </button>
-                );
-              })}
+            {/* Launch CTA */}
+            <div className="mt-8 pt-3.5 border-t border-line flex items-center justify-between">
+              <span className="font-mono text-[11px] text-muted">
+                Pool contains <span className="font-semibold text-pass">{activePool.length}</span> randomized questions
+              </span>
+
+              <button
+                type="button"
+                onClick={handleStartPrep}
+                disabled={activePool.length === 0}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs disabled:opacity-40"
+              >
+                <span>Start Quick Prep</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
         )}
 
-        {/* Search & Difficulty Filter Strip */}
-        <div className="flex items-center justify-between gap-3 px-5 py-2 border-b border-line/60 bg-paper/20">
-          <div className="relative flex-1 max-w-xs">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Filter by keyword..."
-              className="w-full pl-7 pr-2 py-1 rounded-md border border-line/60 bg-paper/60 font-mono text-[11px] text-ink placeholder:text-muted/50 focus:outline-none focus:border-pass"
-            />
-          </div>
+        {/* ========================================================= */}
+        {/* 2. SECOND PAGE: ACTIVE RANDOM Q&A FLASHCARD               */}
+        {/* ========================================================= */}
+        {viewState === "active" && (
+          <div className="flex-1 overflow-y-auto p-5 sm:p-7 flex flex-col justify-between min-h-[300px]">
+            {currentQuestion ? (
+              <div className="space-y-4">
+                
+                {/* Meta row */}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[11px] text-pass font-medium">
+                      {currentQuestion.sectionTitle}
+                    </span>
+                    <span className="text-muted/40">•</span>
+                    <span className="font-mono text-[10px] text-muted">
+                      {currentQuestion.category}
+                    </span>
+                  </div>
 
-          <div className="flex items-center gap-2">
-            <select
-              value={difficultyFilter}
-              onChange={(e) => setDifficultyFilter(e.target.value)}
-              className="py-1 px-2 rounded-md border border-line/60 bg-paper/60 font-mono text-[11px] text-muted focus:outline-none focus:border-pass cursor-pointer"
-            >
-              <option value="all">All Levels</option>
-              <option value="Beginner">Beginner</option>
-              <option value="Intermediate">Intermediate</option>
-              <option value="Advanced">Advanced</option>
-            </select>
-
-            <button
-              type="button"
-              onClick={() => setOnlyBookmarks((prev) => !prev)}
-              className={`p-1 rounded-md border transition cursor-pointer ${
-                onlyBookmarks
-                  ? "border-amber-500/50 bg-amber-500/10 text-amber-500"
-                  : "border-line/60 text-muted hover:text-ink"
-              }`}
-              title="Show Bookmarked Only"
-            >
-              <Bookmark className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Question Card Content */}
-        <div className="flex-1 overflow-y-auto p-5 sm:p-7 flex flex-col justify-between min-h-[300px]">
-          {filteredPool.length === 0 ? (
-            <div className="my-auto text-center py-10">
-              <p className="font-serif text-base text-ink">No questions match your current filters.</p>
-              <button
-                type="button"
-                onClick={() => {
-                  selectAllSections();
-                  setSearchQuery("");
-                  setOnlyBookmarks(false);
-                  setDifficultyFilter("all");
-                }}
-                className="mt-3 px-3 py-1 rounded-md border border-line bg-paper font-mono text-xs text-ink hover:border-pass cursor-pointer"
-              >
-                Reset Filters
-              </button>
-            </div>
-          ) : currentQuestion ? (
-            <div className="space-y-4">
-              
-              {/* Meta pills */}
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[11px] text-pass font-medium">
-                    {currentQuestion.sectionTitle}
-                  </span>
-                  <span className="text-muted/40">•</span>
-                  <span className="font-mono text-[10px] text-muted">
-                    {currentQuestion.category}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => toggleBookmark(currentQuestion.id)}
-                    className="p-1 rounded text-muted hover:text-amber-500 transition cursor-pointer"
-                    title="Bookmark"
-                  >
-                    {isCurrentBookmarked ? (
-                      <BookmarkCheck className="w-4 h-4 text-amber-500" />
-                    ) : (
-                      <Bookmark className="w-4 h-4" />
-                    )}
-                  </button>
                   <button
                     type="button"
                     onClick={handleCopy}
@@ -383,94 +312,101 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
                     {copied ? <Check className="w-4 h-4 text-pass" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
-              </div>
 
-              {/* Question Headline */}
-              <div>
-                <h3 className="font-serif text-lg sm:text-xl text-ink font-normal leading-relaxed">
-                  {currentQuestion.question}
-                </h3>
-              </div>
+                {/* Question Headline */}
+                <div>
+                  <h3 className="font-serif text-lg sm:text-xl text-ink font-normal leading-relaxed">
+                    {currentQuestion.question}
+                  </h3>
+                </div>
 
-              {/* Reveal Answer Section */}
-              <div className="pt-2">
-                {!isAnswerRevealed ? (
-                  <button
-                    type="button"
-                    onClick={() => setIsAnswerRevealed(true)}
-                    className="w-full py-3 px-4 rounded-lg border border-dashed border-line hover:border-pass/60 bg-paper/40 hover:bg-pass/5 text-ink-soft hover:text-pass transition flex items-center justify-center gap-2 font-mono text-xs cursor-pointer"
-                  >
-                    <Eye className="w-3.5 h-3.5 text-pass" />
-                    <span>Reveal Technical Answer (or press Space)</span>
-                  </button>
-                ) : (
-                  <div className="rounded-lg border border-line bg-paper/50 p-4 sm:p-5 animate-in fade-in duration-150">
-                    <div className="flex items-center justify-between pb-2 mb-3 border-b border-line/50">
-                      <span className="font-mono text-[10px] uppercase tracking-wider text-pass font-semibold">
-                        Key Points &amp; Answer
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setIsAnswerRevealed(false)}
-                        className="text-[10px] font-mono text-muted hover:text-ink flex items-center gap-1 cursor-pointer"
-                      >
-                        <EyeOff className="w-3 h-3" />
-                        <span>Hide</span>
-                      </button>
+                {/* Reveal Technical Answer */}
+                <div className="pt-2">
+                  {!isAnswerRevealed ? (
+                    <button
+                      type="button"
+                      onClick={() => setIsAnswerRevealed(true)}
+                      className="w-full py-3 px-4 rounded-lg border border-dashed border-line hover:border-pass/60 bg-paper/40 hover:bg-pass/5 text-ink-soft hover:text-pass transition flex items-center justify-center gap-2 font-mono text-xs cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-pass" />
+                      <span>Reveal Technical Answer (or press Space)</span>
+                    </button>
+                  ) : (
+                    <div className="rounded-lg border border-line bg-paper/50 p-4 sm:p-5 animate-in fade-in duration-150">
+                      <div className="flex items-center justify-between pb-2 mb-3 border-b border-line/50">
+                        <span className="font-mono text-[10px] uppercase tracking-wider text-pass font-semibold">
+                          Key Points &amp; Answer
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setIsAnswerRevealed(false)}
+                          className="text-[10px] font-mono text-muted hover:text-ink flex items-center gap-1 cursor-pointer"
+                        >
+                          <EyeOff className="w-3 h-3" />
+                          <span>Hide</span>
+                        </button>
+                      </div>
+
+                      <div className="space-y-2.5 font-sans text-xs sm:text-sm text-ink-soft leading-relaxed">
+                        {currentQuestion.answers.map((line, idx) => {
+                          const trimmed = line.trim();
+                          const isBullet =
+                            trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("o ");
+                          const isCode =
+                            trimmed.includes("(") &&
+                            trimmed.includes(")") &&
+                            (trimmed.startsWith("pm.") ||
+                              trimmed.startsWith("browser_") ||
+                              trimmed.includes(";"));
+
+                          return (
+                            <div
+                              key={idx}
+                              className={`flex gap-2 ${
+                                isCode
+                                  ? "font-mono text-xs bg-paper-deep text-pass px-2.5 py-1.5 rounded border border-line/40"
+                                  : ""
+                              }`}
+                            >
+                              {isBullet && <span className="text-pass shrink-0">•</span>}
+                              <span className="flex-1">{line.replace(/^[•\-o]\s*/, "")}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
+                  )}
+                </div>
 
-                    <div className="space-y-2.5 font-sans text-xs sm:text-sm text-ink-soft leading-relaxed">
-                      {currentQuestion.answers.map((line, idx) => {
-                        const trimmed = line.trim();
-                        const isBullet = trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("o ");
-                        const isCode =
-                          trimmed.includes("(") && trimmed.includes(")") && (trimmed.startsWith("pm.") || trimmed.startsWith("browser_") || trimmed.includes(";"));
+              </div>
+            ) : null}
 
-                        return (
-                          <div
-                            key={idx}
-                            className={`flex gap-2 ${
-                              isCode ? "font-mono text-xs bg-paper-deep text-pass px-2.5 py-1.5 rounded border border-line/40" : ""
-                            }`}
-                          >
-                            {isBullet && <span className="text-pass shrink-0">•</span>}
-                            <span className="flex-1">{line.replace(/^[•\-o]\s*/, "")}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+            {/* Bottom Navigation Bar */}
+            <div className="mt-6 pt-3.5 border-t border-line flex items-center justify-between">
+              <div className="flex items-center gap-2 font-mono text-[11px] text-muted">
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  disabled={historyIndex <= 0}
+                  className="px-2 py-1 rounded border border-line bg-paper hover:border-pass/60 text-ink disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <span>{historyIndex + 1} explored</span>
               </div>
 
-            </div>
-          ) : null}
-
-          {/* Minimal Bottom Bar */}
-          <div className="mt-6 pt-3.5 border-t border-line flex items-center justify-between">
-            <div className="flex items-center gap-2 font-mono text-[11px] text-muted">
               <button
                 type="button"
-                onClick={handlePrev}
-                disabled={historyIndex <= 0}
-                className="px-2 py-1 rounded border border-line bg-paper hover:border-pass/60 text-ink disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer"
+                onClick={handleNext}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
+                <span>Next Random</span>
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
-              <span>{historyIndex + 1} explored</span>
             </div>
 
-            <button
-              type="button"
-              onClick={handleNext}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs"
-            >
-              <span>Next Random</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
           </div>
-
-        </div>
+        )}
 
       </div>
     </div>

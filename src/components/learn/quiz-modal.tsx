@@ -212,24 +212,27 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            {quizState === "active" && (
+            {quizState === "active" ? (
               <button
                 type="button"
-                onClick={() => setQuizState("config")}
-                className="font-mono text-[11px] text-muted hover:text-ink px-2 py-0.5 rounded transition cursor-pointer"
+                onClick={() => {
+                  setQuizState("config");
+                  onClose();
+                }}
+                className="font-mono text-xs text-muted hover:text-rose-500 px-2 py-0.5 rounded transition cursor-pointer hover:bg-rose-500/10"
               >
                 Quit
               </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-1 rounded-md text-muted hover:text-ink hover:bg-paper transition cursor-pointer"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
             )}
-
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-1 rounded-md text-muted hover:text-ink hover:bg-paper transition cursor-pointer"
-              aria-label="Close"
-            >
-              <X className="w-4 h-4" />
-            </button>
           </div>
         </div>
 

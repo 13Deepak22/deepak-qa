@@ -980,12 +980,25 @@ export function QaGame() {
   ].join(', ');
 
   // Helper: Acquire a DISTINCT, non-overlapping target element across different sections of the page
+  // RULE: Site Header is strictly the LAST section to attack on the page!
   const acquireNewTarget = useCallback((bugId: string, currentX: number, currentY: number): { el: HTMLElement; tx: number; ty: number } | null => {
     if (typeof document === "undefined") return null;
 
     const allCandidates = Array.from(document.querySelectorAll<HTMLElement>(LEAF_SELECTOR));
     
-    // Filter available candidates
+    // Check if an element belongs to the site header
+    const isHeader = (el: HTMLElement) => Boolean(el.closest('header, [role="banner"], nav[aria-label="Primary"]'));
+
+    // Check remaining non-eaten content across the whole page outside header
+    const remainingNonHeaderOnPage = allCandidates.filter(el => {
+      if (isHeader(el)) return false;
+      if (el.closest('[data-game-ui="true"], [role="dialog"], [aria-modal="true"], aside, .press, .site-cursor') || el.closest('.z-\\[60\\]')) return false;
+      if (el.id === '__next' || el.id === 'root') return false;
+      if (el.hasAttribute('data-eaten') || el.closest('[data-eaten="true"]')) return false;
+      return Boolean(el.textContent?.trim());
+    });
+
+    // Filter available candidates currently in the visible viewport
     const available = allCandidates.filter(el => {
       if (el.closest('[data-game-ui="true"], [role="dialog"], [aria-modal="true"], aside, .press, .site-cursor') || el.closest('.z-\\[60\\]')) return false;
       if (el.id === '__next' || el.id === 'root') return false;
@@ -1006,6 +1019,15 @@ export function QaGame() {
 
     if (available.length === 0) return null;
 
+    // Strict Target Hierarchy: Header will be the LAST section to attack!
+    // As long as any non-header content remains on the page, exclude header elements.
+    const nonHeaderAvailable = available.filter(el => !isHeader(el));
+    const targetPool = remainingNonHeaderOnPage.length > 0
+      ? nonHeaderAvailable
+      : available;
+
+    if (targetPool.length === 0) return null;
+
     // Get positions of other bugs' targets to enforce cross-page spreading
     const otherTargetCoords: { x: number; y: number }[] = [];
     defectsRef.current.forEach(other => {
@@ -1019,7 +1041,7 @@ export function QaGame() {
     let bestCoords = { tx: 0, ty: 0 };
 
     // Randomize sample order for organic section spread
-    const shuffled = [...available].sort(() => Math.random() - 0.5);
+    const shuffled = [...targetPool].sort(() => Math.random() - 0.5);
 
     for (const el of shuffled) {
       const rect = el.getBoundingClientRect();
@@ -1233,11 +1255,14 @@ export function QaGame() {
             return;
           }
 
+          const isHeaderBreach = Boolean(bug.eatingTarget?.closest('header, [role="banner"], nav[aria-label="Primary"]'));
           const newLog: TerminalLog = {
             id: Date.now(),
-            text: `💥 Defect ${bug.bugCode} breached content. Critical bug destroyed & reproduced Low priority defect. Integrity at ${integrityLeft}%.`,
-            priority: "P0 [BREACH]",
-            icon: "💥",
+            text: isHeaderBreach
+              ? `🚨 FINAL STAND: Defect ${bug.bugCode} breached SITE HEADER! Critical defect disintegrated & reproduced. Integrity at ${integrityLeft}%.`
+              : `💥 Defect ${bug.bugCode} breached content. Critical bug destroyed & reproduced Low priority defect. Integrity at ${integrityLeft}%.`,
+            priority: isHeaderBreach ? "P0 [HEADER BREACH]" : "P0 [BREACH]",
+            icon: isHeaderBreach ? "🚨" : "💥",
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
           };
           setTerminalLogs(prev => [newLog, ...prev.slice(0, 2)]);
@@ -1342,6 +1367,20 @@ export function QaGame() {
 
       if (shouldAttackTarget) {
         // Critical attack mode: acquire and lock onto a distinct leaf target element
+        const isHeader = (el: HTMLElement) => Boolean(el.closest('header, [role="banner"], nav[aria-label="Primary"]'));
+
+        // If bug is currently locked onto a header element while non-header content is still alive on page, release it!
+        if (targetEl && isHeader(targetEl)) {
+          const hasAliveNonHeader = Array.from(document.querySelectorAll<HTMLElement>(LEAF_SELECTOR))
+            .some(el => !isHeader(el) && !el.hasAttribute('data-eaten') && !el.closest('[data-eaten="true"]'));
+          if (hasAliveNonHeader) {
+            targetEl.removeAttribute('data-targeted-by');
+            targetEl = null;
+            targetX = undefined;
+            targetY = undefined;
+          }
+        }
+
         if (!targetEl || !targetEl.isConnected || targetEl.hasAttribute('data-eaten')) {
           const fresh = acquireNewTarget(bug.id, bug.x, bug.y);
           if (fresh) {

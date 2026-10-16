@@ -8,7 +8,7 @@ import {
   RefreshCw, Zap, Award 
 } from "lucide-react";
 
-export type BugSkinType = "scarab" | "spider" | "mantis" | "centipede" | "wasp";
+export type BugSkinType = "neon" | "classic" | "circuit" | "chip" | "glitch";
 
 export interface BugSkinConfig {
   id: BugSkinType;
@@ -18,43 +18,43 @@ export interface BugSkinConfig {
   description: string;
 }
 
-export const ALL_BUG_SKINS: BugSkinType[] = ["scarab", "spider", "mantis", "centipede", "wasp"];
+export const ALL_BUG_SKINS: BugSkinType[] = ["neon", "classic", "circuit", "chip", "glitch"];
 
 export const BUG_SKIN_CATALOG: Record<BugSkinType, BugSkinConfig> = {
-  scarab: {
-    id: "scarab",
-    name: "Cyber Scarab",
-    short: "Scarab",
-    icon: "🪲",
-    description: "Armor beetle with hydraulic pincers & 6 articulated tripod legs",
+  neon: {
+    id: "neon",
+    name: "Neon Trace",
+    short: "Neon",
+    icon: "⚡",
+    description: "Glowing cybernetic software bug with circuit trace legs (Image 1)",
   },
-  spider: {
-    id: "spider",
-    name: "Nano Arachnid",
-    short: "Spider",
-    icon: "🕷️",
-    description: "8-legged articulated micro-rover with optical cluster & snapping fangs",
+  classic: {
+    id: "classic",
+    name: "Classic Debug",
+    short: "Debug",
+    icon: "🐞",
+    description: "Iconic flat software defect symbol with diagonal slice & radial legs (Image 2)",
   },
-  mantis: {
-    id: "mantis",
-    name: "Cyber Mantis",
-    short: "Mantis",
-    icon: "🦗",
-    description: "Predator hexapod with striking razor scythes & elongated neck",
+  circuit: {
+    id: "circuit",
+    name: "PCB Circuit",
+    short: "PCB",
+    icon: "🖲️",
+    description: "Printed circuit board bug with etched trace lines & solder pads (Image 3)",
   },
-  centipede: {
-    id: "centipede",
-    name: "Segmented Crawler",
-    short: "Centipede",
-    icon: "🐛",
-    description: "5-segment articulated centipede with ripple wave crawling gait",
+  chip: {
+    id: "chip",
+    name: "Silicon Chip",
+    short: "Chip",
+    icon: "💾",
+    description: "Integrated circuit defect with silicon microchip core & IC pins",
   },
-  wasp: {
-    id: "wasp",
-    name: "Mecha Hornet",
-    short: "Wasp",
-    icon: "🐝",
-    description: "Aerodynamic cyber wasp with high-frequency buzz wings & stinger",
+  glitch: {
+    id: "glitch",
+    name: "Matrix Glitch",
+    short: "Glitch",
+    icon: "👾",
+    description: "Cyber software anomaly with digital scanlines & glowing LED matrix",
   },
 };
 
@@ -190,8 +190,8 @@ interface BugSkinProps {
   isFrozen?: boolean;
 }
 
-// 1. CYBER SCARAB: Heavy armored beetle with hydraulic pincers & 6-leg tripod gait
-function BugSkinScarab({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
+// 1. NEON TRACE BUG (Image 1): Glowing cybernetic outline with symmetrical split elytra & circuit legs
+function BugSkinNeon({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
   return (
     <svg
       width={size}
@@ -204,151 +204,364 @@ function BugSkinScarab({ size, color, strideDuration, isEating, isPulsing, isFro
         filter: isFrozen
           ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)"
           : isPulsing
-            ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))"
-            : `drop-shadow(0 2px 5px ${color}55)`,
+            ? "drop-shadow(0 0 8px #ef4444) drop-shadow(0 0 16px rgba(239, 68, 68, 0.8))"
+            : `drop-shadow(0 0 5px ${color}) drop-shadow(0 0 10px ${color}88)`,
       }}
     >
       {/* P0 Critical Pulse Ring */}
       {isPulsing && (
-        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="0.8" fill="none" className="bug-pulse-ring" />
+        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="1" fill="none" className="bug-pulse-ring" />
       )}
 
-      {/* 6 Articulated Tripod Legs */}
-      <g style={{ transformBox: "view-box", animationDuration: strideDuration }}>
-        {/* Front Left */}
+      {/* 6 Circuit-Trace Stepping Legs (bent at clean 90° angles like Image 1) */}
+      <g style={{ transformBox: "view-box" }}>
+        {/* Top Left */}
         <path
           className="bug-leg-a"
-          style={{ transformOrigin: "18px 16px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 18 16 L 9 11 L 4 14"
+          style={{ transformOrigin: "15px 19px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          d="M 15 19 L 8 19 L 8 12"
           stroke={color}
-          strokeWidth="1.35"
+          strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        {/* Front Right */}
+        {/* Top Right */}
         <path
           className="bug-leg-b"
-          style={{ transformOrigin: "26px 16px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 26 16 L 35 11 L 40 14"
+          style={{ transformOrigin: "29px 19px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          d="M 29 19 L 36 19 L 36 12"
           stroke={color}
-          strokeWidth="1.35"
+          strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         {/* Mid Left */}
         <path
           className="bug-leg-b"
-          style={{ transformOrigin: "17px 23px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 17 23 L 7 23 L 3 28"
+          style={{ transformOrigin: "13px 26px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          d="M 13 26 L 6 26 L 6 30"
           stroke={color}
-          strokeWidth="1.35"
+          strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         {/* Mid Right */}
         <path
           className="bug-leg-a"
-          style={{ transformOrigin: "27px 23px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 27 23 L 37 23 L 41 28"
+          style={{ transformOrigin: "31px 26px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          d="M 31 26 L 38 26 L 38 30"
           stroke={color}
-          strokeWidth="1.35"
+          strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        {/* Back Left */}
+        {/* Bottom Left */}
         <path
           className="bug-leg-a"
-          style={{ transformOrigin: "18px 30px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 18 30 L 9 35 L 5 41"
+          style={{ transformOrigin: "15px 33px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          d="M 15 33 L 8 33 L 8 40"
           stroke={color}
-          strokeWidth="1.35"
+          strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        {/* Back Right */}
+        {/* Bottom Right */}
         <path
           className="bug-leg-b"
-          style={{ transformOrigin: "26px 30px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 26 30 L 35 35 L 39 41"
+          style={{ transformOrigin: "29px 33px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          d="M 29 33 L 36 33 L 36 40"
           stroke={color}
-          strokeWidth="1.35"
+          strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
       </g>
 
-      {/* Hydraulic Clamping Pincers (active chewing when eating) */}
-      <g>
-        <path
-          className={isEating ? "scarab-pincer-l" : ""}
-          style={{ transformOrigin: "20.5px 9px", transformBox: "view-box" }}
-          d="M 20.5 9 Q 17.5 4 21.5 3"
+      {/* Head Dome */}
+      <path
+        d="M 17 14 C 17 9.5 27 9.5 27 14 Z"
+        stroke={color}
+        strokeWidth="1.8"
+        fill="#0b0b12"
+        strokeLinejoin="round"
+      />
+
+      {/* Antenna Horns (Image 1) */}
+      <path
+        d="M 19 10 C 17 6 14 5.5 12 7"
+        stroke={color}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M 25 10 C 27 6 30 5.5 32 7"
+        stroke={color}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        fill="none"
+      />
+
+      {/* Symmetrical Split Elytra Body (Image 1) */}
+      {/* Left Shell */}
+      <path
+        d="M 21 16 L 16 16 C 13 16 13 36 17 36 L 21 36 Z"
+        stroke={color}
+        strokeWidth="1.8"
+        fill="#0b0b12"
+        strokeLinejoin="round"
+      />
+      {/* Right Shell */}
+      <path
+        d="M 23 16 L 28 16 C 31 16 31 36 27 36 L 23 36 Z"
+        stroke={color}
+        strokeWidth="1.8"
+        fill="#0b0b12"
+        strokeLinejoin="round"
+      />
+
+      {/* Center Seam Glow */}
+      <line x1="22" y1="16" x2="22" y2="36" stroke={color} strokeWidth="1" strokeDasharray="2 2" opacity="0.6" />
+    </svg>
+  );
+}
+
+// 2. CLASSIC DEBUGGER BUG (Image 2): Iconic flat software debug symbol with diagonal slice & radial legs
+function BugSkinClassic({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 44 44"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={`select-none ${isEating ? "bug-eating-tremor" : "bug-waddle"}`}
+      style={{
+        filter: isFrozen
+          ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)"
+          : isPulsing
+            ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.85))"
+            : `drop-shadow(0 2px 6px ${color}66)`,
+      }}
+    >
+      {/* P0 Critical Pulse Ring */}
+      {isPulsing && (
+        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="1" fill="none" className="bug-pulse-ring" />
+      )}
+
+      {/* 6 Straight Radial Legs (Image 2) */}
+      <g style={{ transformBox: "view-box" }}>
+        {/* Top Left */}
+        <line
+          className="bug-leg-a"
+          style={{ transformOrigin: "13px 20px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          x1="13" y1="20" x2="4" y2="17"
           stroke={color}
-          strokeWidth="1.25"
+          strokeWidth="2.4"
           strokeLinecap="round"
+        />
+        {/* Top Right */}
+        <line
+          className="bug-leg-b"
+          style={{ transformOrigin: "31px 20px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          x1="31" y1="20" x2="40" y2="17"
+          stroke={color}
+          strokeWidth="2.4"
+          strokeLinecap="round"
+        />
+        {/* Mid Left */}
+        <line
+          className="bug-leg-b"
+          style={{ transformOrigin: "13px 27px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          x1="13" y1="27" x2="3" y2="27"
+          stroke={color}
+          strokeWidth="2.4"
+          strokeLinecap="round"
+        />
+        {/* Mid Right */}
+        <line
+          className="bug-leg-a"
+          style={{ transformOrigin: "31px 27px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          x1="31" y1="27" x2="41" y2="27"
+          stroke={color}
+          strokeWidth="2.4"
+          strokeLinecap="round"
+        />
+        {/* Bottom Left */}
+        <line
+          className="bug-leg-a"
+          style={{ transformOrigin: "13px 34px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          x1="13" y1="34" x2="4" y2="37"
+          stroke={color}
+          strokeWidth="2.4"
+          strokeLinecap="round"
+        />
+        {/* Bottom Right */}
+        <line
+          className="bug-leg-b"
+          style={{ transformOrigin: "31px 34px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          x1="31" y1="34" x2="40" y2="37"
+          stroke={color}
+          strokeWidth="2.4"
+          strokeLinecap="round"
+        />
+      </g>
+
+      {/* Solid Rounded Dome Head */}
+      <path d="M 16.5 14 C 16.5 8.5 27.5 8.5 27.5 14 Z" fill={color} />
+
+      {/* Two Short Straight Antennae */}
+      <line x1="19" y1="9" x2="16" y2="4.5" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
+      <line x1="25" y1="9" x2="28" y2="4.5" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
+
+      {/* Solid Capsule / Oval Body (Image 2) */}
+      <rect x="13" y="16" width="18" height="22" rx="9" fill={color} />
+
+      {/* Negative Space Diagonal Slice (The iconic signature of software bug logos in Image 2) */}
+      <line
+        x1="16.5"
+        y1="20"
+        x2="28"
+        y2="33.5"
+        stroke="#1a1a24"
+        strokeWidth="2.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+// 3. PCB CIRCUIT BUG (Image 3): Printed circuit board bug with etched trace lines & solder pads
+function BugSkinCircuit({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 44 44"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={`select-none ${isEating ? "bug-eating-tremor" : "bug-waddle"}`}
+      style={{
+        filter: isFrozen
+          ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)"
+          : isPulsing
+            ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))"
+            : `drop-shadow(0 2px 6px ${color}55)`,
+      }}
+    >
+      {/* P0 Critical Pulse Ring */}
+      {isPulsing && (
+        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="1" fill="none" className="bug-pulse-ring" />
+      )}
+
+      {/* 6 Angular Robotic Circuit Legs (Image 3) */}
+      <g style={{ transformBox: "view-box" }}>
+        {/* Top Left */}
+        <polyline
+          className="bug-leg-a"
+          style={{ transformOrigin: "17px 16px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="17,16 9,13 5,8"
+          stroke={color}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           fill="none"
         />
-        <path
-          className={isEating ? "scarab-pincer-r" : ""}
-          style={{ transformOrigin: "23.5px 9px", transformBox: "view-box" }}
-          d="M 23.5 9 Q 26.5 4 22.5 3"
+        {/* Top Right */}
+        <polyline
+          className="bug-leg-b"
+          style={{ transformOrigin: "27px 16px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="27,16 35,13 39,8"
           stroke={color}
-          strokeWidth="1.25"
+          strokeWidth="1.8"
           strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        {/* Mid Left */}
+        <polyline
+          className="bug-leg-b"
+          style={{ transformOrigin: "15px 24px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="15,24 7,23 4,29"
+          stroke={color}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        {/* Mid Right */}
+        <polyline
+          className="bug-leg-a"
+          style={{ transformOrigin: "29px 24px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="29,24 37,23 40,29"
+          stroke={color}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        {/* Bottom Left */}
+        <polyline
+          className="bug-leg-a"
+          style={{ transformOrigin: "17px 32px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="17,32 10,34 6,41"
+          stroke={color}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        {/* Bottom Right */}
+        <polyline
+          className="bug-leg-b"
+          style={{ transformOrigin: "27px 32px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="27,32 34,34 38,41"
+          stroke={color}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           fill="none"
         />
       </g>
 
-      {/* Twitching Antennae */}
+      {/* Main Chitin Shell (Image 3) */}
       <path
-        className="antenna-l"
-        style={{ transformOrigin: "20px 9px", transformBox: "view-box", animationPlayState: isFrozen ? "paused" : "running" }}
-        d="M 20 9 L 16 5 L 12 6"
+        d="M 16 17 C 12 25 13 35 22 38 C 31 35 32 25 28 17 Z"
+        fill="#0d0d14"
         stroke={color}
-        strokeWidth="0.9"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        className="antenna-r"
-        style={{ transformOrigin: "24px 9px", transformBox: "view-box", animationPlayState: isFrozen ? "paused" : "running" }}
-        d="M 24 9 L 28 5 L 32 6"
-        stroke={color}
-        strokeWidth="0.9"
-        strokeLinecap="round"
-        fill="none"
+        strokeWidth="1.4"
       />
 
-      {/* Armored Elytra Shell (Main Body) */}
-      <path
-        d="M 16 19 C 14 26 14 34 22 36.5 C 30 34 30 26 28 19 Z"
-        fill="#0b0b10"
-        stroke={color}
-        strokeWidth="1.1"
-      />
+      {/* Etched PCB Circuit Traces & Solder Nodes (Image 3) */}
+      <g>
+        {/* Trace 1 */}
+        <path d="M 16 36 L 16 30 L 18 27" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" />
+        <circle cx="18" cy="27" r="1.5" fill={color} />
 
-      {/* Wing Seam Split */}
-      <line x1="22" y1="19" x2="22" y2="36" stroke={color} strokeWidth="1" opacity="0.85" />
+        {/* Trace 2 */}
+        <path d="M 22 37 L 22 23" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" />
+        <circle cx="22" cy="23" r="1.5" fill={color} />
 
-      {/* Cyber Circuit Inlays */}
-      <path d="M 17 24 L 20 27 L 20 32" stroke={color} strokeWidth="0.75" opacity="0.7" fill="none" />
-      <path d="M 27 24 L 24 27 L 24 32" stroke={color} strokeWidth="0.75" opacity="0.7" fill="none" />
+        {/* Trace 3 */}
+        <path d="M 28 36 L 28 30 L 26 27" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" />
+        <circle cx="26" cy="27" r="1.5" fill={color} />
+      </g>
 
       {/* Thorax Plate */}
-      <polygon points="17,19 27,19 25,14 19,14" fill="#14141c" stroke={color} strokeWidth="0.9" />
+      <polygon points="17,17 27,17 25,12 19,12" fill="#141420" stroke={color} strokeWidth="1.1" />
 
-      {/* Thorax Reactor Core */}
-      <polygon points="22,15.5 23.5,17 22,18.5 20.5,17" fill={color} />
+      {/* Head */}
+      <polygon points="19,12 25,12 24,8 20,8" fill="#09090e" stroke={color} strokeWidth="1.1" />
 
-      {/* Head & Optic Visor */}
-      <polygon points="19,14 25,14 24,9 20,9" fill="#09090d" stroke={color} strokeWidth="0.9" />
-      <line x1="20.5" y1="11.5" x2="23.5" y2="11.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+      {/* Antenna Pins */}
+      <polyline points="20,8 15,3" stroke={color} strokeWidth="1.5" strokeLinecap="round" fill="none" />
+      <polyline points="24,8 29,3" stroke={color} strokeWidth="1.5" strokeLinecap="round" fill="none" />
     </svg>
   );
 }
 
-// 2. NANO ARACHNID: 8-legged articulated micro-rover with optical cluster & snapping fangs
-function BugSkinSpider({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
+// 4. SILICON CHIP BUG: Hex integrated circuit bug with silicon microchip core & IC pins
+function BugSkinChip({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
   return (
     <svg
       width={size}
@@ -362,158 +575,103 @@ function BugSkinSpider({ size, color, strideDuration, isEating, isPulsing, isFro
           ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)"
           : isPulsing
             ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))"
-            : `drop-shadow(0 2px 5px ${color}55)`,
+            : `drop-shadow(0 2px 6px ${color}55)`,
       }}
     >
       {/* P0 Critical Pulse Ring */}
       {isPulsing && (
-        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="0.8" fill="none" className="bug-pulse-ring" />
+        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="1" fill="none" className="bug-pulse-ring" />
       )}
 
-      {/* 8 Articulated Arched Arachnid Legs */}
+      {/* 6 IC Pin Bus Legs */}
       <g style={{ transformBox: "view-box" }}>
-        {/* L1 */}
+        {/* Top Left */}
         <polyline
-          className="spider-leg-1"
-          style={{ transformOrigin: "20px 16px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="20,16 11,8 4,12"
+          className="bug-leg-a"
+          style={{ transformOrigin: "13px 20px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="13,20 6,17 3,12"
           stroke={color}
-          strokeWidth="1.2"
+          strokeWidth="1.7"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
         />
-        {/* R1 */}
+        {/* Top Right */}
         <polyline
-          className="spider-leg-2"
-          style={{ transformOrigin: "24px 16px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="24,16 33,8 40,12"
+          className="bug-leg-b"
+          style={{ transformOrigin: "31px 20px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="31,20 38,17 41,12"
           stroke={color}
-          strokeWidth="1.2"
+          strokeWidth="1.7"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
         />
-        {/* L2 */}
-        <polyline
-          className="spider-leg-2"
-          style={{ transformOrigin: "19px 18px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="19,18 9,15 3,21"
+        {/* Mid Left */}
+        <line
+          className="bug-leg-b"
+          style={{ transformOrigin: "13px 26px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          x1="13" y1="26" x2="4" y2="26"
           stroke={color}
-          strokeWidth="1.2"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+        {/* Mid Right */}
+        <line
+          className="bug-leg-a"
+          style={{ transformOrigin: "31px 26px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          x1="31" y1="26" x2="40" y2="26"
+          stroke={color}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+        {/* Bottom Left */}
+        <polyline
+          className="bug-leg-a"
+          style={{ transformOrigin: "13px 31px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="13,31 6,34 3,40"
+          stroke={color}
+          strokeWidth="1.7"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
         />
-        {/* R2 */}
+        {/* Bottom Right */}
         <polyline
-          className="spider-leg-1"
-          style={{ transformOrigin: "25px 18px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="25,18 35,15 41,21"
+          className="bug-leg-b"
+          style={{ transformOrigin: "31px 31px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="31,31 38,34 41,40"
           stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        {/* L3 */}
-        <polyline
-          className="spider-leg-1"
-          style={{ transformOrigin: "19px 20px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="19,20 9,26 4,33"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        {/* R3 */}
-        <polyline
-          className="spider-leg-2"
-          style={{ transformOrigin: "25px 20px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="25,20 35,26 40,33"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        {/* L4 */}
-        <polyline
-          className="spider-leg-2"
-          style={{ transformOrigin: "20px 22px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="20,22 12,33 6,40"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        {/* R4 */}
-        <polyline
-          className="spider-leg-1"
-          style={{ transformOrigin: "24px 22px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="24,22 32,33 38,40"
-          stroke={color}
-          strokeWidth="1.2"
+          strokeWidth="1.7"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
         />
       </g>
 
-      {/* Chelicerae / Snapping Fangs (active bite when eating) */}
-      <g>
-        <path
-          className={isEating ? "spider-fang-l" : ""}
-          style={{ transformOrigin: "20.5px 13px", transformBox: "view-box" }}
-          d="M 20.5 13 Q 19 8.5 21.5 8"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <path
-          className={isEating ? "spider-fang-r" : ""}
-          style={{ transformOrigin: "23.5px 13px", transformBox: "view-box" }}
-          d="M 23.5 13 Q 25 8.5 22.5 8"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-      </g>
-
-      {/* Diamond-Faceted Abdomen */}
+      {/* Hexagonal Silicon Package Body */}
       <polygon
-        points="22,23 28,30 22,38 16,30"
-        fill="#12121a"
+        points="22,14 31,19 31,32 22,37 13,32 13,19"
+        fill="#0d0d16"
         stroke={color}
-        strokeWidth="1.1"
-      />
-      <path d="M 19 28 L 22 31 L 25 28 M 20 33 L 22 35 L 24 33" stroke={color} strokeWidth="0.8" fill="none" opacity="0.75" />
-
-      {/* Cephalothorax (Front Core) */}
-      <polygon
-        points="19,21 25,21 24,15 22,13 20,15"
-        fill="#09090d"
-        stroke={color}
-        strokeWidth="1"
+        strokeWidth="1.5"
       />
 
-      {/* 6-Optic Sensor Cluster */}
-      <circle cx="21" cy="15.5" r="0.9" fill={color} />
-      <circle cx="23" cy="15.5" r="0.9" fill={color} />
-      <circle cx="20" cy="17" r="0.65" fill={color} opacity="0.85" />
-      <circle cx="24" cy="17" r="0.65" fill={color} opacity="0.85" />
-      <circle cx="21.5" cy="18.5" r="0.55" fill={color} opacity="0.75" />
-      <circle cx="22.5" cy="18.5" r="0.55" fill={color} opacity="0.75" />
+      {/* Center Microchip Core */}
+      <rect x="17.5" y="21.5" width="9" height="9" rx="1.5" fill={color} />
+      <rect x="19" y="23" width="6" height="6" fill="#09090f" />
+      <circle cx="20.5" cy="24.5" r="0.75" fill={color} />
+
+      {/* Digital Sensor Head */}
+      <polygon points="18,14 26,14 25,9 19,9" fill="#141422" stroke={color} strokeWidth="1" />
+      <line x1="20" y1="9" x2="20" y2="4" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+      <line x1="24" y1="9" x2="24" y2="4" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
     </svg>
   );
 }
 
-// 3. CYBER MANTIS: Predator hexapod with striking razor scythes & elongated neck
-function BugSkinMantis({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
+// 5. MATRIX GLITCH BUG: Cyber software anomaly with digital scanlines & glowing LED matrix
+function BugSkinGlitch({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
   return (
     <svg
       width={size}
@@ -527,398 +685,108 @@ function BugSkinMantis({ size, color, strideDuration, isEating, isPulsing, isFro
           ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)"
           : isPulsing
             ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))"
-            : `drop-shadow(0 2px 5px ${color}55)`,
+            : `drop-shadow(0 2px 6px ${color}55)`,
       }}
     >
       {/* P0 Critical Pulse Ring */}
       {isPulsing && (
-        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="0.8" fill="none" className="bug-pulse-ring" />
+        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="1" fill="none" className="bug-pulse-ring" />
       )}
 
-      {/* 4 Hind Walking Legs */}
+      {/* 6 Cyber Joint Legs */}
       <g style={{ transformBox: "view-box" }}>
+        {/* Top Left */}
         <polyline
           className="bug-leg-a"
-          style={{ transformOrigin: "21px 24px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="21,24 10,26 4,33"
+          style={{ transformOrigin: "15px 18px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="15,18 7,16 4,11"
           stroke={color}
-          strokeWidth="1.2"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <polyline
-          className="bug-leg-b"
-          style={{ transformOrigin: "23px 24px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="23,24 34,26 40,33"
-          stroke={color}
-          strokeWidth="1.2"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <polyline
-          className="bug-leg-b"
-          style={{ transformOrigin: "21px 27px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="21,27 12,35 6,42"
-          stroke={color}
-          strokeWidth="1.2"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <polyline
-          className="bug-leg-a"
-          style={{ transformOrigin: "23px 27px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="23,27 32,35 38,42"
-          stroke={color}
-          strokeWidth="1.2"
-          fill="none"
-          strokeLinecap="round"
-        />
-      </g>
-
-      {/* Massive Raptorial Scythe Arms (active striking/slashing when eating) */}
-      <g>
-        <path
-          className={isEating ? "mantis-strike-l" : ""}
-          style={{ transformOrigin: "21px 15px", transformBox: "view-box" }}
-          d="M 21 15 L 12 10 L 14 4 L 20 5"
-          stroke={color}
-          strokeWidth="1.4"
+          strokeWidth="1.7"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
         />
-        <path
-          className={isEating ? "mantis-strike-r" : ""}
-          style={{ transformOrigin: "23px 15px", transformBox: "view-box" }}
-          d="M 23 15 L 32 10 L 30 4 L 24 5"
+        {/* Top Right */}
+        <polyline
+          className="bug-leg-b"
+          style={{ transformOrigin: "29px 18px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="29,18 37,16 40,11"
           stroke={color}
-          strokeWidth="1.4"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        {/* Mid Left */}
+        <line
+          className="bug-leg-b"
+          style={{ transformOrigin: "14px 26px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          x1="14" y1="26" x2="4" y2="26"
+          stroke={color}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+        {/* Mid Right */}
+        <line
+          className="bug-leg-a"
+          style={{ transformOrigin: "30px 26px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          x1="30" y1="26" x2="40" y2="26"
+          stroke={color}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+        {/* Bottom Left */}
+        <polyline
+          className="bug-leg-a"
+          style={{ transformOrigin: "16px 33px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="16,33 9,35 6,41"
+          stroke={color}
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        {/* Bottom Right */}
+        <polyline
+          className="bug-leg-b"
+          style={{ transformOrigin: "28px 33px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          points="28,33 35,35 38,41"
+          stroke={color}
+          strokeWidth="1.7"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
         />
       </g>
 
-      {/* Slender Tapered Abdomen */}
+      {/* Main Shell */}
       <path
-        d="M 20.5 23 C 19 28 19.5 35 22 41 C 24.5 35 25 28 23.5 23 Z"
-        fill="#0e0e14"
+        d="M 15 17 C 12 24 13 34 22 37 C 31 34 32 24 29 17 Z"
+        fill="#0e0e18"
         stroke={color}
-        strokeWidth="1"
+        strokeWidth="1.4"
       />
-      <line x1="20" y1="28" x2="24" y2="28" stroke={color} strokeWidth="0.7" opacity="0.75" />
-      <line x1="20.5" y1="32" x2="23.5" y2="32" stroke={color} strokeWidth="0.7" opacity="0.75" />
-      <line x1="21" y1="36" x2="23" y2="36" stroke={color} strokeWidth="0.7" opacity="0.75" />
 
-      {/* Elongated Armored Pronotum (Neck) */}
-      <path d="M 21 12 L 21 21 L 23 21 L 23 12 Z" fill="#161620" stroke={color} strokeWidth="0.8" />
+      {/* Digital Scanline Ladder */}
+      <line x1="17" y1="21" x2="27" y2="21" stroke={color} strokeWidth="1.2" strokeLinecap="round" opacity="0.85" />
+      <line x1="16" y1="25" x2="28" y2="25" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+      <line x1="17" y1="29" x2="27" y2="29" stroke={color} strokeWidth="1.2" strokeLinecap="round" opacity="0.85" />
+      <line x1="19" y1="33" x2="25" y2="33" stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.65" />
 
-      {/* Swivel Triangular Head */}
-      <polygon points="22,12 17,7 27,7" fill="#09090d" stroke={color} strokeWidth="1" />
+      {/* Status Core LED */}
+      <circle cx="22" cy="18" r="1.8" fill={color} />
 
-      {/* Outer Compound Optics */}
-      <ellipse cx="17.5" cy="7.5" rx="1.5" ry="1.2" fill={color} />
-      <ellipse cx="26.5" cy="7.5" rx="1.5" ry="1.2" fill={color} />
+      {/* Tech Head */}
+      <polygon points="18,14 26,14 24,9 20,9" fill="#09090e" stroke={color} strokeWidth="1.1" />
+      <circle cx="20" cy="11.5" r="1" fill={color} />
+      <circle cx="24" cy="11.5" r="1" fill={color} />
+      <line x1="19" y1="9" x2="16" y2="4.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="25" y1="9" x2="28" y2="4.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
 }
 
-// 4. SEGMENTED CRAWLER: 5-segment articulated centipede with ripple wave crawling gait
-function BugSkinCentipede({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 44 44"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={`select-none ${isEating ? "bug-eating-tremor" : "bug-waddle"}`}
-      style={{
-        filter: isFrozen
-          ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)"
-          : isPulsing
-            ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))"
-            : `drop-shadow(0 2px 5px ${color}55)`,
-      }}
-    >
-      {/* P0 Critical Pulse Ring */}
-      {isPulsing && (
-        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="0.8" fill="none" className="bug-pulse-ring" />
-      )}
-
-      {/* 10 Rippling Traveling-Wave Legs */}
-      <g style={{ transformBox: "view-box" }}>
-        {/* Segment 1 Legs */}
-        <path
-          className="centipede-leg"
-          style={{ transformOrigin: "18px 13px", animationDuration: strideDuration, animationDelay: "0s", animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 18 13 L 9 10 L 4 13"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <path
-          className="centipede-leg"
-          style={{ transformOrigin: "26px 13px", animationDuration: strideDuration, animationDelay: "0.06s", animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 26 13 L 35 10 L 40 13"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-
-        {/* Segment 2 Legs */}
-        <path
-          className="centipede-leg"
-          style={{ transformOrigin: "18px 18px", animationDuration: strideDuration, animationDelay: "0.12s", animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 18 18 L 8 17 L 3 22"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <path
-          className="centipede-leg"
-          style={{ transformOrigin: "26px 18px", animationDuration: strideDuration, animationDelay: "0.18s", animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 26 18 L 36 17 L 41 22"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-
-        {/* Segment 3 Legs */}
-        <path
-          className="centipede-leg"
-          style={{ transformOrigin: "18.5px 23px", animationDuration: strideDuration, animationDelay: "0.24s", animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 18.5 23 L 9 24 L 4 30"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <path
-          className="centipede-leg"
-          style={{ transformOrigin: "25.5px 23px", animationDuration: strideDuration, animationDelay: "0.30s", animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 25.5 23 L 35 24 L 40 30"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-
-        {/* Segment 4 Legs */}
-        <path
-          className="centipede-leg"
-          style={{ transformOrigin: "19px 28px", animationDuration: strideDuration, animationDelay: "0.36s", animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 19 28 L 10 31 L 5 37"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <path
-          className="centipede-leg"
-          style={{ transformOrigin: "25px 28px", animationDuration: strideDuration, animationDelay: "0.42s", animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 25 28 L 34 31 L 39 37"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-
-        {/* Segment 5 Legs */}
-        <path
-          className="centipede-leg"
-          style={{ transformOrigin: "19.5px 33px", animationDuration: strideDuration, animationDelay: "0.48s", animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 19.5 33 L 12 37 L 7 42"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <path
-          className="centipede-leg"
-          style={{ transformOrigin: "24.5px 33px", animationDuration: strideDuration, animationDelay: "0.54s", animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 24.5 33 L 32 37 L 37 42"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-      </g>
-
-      {/* 5 Articulated Overlapping Body Plates */}
-      <rect x="18" y="11" width="8" height="5.5" rx="1.5" fill="#171722" stroke={color} strokeWidth="0.8" />
-      <rect x="18" y="16" width="8" height="5.5" rx="1.5" fill="#13131b" stroke={color} strokeWidth="0.8" />
-      <rect x="18.5" y="21" width="7" height="5.5" rx="1.5" fill="#171722" stroke={color} strokeWidth="0.8" />
-      <rect x="19" y="26" width="6" height="5.5" rx="1.5" fill="#13131b" stroke={color} strokeWidth="0.8" />
-      <polygon points="19,31 25,31 22,37" fill="#0f0f15" stroke={color} strokeWidth="0.8" />
-
-      {/* Rear Tail Cerci */}
-      <line x1="21" y1="37" x2="18" y2="43" stroke={color} strokeWidth="0.9" strokeLinecap="round" />
-      <line x1="23" y1="37" x2="26" y2="43" stroke={color} strokeWidth="0.9" strokeLinecap="round" />
-
-      {/* Head & Forward Pincers */}
-      <polygon points="20,11 24,11 23,6 21,6" fill="#09090d" stroke={color} strokeWidth="0.9" />
-      <path
-        className={isEating ? "scarab-pincer-l" : ""}
-        style={{ transformOrigin: "21px 6px", transformBox: "view-box" }}
-        d="M 21 6 L 18 3"
-        stroke={color}
-        strokeWidth="1.1"
-        strokeLinecap="round"
-      />
-      <path
-        className={isEating ? "scarab-pincer-r" : ""}
-        style={{ transformOrigin: "23px 6px", transformBox: "view-box" }}
-        d="M 23 6 L 26 3"
-        stroke={color}
-        strokeWidth="1.1"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-// 5. MECHA HORNET: Aerodynamic cyber wasp with high-frequency buzz wings & stinger
-function BugSkinWasp({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 44 44"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={`select-none ${isEating ? "bug-eating-tremor" : "bug-waddle"}`}
-      style={{
-        filter: isFrozen
-          ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)"
-          : isPulsing
-            ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))"
-            : `drop-shadow(0 2px 5px ${color}55)`,
-      }}
-    >
-      {/* P0 Critical Pulse Ring */}
-      {isPulsing && (
-        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="0.8" fill="none" className="bug-pulse-ring" />
-      )}
-
-      {/* High-Frequency Fluttering Wings (active buzz blur) */}
-      <g style={{ transformBox: "view-box" }}>
-        <polygon
-          className={isEating ? "wasp-wing-eating-l" : "wasp-wing-l"}
-          style={{ transformOrigin: "19px 17px", animationPlayState: isFrozen ? "paused" : "running" }}
-          points="19,17 3,10 6,22 19,19"
-          fill={color}
-          fillOpacity="0.28"
-          stroke={color}
-          strokeWidth="0.85"
-        />
-        <polygon
-          className={isEating ? "wasp-wing-eating-r" : "wasp-wing-r"}
-          style={{ transformOrigin: "25px 17px", animationPlayState: isFrozen ? "paused" : "running" }}
-          points="25,17 41,10 38,22 25,19"
-          fill={color}
-          fillOpacity="0.28"
-          stroke={color}
-          strokeWidth="0.85"
-        />
-      </g>
-
-      {/* 6 Agile Claw Legs */}
-      <g style={{ transformBox: "view-box" }}>
-        {/* FL */}
-        <path
-          className="bug-leg-a"
-          style={{ transformOrigin: "19px 16px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 19 16 L 11 12 L 6 15"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-        {/* FR */}
-        <path
-          className="bug-leg-b"
-          style={{ transformOrigin: "25px 16px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 25 16 L 33 12 L 38 15"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-        {/* ML */}
-        <path
-          className="bug-leg-b"
-          style={{ transformOrigin: "19px 20px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 19 20 L 9 21 L 5 27"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-        {/* MR */}
-        <path
-          className="bug-leg-a"
-          style={{ transformOrigin: "25px 20px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 25 20 L 35 21 L 39 27"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-        {/* BL */}
-        <path
-          className="bug-leg-a"
-          style={{ transformOrigin: "20px 23px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 20 23 L 12 30 L 8 36"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-        {/* BR */}
-        <path
-          className="bug-leg-b"
-          style={{ transformOrigin: "24px 23px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 24 23 L 32 30 L 36 36"
-          stroke={color}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-      </g>
-
-      {/* Curved Abdomen with Energy Stinger */}
-      <path
-        d="M 19 24 C 17 28 18 34 22 38 C 26 34 27 28 25 24 Z"
-        fill="#0d0d12"
-        stroke={color}
-        strokeWidth="1.1"
-      />
-      <line x1="19" y1="28" x2="25" y2="28" stroke={color} strokeWidth="0.8" opacity="0.8" />
-      <line x1="19.5" y1="32" x2="24.5" y2="32" stroke={color} strokeWidth="0.8" opacity="0.8" />
-
-      {/* Energy Stinger Needle */}
-      <line x1="22" y1="38" x2="22" y2="43" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
-
-      {/* Slender Waist */}
-      <line x1="22" y1="22" x2="22" y2="24" stroke={color} strokeWidth="1.5" />
-
-      {/* Thorax Plate & Turbine Vent */}
-      <polygon points="19,16 25,16 24,22 20,22" fill="#161622" stroke={color} strokeWidth="0.9" />
-      <circle cx="22" cy="19" r="1.3" fill={color} />
-
-      {/* Head & Drill Proboscis */}
-      <polygon points="20,16 24,16 23,11 21,11" fill="#09090d" stroke={color} strokeWidth="0.9" />
-      <line x1="22" y1="11" x2="22" y2="7" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-// Master Bug Renderer (switches between 5 modern models)
+// Master Bug Renderer (switches between 5 software bug models)
 interface ModernBugProps {
   skin: BugSkinType;
   size: number;
@@ -933,21 +801,21 @@ export function ModernBug({ skin, size, color, speedScale, isEating, isPulsing, 
   const strideDuration = isFrozen 
     ? "0s" 
     : isEating 
-      ? "0.08s" 
-      : `${Math.max(0.05, 0.24 / (speedScale || 1))}s`;
+      ? "0.07s" 
+      : `${Math.max(0.05, 0.22 / (speedScale || 1))}s`;
 
   switch (skin) {
-    case "spider":
-      return <BugSkinSpider size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
-    case "mantis":
-      return <BugSkinMantis size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
-    case "centipede":
-      return <BugSkinCentipede size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
-    case "wasp":
-      return <BugSkinWasp size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
-    case "scarab":
+    case "classic":
+      return <BugSkinClassic size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
+    case "circuit":
+      return <BugSkinCircuit size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
+    case "chip":
+      return <BugSkinChip size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
+    case "glitch":
+      return <BugSkinGlitch size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
+    case "neon":
     default:
-      return <BugSkinScarab size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
+      return <BugSkinNeon size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
   }
 }
 
@@ -2126,7 +1994,7 @@ export function QaGame() {
                     }}
                   >
                     <ModernBug
-                      skin={bug.bugSkin || "scarab"}
+                      skin={bug.bugSkin || "neon"}
                       size={bug.size}
                       color={bug.color}
                       speedScale={bug.speedScale || 1}
@@ -2351,133 +2219,6 @@ export function QaGame() {
             }
             .bug-leg-b {
               animation: bugLegB 0.22s infinite ease-in-out;
-            }
-
-            @keyframes spiderLeg1 {
-              0% { transform: rotate(0deg); }
-              50% { transform: rotate(13deg); }
-              100% { transform: rotate(0deg); }
-            }
-            .spider-leg-1 {
-              animation: spiderLeg1 0.2s infinite ease-in-out;
-            }
-            @keyframes spiderLeg2 {
-              0% { transform: rotate(0deg); }
-              50% { transform: rotate(-13deg); }
-              100% { transform: rotate(0deg); }
-            }
-            .spider-leg-2 {
-              animation: spiderLeg2 0.2s infinite ease-in-out;
-            }
-
-            @keyframes centipedeLegWave {
-              0% { transform: rotate(-12deg); }
-              50% { transform: rotate(14deg); }
-              100% { transform: rotate(-12deg); }
-            }
-            .centipede-leg {
-              animation: centipedeLegWave 0.24s infinite ease-in-out;
-            }
-
-            @keyframes scarabPincerL {
-              0% { transform: rotate(0deg); }
-              50% { transform: rotate(24deg); }
-              100% { transform: rotate(0deg); }
-            }
-            .scarab-pincer-l {
-              animation: scarabPincerL 0.1s infinite ease-in-out;
-            }
-            @keyframes scarabPincerR {
-              0% { transform: rotate(0deg); }
-              50% { transform: rotate(-24deg); }
-              100% { transform: rotate(0deg); }
-            }
-            .scarab-pincer-r {
-              animation: scarabPincerR 0.1s infinite ease-in-out;
-            }
-
-            @keyframes spiderFangL {
-              0% { transform: rotate(0deg); }
-              50% { transform: rotate(26deg); }
-              100% { transform: rotate(0deg); }
-            }
-            .spider-fang-l {
-              animation: spiderFangL 0.09s infinite ease-in-out;
-            }
-            @keyframes spiderFangR {
-              0% { transform: rotate(0deg); }
-              50% { transform: rotate(-26deg); }
-              100% { transform: rotate(0deg); }
-            }
-            .spider-fang-r {
-              animation: spiderFangR 0.09s infinite ease-in-out;
-            }
-
-            @keyframes mantisStrikeL {
-              0% { transform: rotate(0deg); }
-              50% { transform: rotate(28deg); }
-              100% { transform: rotate(0deg); }
-            }
-            .mantis-strike-l {
-              animation: mantisStrikeL 0.12s infinite ease-in-out;
-            }
-            @keyframes mantisStrikeR {
-              0% { transform: rotate(0deg); }
-              50% { transform: rotate(-28deg); }
-              100% { transform: rotate(0deg); }
-            }
-            .mantis-strike-r {
-              animation: mantisStrikeR 0.12s infinite ease-in-out;
-            }
-
-            @keyframes waspWingL {
-              0% { transform: rotate(0deg) scaleX(1); opacity: 0.3; }
-              50% { transform: rotate(-22deg) scaleX(0.7); opacity: 0.65; }
-              100% { transform: rotate(0deg) scaleX(1); opacity: 0.3; }
-            }
-            .wasp-wing-l {
-              animation: waspWingL 0.06s infinite linear;
-            }
-            @keyframes waspWingR {
-              0% { transform: rotate(0deg) scaleX(1); opacity: 0.3; }
-              50% { transform: rotate(22deg) scaleX(0.7); opacity: 0.65; }
-              100% { transform: rotate(0deg) scaleX(1); opacity: 0.3; }
-            }
-            .wasp-wing-r {
-              animation: waspWingR 0.06s infinite linear;
-            }
-            @keyframes waspWingEatL {
-              0% { transform: rotate(-10deg) scaleX(1.1); opacity: 0.4; }
-              50% { transform: rotate(-35deg) scaleX(0.5); opacity: 0.85; }
-              100% { transform: rotate(-10deg) scaleX(1.1); opacity: 0.4; }
-            }
-            .wasp-wing-eating-l {
-              animation: waspWingEatL 0.035s infinite linear;
-            }
-            @keyframes waspWingEatR {
-              0% { transform: rotate(10deg) scaleX(1.1); opacity: 0.4; }
-              50% { transform: rotate(35deg) scaleX(0.5); opacity: 0.85; }
-              100% { transform: rotate(10deg) scaleX(1.1); opacity: 0.4; }
-            }
-            .wasp-wing-eating-r {
-              animation: waspWingEatR 0.035s infinite linear;
-            }
-
-            @keyframes antennaL {
-              0% { transform: rotate(0deg); }
-              50% { transform: rotate(-10deg); }
-              100% { transform: rotate(0deg); }
-            }
-            .antenna-l {
-              animation: antennaL 0.28s infinite ease-in-out;
-            }
-            @keyframes antennaR {
-              0% { transform: rotate(0deg); }
-              50% { transform: rotate(10deg); }
-              100% { transform: rotate(0deg); }
-            }
-            .antenna-r {
-              animation: antennaR 0.28s infinite ease-in-out;
             }
 
             @keyframes bugEatingTremor {

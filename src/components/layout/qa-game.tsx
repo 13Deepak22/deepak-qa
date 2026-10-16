@@ -791,13 +791,13 @@ export function QaGame() {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     setDefects(prev => prev.map(b => b.id === bugId ? { ...b, scanning: true } : b));
 
-    // Target hover squash (300ms)
+    // Target hover squash (100ms)
     hoverTimeoutRef.current = setTimeout(() => {
       const bug = defectsRef.current.find(b => b.id === bugId);
       if (bug && !bug.squashed) {
         squashDefect(bugId, bug.x, bug.y);
       }
-    }, 300);
+    }, 100);
   }, [squashDefect]);
 
   const handlePointerLeave = useCallback((bugId: string) => {

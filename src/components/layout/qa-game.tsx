@@ -313,74 +313,84 @@ export interface BugDefenseProfile {
   lateralJitter: number;
 }
 
-// Dynamic Evasion Defense: Very low priority bugs have minimal defense/awareness,
-// while higher priority & critical bugs have enhanced awareness, agility & flee defense.
+// Dynamic Evasion Defense: Very low priority bugs rarely react at all,
+// medium bugs react sluggishly and slowly, while higher tiers are balanced and accessible.
 export function getBugDefenseProfile(
   age: number,
   tier: BugPriorityTier,
   category: string,
   initialSeverity?: "P0" | "P1" | "P2" | "P3",
-  wave: number = 1
+  wave: number = 1,
+  wobbleSeed: number = 0
 ): BugDefenseProfile {
-  // 1. Intrinsic Category Defense Multiplier based on technical bug severity & category
-  let categoryMult = 1.0;
+  // 1. Intrinsic Category Defense Multiplier (normalized so categories don't overpower evasion)
+  let categoryMult = 0.85;
   if (["LOG", "CODE", "CACHE", "TEST"].includes(category) || initialSeverity === "P3") {
-    categoryMult = 0.65; // Very low intrinsic defense (lint warnings, logs, flaky tests)
+    categoryMult = 0.55; // Very low defense
   } else if (["HTTP", "RATE", "WAIT", "AUTH", "SSR"].includes(category)) {
-    categoryMult = 1.0;  // Standard medium defense (404, rate limits, timeouts)
+    categoryMult = 0.75; // Gentle medium defense
   } else if (["MEM", "NET", "LOCK", "CALL", "SRV"].includes(category)) {
-    categoryMult = 1.25; // High defense (null ptrs, deadlocks, bad gateways)
+    categoryMult = 0.90; // Moderate defense
   } else if (["SYS", "SYNC", "HEAP"].includes(category) || initialSeverity === "P0") {
-    categoryMult = 1.45; // Maximum defense (internal err, race condition, mem leaks)
+    categoryMult = 1.05; // Capped max defense
   }
 
-  // Wave speed scaling (+0.2x per wave)
-  const waveMult = 1.0 + (wave - 1) * 0.2;
+  // Very gentle wave scaling (+0.05x per wave)
+  const waveMult = 1.0 + (wave - 1) * 0.05;
 
   // 2. Base Defense Matrix by Tier:
-  // Low (P3): Minimal defense. Detection zone only touches bug body (34px-44px), crawl force is 0.20-0.45, steer is sluggish 0.03-0.07, zero jitter.
-  // Med (P2): Moderate defense. Radius 50px-74px, force 0.75-1.75, steer 0.12-0.30, gentle jitter 0.1-0.25.
-  // High (P1): Strong defense. Radius 78px-104px, force 2.0-3.3, steer 0.35-0.65, agile jitter 0.3-0.55.
-  // Critical (P0): Elite defense. Radius 126px, force 4.4, steer 0.88, erratic panic jitter 0.72.
+  // Low (P3): "low will rarly do it" - 85% of low bugs have zero evasion reflex.
+  //           Only ~15% flinch slightly when cursor is right on top (<22px).
+  // Med (P2): "med slow" - Slow, sluggish reaction. Small radius (30-40px), gentle crawl (force 0.20-0.42), sluggish steer.
+  // High (P1): Moderate reaction. Radius 46-60px, force 0.60-1.05, steer 0.08-0.15.
+  // Critical (P0): Alert, but fair. Radius 70px, force 1.45, steer 0.20, jitter 0.20.
 
-  let baseRadius = 36;
-  let baseForce = 0.25;
-  let baseSteer = 0.035;
-  let baseJitter = 0.0;
+  let baseRadius = 0;
+  let baseForce = 0;
+  let baseSteer = 0;
+  let baseJitter = 0;
 
   if (tier === "low") {
-    // Smooth ramp within low tier as it approaches medium (0 - 7000ms)
-    const t = Math.max(0, Math.min(1, age / STAGE_DURATION_MS));
-    baseRadius = 34 + t * 10;     // 34px -> 44px
-    baseForce = 0.20 + t * 0.25;   // 0.20 -> 0.45 (very sluggish crawl)
-    baseSteer = 0.03 + t * 0.04;   // 0.03 -> 0.07 (barely swerves, very easy to squash)
-    baseJitter = 0.0;             // Zero lateral dodging in low priority
+    // 85% of low bugs NEVER react/evade cursor ("low will rarly do it")
+    const hasReflex = (Math.abs(Math.sin(wobbleSeed)) * 100) < 15;
+    if (hasReflex) {
+      const t = Math.max(0, Math.min(1, age / STAGE_DURATION_MS));
+      baseRadius = 16 + t * 6;      // 16px -> 22px (only when cursor is right over the 54px body)
+      baseForce = 0.04 + t * 0.04;  // 0.04 -> 0.08 (imperceptible drift)
+      baseSteer = 0.01 + t * 0.01;  // Minimal steer
+      baseJitter = 0.0;
+    } else {
+      baseRadius = 0;
+      baseForce = 0;
+      baseSteer = 0;
+      baseJitter = 0;
+    }
   } else if (tier === "med") {
-    // Medium tier: 7000ms - 14000ms
+    // "med slow": sluggish awareness and slow crawl
     const t = Math.max(0, Math.min(1, (age - STAGE_DURATION_MS) / STAGE_DURATION_MS));
-    baseRadius = 50 + t * 24;     // 50px -> 74px
-    baseForce = 0.75 + t * 1.0;   // 0.75 -> 1.75
-    baseSteer = 0.12 + t * 0.18;  // 0.12 -> 0.30
-    baseJitter = 0.1 + t * 0.15;  // 0.10 -> 0.25
+    baseRadius = 28 + t * 12;     // 28px -> 40px
+    baseForce = 0.18 + t * 0.24;  // 0.18 -> 0.42 (slow and easy to hover)
+    baseSteer = 0.025 + t * 0.035; // 0.025 -> 0.06 (lazy turn)
+    baseJitter = 0.02;
   } else if (tier === "high") {
-    // High tier: 14000ms - 21000ms
+    // High tier: moderate, fair reaction
     const t = Math.max(0, Math.min(1, (age - STAGE_DURATION_MS * 2) / STAGE_DURATION_MS));
-    baseRadius = 78 + t * 26;     // 78px -> 104px
-    baseForce = 2.0 + t * 1.3;    // 2.0 -> 3.3
-    baseSteer = 0.35 + t * 0.30;  // 0.35 -> 0.65
-    baseJitter = 0.3 + t * 0.25;  // 0.30 -> 0.55
+    baseRadius = 46 + t * 14;     // 46px -> 60px
+    baseForce = 0.55 + t * 0.50;  // 0.55 -> 1.05
+    baseSteer = 0.07 + t * 0.08;  // 0.07 -> 0.15
+    baseJitter = 0.08 + t * 0.07;
   } else {
-    // Critical tier: 21000ms+
-    baseRadius = 126;
-    baseForce = 4.4;
-    baseSteer = 0.88;
-    baseJitter = 0.72;
+    // Critical tier: alert but squashable
+    baseRadius = 70;
+    baseForce = 1.45;
+    baseSteer = 0.20;
+    baseJitter = 0.20;
   }
 
   // Calculate final dynamic parameters
-  const finalRadius = Math.max(28, Math.min(135, Math.round(baseRadius * Math.sqrt(categoryMult))));
+  const finalRadius = baseRadius === 0 ? 0 : Math.max(16, Math.min(80, Math.round(baseRadius * Math.sqrt(categoryMult))));
   const finalForce = baseForce * categoryMult * waveMult;
-  const finalSteer = Math.max(0.025, Math.min(0.95, baseSteer * categoryMult));
+  const finalSteer = Math.max(0.01, Math.min(0.35, baseSteer * categoryMult));
   const finalJitter = baseJitter * categoryMult;
 
   return {
@@ -680,6 +690,7 @@ export function QaGame() {
   const hasWonRef = useRef(false);
   const waveRef = useRef(1);
   const spawnDefectRef = useRef<() => void>(() => {});
+  const scheduleNextRef = useRef<(delayOverride?: number) => void>(() => {});
 
   // Dynamic performance, hanging detection & bug capacity refs (Max 10)
   const corruptedCountRef = useRef(0);
@@ -1045,8 +1056,10 @@ export function QaGame() {
       setDefects(prev => prev.filter(b => b.id !== id));
       if (!hasCrashedRef.current && !hasWonRef.current) {
         const remainingActive = defectsRef.current.filter(b => !b.squashed && !b.isDying && b.id !== id).length;
-        if (remainingActive < dynamicMaxBugsRef.current && remainingActive < ABSOLUTE_MAX_BUGS) {
-          spawnDefectRef.current?.();
+        // If NO bugs remain on screen, trigger fast spawn in few seconds (1.6s) so player isn't waiting!
+        // Otherwise, let the patterned slowdown timer pace the spawns naturally.
+        if (remainingActive === 0) {
+          scheduleNextRef.current?.(1600);
         }
       }
     }, 400);
@@ -1668,7 +1681,8 @@ export function QaGame() {
           tier,
           bug.bugCategory,
           bug.initialSeverity,
-          waveRef.current
+          waveRef.current,
+          bug.wobbleSeed
         );
         const distToMouse = Math.hypot(bug.x - mouse.x, bug.y - mouse.y);
 
@@ -1771,30 +1785,56 @@ export function QaGame() {
         if (!hasCrashedRef.current) spawnDefect();
       }, 900);
 
-      let timeoutId: NodeJS.Timeout;
-      const scheduleNext = () => {
-        // Base spawn interval 2400ms reduced by 0.1x (10% faster) on each wave
-        const baseInterval = 2400;
-        const waveSpawnFactor = Math.max(0.25, 1.0 - (waveRef.current - 1) * 0.1);
-        const spawnDelay = Math.round((baseInterval + Math.random() * 500) * waveSpawnFactor);
+      let timeoutId: NodeJS.Timeout | null = null;
+      const scheduleNext = (delayOverride?: number) => {
+        if (timeoutId) clearTimeout(timeoutId);
+
+        // Patterned spawn timing:
+        // - If NO bugs available on screen (0 bugs): spawn in few seconds (1600ms) so player isn't waiting!
+        // - Otherwise, progressively slow down spawn rate as bug count increases:
+        //   1 bug: ~4.5s
+        //   2 bugs: ~5.8s
+        //   3-4 bugs: ~7.5s
+        //   5-7 bugs: ~9.5s
+        //   8+ bugs: ~13.0s
+        const activeCount = defectsRef.current.filter(b => !b.squashed && !b.isDying).length;
+
+        let baseDelay = 1600;
+        if (activeCount === 1) {
+          baseDelay = 4500;
+        } else if (activeCount === 2) {
+          baseDelay = 5800;
+        } else if (activeCount >= 3 && activeCount <= 4) {
+          baseDelay = 7500;
+        } else if (activeCount >= 5 && activeCount <= 7) {
+          baseDelay = 9500;
+        } else if (activeCount >= 8) {
+          baseDelay = 13000;
+        }
+
+        const wavePacing = Math.max(0.75, 1.0 - (waveRef.current - 1) * 0.05);
+        const jitter = Math.random() * 400 - 200;
+        const spawnDelay = delayOverride ?? Math.max(1200, Math.round(baseDelay * wavePacing + jitter));
 
         timeoutId = setTimeout(() => {
           if (!hasCrashedRef.current && !hasWonRef.current) {
             // Strictly cap bugs on screen dynamically (never exceeding 10)
-            const activeCount = defectsRef.current.filter(b => !b.squashed && !b.isDying).length;
-            if (activeCount < dynamicMaxBugsRef.current && activeCount < ABSOLUTE_MAX_BUGS) {
+            const currentActive = defectsRef.current.filter(b => !b.squashed && !b.isDying).length;
+            if (currentActive < dynamicMaxBugsRef.current && currentActive < ABSOLUTE_MAX_BUGS) {
               spawnDefect();
             }
           }
           scheduleNext();
         }, spawnDelay);
       };
+
+      scheduleNextRef.current = scheduleNext;
       scheduleNext();
 
       requestRef.current = requestAnimationFrame(updatePositions);
 
       return () => {
-        clearTimeout(timeoutId);
+        if (timeoutId) clearTimeout(timeoutId);
         if (requestRef.current) cancelAnimationFrame(requestRef.current);
         delete document.documentElement.dataset.game;
       };
@@ -2021,6 +2061,7 @@ export function QaGame() {
                     corruptedCountRef.current = 0;
                     frameDeltasRef.current = [];
                     spawnDefect();
+                    scheduleNextRef.current?.(3500);
                   }}
                   className="text-muted hover:text-amber-500 hover:border-amber-500 transition-colors p-0.5 rounded border border-line"
                   title="Reboot Environment"
@@ -2075,9 +2116,17 @@ export function QaGame() {
                   data-dying={isDying ? "true" : undefined}
                   data-born={isBorn ? "true" : undefined}
                   data-cursor={isDying ? undefined : `Squash defect ${bug.bugCode}: ${bug.bugLabel}`}
-                  onClick={() => !isDying && squashDefect(bug.id, bug.x, bug.y)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isDying) squashDefect(bug.id, bug.x, bug.y);
+                  }}
+                  onPointerDown={(e) => {
+                    e.stopPropagation();
+                    if (!isDying) squashDefect(bug.id, bug.x, bug.y);
+                  }}
                   onTouchStart={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     if (!isDying) squashDefect(bug.id, bug.x, bug.y);
                   }}
                   onPointerEnter={() => !isDying && handlePointerEnter(bug.id)}
@@ -2314,6 +2363,7 @@ export function QaGame() {
                       corruptedCountRef.current = 0;
                       frameDeltasRef.current = [];
                       spawnDefect();
+                      scheduleNextRef.current?.(3500);
                     }}
                     data-cursor="Deploy hotfix & reboot environment"
                     className="press flex-1 inline-flex items-center justify-center gap-2 border border-pass bg-pass text-on-band hover:bg-pass-fill font-bold py-2.5 px-4 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm tracking-wide transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer whitespace-nowrap"

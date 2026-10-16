@@ -5,13 +5,9 @@ import {
   X,
   ChevronRight,
   ChevronLeft,
-  Eye,
-  EyeOff,
   Copy,
   Check,
   ArrowRight,
-  SlidersHorizontal,
-  RotateCcw,
 } from "lucide-react";
 import {
   QUICK_PREP_SECTIONS,
@@ -26,13 +22,6 @@ interface QuickPrepModalProps {
 
 type PrepViewState = "config" | "active";
 
-interface SavedPrepSession {
-  history: QuickPrepItem[];
-  historyIndex: number;
-  selectedSectionIds: string[];
-  savedAt: number;
-}
-
 export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
   // All 12 sections auto-selected by default
   const [selectedSectionIds, setSelectedSectionIds] = useState<Set<string>>(
@@ -41,35 +30,19 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
 
   // First page shows only the filter to select; "active" shows Q&A on Start
   const [viewState, setViewState] = useState<PrepViewState>("config");
-  const [isAnswerRevealed, setIsAnswerRevealed] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
-
-  // Saved in-progress quick prep session
-  const [savedPrepSession, setSavedPrepSession] = useState<SavedPrepSession | null>(null);
 
   // History tracking for Next/Previous random navigation
   const [history, setHistory] = useState<QuickPrepItem[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
 
-  // Load saved session on open & always show config first
+  // Reset to config state when modal opens & remove any legacy prep session key
   useEffect(() => {
     if (!isOpen || typeof window === "undefined") return;
     setViewState("config");
     try {
-      const raw = localStorage.getItem("deepak_qa_saved_quick_prep_session");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && Array.isArray(parsed.history) && parsed.history.length > 0) {
-          setSavedPrepSession(parsed);
-        } else {
-          setSavedPrepSession(null);
-        }
-      } else {
-        setSavedPrepSession(null);
-      }
-    } catch {
-      setSavedPrepSession(null);
-    }
+      localStorage.removeItem("deepak_qa_saved_quick_prep_session");
+    } catch {}
   }, [isOpen]);
 
   // Section toggle handlers
@@ -105,45 +78,6 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
     return pool;
   }, [selectedSectionIds]);
 
-  // Persist prep session helper
-  const persistPrepSession = useCallback(
-    (hist: QuickPrepItem[], hIdx: number) => {
-      if (typeof window === "undefined" || hist.length === 0) return;
-      try {
-        const session: SavedPrepSession = {
-          history: hist,
-          historyIndex: hIdx,
-          selectedSectionIds: Array.from(selectedSectionIds),
-          savedAt: Date.now(),
-        };
-        localStorage.setItem("deepak_qa_saved_quick_prep_session", JSON.stringify(session));
-        setSavedPrepSession(session);
-      } catch (e) {
-        console.error("Failed to persist prep session", e);
-      }
-    },
-    [selectedSectionIds]
-  );
-
-  // Resume saved prep session
-  const handleResumeSavedPrepSession = () => {
-    if (!savedPrepSession) return;
-    setHistory(savedPrepSession.history);
-    setHistoryIndex(savedPrepSession.historyIndex);
-    setIsAnswerRevealed(false);
-    setViewState("active");
-  };
-
-  // Discard saved prep session
-  const handleDiscardSavedPrepSession = () => {
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.removeItem("deepak_qa_saved_quick_prep_session");
-      } catch {}
-    }
-    setSavedPrepSession(null);
-  };
-
   // Function to pick a new random question from selected pool
   const pickRandomQuestion = useCallback(() => {
     if (activePool.length === 0) return;
@@ -153,9 +87,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
     const newIndex = historyIndex + 1;
     setHistory(newHistory);
     setHistoryIndex(newIndex);
-    setIsAnswerRevealed(false);
-    persistPrepSession(newHistory, newIndex);
-  }, [activePool, history, historyIndex, persistPrepSession]);
+  }, [activePool, history, historyIndex]);
 
   // Handler to start Quick Prep
   const handleStartPrep = () => {
@@ -165,9 +97,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
     const newHistory = [chosen];
     setHistory(newHistory);
     setHistoryIndex(0);
-    setIsAnswerRevealed(false);
     setViewState("active");
-    persistPrepSession(newHistory, 0);
   };
 
   // Current active question
@@ -177,10 +107,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
   // Handlers for Next and Prev
   const handleNext = () => {
     if (historyIndex < history.length - 1) {
-      const nextIdx = historyIndex + 1;
-      setHistoryIndex(nextIdx);
-      setIsAnswerRevealed(false);
-      persistPrepSession(history, nextIdx);
+      setHistoryIndex(historyIndex + 1);
     } else {
       pickRandomQuestion();
     }
@@ -188,10 +115,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
 
   const handlePrev = () => {
     if (historyIndex > 0) {
-      const prevIdx = historyIndex - 1;
-      setHistoryIndex(prevIdx);
-      setIsAnswerRevealed(false);
-      persistPrepSession(history, prevIdx);
+      setHistoryIndex(historyIndex - 1);
     }
   };
 
@@ -216,10 +140,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
       if (e.key === "Escape") {
         handleClose();
       } else if (viewState === "active") {
-        if (e.key === " " && (e.target as HTMLElement).tagName !== "INPUT") {
-          e.preventDefault();
-          setIsAnswerRevealed((prev) => !prev);
-        } else if (e.key === "ArrowRight" && (e.target as HTMLElement).tagName !== "INPUT") {
+        if (e.key === "ArrowRight" && (e.target as HTMLElement).tagName !== "INPUT") {
           e.preventDefault();
           handleNext();
         } else if (e.key === "ArrowLeft" && (e.target as HTMLElement).tagName !== "INPUT") {
@@ -292,48 +213,6 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
                   Choose which sections to include in random Q&amp;A. All 12 tracks are auto-selected.
                 </p>
               </div>
-
-              {/* Continue Saved Quick Prep Session */}
-              {savedPrepSession && (
-                <div className="rounded-xl border border-pass/35 bg-pass/10 p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 animate-in fade-in duration-150">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-pass/20 border border-pass/40 text-pass flex items-center justify-center shrink-0">
-                      <RotateCcw className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-mono text-xs font-semibold text-ink">
-                          Resume Previous Prep
-                        </span>
-                        <span className="font-mono text-[9px] uppercase px-1.5 py-0.2 rounded bg-pass/20 text-pass font-semibold">
-                          Saved
-                        </span>
-                      </div>
-                      <p className="font-mono text-[11px] text-muted truncate mt-0.5">
-                        {savedPrepSession.history.length} flashcards in session · Currently on #{savedPrepSession.historyIndex + 1}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-end gap-2 shrink-0 border-t border-pass/20 sm:border-0 pt-2 sm:pt-0">
-                    <button
-                      type="button"
-                      onClick={handleDiscardSavedPrepSession}
-                      className="text-[11px] font-mono text-muted hover:text-rose-500 px-2 py-1 transition cursor-pointer"
-                    >
-                      Discard
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleResumeSavedPrepSession}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs"
-                    >
-                      <span>Continue Prep</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {/* Section Checkbox Chips (All 12 auto-selected by default) */}
               <div className="pt-0.5">
@@ -443,62 +322,43 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
                   </h3>
                 </div>
 
-                {/* Reveal Technical Answer */}
+                {/* Technical Answer (Always Open) */}
                 <div className="pt-1">
-                  {!isAnswerRevealed ? (
-                    <button
-                      type="button"
-                      onClick={() => setIsAnswerRevealed(true)}
-                      className="w-full py-2.5 px-3.5 rounded-lg border border-dashed border-line hover:border-pass/60 bg-paper/40 hover:bg-pass/5 text-ink-soft hover:text-pass transition flex items-center justify-center gap-2 font-mono text-xs cursor-pointer"
-                    >
-                      <Eye className="w-3.5 h-3.5 text-pass" />
-                      <span>Reveal Technical Answer (or press Space)</span>
-                    </button>
-                  ) : (
-                    <div className="rounded-lg border border-line bg-paper/50 p-3 sm:p-4 animate-in fade-in duration-150">
-                      <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-line/50">
-                        <span className="font-mono text-[10px] uppercase tracking-wider text-pass font-semibold">
-                          Key Points &amp; Answer
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setIsAnswerRevealed(false)}
-                          className="text-[10px] font-mono text-muted hover:text-ink flex items-center gap-1 cursor-pointer"
-                        >
-                          <EyeOff className="w-3 h-3" />
-                          <span>Hide</span>
-                        </button>
-                      </div>
-
-                      <div className="space-y-1.5 font-sans text-xs sm:text-[13px] text-ink-soft leading-relaxed">
-                        {currentQuestion.answers.map((line, idx) => {
-                          const trimmed = line.trim();
-                          const isBullet =
-                            trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("o ");
-                          const isCode =
-                            trimmed.includes("(") &&
-                            trimmed.includes(")") &&
-                            (trimmed.startsWith("pm.") ||
-                              trimmed.startsWith("browser_") ||
-                              trimmed.includes(";"));
-
-                          return (
-                            <div
-                              key={idx}
-                              className={`flex gap-2 ${
-                                isCode
-                                  ? "font-mono text-xs bg-paper-deep text-pass px-2.5 py-1.5 rounded border border-line/40"
-                                  : ""
-                              }`}
-                            >
-                              {isBullet && <span className="text-pass shrink-0">•</span>}
-                              <span className="flex-1">{line.replace(/^[•\-o]\s*/, "")}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
+                  <div className="rounded-lg border border-line bg-paper/50 p-3 sm:p-4">
+                    <div className="pb-1.5 mb-2 border-b border-line/50">
+                      <span className="font-mono text-[10px] uppercase tracking-wider text-pass font-semibold">
+                        Key Points &amp; Answer
+                      </span>
                     </div>
-                  )}
+
+                    <div className="space-y-1.5 font-sans text-xs sm:text-[13px] text-ink-soft leading-relaxed">
+                      {currentQuestion.answers.map((line, idx) => {
+                        const trimmed = line.trim();
+                        const isBullet =
+                          trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("o ");
+                        const isCode =
+                          trimmed.includes("(") &&
+                          trimmed.includes(")") &&
+                          (trimmed.startsWith("pm.") ||
+                            trimmed.startsWith("browser_") ||
+                            trimmed.includes(";"));
+
+                        return (
+                          <div
+                            key={idx}
+                            className={`flex gap-2 ${
+                              isCode
+                                ? "font-mono text-xs bg-paper-deep text-pass px-2.5 py-1.5 rounded border border-line/40"
+                                : ""
+                            }`}
+                          >
+                            {isBullet && <span className="text-pass shrink-0">•</span>}
+                            <span className="flex-1">{line.replace(/^[•\-o]\s*/, "")}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
 
               </div>
@@ -524,7 +384,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
                 onClick={handleNext}
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs"
               >
-                <span>Next Random</span>
+                <span>Next</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>

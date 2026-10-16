@@ -32,6 +32,7 @@ interface Defect {
   bugCode: string;
   bugLabel: string;
   bugSeverity: "P0" | "P1" | "P2" | "P3";
+  initialSeverity?: "P0" | "P1" | "P2" | "P3";
   bugIcon: string;
   bugCategory: string;
 }
@@ -113,20 +114,64 @@ export interface BugTemplate {
   category: string;
 }
 
+export type BugPriorityTier = "low" | "med" | "high" | "critical";
+
+export interface PriorityConfig {
+  name: BugPriorityTier;
+  label: string;
+  color: string;
+  size: number;
+  speedScale: number;
+}
+
+export const BUG_PRIORITY_CONFIG: Record<BugPriorityTier, PriorityConfig> = {
+  low: {
+    name: "low",
+    label: "P3 [Low]",
+    color: "#10b981", // Low: Green
+    size: 36,
+    speedScale: 0.95,
+  },
+  med: {
+    name: "med",
+    label: "P2 [Medium]",
+    color: "#eab308", // Med: Yellow
+    size: 42,
+    speedScale: 1.75,
+  },
+  high: {
+    name: "high",
+    label: "P1 [High]",
+    color: "#f97316", // High: Orange
+    size: 48,
+    speedScale: 2.75,
+  },
+  critical: {
+    name: "critical",
+    label: "P0 [Critical]",
+    color: "#ef4444", // Critical: Red
+    size: 54,
+    speedScale: 4.1,
+  },
+};
+
 export const UI_BUG_TYPES: BugTemplate[] = [
-  { code: "#404", label: "NOT_FOUND", defaultSeverity: "P2", color: "#f59e0b", bgTint: "rgba(245, 158, 11, 0.16)", icon: "⚠️", category: "HTTP" },
+  { code: "#404", label: "NOT_FOUND", defaultSeverity: "P2", color: "#eab308", bgTint: "rgba(234, 179, 8, 0.16)", icon: "⚠️", category: "HTTP" },
   { code: "#500", label: "INTERNAL_ERR", defaultSeverity: "P0", color: "#ef4444", bgTint: "rgba(239, 68, 68, 0.22)", icon: "💥", category: "SYS" },
   { code: "#01", label: "NULL_PTR", defaultSeverity: "P1", color: "#f97316", bgTint: "rgba(249, 115, 22, 0.18)", icon: "🛑", category: "MEM" },
-  { code: "#02", label: "RACE_COND", defaultSeverity: "P0", color: "#dc2626", bgTint: "rgba(220, 38, 38, 0.24)", icon: "⚡", category: "SYNC" },
+  { code: "#02", label: "RACE_COND", defaultSeverity: "P0", color: "#ef4444", bgTint: "rgba(239, 68, 68, 0.24)", icon: "⚡", category: "SYNC" },
   { code: "#502", label: "BAD_GATEWAY", defaultSeverity: "P1", color: "#f97316", bgTint: "rgba(249, 115, 22, 0.18)", icon: "🔌", category: "NET" },
-  { code: "#03", label: "MEM_LEAK", defaultSeverity: "P0", color: "#b91c1c", bgTint: "rgba(185, 28, 28, 0.25)", icon: "🔥", category: "HEAP" },
+  { code: "#03", label: "MEM_LEAK", defaultSeverity: "P0", color: "#ef4444", bgTint: "rgba(239, 68, 68, 0.25)", icon: "🔥", category: "HEAP" },
   { code: "#429", label: "RATE_LIMIT", defaultSeverity: "P2", color: "#eab308", bgTint: "rgba(234, 179, 8, 0.16)", icon: "⏱️", category: "RATE" },
-  { code: "#04", label: "DEADLOCK", defaultSeverity: "P1", color: "#ea580c", bgTint: "rgba(234, 88, 12, 0.18)", icon: "🔒", category: "LOCK" },
-  { code: "#05", label: "TIMEOUT_ERR", defaultSeverity: "P2", color: "#f59e0b", bgTint: "rgba(245, 158, 11, 0.16)", icon: "⏳", category: "WAIT" },
+  { code: "#04", label: "DEADLOCK", defaultSeverity: "P1", color: "#f97316", bgTint: "rgba(249, 115, 22, 0.18)", icon: "🔒", category: "LOCK" },
+  { code: "#05", label: "TIMEOUT_ERR", defaultSeverity: "P2", color: "#eab308", bgTint: "rgba(234, 179, 8, 0.16)", icon: "⏳", category: "WAIT" },
   { code: "#403", label: "FORBIDDEN", defaultSeverity: "P2", color: "#eab308", bgTint: "rgba(234, 179, 8, 0.16)", icon: "🚫", category: "AUTH" },
   { code: "#06", label: "FLAKY_SPEC", defaultSeverity: "P3", color: "#10b981", bgTint: "rgba(16, 185, 129, 0.16)", icon: "🧪", category: "TEST" },
   { code: "#07", label: "STACK_OFLOW", defaultSeverity: "P1", color: "#f97316", bgTint: "rgba(249, 115, 22, 0.18)", icon: "📉", category: "CALL" },
-  { code: "#08", label: "HYDRATE_FAIL", defaultSeverity: "P2", color: "#06b6d4", bgTint: "rgba(6, 182, 212, 0.16)", icon: "💧", category: "SSR" },
+  { code: "#08", label: "HYDRATE_FAIL", defaultSeverity: "P2", color: "#eab308", bgTint: "rgba(234, 179, 8, 0.16)", icon: "💧", category: "SSR" },
+  { code: "#09", label: "LINT_WARN", defaultSeverity: "P3", color: "#10b981", bgTint: "rgba(16, 185, 129, 0.16)", icon: "✨", category: "CODE" },
+  { code: "#10", label: "LOG_NOISE", defaultSeverity: "P3", color: "#10b981", bgTint: "rgba(16, 185, 129, 0.16)", icon: "📋", category: "LOG" },
+  { code: "#11", label: "STALE_CACHE", defaultSeverity: "P3", color: "#10b981", bgTint: "rgba(16, 185, 129, 0.16)", icon: "🔄", category: "CACHE" },
   { code: "#503", label: "SVC_UNAVAIL", defaultSeverity: "P1", color: "#f97316", bgTint: "rgba(249, 115, 22, 0.18)", icon: "🛑", category: "SRV" },
 ];
 
@@ -152,8 +197,8 @@ export function PcbCircuitBug({
   const strideDuration = isFrozen 
     ? "0s" 
     : isEating 
-      ? "0.07s" 
-      : `${Math.max(0.05, 0.22 / (speedScale || 1))}s`;
+      ? "0.06s" 
+      : `${Math.max(0.045, 0.22 / (speedScale || 1))}s`;
 
   return (
     <svg
@@ -162,18 +207,38 @@ export function PcbCircuitBug({
       viewBox="0 0 44 44"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={`select-none ${isEating ? "bug-eating-tremor" : "bug-waddle"}`}
+      className={`select-none pcb-bug-circuit ${isEating ? "bug-eating-tremor" : "bug-waddle"}`}
       style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        transition: "width 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.65s ease",
         filter: isFrozen
-          ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)"
+          ? "drop-shadow(0 0 10px #38bdf8) brightness(1.25)"
           : isPulsing
-            ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))"
-            : `drop-shadow(0 2px 6px ${color}55)`,
+            ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.9)) drop-shadow(0 0 18px rgba(239, 68, 68, 0.6))"
+            : `drop-shadow(0 2px 7px ${color}77)`,
       }}
     >
+      <style>{`
+        .pcb-bug-circuit polyline,
+        .pcb-bug-circuit path,
+        .pcb-bug-circuit circle,
+        .pcb-bug-circuit polygon {
+          transition: stroke 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), fill 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+      `}</style>
       {/* P0 Critical Pulse Ring */}
       {isPulsing && (
-        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="1" fill="none" className="bug-pulse-ring" />
+        <circle 
+          cx="22" 
+          cy="22" 
+          r="18" 
+          stroke={color} 
+          strokeWidth="1.2" 
+          fill="none" 
+          className="bug-pulse-ring" 
+          style={{ transition: "stroke 0.75s ease" }}
+        />
       )}
 
       {/* 6 Angular Robotic Circuit Legs */}
@@ -181,7 +246,12 @@ export function PcbCircuitBug({
         {/* Top Left */}
         <polyline
           className="bug-leg-a"
-          style={{ transformOrigin: "17px 16px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          style={{ 
+            transformOrigin: "17px 16px", 
+            animationDuration: strideDuration, 
+            animationPlayState: isFrozen ? "paused" : "running",
+            transition: "stroke 0.75s ease",
+          }}
           points="17,16 9,13 5,8"
           stroke={color}
           strokeWidth="1.8"
@@ -192,7 +262,12 @@ export function PcbCircuitBug({
         {/* Top Right */}
         <polyline
           className="bug-leg-b"
-          style={{ transformOrigin: "27px 16px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          style={{ 
+            transformOrigin: "27px 16px", 
+            animationDuration: strideDuration, 
+            animationPlayState: isFrozen ? "paused" : "running",
+            transition: "stroke 0.75s ease",
+          }}
           points="27,16 35,13 39,8"
           stroke={color}
           strokeWidth="1.8"
@@ -203,7 +278,12 @@ export function PcbCircuitBug({
         {/* Mid Left */}
         <polyline
           className="bug-leg-b"
-          style={{ transformOrigin: "15px 24px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          style={{ 
+            transformOrigin: "15px 24px", 
+            animationDuration: strideDuration, 
+            animationPlayState: isFrozen ? "paused" : "running",
+            transition: "stroke 0.75s ease",
+          }}
           points="15,24 7,23 4,29"
           stroke={color}
           strokeWidth="1.8"
@@ -214,7 +294,12 @@ export function PcbCircuitBug({
         {/* Mid Right */}
         <polyline
           className="bug-leg-a"
-          style={{ transformOrigin: "29px 24px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          style={{ 
+            transformOrigin: "29px 24px", 
+            animationDuration: strideDuration, 
+            animationPlayState: isFrozen ? "paused" : "running",
+            transition: "stroke 0.75s ease",
+          }}
           points="29,24 37,23 40,29"
           stroke={color}
           strokeWidth="1.8"
@@ -225,7 +310,12 @@ export function PcbCircuitBug({
         {/* Bottom Left */}
         <polyline
           className="bug-leg-a"
-          style={{ transformOrigin: "17px 32px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          style={{ 
+            transformOrigin: "17px 32px", 
+            animationDuration: strideDuration, 
+            animationPlayState: isFrozen ? "paused" : "running",
+            transition: "stroke 0.75s ease",
+          }}
           points="17,32 10,34 6,41"
           stroke={color}
           strokeWidth="1.8"
@@ -236,7 +326,12 @@ export function PcbCircuitBug({
         {/* Bottom Right */}
         <polyline
           className="bug-leg-b"
-          style={{ transformOrigin: "27px 32px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
+          style={{ 
+            transformOrigin: "27px 32px", 
+            animationDuration: strideDuration, 
+            animationPlayState: isFrozen ? "paused" : "running",
+            transition: "stroke 0.75s ease",
+          }}
           points="27,32 34,34 38,41"
           stroke={color}
           strokeWidth="1.8"
@@ -252,32 +347,33 @@ export function PcbCircuitBug({
         fill="#0d0d14"
         stroke={color}
         strokeWidth="1.4"
+        style={{ transition: "stroke 0.75s ease, fill 0.75s ease" }}
       />
 
       {/* Etched PCB Circuit Traces & Solder Nodes */}
       <g>
         {/* Trace 1 */}
-        <path d="M 16 36 L 16 30 L 18 27" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" />
-        <circle cx="18" cy="27" r="1.5" fill={color} />
+        <path d="M 16 36 L 16 30 L 18 27" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" style={{ transition: "stroke 0.75s ease" }} />
+        <circle cx="18" cy="27" r="1.5" fill={color} style={{ transition: "fill 0.75s ease" }} />
 
         {/* Trace 2 */}
-        <path d="M 22 37 L 22 23" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" />
-        <circle cx="22" cy="23" r="1.5" fill={color} />
+        <path d="M 22 37 L 22 23" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" style={{ transition: "stroke 0.75s ease" }} />
+        <circle cx="22" cy="23" r="1.5" fill={color} style={{ transition: "fill 0.75s ease" }} />
 
         {/* Trace 3 */}
-        <path d="M 28 36 L 28 30 L 26 27" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" />
-        <circle cx="26" cy="27" r="1.5" fill={color} />
+        <path d="M 28 36 L 28 30 L 26 27" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" style={{ transition: "stroke 0.75s ease" }} />
+        <circle cx="26" cy="27" r="1.5" fill={color} style={{ transition: "fill 0.75s ease" }} />
       </g>
 
       {/* Thorax Plate */}
-      <polygon points="17,17 27,17 25,12 19,12" fill="#141420" stroke={color} strokeWidth="1.1" />
+      <polygon points="17,17 27,17 25,12 19,12" fill="#141420" stroke={color} strokeWidth="1.1" style={{ transition: "stroke 0.75s ease, fill 0.75s ease" }} />
 
       {/* Head */}
-      <polygon points="19,12 25,12 24,8 20,8" fill="#09090e" stroke={color} strokeWidth="1.1" />
+      <polygon points="19,12 25,12 24,8 20,8" fill="#09090e" stroke={color} strokeWidth="1.1" style={{ transition: "stroke 0.75s ease, fill 0.75s ease" }} />
 
       {/* Antenna Pins */}
-      <polyline points="20,8 15,3" stroke={color} strokeWidth="1.5" strokeLinecap="round" fill="none" />
-      <polyline points="24,8 29,3" stroke={color} strokeWidth="1.5" strokeLinecap="round" fill="none" />
+      <polyline points="20,8 15,3" stroke={color} strokeWidth="1.5" strokeLinecap="round" fill="none" style={{ transition: "stroke 0.75s ease" }} />
+      <polyline points="24,8 29,3" stroke={color} strokeWidth="1.5" strokeLinecap="round" fill="none" style={{ transition: "stroke 0.75s ease" }} />
     </svg>
   );
 }
@@ -639,9 +735,14 @@ export function QaGame() {
     
     // Choose template from technical bug catalog
     const template = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
-    const baseSpeed = 0.95 + Math.random() * 0.35; // 0.95 to 1.3 px/frame
-    const baseSize = 44;
-    const hungerThreshold = 8500 + Math.random() * 4500; // 8.5s to 13s before critical
+    const initialTier: BugPriorityTier = 
+      template.defaultSeverity === "P0" ? "critical" :
+      template.defaultSeverity === "P1" ? "high" :
+      template.defaultSeverity === "P2" ? "med" : "low";
+    const initialCfg = BUG_PRIORITY_CONFIG[initialTier];
+    const baseSpeed = 1.05 + Math.random() * 0.25;
+    const baseSize = initialCfg.size;
+    const hungerThreshold = 8500 + Math.random() * 4500;
 
     const newDefect: Defect = {
       id: Math.random().toString(36).substring(7),
@@ -654,14 +755,16 @@ export function QaGame() {
       speed: baseSpeed,
       size: baseSize,
       baseSize,
-      color: template.color,
-      isPulsing: template.defaultSeverity === "P0",
+      speedScale: initialCfg.speedScale,
+      color: initialCfg.color,
+      isPulsing: initialTier === "critical",
       direction: Math.random() * Math.PI * 2,
       hungerThreshold,
       wobbleSeed: Math.random() * 1000,
       bugCode: template.code,
       bugLabel: template.label,
       bugSeverity: template.defaultSeverity,
+      initialSeverity: template.defaultSeverity,
       bugIcon: template.icon,
       bugCategory: template.category,
     };
@@ -860,36 +963,35 @@ export function QaGame() {
       const threshold = bug.hungerThreshold || 10000;
       const progress = Math.min(age / threshold, 1.2);
       
-      // Fully reactive state progression:
-      let color = bug.color;
-      let isPulsing = false;
-      let severity: "P0" | "P1" | "P2" | "P3" = bug.bugSeverity;
-      let speedScale = 1.0;
-
-      if (progress >= 1.0) {
-        color = "#dc2626";
-        isPulsing = true;
-        severity = "P0";
-        speedScale = 4.2; // frantic darting
-      } else if (progress >= 0.70) {
-        color = "#ef4444";
-        isPulsing = false;
-        severity = "P1";
-        speedScale = 3.0; // fast
-      } else if (progress >= 0.35) {
-        color = bug.color;
-        isPulsing = false;
-        severity = bug.bugSeverity === "P0" ? "P0" : "P2";
-        speedScale = 1.9; // medium
+      // Fully reactive priority progression (Low -> Med -> High -> Critical)
+      const initialSeverity = bug.initialSeverity || bug.bugSeverity;
+      let tier: BugPriorityTier = "low";
+      if (bug.eating || progress >= 0.90 || initialSeverity === "P0") {
+        tier = "critical";
+      } else if (progress >= 0.60 || initialSeverity === "P1") {
+        tier = "high";
+      } else if (progress >= 0.25 || initialSeverity === "P2") {
+        tier = "med";
       } else {
-        color = bug.color;
-        isPulsing = false;
-        severity = bug.bugSeverity;
-        speedScale = 1.0; // steady drift
+        tier = "low";
       }
 
-      const currentSize = bug.baseSize;
-      let activeSpeed = isFrozen ? 0 : bug.originalSpeed * speedScale;
+      const cfg = BUG_PRIORITY_CONFIG[tier];
+      const targetColor = cfg.color;
+      const targetSize = cfg.size;
+      const targetSpeedScale = cfg.speedScale;
+      const isPulsing = tier === "critical";
+      const severity: "P0" | "P1" | "P2" | "P3" = 
+        tier === "critical" ? "P0" : tier === "high" ? "P1" : tier === "med" ? "P2" : "P3";
+
+      // Frame-by-frame smooth exponential lerp (0.08) for physical scaling & speed:
+      const currentSize = bug.size || targetSize;
+      const smoothSize = currentSize + (targetSize - currentSize) * 0.08;
+
+      const currentSpeedScale = bug.speedScale ?? targetSpeedScale;
+      const smoothSpeedScale = currentSpeedScale + (targetSpeedScale - currentSpeedScale) * 0.08;
+
+      const activeSpeed = isFrozen ? 0 : bug.originalSpeed * smoothSpeedScale;
       
       // Eating handling
       if (bug.eating) {
@@ -930,8 +1032,12 @@ export function QaGame() {
 
           // 3. Child bug logic: Spawn brand new defect from catalog
           const childTemplate = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
-          const childSpeed = 0.95 + Math.random() * 0.35;
-          const childSize = 44;
+          const childTier: BugPriorityTier = 
+            childTemplate.defaultSeverity === "P0" ? "critical" :
+            childTemplate.defaultSeverity === "P1" ? "high" :
+            childTemplate.defaultSeverity === "P2" ? "med" : "low";
+          const childCfg = BUG_PRIORITY_CONFIG[childTier];
+          const childSpeed = 1.0 + Math.random() * 0.3;
           newBugsToSpawn.push({
             id: Math.random().toString(36).substring(7),
             x: Math.max(70, Math.min(window.innerWidth - 70, bug.x + (Math.random() - 0.5) * 60)),
@@ -942,16 +1048,18 @@ export function QaGame() {
             spawnTime: now,
             originalSpeed: childSpeed,
             speed: childSpeed,
-            size: childSize,
-            baseSize: childSize,
-            color: childTemplate.color,
-            isPulsing: childTemplate.defaultSeverity === "P0",
+            size: childCfg.size,
+            baseSize: childCfg.size,
+            speedScale: childCfg.speedScale,
+            color: childCfg.color,
+            isPulsing: childTier === "critical",
             direction: Math.random() * Math.PI * 2,
             hungerThreshold: 8500 + Math.random() * 4500,
             wobbleSeed: Math.random() * 1000,
             bugCode: childTemplate.code,
             bugLabel: childTemplate.label,
             bugSeverity: childTemplate.defaultSeverity,
+            initialSeverity: childTemplate.defaultSeverity,
             bugIcon: childTemplate.icon,
             bugCategory: childTemplate.category,
           });
@@ -963,7 +1071,7 @@ export function QaGame() {
             id: Math.random().toString(36).substring(7),
             x: bug.x,
             y: bug.y,
-            color: "#ef4444"
+            color: targetColor || "#ef4444"
           }));
           setParticles(prev => [...prev, ...crashParticles]);
           setTimeout(() => {
@@ -995,7 +1103,14 @@ export function QaGame() {
           // 4. Old critical bug DIES! Returning null removes it from defects list.
           return null;
         }
-        return { ...bug, color: "#dc2626", isPulsing: true, size: currentSize }; // Stay still while corrupting
+        return { 
+          ...bug, 
+          color: targetColor, 
+          isPulsing: true, 
+          size: smoothSize, 
+          speedScale: 0,
+          bugSeverity: "P0",
+        }; // Stay still while corrupting
       }
 
       let nextLastHitTest = bug.lastHitTest || 0;
@@ -1032,9 +1147,10 @@ export function QaGame() {
               speed: 0,
               speedScale: 0,
               lastHitTest: nextLastHitTest,
-              color: progress >= 1.0 ? '#dc2626' : bug.color,
-              isPulsing: progress >= 1.0,
-              size: currentSize
+              color: "#ef4444",
+              isPulsing: true,
+              size: smoothSize,
+              bugSeverity: "P0",
             };
           } else {
             // Steer towards nearest leaf in section/viewport
@@ -1076,10 +1192,10 @@ export function QaGame() {
         y: newY, 
         direction: nextDirection, 
         lastHitTest: nextLastHitTest, 
-        size: currentSize, 
+        size: smoothSize, 
         speed: nextSpeed, 
-        speedScale,
-        color, 
+        speedScale: smoothSpeedScale,
+        color: targetColor, 
         isPulsing,
         bugSeverity: severity,
       };
@@ -1360,10 +1476,12 @@ export function QaGame() {
                   style={{
                     left: bug.x,
                     top: bug.y,
+                    width: `${bug.size}px`,
+                    height: `${bug.size}px`,
                     transform: `translate(-50%, -50%) ${bug.squashed ? "scale(1.45, 0.22)" : "scale(1, 1)"}`,
                     transition: bug.squashed 
                       ? "transform 320ms cubic-bezier(0.1, 0.9, 0.2, 1), opacity 320ms ease" 
-                      : "opacity 150ms ease",
+                      : "width 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 150ms ease",
                     opacity: bug.squashed ? 0 : 1,
                     cursor: "crosshair",
                     pointerEvents: bug.squashed ? "none" : "auto",

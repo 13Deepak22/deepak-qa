@@ -174,7 +174,11 @@ export default function ServicesPage() {
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {phases.map((phase, idx) => (
-              <div key={phase.step} className="flex flex-col border border-line bg-paper p-5 sm:p-6">
+              <div
+                key={phase.step}
+                data-cursor={`QA Lifecycle: ${phase.step} — ${phase.title}`}
+                className="flex flex-col border border-line bg-paper p-5 sm:p-6"
+              >
                 <span className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">
                   {phase.step}
                 </span>
@@ -220,7 +224,7 @@ export default function ServicesPage() {
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 border-t border-line pt-12">
-            <div className="border border-line bg-card p-5">
+            <div className="border border-line bg-card p-5" data-cursor="RCA Pillar 1: Exploratory Latency Conditioning">
               <span className="font-mono text-[0.65rem] tracking-[0.16em] text-pass uppercase block">
                 01 · Discovery Method
               </span>
@@ -232,7 +236,7 @@ export default function ServicesPage() {
               </p>
             </div>
 
-            <div className="border border-line bg-card p-5">
+            <div className="border border-line bg-card p-5" data-cursor="RCA Pillar 2: Application Memory Race Analysis">
               <span className="font-mono text-[0.65rem] tracking-[0.16em] text-pass uppercase block">
                 02 · Root Cause
               </span>
@@ -244,7 +248,7 @@ export default function ServicesPage() {
               </p>
             </div>
 
-            <div className="border border-line bg-card p-5">
+            <div className="border border-line bg-card p-5" data-cursor="RCA Pillar 3: Release Gate Concurrency Suite">
               <span className="font-mono text-[0.65rem] tracking-[0.16em] text-pass uppercase block">
                 03 · Automated Prevention
               </span>
@@ -277,7 +281,7 @@ export default function ServicesPage() {
             <Link
               href="/experience#skills"
               className="press inline-flex items-center gap-2 border border-line bg-card px-4 py-2.5 text-xs font-mono uppercase tracking-wider text-ink hover:border-pass hover:text-pass transition-colors"
-              data-cursor="ATS keywords & stack"
+              data-cursor="Jump to verified technical skills & frameworks"
             >
               <span>Skills &amp; Toolkit</span>
               <ArrowRight className="h-3.5 w-3.5" />
@@ -285,7 +289,7 @@ export default function ServicesPage() {
             <Link
               href="/learn"
               className="press inline-flex items-center gap-2 border border-line bg-card px-4 py-2.5 text-xs font-mono uppercase tracking-wider text-ink hover:border-pass hover:text-pass transition-colors"
-              data-cursor="Playwright, Selenium & QA Docs"
+              data-cursor="Read technical QA guides, Playwright docs & Q&A"
             >
               <span>Learn QA Docs</span>
               <ArrowRight className="h-3.5 w-3.5" />
@@ -293,7 +297,7 @@ export default function ServicesPage() {
             <Link
               href="/#contact"
               className="press inline-flex items-center gap-2 border border-pass bg-paper px-4 py-2.5 text-xs font-mono uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
-              data-cursor="Start a conversation"
+              data-cursor="Schedule a direct QA consultation"
             >
               <span>Contact Deepak</span>
               <ArrowRight className="h-3.5 w-3.5" />

@@ -102,13 +102,13 @@ export default function ResumePage() {
                 </li>
                 <li className="flex items-center gap-1.5">
                   <Phone className="h-3.5 w-3.5 text-pass shrink-0" />
-                  <a href={profile.phoneHref} className="hover:text-pass transition-colors">
+                  <a href={profile.phoneHref} data-cursor="Call Deepak directly" className="hover:text-pass transition-colors">
                     {profile.phone}
                   </a>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <Mail className="h-3.5 w-3.5 text-pass shrink-0" />
-                  <a href={`mailto:${profile.email}`} className="hover:text-pass transition-colors">
+                  <a href={`mailto:${profile.email}`} data-cursor="Email Deepak directly" className="hover:text-pass transition-colors">
                     {profile.email}
                   </a>
                 </li>
@@ -117,20 +117,20 @@ export default function ResumePage() {
                 {profile.website ? (
                   <li className="flex items-center gap-1.5">
                     <Globe className="h-3.5 w-3.5 text-pass shrink-0" />
-                    <a href={profile.website} className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
+                    <a href={profile.website} data-cursor="Visit personal QA website" className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
                       {bare(profile.website)}
                     </a>
                   </li>
                 ) : null}
                 <li className="flex items-center gap-1.5">
                   <LinkedInIcon className="h-3.5 w-3.5 text-pass shrink-0" />
-                  <a href={profile.linkedin} className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
+                  <a href={profile.linkedin} data-cursor="View LinkedIn profile ↗" className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
                     {bare(profile.linkedin)}
                   </a>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <GitHubIcon className="h-3.5 w-3.5 text-pass shrink-0" />
-                  <a href={profile.github} className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
+                  <a href={profile.github} data-cursor="View GitHub profile ↗" className="hover:text-pass transition-colors" target="_blank" rel="noopener noreferrer">
                     {bare(profile.github)}
                   </a>
                 </li>
@@ -246,6 +246,7 @@ export default function ResumePage() {
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             <Link
               href="/rca"
+              data-cursor="Read Root Cause Analysis (RCA)"
               className="press inline-flex items-center gap-2 border border-line bg-card px-4 py-2 text-xs font-mono uppercase tracking-wider text-ink hover:border-pass hover:text-pass transition-colors"
             >
               <span>View RCA Case Study</span>
@@ -253,6 +254,7 @@ export default function ResumePage() {
             </Link>
             <Link
               href="/#contact"
+              data-cursor="Schedule direct QA discussion"
               className="press inline-flex items-center gap-2 border border-pass bg-card px-4 py-2 text-xs font-mono uppercase tracking-wider text-pass hover:bg-pass-fill hover:text-on-band transition-colors"
             >
               <span>Schedule Interview</span>

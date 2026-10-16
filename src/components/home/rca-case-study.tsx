@@ -107,6 +107,7 @@ export function RcaCaseStudy({ id = "rca" }: { id?: string } = {}) {
                       key={item.step}
                       type="button"
                       data-active={isActive}
+                      data-cursor={`Inspect RCA Phase ${item.step}: ${item.phase}`}
                       onClick={() => startSimulation(index)}
                       className={`rca-step-card group relative flex min-w-0 w-full flex-col items-start p-4 text-left border sm:p-5 transition-all ${
                         isActive
@@ -209,6 +210,7 @@ export function RcaCaseStudy({ id = "rca" }: { id?: string } = {}) {
                 </div>
                 <button
                   type="button"
+                  data-cursor={`Simulate execution for Phase ${currentStep.step}`}
                   onClick={() => startSimulation(activeStep)}
                   disabled={isSimulating}
                   className="press inline-flex shrink-0 items-center gap-1.5 border border-on-band/20 px-3 py-1 font-mono text-[0.68rem] text-on-band hover:border-pass hover:text-pass disabled:opacity-50 transition-colors"

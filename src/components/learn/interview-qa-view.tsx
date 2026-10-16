@@ -370,6 +370,7 @@ export function InterviewQAView({ activeDocId, onSelectDoc }: InterviewQAViewPro
                 href="/learn"
                 className="press inline-flex items-center gap-1.5 border border-line bg-card px-2.5 py-1 rounded-md font-mono text-xs uppercase tracking-wider text-muted hover:border-pass hover:text-pass transition-colors shrink-0"
                 title="Return to Learning Hub"
+                data-cursor="Return to Learning Hub"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Hub</span>
@@ -395,6 +396,7 @@ export function InterviewQAView({ activeDocId, onSelectDoc }: InterviewQAViewPro
                       onSelectDoc(t.id);
                       setSearchQuery("");
                     }}
+                    data-cursor={`Switch to ${t.label} track`}
                     className={`press inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono transition-colors shrink-0 cursor-pointer ${
                       isActive
                         ? "bg-ink text-paper font-semibold"
@@ -420,11 +422,13 @@ export function InterviewQAView({ activeDocId, onSelectDoc }: InterviewQAViewPro
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={`Search questions in ${currentTrackMeta.label} (press /)...`}
+                data-cursor={`Search questions in ${currentTrackMeta.label} (press /)`}
                 className="w-full pl-8 pr-12 py-1.5 rounded-md border border-line bg-card text-ink text-xs placeholder:text-muted focus:border-pass focus:outline-none transition-colors font-sans"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
+                  data-cursor="Clear search filter"
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-ink p-0.5 cursor-pointer"
                   title="Clear search"
                 >
@@ -437,6 +441,7 @@ export function InterviewQAView({ activeDocId, onSelectDoc }: InterviewQAViewPro
             <div className="flex items-center gap-2 shrink-0 text-xs font-mono">
               <button
                 onClick={handleExpandAll}
+                data-cursor="Expand all technical answers"
                 className="press inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-line bg-card text-[11px] uppercase tracking-wider text-muted hover:text-ink hover:border-line transition-colors cursor-pointer"
                 title="Expand all questions"
               >
@@ -446,6 +451,7 @@ export function InterviewQAView({ activeDocId, onSelectDoc }: InterviewQAViewPro
 
               <button
                 onClick={handleCollapseAll}
+                data-cursor="Collapse all technical answers"
                 className="press inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-line bg-card text-[11px] uppercase tracking-wider text-muted hover:text-ink hover:border-line transition-colors cursor-pointer"
                 title="Collapse all questions"
               >
@@ -482,6 +488,7 @@ export function InterviewQAView({ activeDocId, onSelectDoc }: InterviewQAViewPro
                     <button
                       key={sec.id}
                       onClick={() => scrollToSection(sec.id)}
+                      data-cursor={`Jump to ${sec.heading} (${sec.questions.length} questions)`}
                       className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left text-xs transition-colors cursor-pointer group ${
                         isActive
                           ? "bg-pass/15 font-semibold text-pass ring-1 ring-pass/30 shadow-xs"
@@ -516,6 +523,7 @@ export function InterviewQAView({ activeDocId, onSelectDoc }: InterviewQAViewPro
             <div className="lg:hidden mb-4">
               <button
                 onClick={() => setMobileDrawerOpen(true)}
+                data-cursor="Select interview topic section"
                 className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-line bg-card text-xs font-mono text-ink shadow-2xs cursor-pointer hover:border-pass transition-colors"
               >
                 <span className="flex items-center gap-2 truncate">
@@ -603,6 +611,7 @@ export function InterviewQAView({ activeDocId, onSelectDoc }: InterviewQAViewPro
                             {/* Question Header */}
                             <div
                               onClick={() => toggleCard(q.id)}
+                              data-cursor={isExpanded ? "Collapse technical answer" : "Expand technical answer & code"}
                               className="p-4 sm:p-4.5 flex items-start justify-between gap-3 sm:gap-4 cursor-pointer select-none hover:bg-paper-deep/30 transition-colors"
                             >
                               <div className="flex items-start gap-3 sm:gap-3.5 flex-1 min-w-0">
@@ -633,6 +642,7 @@ export function InterviewQAView({ activeDocId, onSelectDoc }: InterviewQAViewPro
                                     handleCopy(q.id, `Q${q.num}: ${q.question}\n\nAnswer:\n${q.answers.join("\n")}`);
                                   }}
                                   title="Copy question and answer"
+                                  data-cursor="Copy question and answer to clipboard"
                                   className="p-1.5 rounded-md border border-line bg-card text-muted hover:text-ink transition-colors cursor-pointer"
                                 >
                                   {copiedId === q.id ? (
@@ -646,6 +656,7 @@ export function InterviewQAView({ activeDocId, onSelectDoc }: InterviewQAViewPro
                                 <button
                                   type="button"
                                   onClick={() => toggleCard(q.id)}
+                                  data-cursor={isExpanded ? "Collapse answer" : "Expand answer"}
                                   className={`p-1.5 rounded-md border border-line bg-card text-muted transition-transform duration-150 cursor-pointer ${
                                     isExpanded ? "rotate-180 text-ink" : ""
                                   }`}
@@ -681,6 +692,7 @@ export function InterviewQAView({ activeDocId, onSelectDoc }: InterviewQAViewPro
                                             </span>
                                             <button
                                               onClick={() => handleCopy(`${q.id}-code-${bIdx}`, codeString)}
+                                              data-cursor="Copy code snippet to clipboard"
                                               className="flex items-center gap-1 text-[10.5px] hover:text-ink transition-colors cursor-pointer"
                                               title="Copy code"
                                             >

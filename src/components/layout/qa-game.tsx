@@ -1146,6 +1146,7 @@ export function QaGame() {
         className="press fixed left-5 bottom-5 z-[60] inline-flex h-12 w-12 items-center justify-center border border-pass bg-paper text-pass shadow-[4px_4px_0_var(--ink)] hover:bg-pass-fill hover:text-on-band transition-transform active:translate-x-[2px] active:translate-y-[2px]"
         aria-label={isOpen ? "Close QA Defect Hunter Game" : "Play QA Defect Hunter Game"}
         title="QA Mini-game"
+        data-cursor={isOpen ? "Exit Defect Hunter" : "Play QA Defect Hunter mini-game"}
       >
         {isOpen ? <X size={20} strokeWidth={1.75} /> : <Gamepad2 size={20} strokeWidth={1.75} />}
       </button>
@@ -1212,6 +1213,7 @@ export function QaGame() {
                   disabled={breakpoints <= 0 || isFrozen}
                   title="Debugger Breakpoint (Spacebar)"
                   aria-label="Freeze Bugs"
+                  data-cursor="Debugger breakpoint: freeze defects (Spacebar)"
                   className={`flex items-center gap-0.5 px-1 py-0.5 rounded font-bold transition-all text-[8px] ${
                     isFrozen 
                       ? "bg-blue-600 text-white animate-pulse" 
@@ -1231,6 +1233,7 @@ export function QaGame() {
                   className="text-muted hover:text-ink hover:border-pass transition-colors p-0.5 rounded border border-line"
                   title={isMuted ? "Unmute Sound" : "Mute Sound"}
                   aria-label={isMuted ? "Unmute Sound" : "Mute Sound"}
+                  data-cursor={isMuted ? "Unmute game audio effects" : "Mute game audio effects"}
                 >
                   {isMuted ? <VolumeX size={9} /> : <Volume2 size={9} />}
                 </button>
@@ -1253,6 +1256,7 @@ export function QaGame() {
                   className="text-muted hover:text-amber-500 hover:border-amber-500 transition-colors p-0.5 rounded border border-line"
                   title="Reboot Environment"
                   aria-label="Reboot Environment"
+                  data-cursor="Reboot test environment & restore elements"
                 >
                   <RefreshCw size={8} />
                 </button>
@@ -1281,6 +1285,7 @@ export function QaGame() {
                 <button
                   key={bug.id}
                   data-squashed={bug.squashed ? "true" : undefined}
+                  data-cursor="Squash defect!"
                   onClick={() => squashDefect(bug.id, bug.x, bug.y)}
                   onPointerEnter={() => handlePointerEnter(bug.id)}
                   onPointerLeave={() => handlePointerLeave(bug.id)}
@@ -1459,6 +1464,7 @@ export function QaGame() {
                       setDefects([]);
                       spawnDefect();
                     }}
+                    data-cursor="Deploy hotfix & retry regression"
                     className="press flex-1 inline-flex items-center justify-center gap-2 border border-pass bg-pass text-on-band hover:bg-pass-fill font-bold py-3 px-4 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm tracking-wide transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer whitespace-nowrap"
                   >
                     <RefreshCw size={14} className="shrink-0" />
@@ -1475,6 +1481,7 @@ export function QaGame() {
                       setMaxCombo(0);
                       setIsOpen(false);
                     }}
+                    data-cursor="Close mini-game & restore UI"
                     className="press inline-flex items-center justify-center border border-line bg-card text-ink hover:border-ink hover:text-ink font-semibold py-3 px-5 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer"
                   >
                     Close Game

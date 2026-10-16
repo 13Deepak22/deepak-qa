@@ -366,6 +366,7 @@ export function TestRun() {
             className="press inline-flex shrink-0 items-center gap-1.5 border border-pass bg-card px-3 py-1.5 font-mono text-xs tracking-[0.12em] uppercase text-ink hover:bg-pass-fill hover:text-on-band transition-colors shadow-xs"
             onClick={handleRerun}
             aria-label="Rerun test suite"
+            data-cursor="Rerun automated test suite assertions"
           >
             <RotateCcw className={`h-3 w-3 ${!isDone ? "animate-spin" : ""}`} />
             <span>Rerun</span>
@@ -426,6 +427,7 @@ export function TestRun() {
                 tabIndex={0}
                 aria-expanded={isExpanded}
                 aria-label={`Toggle assertion details for ${check.file}`}
+                data-cursor={isExpanded ? "Collapse test assertions" : "Inspect test assertions & execution log"}
               >
                 <div className="flex min-w-0 items-center gap-2">
                   {/* Status Indicator Badge */}

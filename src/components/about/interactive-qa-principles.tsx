@@ -97,6 +97,7 @@ export function InteractiveQaPrinciples() {
               key={p.id}
               type="button"
               data-testid={`principle-tab-${p.id}`}
+              data-cursor={`Examine principle: ${p.title}`}
               onClick={() => setActivePrincipleId(p.id)}
               className={`p-3.5 border text-left transition-all flex flex-col justify-between ${
                 isSelected

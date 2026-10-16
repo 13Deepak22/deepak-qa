@@ -220,6 +220,7 @@ export function InteractiveServices() {
                 key={s.id}
                 type="button"
                 data-testid={`service-tab-${s.id}`}
+                data-cursor={`Select ${s.name} capability & runner`}
                 onClick={() => handleSelectTab(s.id)}
                 className={`p-3.5 border text-left transition-all flex flex-col justify-between select-none ${
                   isSelected

@@ -149,7 +149,12 @@ export default function AboutPage() {
                 <span className="journey-fill" aria-hidden="true" />
                 <ol className="journey-steps">
                   {about.journey.map((step, index) => (
-                    <li key={step.when} className="journey-step" style={{ "--i": index } as CSSProperties}>
+                    <li
+                      key={step.when}
+                      className="journey-step"
+                      data-cursor={`Career milestone: ${step.when}`}
+                      style={{ "--i": index } as CSSProperties}
+                    >
                       <span className="journey-dot" aria-hidden="true" />
                       <p className="font-mono text-[0.65rem] tracking-[0.14em] text-pass uppercase">{step.when}</p>
                       <p className="mt-1 font-serif text-lg leading-tight tracking-tight">{step.title}</p>
@@ -170,7 +175,12 @@ export default function AboutPage() {
                     <dd>
                       <ul className="flex flex-wrap gap-2">
                         {group.items.map((item) => (
-                          <li key={item} className="about-chip" data-tone={group.label === "Practice" ? undefined : "pass"}>
+                          <li
+                            key={item}
+                            className="about-chip"
+                            data-cursor={`Core competency: ${item}`}
+                            data-tone={group.label === "Practice" ? undefined : "pass"}
+                          >
                             {item}
                           </li>
                         ))}
@@ -184,7 +194,7 @@ export default function AboutPage() {
             <Chapter index={4} chapter={interests} body={about.interests}>
               <ul className="mt-8 flex max-w-2xl flex-wrap gap-2">
                 {about.interestTags.map((tag) => (
-                  <li key={tag} className="about-chip">
+                  <li key={tag} className="about-chip" data-cursor={`Interest: #${tag}`}>
                     <span className="text-pass" aria-hidden="true">
                       #
                     </span>
@@ -202,6 +212,7 @@ export default function AboutPage() {
                     <li
                       key={goal}
                       className="flex items-start gap-3 text-sm text-ink"
+                      data-cursor={`Release criterion: ${goal}`}
                       style={{ "--i": index } as CSSProperties}
                     >
                       <svg viewBox="0 0 20 20" aria-hidden="true" className="goal-box mt-px size-5 shrink-0">

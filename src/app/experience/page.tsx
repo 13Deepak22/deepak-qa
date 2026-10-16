@@ -87,6 +87,7 @@ export default function ExperiencePage() {
           <span className="font-mono text-xs uppercase tracking-wider text-muted mr-1">Jump to:</span>
           <a
             href="#timeline"
+            data-cursor="Jump to career chronology & roles"
             className="press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-line bg-card text-xs font-mono text-ink-soft hover:text-ink hover:border-pass transition-colors"
           >
             <Clock className="h-3 w-3 text-pass" />
@@ -94,6 +95,7 @@ export default function ExperiencePage() {
           </a>
           <a
             href="#work"
+            data-cursor="Jump to 7 public consumer apps"
             className="press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-line bg-card text-xs font-mono text-ink-soft hover:text-ink hover:border-pass transition-colors"
           >
             <Layers className="h-3 w-3 text-pass" />
@@ -101,6 +103,7 @@ export default function ExperiencePage() {
           </a>
           <a
             href="#skills"
+            data-cursor="Jump to technical skill matrix & tools"
             className="press inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-line bg-card text-xs font-mono text-ink-soft hover:text-ink hover:border-pass transition-colors"
           >
             <Wrench className="h-3 w-3 text-pass" />
@@ -112,10 +115,13 @@ export default function ExperiencePage() {
       {/* 01: Employment Chronicle (Timeline) */}
       <section id="timeline" className="scroll-mt-24 mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
         <div className="border border-line bg-card p-6 sm:p-10 lg:p-12 rounded-xl shadow-xs">
-          <div className="flex items-center justify-between border-b border-line pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-line pb-6">
             <div>
               <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">01 / Employment Chronicle</p>
               <h2 className="mt-1 font-serif text-2xl sm:text-3xl text-ink">Roles &amp; Impact History</h2>
+              <p className="mt-2 max-w-xl text-xs sm:text-sm text-ink-soft leading-relaxed">
+                Chronological record of full-time QA engineering roles across fintech startups and NBFC enterprises, leading release validations, test suite authoring, and zero-leak deployments.
+              </p>
             </div>
             <span className="font-mono text-xs text-muted hidden sm:inline">Active Timeline</span>
           </div>
@@ -131,6 +137,9 @@ export default function ExperiencePage() {
             <div>
               <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">02 / Delivered Work &amp; Consumer Apps</p>
               <h2 className="mt-1 font-serif text-2xl sm:text-3xl text-ink">7 Public Consumer Products Tested</h2>
+              <p className="mt-2 max-w-xl text-xs sm:text-sm text-ink-soft leading-relaxed">
+                Direct QA testing ownership across digital wallets, lending platforms, gold loans, forex cards, and enterprise workforce systems live on app stores.
+              </p>
             </div>
             <p className="max-w-md text-xs leading-relaxed text-muted sm:text-right">
               Tap any product to inspect primary user journeys, test coverage areas, and store links.
@@ -150,6 +159,9 @@ export default function ExperiencePage() {
             <div>
               <p className="font-mono text-[0.68rem] tracking-[0.16em] text-pass uppercase">03 / Technical Arsenal &amp; Toolkit</p>
               <h2 className="mt-1 font-serif text-2xl sm:text-3xl text-ink">Core Frameworks &amp; Verified Skills</h2>
+              <p className="mt-2 max-w-xl text-xs sm:text-sm text-ink-soft leading-relaxed">
+                Comprehensive matrix of {totalSkills}+ technical QA competencies across web, mobile, API, performance, and financial payment protocols derived directly from production releases.
+              </p>
             </div>
             <p className="max-w-md text-xs leading-relaxed text-muted sm:text-right">
               {totalSkills}+ QA competencies across web, mobile, API, and lending infrastructure. Derived directly from live releases.

@@ -19,7 +19,7 @@ export function DownloadOptions() {
                 href={`/resume/download/${format}`}
                 download={resumeFileName(format)}
                 aria-label={`Download resume as ${label}`}
-                data-cursor={hint}
+                data-cursor={`Download ${label} (${hint})`}
                 className={`press flex h-11 items-center justify-center gap-2 px-4 text-sm sm:px-5 ${
                   index ? "text-ink hover:bg-pass-fill hover:text-on-band" : "bg-ink text-paper hover:bg-ink-soft"
                 }`}

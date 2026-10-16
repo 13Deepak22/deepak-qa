@@ -125,6 +125,7 @@ export function MobileDeviceMatrix() {
           <button
             type="button"
             data-testid="os-toggle-android"
+            data-cursor="Switch to Android real-device matrix (UiAutomator2)"
             onClick={() => {
               setSelectedOs("android");
               setSelectedDeviceId("pixel8");
@@ -141,6 +142,7 @@ export function MobileDeviceMatrix() {
           <button
             type="button"
             data-testid="os-toggle-ios"
+            data-cursor="Switch to iOS real-device matrix (XCUITest)"
             onClick={() => {
               setSelectedOs("ios");
               setSelectedDeviceId("iphone16");
@@ -166,6 +168,7 @@ export function MobileDeviceMatrix() {
               key={dev.id}
               type="button"
               data-testid={`device-select-${dev.id}`}
+              data-cursor={`Select ${dev.name} (${dev.osVersion})`}
               onClick={() => {
                 setSelectedDeviceId(dev.id);
                 setStepIndex(-1);
@@ -213,6 +216,7 @@ export function MobileDeviceMatrix() {
                         key={sc.id}
                         type="button"
                         data-testid={`scenario-select-${sc.id}`}
+                        data-cursor={`Select ${sc.name} test journey`}
                         onClick={() => {
                           setSelectedScenarioId(sc.id);
                           setStepIndex(-1);
@@ -236,6 +240,7 @@ export function MobileDeviceMatrix() {
             <button
               type="button"
               data-testid="mobile-simulate-run"
+              data-cursor={`Execute ${activeScenario.name} on ${activeDevice.name}`}
               onClick={handleRunSimulation}
               disabled={isSimulating}
               className="press w-full flex items-center justify-center gap-2 border border-pass bg-pass text-on-band px-4 py-2.5 font-mono text-xs uppercase tracking-wider font-semibold hover:bg-pass-fill transition-colors disabled:opacity-60 shadow-xs"

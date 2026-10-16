@@ -230,6 +230,7 @@ export function CoolSkillsShowcase() {
           {CORE_ARSENAL.map((tool) => (
             <div
               key={tool.name}
+              data-cursor={`Core QA tool: ${tool.name} · ${tool.role}`}
               className="group relative flex flex-col justify-between rounded-xl border border-line bg-card p-5 sm:p-6 transition-all hover:border-pass/80 hover:shadow-xs"
             >
               <div>
@@ -300,6 +301,7 @@ export function CoolSkillsShowcase() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search skills (e.g. UPI, TestNG)..."
+                data-cursor="Search across 40+ verified skills"
                 className="w-full rounded-lg border border-line bg-paper py-2 pr-8 pl-8 font-mono text-xs text-ink placeholder:text-muted transition-colors focus:border-pass focus:outline-none"
               />
               {searchQuery && (
@@ -307,6 +309,7 @@ export function CoolSkillsShowcase() {
                   type="button"
                   onClick={() => setSearchQuery("")}
                   aria-label="Clear search"
+                  data-cursor="Clear search query"
                   className="absolute right-2.5 text-muted hover:text-ink cursor-pointer"
                 >
                   <X className="h-3.5 w-3.5" />
@@ -326,6 +329,7 @@ export function CoolSkillsShowcase() {
                 type="button"
                 role="tab"
                 aria-selected={isSelected}
+                data-cursor={`Filter skills: ${cat.label} (${cat.count})`}
                 onClick={() => {
                   setActiveCategory(cat.label);
                   setSearchQuery("");
@@ -351,6 +355,7 @@ export function CoolSkillsShowcase() {
                 setActiveCategory("All");
                 setSearchQuery("");
               }}
+              data-cursor="Reset category filter"
               className="press ml-2 inline-flex items-center gap-1 font-mono text-[11px] text-muted hover:text-pass uppercase cursor-pointer"
             >
               <X className="h-3 w-3" />
@@ -372,6 +377,7 @@ export function CoolSkillsShowcase() {
                 setActiveCategory("All");
                 setSearchQuery("");
               }}
+              data-cursor="Show all 40+ verified skills"
               className="text-pass hover:underline cursor-pointer"
             >
               Show all {totalSkillsCount}
@@ -399,6 +405,7 @@ export function CoolSkillsShowcase() {
                   return (
                     <div
                       key={item}
+                      data-cursor={`Verified skill: ${item}${badge ? ` · ${badge}` : ''}`}
                       className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border font-mono text-xs transition-colors ${
                         badge
                           ? "border-pass/50 bg-paper text-ink shadow-2xs"
@@ -438,6 +445,7 @@ export function CoolSkillsShowcase() {
           <button
             type="button"
             onClick={handleCopyKeywords}
+            data-cursor="Copy ATS keywords block to clipboard"
             className="press inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md border border-line bg-card font-mono text-xs uppercase tracking-wider text-ink hover:border-pass hover:text-pass transition-colors cursor-pointer self-start sm:self-auto"
           >
             {hasCopied ? (

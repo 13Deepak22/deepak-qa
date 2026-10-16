@@ -259,6 +259,7 @@ export function InteractiveDeliverables() {
               key={tab.id}
               type="button"
               data-testid={`deliverable-tab-${tab.id}`}
+              data-cursor={`Inspect ${tab.title} (${tab.documentType})`}
               onClick={() => setActiveTabId(tab.id)}
               className={`p-3.5 sm:p-4 text-left transition-all flex flex-col justify-between ${
                 isSelected

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-const INTERACTIVE = "a, button, summary, [role='button']";
+const INTERACTIVE = "a, button, summary, [role='button'], [data-cursor]";
 const FIELD = "input, textarea, select, [contenteditable='true']";
 const DOT = 6;
 const PAD = 6;
@@ -29,7 +29,7 @@ function nameOf(el: Element) {
 }
 
 function labelFor(el: Element) {
-  const custom = el.getAttribute("data-cursor");
+  const custom = el.getAttribute("data-cursor") ?? el.closest("[data-cursor]")?.getAttribute("data-cursor");
   if (custom) return custom;
   const hasText = Boolean(el.textContent?.trim());
   if (el instanceof HTMLAnchorElement) {

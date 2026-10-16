@@ -1,4 +1,4 @@
-import { Skeleton, SkeletonGrid, SkeletonHeader, SkeletonText } from "@/components/ui/skeleton";
+import { Skeleton, SkeletonGrid, SkeletonHeader } from "@/components/ui/skeleton";
 
 export default function ServicesLoading() {
   return (
@@ -23,9 +23,12 @@ export default function ServicesLoading() {
           <SkeletonGrid count={4} columns={2} />
         </div>
 
-
+        {/* Practices Strip */}
+        <div className="mt-12 space-y-6">
+          <Skeleton className="h-5 w-48 rounded-xs" />
+          <SkeletonGrid count={4} columns={4} />
+        </div>
       </div>
     </main>
   );
 }
-

@@ -625,7 +625,6 @@ export function QaGame() {
   const [eatenCount, setEatenCount] = useState(0);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [defects, setDefects] = useState<Defect[]>([]);
-  const [particles, setParticles] = useState<{ id: string; x: number; y: number; color: string }[]>([]);
 
   // Wave transition banner state (non-skippable, transparent frosted glass merging into game stats)
   const [waveBanner, setWaveBanner] = useState<{
@@ -682,6 +681,7 @@ export function QaGame() {
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const comboTimerRef = useRef<NodeJS.Timeout | null>(null);
   const freezeTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const scoreRef = useRef(0);
   const isMutedRef = useRef(false);
@@ -727,34 +727,23 @@ export function QaGame() {
     }
   }, []);
 
-  const playResolveAudio = useCallback((comboMultiplier = 1) => {
+  // Minimal tactile switch-off click effect: clean, quiet, non-irritating
+  const playResolveAudio = useCallback((_comboMultiplier = 1) => {
     const ctx = getAudio();
     if (!ctx) return;
     try {
       const now = ctx.currentTime;
-      const baseFreq = 700 + Math.min(comboMultiplier * 120, 900);
-
-      const osc1 = ctx.createOscillator();
-      const gain1 = ctx.createGain();
-      osc1.type = "sine";
-      osc1.frequency.setValueAtTime(baseFreq, now);
-      gain1.gain.setValueAtTime(0.08, now);
-      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-      osc1.connect(gain1);
-      gain1.connect(ctx.destination);
-      osc1.start(now);
-      osc1.stop(now + 0.12);
-
-      const osc2 = ctx.createOscillator();
-      const gain2 = ctx.createGain();
-      osc2.type = "triangle";
-      osc2.frequency.setValueAtTime(baseFreq * 1.5, now + 0.08);
-      gain2.gain.setValueAtTime(0.1, now + 0.08);
-      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
-      osc2.connect(gain2);
-      gain2.connect(ctx.destination);
-      osc2.start(now + 0.08);
-      osc2.stop(now + 0.28);
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(340, now);
+      osc.frequency.exponentialRampToValueAtTime(100, now + 0.035);
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.035);
     } catch {}
   }, [getAudio]);
 
@@ -955,12 +944,12 @@ export function QaGame() {
       stage: "enter",
     });
 
-    // Center display phase for 1500ms with transparent frosted glass effect
+    // Center display phase for 650ms (fast, clean, non-intrusive)
     setTimeout(() => {
       // Start merge into top-left HUD stats!
       setWaveBanner(prev => (prev ? { ...prev, stage: "merge" } : null));
 
-      // Complete merge animation at 2200ms
+      // Complete merge animation at 350ms
       setTimeout(() => {
         setWaveBanner(null);
         isWaveAdvancingRef.current = false;
@@ -970,18 +959,15 @@ export function QaGame() {
         scoreRef.current = 0;
         // Trigger a brief HUD pulse effect
         setHudPulse(true);
-        setTimeout(() => setHudPulse(false), 900);
-      }, 700);
-    }, 1500);
+        setTimeout(() => setHudPulse(false), 500);
+      }, 350);
+    }, 650);
   }, [playVictoryAudio]);
 
-  // Squash Defect
-  const squashDefect = useCallback((id: string, x: number, y: number) => {
+  // Squash Defect (Instant minimal switch-off effect)
+  const squashDefect = useCallback((id: string, _x: number, _y: number) => {
     const targetBug = defectsRef.current.find(b => b.id === id);
     if (!targetBug || targetBug.squashed) return;
-
-    const progress = (Date.now() - targetBug.spawnTime) / (targetBug.hungerThreshold || 10000);
-
 
     // Update combo
     if (comboTimerRef.current) clearTimeout(comboTimerRef.current);
@@ -990,7 +976,7 @@ export function QaGame() {
     setMaxCombo(prev => Math.max(prev, newCombo));
     comboTimerRef.current = setTimeout(() => setCombo(0), 2000);
 
-    // Audio
+    // Subtle tactile switch-off click audio
     playResolveAudio(newCombo);
 
     // Award Breakpoint charge every 6 squashes & check Win Quota
@@ -1007,7 +993,7 @@ export function QaGame() {
       return nextScore;
     });
 
-    // If bug was targeting or eating an element, save and restore the element from being eaten
+    // If bug was targeting or eating an element, restore the element
     if (targetBug.targetElement) {
       const targetEl = targetBug.targetElement;
       targetEl.removeAttribute('data-targeted-by');
@@ -1039,56 +1025,36 @@ export function QaGame() {
       hoverTimeoutRef.current = null;
     }
 
-    // Mark bug as squashed
+    // Mark bug as squashed (switches off immediately with minimal fade)
     setDefects(prev => prev.map(b => b.id === id ? { ...b, squashed: true, scanning: false, eating: false } : b));
 
-    // Spawn colorful debris particles matching bug color (adapted to performance tier)
-    const particleCount = dynamicMaxBugsRef.current <= 6 ? 4 : 6;
-    const newParticles = Array.from({ length: particleCount }).map(() => ({
-      id: Math.random().toString(36).substring(7),
-      x,
-      y,
-      color: targetBug.color
-    }));
-    setParticles(prev => [...prev, ...newParticles]);
-
+    // Clean swift removal in 110ms - like turning off a switch
     setTimeout(() => {
       setDefects(prev => prev.filter(b => b.id !== id));
       if (!hasCrashedRef.current && !hasWonRef.current) {
         const remainingActive = defectsRef.current.filter(b => !b.squashed && !b.isDying && b.id !== id).length;
-        // If NO bugs remain on screen, trigger fast spawn in few seconds (1.6s) so player isn't waiting!
-        // Otherwise, let the patterned slowdown timer pace the spawns naturally.
         if (remainingActive === 0) {
           scheduleNextRef.current?.(1600);
         }
       }
-    }, 400);
+    }, 110);
 
-    setTimeout(() => {
-      setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
-    }, 800);
-
-    // Generate procedural QA bug log
-    const urgency = targetBug.bugSeverity === "P0" 
-      ? "prevented production outage!" 
-      : targetBug.bugSeverity === "P1" 
-        ? "prevented critical data loss." 
-        : targetBug.bugSeverity === "P2" 
-          ? "system stability preserved." 
-          : "routine maintenance.";
-
-    const action = ACTIONS_CATALOG[(scoreRef.current * 3) % ACTIONS_CATALOG.length];
-    const fullText = `${targetBug.bugIcon} ${targetBug.bugSeverity}: ${action} ${targetBug.bugCode} [${targetBug.bugLabel}] (${urgency})`;
-
+    // Easy, minimal achievement toast with high default invisible time
     const newLog: TerminalLog = {
       id: Date.now(),
-      text: fullText,
-      priority: `${targetBug.bugSeverity} [${targetBug.bugCategory}]`,
-      icon: targetBug.bugIcon,
+      text: `Resolved ${targetBug.bugCode}`,
+      priority: targetBug.bugSeverity,
+      icon: "✓",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     };
-    setTerminalLogs(prev => [newLog, ...prev.slice(0, 3)]); // Keep last 4 logs
-  }, [combo, isFrozen, playResolveAudio]);
+    setTerminalLogs([newLog]);
+
+    // Auto-dismiss after 1000ms: stays invisible almost all the time!
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    toastTimeoutRef.current = setTimeout(() => {
+      setTerminalLogs([]);
+    }, 1000);
+  }, [combo, advanceWave, playResolveAudio]);
 
   const handlePointerEnter = useCallback((bugId: string) => {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
@@ -1429,18 +1395,6 @@ export function QaGame() {
 
           playCrashAudio();
 
-          // Spawn death debris particles at bug position (the critical bug dies!)
-          const crashParticles = Array.from({ length: 10 }).map(() => ({
-            id: Math.random().toString(36).substring(7),
-            x: bug.x,
-            y: bug.y,
-            color: "#ef4444"
-          }));
-          setParticles(prev => [...prev, ...crashParticles]);
-          setTimeout(() => {
-            setParticles(prev => prev.filter(p => !crashParticles.find(cp => cp.id === p.id)));
-          }, 800);
-
           // Update integrity using tracked corrupted count
           corruptedCountRef.current += 1;
           const corruptedCount = corruptedCountRef.current;
@@ -1457,14 +1411,16 @@ export function QaGame() {
           const isHeaderBreach = Boolean(bug.eatingTarget?.closest('header, [role="banner"], nav[aria-label="Primary"]'));
           const newLog: TerminalLog = {
             id: Date.now(),
-            text: isHeaderBreach
-              ? `🚨 FINAL STAND: Defect ${bug.bugCode} breached SITE HEADER! Critical defect disintegrated & reproduced. Integrity at ${integrityLeft}%.`
-              : `💥 Defect ${bug.bugCode} breached content. Critical bug destroyed & reproduced Low priority defect. Integrity at ${integrityLeft}%.`,
-            priority: isHeaderBreach ? "P0 [HEADER BREACH]" : "P0 [BREACH]",
-            icon: isHeaderBreach ? "🚨" : "💥",
+            text: isHeaderBreach ? `Breach: Header Integrity ${integrityLeft}%` : `Breach: Content Integrity ${integrityLeft}%`,
+            priority: "ALERT",
+            icon: "🚨",
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
           };
-          setTerminalLogs(prev => [newLog, ...prev.slice(0, 2)]);
+          setTerminalLogs([newLog]);
+          if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+          toastTimeoutRef.current = setTimeout(() => {
+            setTerminalLogs([]);
+          }, 1200);
 
           // 1. CRITICAL BUG DIES WITH VISIBLE OVERLOAD & SHOCKWAVE ANIMATION
           nextDefects.push({
@@ -1484,17 +1440,6 @@ export function QaGame() {
           const currentActiveCount = defectsRef.current.filter(b => !b.squashed && !b.isDying && b.id !== bug.id).length;
           if (currentActiveCount < dynamicMaxBugsRef.current && currentActiveCount < ABSOLUTE_MAX_BUGS) {
             playBirthAudio();
-            const birthParticleCount = dynamicMaxBugsRef.current <= 6 ? 4 : 6;
-            const birthParticles = Array.from({ length: birthParticleCount }).map(() => ({
-              id: Math.random().toString(36).substring(7),
-              x: bug.x,
-              y: bug.y,
-              color: "#10b981"
-            }));
-            setParticles(prev => [...prev, ...birthParticles]);
-            setTimeout(() => {
-              setParticles(prev => prev.filter(p => !birthParticles.find(bp => bp.id === p.id)));
-            }, 800);
 
             const angle = Math.random() * Math.PI * 2;
             const spawnX = Math.max(40, Math.min(window.innerWidth - 40, bug.x + Math.cos(angle) * 24));
@@ -2142,41 +2087,30 @@ export function QaGame() {
                     minWidth: "36px",
                     minHeight: "36px",
                     transform: `translate(-50%, -50%) ${
-                      bug.squashed ? "scale(1.45, 0.22)" : ""
+                      bug.squashed ? "scale(0.85)" : ""
                     }`,
                     animation: isDying 
-                      ? "criticalBugDie 0.48s cubic-bezier(0.2, 0.8, 0.2, 1) forwards" 
+                      ? "criticalBugDie 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards" 
                       : isBorn 
-                        ? "bugBirthEmerge 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards" 
+                        ? "bugBirthEmerge 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards" 
                         : undefined,
                     transition: bug.squashed 
-                      ? "transform 320ms cubic-bezier(0.1, 0.9, 0.2, 1), opacity 320ms ease" 
+                      ? "opacity 100ms ease-out, transform 100ms ease-out" 
                       : "opacity 150ms ease",
                     opacity: bug.squashed ? 0 : 1,
+                    filter: bug.squashed ? "grayscale(1) brightness(0.35)" : undefined,
                     pointerEvents: bug.squashed || isDying ? "none" : "auto",
                   }}
                   aria-label={bug.squashed || isDying ? undefined : `Squash defect ${bug.bugCode} ${bug.bugLabel}`}
                   aria-hidden={bug.squashed || isDying ? "true" : undefined}
                   disabled={bug.squashed || isDying}
                 >
-                  {/* Glowing Green Reproduction Ripple Ring for Newborn Bug */}
+                  {/* Subtle Born Indicator Ring */}
                   {isBorn && (
                     <div 
-                      className="absolute inset-[-6px] rounded-full border border-emerald-400 pointer-events-none"
+                      className="absolute inset-[-4px] rounded-full border border-emerald-400 pointer-events-none"
                       style={{
-                        animation: "birthRipple 0.65s ease-out forwards",
-                        boxShadow: "0 0 14px rgba(16, 185, 129, 0.8)",
-                      }}
-                    />
-                  )}
-
-                  {/* Expanding Red Death Shockwave for Dying Critical Bug */}
-                  {isDying && (
-                    <div 
-                      className="absolute inset-[-8px] rounded-full border border-red-500 pointer-events-none"
-                      style={{
-                        animation: "deathShockwave 0.48s ease-out forwards",
-                        boxShadow: "0 0 18px rgba(239, 68, 68, 0.9)",
+                        animation: "birthRipple 0.5s ease-out forwards",
                       }}
                     />
                   )}
@@ -2214,75 +2148,36 @@ export function QaGame() {
                 </button>
               );
             })}
-
-
-
-            {/* Explosive Splat Particles */}
-            {particles.map((p, i) => {
-              const tx = (Math.random() - 0.5) * 160;
-              const ty = (Math.random() - 0.5) * 160;
-              return (
-                <div
-                  key={`${p.id}-${i}`}
-                  className="absolute h-2.5 w-2.5 rounded-full pointer-events-none"
-                  style={{
-                    left: p.x + 16,
-                    top: p.y + 16,
-                    backgroundColor: p.color || "#fde047",
-                    boxShadow: `0 0 10px ${p.color || "#fde047"}`,
-                    animation: `explode 0.75s cubic-bezier(0.1, 0.8, 0.3, 1) forwards`,
-                    animationDelay: `${(i % 5) * 0.02}s`,
-                    transformOrigin: "center",
-                    "--tx": `${tx}px`,
-                    "--ty": `${ty}px`,
-                  } as React.CSSProperties}
-                />
-              );
-            })}
           </div>
 
-          {/* Real-time Non-overlapping CI/CD Resolution Toast */}
+          {/* Minimal & Non-intrusive Quick Resolution Pill (Auto-dismisses in 1s, high invisible time) */}
           {terminalLogs[0] && !hasCrashed && (
             <aside 
               key={terminalLogs[0].id}
-              aria-label="CI/CD Pipeline Log"
-              className="fixed bottom-6 right-6 z-[60] pointer-events-none flex items-center gap-2.5 bg-ink/95 text-paper px-4 py-2.5 rounded-xl border border-pass shadow-[4px_4px_0_var(--pass)] font-mono text-xs animate-fade-in backdrop-blur-md max-w-sm sm:max-w-md"
+              aria-label="Resolution Notice"
+              className="fixed bottom-5 right-5 z-[60] pointer-events-none flex items-center gap-2 bg-card/95 text-ink px-3 py-1.5 rounded-full border border-pass/40 shadow-sm font-mono text-[11px] animate-fade-in backdrop-blur-xs select-none"
             >
-              <span className="text-sm shrink-0 select-none">{terminalLogs[0].icon}</span>
-              <div className="truncate">
-                <span className="font-bold text-pass mr-1.5">{terminalLogs[0].priority}:</span>
-                <span className="text-paper/90 text-[11px]">{terminalLogs[0].text.split(': ')[1] || terminalLogs[0].text}</span>
-              </div>
+              <span className="w-1.5 h-1.5 rounded-full bg-pass shrink-0" />
+              <span className="font-semibold text-pass">{terminalLogs[0].priority}</span>
+              <span className="text-muted/40">•</span>
+              <span className="text-ink-soft">{terminalLogs[0].text}</span>
             </aside>
           )}
 
-
-
-          {/* Transparent Non-Skippable Wave Upgrade Banner Merging into HUD Stats */}
+          {/* Minimal Wave Advancement Badge */}
           {waveBanner && (
             <div 
-              className={`fixed z-[70] pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              className={`fixed z-[70] pointer-events-none transition-all duration-400 ease-out ${
                 waveBanner.stage === "enter"
-                  ? "top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 opacity-100"
-                  : "top-4 left-4 -translate-x-0 -translate-y-0 scale-[0.25] opacity-0"
+                  ? "top-14 left-1/2 -translate-x-1/2 scale-100 opacity-100"
+                  : "top-4 left-4 -translate-x-0 scale-75 opacity-0"
               }`}
             >
-              <div className="bg-paper/85 dark:bg-card/85 backdrop-blur-md border border-pass/50 px-4 sm:px-6 py-3.5 sm:py-4 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] font-mono text-center flex flex-col items-center gap-2 max-w-[92vw] min-w-[260px] sm:min-w-[280px]">
-                <div className="flex items-center gap-2 text-pass text-[10px] uppercase font-bold tracking-widest">
-                  <Zap size={12} className="text-pass animate-bounce" />
-                  <span>System Upgrade · Wave {waveBanner.clearedWave} Cleared</span>
-                </div>
-                <h3 className="font-serif text-xl sm:text-2xl font-bold text-ink tracking-tight">
-                  Advancing to Wave {waveBanner.nextWave}
-                </h3>
-                <div className="flex items-center gap-2 pt-1 border-t border-line/60 text-[11px] text-muted flex-wrap justify-center">
-                  <span className="px-2 py-0.5 rounded bg-pass/10 text-pass font-bold border border-pass/30">
-                    Speed +0.2x ({(1 + (waveBanner.nextWave - 1) * 0.2).toFixed(1)}x)
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/30">
-                    Spawn -10%
-                  </span>
-                </div>
+              <div className="bg-card/95 border border-pass/50 px-3.5 py-1.5 rounded-full shadow-md font-mono text-center flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-pass animate-ping" />
+                <span className="font-mono text-xs font-semibold text-pass">Wave {waveBanner.nextWave} Active</span>
+                <span className="text-muted/40">•</span>
+                <span className="font-mono text-[11px] text-muted">Wave {waveBanner.clearedWave} Cleared</span>
               </div>
             </div>
           )}
@@ -2406,13 +2301,6 @@ export function QaGame() {
               60% { transform: translate(-2px, -1px); filter: contrast(1.15); }
               80% { transform: translate(2px, 1px); filter: none; }
               100% { transform: translate(0, 0); filter: none; }
-            }
-            @keyframes explode {
-              0% { transform: translate(0, 0) scale(1.4); opacity: 1; }
-              100% { 
-                transform: translate(var(--tx), var(--ty)) scale(0);
-                opacity: 0;
-              }
             }
             @keyframes fadeIn {
               from { opacity: 0; transform: translateY(4px); }

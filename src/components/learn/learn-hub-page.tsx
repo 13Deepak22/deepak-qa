@@ -5,10 +5,11 @@ import Link from "next/link";
 import {
   ArrowRight,
   BookOpen,
-  Layers,
-  GraduationCap,
   HelpCircle,
-  FileText,
+  Search,
+  X,
+  Layers,
+  Sparkles,
 } from "lucide-react";
 import { ToolLogo } from "@/components/home/tool-logo";
 import type { ToolLogo as ToolLogoName } from "@/data";
@@ -18,12 +19,11 @@ export interface LearningTrack {
   slug: string;
   title: string;
   shortTitle: string;
+  toolTag: string;
+  toolKey: string;
   tagline: string;
   description: string;
-  category: "fundamentals" | "automation" | "api-perf" | "languages";
-  categoryLabel: string;
   logo: ToolLogoName;
-  level: "Beginner" | "Intermediate" | "Advanced" | "All Levels";
   docCount: number;
 }
 
@@ -32,66 +32,37 @@ export interface InterviewModuleItem {
   slug: string;
   title: string;
   shortTitle: string;
+  toolTag: string;
+  toolKey: string;
   tagline: string;
   description: string;
   qCount: string;
-  categoryLabel: string;
   logo: ToolLogoName;
-  level: "All Levels" | "Intermediate" | "Advanced" | "DevOps QA" | "Practical" | "Real-World";
-  highlights: string[];
 }
 
 export const GUIDE_TRACKS: LearningTrack[] = [
   {
-    id: "manual",
-    slug: "manual",
-    title: "Manual Software Testing & QA",
-    shortTitle: "Manual Testing",
-    tagline: "31 chapters from basic to advance: SDLC, STLC, BVA, ECP & Defect triage.",
-    description: "Start from absolute zero: 7 ISTQB principles, SDLC models, STLC 6 phases, BVA & ECP, decision tables, state machines, IEEE 829 test plans, defect lifecycle, and FinTech payment QA.",
-    category: "fundamentals",
-    categoryLabel: "Fundamentals",
-    logo: "manual",
-    level: "All Levels",
-    docCount: 31,
-  },
-  {
-    id: "automation",
-    slug: "automation",
-    title: "Test Automation Architecture",
-    shortTitle: "Automation Testing",
-    tagline: "Production test architecture: POM, Docker grids, and CI/CD pipelines.",
-    description: "Design production-grade test automation architecture: Page Object Model (POM), data-driven testing, GitHub Actions CI/CD pipelines, Docker containerized grids, and the test automation pyramid.",
-    category: "automation",
-    categoryLabel: "Architecture",
-    logo: "automation",
-    level: "Intermediate",
-    docCount: 12,
+    id: "playwright",
+    slug: "playwright",
+    title: "Microsoft Playwright Automation",
+    shortTitle: "Playwright",
+    toolTag: "Playwright · Web & MCP",
+    toolKey: "playwright",
+    tagline: "Auto-waits, multi-context browser isolation, trace viewer & MCP AI test agents.",
+    description: "Next-gen web automation: zero-flakiness auto-waiting, network mocking, HAR capture, Codegen test generator, Trace Viewer debugging, and API testing capabilities.",
+    logo: "playwright",
+    docCount: 16,
   },
   {
     id: "postman",
     slug: "postman",
     title: "Postman & REST API Automation",
     shortTitle: "Postman API",
-    tagline: "HTTP requests, environment scopes, assertions & Newman headless suites.",
-    description: "Automate REST APIs with Postman: dynamic variables, environment scopes, pre-request & test assertion scripts, JSON schema validation, Newman headless CLI runners, and mock servers.",
-    category: "api-perf",
-    categoryLabel: "API",
+    toolTag: "Postman · REST API",
+    toolKey: "postman",
+    tagline: "Dynamic variables, JSON schemas, assertion scripts & Newman headless suites.",
+    description: "Automate REST APIs with Postman: pre-request scripts, test assertions, environment scopes, JSON schema validation, Newman headless CLI runners, and mock servers.",
     logo: "postman",
-    level: "Beginner",
-    docCount: 10,
-  },
-  {
-    id: "jmeter",
-    slug: "jmeter",
-    title: "Apache JMeter Performance Testing",
-    shortTitle: "JMeter Load Testing",
-    tagline: "Virtual user load simulation, Thread Groups, Timers & CLI execution.",
-    description: "Simulate thousands of concurrent virtual users: Thread Groups, HTTP Request Defaults, CSV Data Set Config, Timers, Listeners, Response Assertions, and Distributed Remote Slaves.",
-    category: "api-perf",
-    categoryLabel: "Performance",
-    logo: "jmeter",
-    level: "Advanced",
     docCount: 10,
   },
   {
@@ -99,12 +70,11 @@ export const GUIDE_TRACKS: LearningTrack[] = [
     slug: "selenium",
     title: "Selenium WebDriver & Grid",
     shortTitle: "Selenium 4",
-    tagline: "Modern Selenium 4: W3C compliance, locators, dynamic waits & Grid.",
+    toolTag: "Selenium 4 · Web Grid",
+    toolKey: "selenium",
+    tagline: "W3C WebDriver compliance, dynamic locators, explicit waits & Grid scaling.",
     description: "Classic browser automation using modern Selenium 4: W3C WebDriver compliance, dynamic locators, explicit & fluent waits, Actions API, JavaScriptExecutor, and Selenium Grid distributed testing.",
-    category: "automation",
-    categoryLabel: "Web Automation",
     logo: "selenium",
-    level: "Intermediate",
     docCount: 11,
   },
   {
@@ -112,65 +82,84 @@ export const GUIDE_TRACKS: LearningTrack[] = [
     slug: "appium",
     title: "Appium Mobile Automation",
     shortTitle: "Appium Mobile",
-    tagline: "Native Android & iOS automation with UiAutomator2 and XCUITest.",
-    description: "Automate native Android and iOS mobile applications: UiAutomator2, XCUITest driver, mobile touch gestures, Appium Inspector, real device testing, and cloud device farm execution.",
-    category: "automation",
-    categoryLabel: "Mobile",
+    toolTag: "Appium · iOS & Android",
+    toolKey: "appium",
+    tagline: "Native Android & iOS automation with UiAutomator2, XCUITest & touch gestures.",
+    description: "Automate native mobile apps: UiAutomator2, XCUITest driver, mobile touch gestures, Appium Inspector, real device testing, and cloud device farm execution.",
     logo: "appium",
-    level: "Advanced",
     docCount: 11,
   },
   {
-    id: "playwright",
-    slug: "playwright",
-    title: "Microsoft Playwright Automation",
-    shortTitle: "Playwright",
-    tagline: "Zero-flakiness web testing: auto-waits, trace viewer, codegen & MCP.",
-    description: "Next-generation web automation: auto-waiting, multi-page browser contexts, network mocking & HAR capture, Codegen test generator, Trace Viewer debugging, and API testing capabilities.",
-    category: "automation",
-    categoryLabel: "Web Automation",
-    logo: "playwright",
-    level: "Intermediate",
-    docCount: 16,
+    id: "jmeter",
+    slug: "jmeter",
+    title: "Apache JMeter Performance Testing",
+    shortTitle: "JMeter Load Testing",
+    toolTag: "JMeter · Concurrency Load",
+    toolKey: "jmeter",
+    tagline: "Virtual user load simulation, Thread Groups, Timers & CLI remote slaves.",
+    description: "Simulate thousands of concurrent virtual users: Thread Groups, HTTP Request Defaults, CSV Data Set Config, Timers, Listeners, Response Assertions, and Distributed Remote Slaves.",
+    logo: "jmeter",
+    docCount: 10,
   },
   {
     id: "java",
     slug: "java",
     title: "Java for QA & Test Automation",
     shortTitle: "Java for Testers",
-    tagline: "64 chapters: OOP, 50+ keywords, Collections, Streams & ThreadLocal.",
+    toolTag: "Java · SDET & Frameworks",
+    toolKey: "java",
+    tagline: "64 chapters: OOP, 50+ keywords, Collections, Streams & ThreadLocal safety.",
     description: "Start Java from absolute zero: JDK architecture, 50+ keywords, modern switch expressions, Collections (List, Set, Map), exception handling, and ThreadLocal safety.",
-    category: "languages",
-    categoryLabel: "Java",
     logo: "java",
-    level: "All Levels",
     docCount: 64,
-  },
-  {
-    id: "javascript",
-    slug: "javascript",
-    title: "Modern JavaScript for Playwright",
-    shortTitle: "JS for Playwright",
-    tagline: "19 Playwright-tailored chapters: ES6+, async/await & page fixtures.",
-    description: "Start JavaScript from absolute zero: const/let scoping, destructuring fixtures ({ page, request }), async/await event loop, for..of locator iteration, page.evaluate, and network mocking.",
-    category: "languages",
-    categoryLabel: "JavaScript",
-    logo: "javascript",
-    level: "All Levels",
-    docCount: 19,
   },
   {
     id: "typescript",
     slug: "typescript",
     title: "TypeScript for QA Engineers",
     shortTitle: "TS for Playwright",
-    tagline: "16 Playwright-tailored chapters: typed POM, generics & Zod schema.",
-    description: "Start TypeScript from absolute zero: strict typing, strongly typed Page Object Models, generic API clients, utility types (Partial, Pick, Omit), test.extend custom fixtures, and Zod schema validation.",
-    category: "languages",
-    categoryLabel: "TypeScript",
+    toolTag: "TypeScript · Strongly Typed POM",
+    toolKey: "typescript",
+    tagline: "Strict typing, typed Page Object Models, generics & Zod schema validation.",
+    description: "Start TypeScript from absolute zero: strict typing, strongly typed Page Object Models, generic API clients, utility types (Partial, Pick, Omit), custom fixtures, and Zod schema validation.",
     logo: "typescript",
-    level: "Intermediate",
     docCount: 16,
+  },
+  {
+    id: "javascript",
+    slug: "javascript",
+    title: "Modern JavaScript for Playwright",
+    shortTitle: "JS for Playwright",
+    toolTag: "JavaScript · Modern ES6+",
+    toolKey: "typescript",
+    tagline: "19 Playwright-tailored chapters: ES6+, async/await & fixture destructuring.",
+    description: "Start JavaScript from absolute zero: const/let scoping, destructuring fixtures ({ page, request }), async/await event loop, for..of locator iteration, page.evaluate, and network mocking.",
+    logo: "javascript",
+    docCount: 19,
+  },
+  {
+    id: "automation",
+    slug: "automation",
+    title: "Test Automation Architecture",
+    shortTitle: "Architecture & CI/CD",
+    toolTag: "DevOps · CI/CD & Docker",
+    toolKey: "devops",
+    tagline: "Production test architecture: POM, Docker grids & GitHub Actions CI/CD.",
+    description: "Design production-grade test automation architecture: Page Object Model (POM), data-driven testing, GitHub Actions CI/CD pipelines, Docker containerized grids, and the test automation pyramid.",
+    logo: "docker",
+    docCount: 12,
+  },
+  {
+    id: "manual",
+    slug: "manual",
+    title: "Manual Software Testing & QA",
+    shortTitle: "Manual QA",
+    toolTag: "Manual QA · STLC & ISTQB",
+    toolKey: "manual",
+    tagline: "31 chapters: 7 ISTQB principles, SDLC, STLC, BVA, ECP & Defect triage.",
+    description: "Start from absolute zero: 7 ISTQB principles, SDLC models, STLC 6 phases, BVA & ECP, decision tables, state machines, IEEE 829 test plans, defect lifecycle, and FinTech payment QA.",
+    logo: "manual",
+    docCount: 31,
   },
 ];
 
@@ -179,411 +168,516 @@ export const LEARNING_TRACKS = GUIDE_TRACKS;
 
 export const INTERVIEW_MODULES: InterviewModuleItem[] = [
   {
-    id: "interview-manual-testing",
-    slug: "interview/interview-manual-testing",
-    title: "Manual Q&A",
-    shortTitle: "Manual",
-    tagline: "130+ questions: SDLC, STLC, Defect Life Cycle, ISTQB principles & BVA.",
-    description: "Sequence-wise interview questions covering testing fundamentals, 7 ISTQB principles, verification vs validation, severity vs priority, boundary value analysis, decision tables, defect triage, and root cause analysis.",
-    qCount: "130+ Q&As",
-    categoryLabel: "Manual QA",
-    logo: "manual",
-    level: "All Levels",
-    highlights: ["SDLC & STLC", "Defect Cycle", "BVA & ECP", "Agile QA"],
-  },
-  {
-    id: "interview-selenium-java",
-    slug: "interview/interview-selenium-java",
-    title: "Selenium with Java",
-    shortTitle: "Selenium Java",
-    tagline: "159 questions: WebDriver, dynamic locators, waits, TestNG & POM.",
-    description: "Complete Selenium with Java interview questions: Selenium 3 vs 4, StaleElementReferenceException handling, FluentWait vs WebDriverWait, JavaScriptExecutor, Page Object Model, and TestNG framework.",
-    qCount: "153 Q&As",
-    categoryLabel: "Web Automation",
-    logo: "selenium",
-    level: "Intermediate",
-    highlights: ["WebDriver Core", "Locators", "Waits", "TestNG & POM"],
-  },
-  {
     id: "interview-playwright-mcp",
     slug: "interview/interview-playwright-mcp",
     title: "Playwright + MCP Automation",
     shortTitle: "Playwright + MCP",
-    tagline: "33 questions: MCP server architecture, AI test generation, self-healing & CI/CD.",
-    description: "Deep dive into Microsoft Playwright and Model Context Protocol (MCP) testing: CDP engine, live locators, Planner/Generator/Healer agents, MCP server tools, self-healing mechanics, and enterprise CI/CD governance.",
+    toolTag: "Playwright · MCP Protocol",
+    toolKey: "playwright",
+    tagline: "37 questions: MCP server architecture, AI test generation & self-healing QA.",
+    description: "Deep dive into Microsoft Playwright and Model Context Protocol (MCP) testing: CDP engine, live locators, Planner/Generator/Healer agents, MCP server tools, and CI/CD governance.",
     qCount: "37 Q&As",
-    categoryLabel: "AI Automation",
     logo: "playwright",
-    level: "Advanced",
-    highlights: ["Engine Architecture", "MCP Protocol", "Self-Healing QA", "CI/CD Governance"],
   },
   {
     id: "interview-api-postman",
     slug: "interview/interview-api-postman",
     title: "API Testing with Postman",
     shortTitle: "Postman API",
-    tagline: "143+ questions: REST architecture, HTTP methods, scripts & Newman.",
+    toolTag: "Postman · REST & Newman",
+    toolKey: "postman",
+    tagline: "107+ questions: REST architecture, HTTP methods, scripts & Newman CLI.",
     description: "Complete API testing interview questions: REST architecture, idempotency, pre-request scripts, test assertions, Newman headless CLI suites, environment scopes, and mock servers.",
     qCount: "107+ Q&As",
-    categoryLabel: "API Testing",
     logo: "postman",
-    level: "All Levels",
-    highlights: ["REST Verbs", "Status Codes", "Newman CLI", "Mocks"],
   },
   {
-    id: "interview-sql-database",
-    slug: "interview/interview-sql-database",
-    title: "SQL & Database Testing",
-    shortTitle: "SQL & DB",
-    tagline: "52+ questions: SELECT queries, WHERE, GROUP BY, joins & ACID rules.",
-    description: "Core SQL interview questions for QA engineers: find second highest salary, eliminate duplicate rows, INNER vs LEFT joins, aggregations, ACID transactions, and database testing for QA.",
-    qCount: "52+ Q&As",
-    categoryLabel: "Database QA",
-    logo: "jira",
-    level: "Intermediate",
-    highlights: ["Queries & Joins", "Aggregations", "ACID", "Database QA"],
+    id: "interview-selenium-java",
+    slug: "interview/interview-selenium-java",
+    title: "Selenium with Java",
+    shortTitle: "Selenium Java",
+    toolTag: "Selenium · WebDriver & POM",
+    toolKey: "selenium",
+    tagline: "153 questions: WebDriver 4, dynamic locators, waits, TestNG & POM.",
+    description: "Complete Selenium with Java interview questions: Selenium 3 vs 4, StaleElementReferenceException handling, FluentWait vs WebDriverWait, JavaScriptExecutor, Page Object Model, and TestNG framework.",
+    qCount: "153 Q&As",
+    logo: "selenium",
   },
   {
     id: "interview-core-java",
     slug: "interview/interview-core-java",
     title: "Core Java for SDET / QA",
     shortTitle: "Core Java",
-    tagline: "52+ questions: OOP concepts, Collections, Exceptions & ThreadLocal.",
+    toolTag: "Java · SDET Fundamentals",
+    toolKey: "java",
+    tagline: "55+ questions: OOP concepts, Collections, Exceptions & ThreadLocal.",
     description: "Essential Java interview questions for QA: OOP principles, method overriding vs overloading, Collections (List, Set, Map), exceptions hierarchy, garbage collection, and ThreadLocal safety.",
     qCount: "55+ Q&As",
-    categoryLabel: "Core Java",
     logo: "java",
-    level: "Intermediate",
-    highlights: ["OOP Principles", "Collections", "Exceptions", "ThreadLocal"],
   },
   {
     id: "interview-java-coding-programs",
     slug: "interview/interview-java-coding-programs",
     title: "Top 20 Java Programs",
     shortTitle: "Java Programs",
+    toolTag: "Java · Coding Solutions",
+    toolKey: "java",
     tagline: "Top 20 coding interview programs with complete runnable Java code.",
     description: "String reverse, palindrome check, Fibonacci sequence, prime numbers, armstrong number, remove duplicates, count characters, and array sorting with full runnable Java solutions.",
     qCount: "20 Programs",
-    categoryLabel: "Coding",
     logo: "java",
-    level: "Practical",
-    highlights: ["String Reverse", "Palindrome", "Fibonacci", "Sorting"],
-  },
-  {
-    id: "interview-git",
-    slug: "interview/interview-git",
-    title: "Git & Version Control",
-    shortTitle: "Git & GitHub",
-    tagline: "25 questions: Repositories, branching, remotes, git revert & reset.",
-    description: "Master essential Git commands and workflows for QA: git init, staging, commits, branch management, merge, remote GitHub workflow, git revert, reset, and commit --amend.",
-    qCount: "25 Q&As",
-    categoryLabel: "Version Control",
-    logo: "automation",
-    level: "All Levels",
-    highlights: ["Git vs GitHub", "Branching & Merging", "Remote Workflow", "Revert & Reset"],
   },
   {
     id: "interview-git-cicd-jenkins",
     slug: "interview/interview-git-cicd-jenkins",
     title: "CI/CD, Jenkins & Docker",
     shortTitle: "DevOps QA",
-    tagline: "106 questions: Jenkinsfile, webhook triggers, Docker & Linux.",
-    description: "DevOps & CI/CD interview questions for QA: Jenkins declarative pipelines, webhook triggers, Docker test containers, Linux commands, and CI test execution.",
+    toolTag: "Docker · Pipelines & Linux",
+    toolKey: "devops",
+    tagline: "106 questions: Jenkinsfile, webhook triggers, Docker & Linux test runners.",
+    description: "DevOps & CI/CD interview questions for QA: Jenkins declarative pipelines, webhook triggers, Docker test containers, Linux commands, and automated CI test execution.",
     qCount: "106 Q&As",
-    categoryLabel: "DevOps & CI/CD",
-    logo: "automation",
-    level: "DevOps QA",
-    highlights: ["Git Flow", "Merge Conflicts", "Pipelines", "Docker"],
+    logo: "docker",
+  },
+  {
+    id: "interview-git",
+    slug: "interview/interview-git",
+    title: "Git & Version Control",
+    shortTitle: "Git & GitHub",
+    toolTag: "Git · Branching & Remotes",
+    toolKey: "git",
+    tagline: "25 questions: Repositories, branching, remotes, git revert & reset.",
+    description: "Master essential Git commands and workflows for QA: git init, staging, commits, branch management, merge, remote GitHub workflow, git revert, reset, and commit --amend.",
+    qCount: "25 Q&As",
+    logo: "git",
+  },
+  {
+    id: "interview-sql-database",
+    slug: "interview/interview-sql-database",
+    title: "SQL & Database Testing",
+    shortTitle: "SQL & DB",
+    toolTag: "SQL · Data Verification",
+    toolKey: "sql",
+    tagline: "52+ questions: SELECT queries, WHERE, GROUP BY, joins & ACID rules.",
+    description: "Core SQL interview questions for QA engineers: find second highest salary, eliminate duplicate rows, INNER vs LEFT joins, aggregations, ACID transactions, and database testing for QA.",
+    qCount: "52+ Q&As",
+    logo: "sql",
+  },
+  {
+    id: "interview-manual-testing",
+    slug: "interview/interview-manual-testing",
+    title: "Manual Testing Q&A",
+    shortTitle: "Manual QA",
+    toolTag: "Manual QA · ISTQB & BVA",
+    toolKey: "manual",
+    tagline: "130+ questions: SDLC, STLC, Defect Life Cycle, ISTQB principles & BVA.",
+    description: "Sequence-wise interview questions covering testing fundamentals, 7 ISTQB principles, verification vs validation, severity vs priority, boundary value analysis, decision tables, defect triage, and root cause analysis.",
+    qCount: "130+ Q&As",
+    logo: "manual",
   },
   {
     id: "interview-100-real-time-scenarios",
     slug: "interview/interview-100-real-time-scenarios",
-    title: "100 Real-Time Scenarios",
+    title: "100 Real-Time QA Scenarios",
     shortTitle: "100 Scenarios",
-    tagline: "106 scenario-based questions: e-commerce, payment timeouts & hotfixes.",
+    toolTag: "Scenarios · Real-World QA",
+    toolKey: "manual",
+    tagline: "105 scenario-based questions: e-commerce, payment timeouts & hotfixes.",
     description: "100 practical real-world QA engineering scenarios: concurrency conflicts, payment gateway timeouts, cart drop-offs, flakiness mitigation, production escalations, and cross-team disputes.",
     qCount: "105 Scenarios",
-    categoryLabel: "Scenarios",
     logo: "interview",
-    level: "Real-World",
-    highlights: ["E-Commerce QA", "Payments", "Hotfixes", "Disputes"],
   },
 ];
 
-const GUIDE_CATEGORY_TABS = [
-  { id: "all", label: "All", count: 10 },
-  { id: "fundamentals", label: "Fundamentals", count: 1 },
-  { id: "automation", label: "Automation", count: 4 },
-  { id: "api-perf", label: "API & Perf", count: 2 },
-  { id: "languages", label: "Languages", count: 3 },
-] as const;
+interface ToolDefinition {
+  id: string;
+  name: string;
+  logo: ToolLogoName;
+  count: number;
+}
 
-export const COURSE_CATEGORY_TABS = GUIDE_CATEGORY_TABS;
+const FEATURED_TOOLS: ToolDefinition[] = [
+  { id: "all", name: "All Tools", logo: "automation", count: 20 },
+  { id: "playwright", name: "Playwright", logo: "playwright", count: 2 },
+  { id: "postman", name: "Postman", logo: "postman", count: 2 },
+  { id: "selenium", name: "Selenium", logo: "selenium", count: 2 },
+  { id: "appium", name: "Appium", logo: "appium", count: 1 },
+  { id: "jmeter", name: "JMeter", logo: "jmeter", count: 1 },
+  { id: "java", name: "Java", logo: "java", count: 3 },
+  { id: "typescript", name: "TypeScript", logo: "typescript", count: 2 },
+  { id: "devops", name: "Docker & CI/CD", logo: "docker", count: 2 },
+  { id: "git", name: "Git", logo: "git", count: 1 },
+  { id: "sql", name: "SQL", logo: "sql", count: 1 },
+  { id: "manual", name: "Manual QA", logo: "manual", count: 3 },
+];
 
-type HubSection = "all" | "guides" | "interviews";
+type SectionFilter = "all" | "guides" | "interviews";
 
 export function LearnHubPage() {
-  const [activeSection, setActiveSection] = useState<HubSection>("all");
-  const [activeGuideCategory, setActiveGuideCategory] = useState<string>("all");
+  const [selectedTool, setSelectedTool] = useState<string>("all");
+  const [activeSection, setActiveSection] = useState<SectionFilter>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
+  // Filter guides by tool and search query
   const filteredGuides = useMemo(() => {
-    if (activeGuideCategory === "all") return GUIDE_TRACKS;
-    return GUIDE_TRACKS.filter((track) => track.category === activeGuideCategory);
-  }, [activeGuideCategory]);
+    return GUIDE_TRACKS.filter((guide) => {
+      const matchesTool = selectedTool === "all" || guide.toolKey === selectedTool;
+      if (!matchesTool) return false;
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        guide.title.toLowerCase().includes(q) ||
+        guide.tagline.toLowerCase().includes(q) ||
+        guide.toolTag.toLowerCase().includes(q)
+      );
+    });
+  }, [selectedTool, searchQuery]);
+
+  // Filter interviews by tool and search query
+  const filteredInterviews = useMemo(() => {
+    return INTERVIEW_MODULES.filter((item) => {
+      const matchesTool = selectedTool === "all" || item.toolKey === selectedTool;
+      if (!matchesTool) return false;
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        item.title.toLowerCase().includes(q) ||
+        item.tagline.toLowerCase().includes(q) ||
+        item.toolTag.toLowerCase().includes(q)
+      );
+    });
+  }, [selectedTool, searchQuery]);
+
+  const totalResults =
+    (activeSection !== "interviews" ? filteredGuides.length : 0) +
+    (activeSection !== "guides" ? filteredInterviews.length : 0);
+
+  const activeToolDef = FEATURED_TOOLS.find((t) => t.id === selectedTool);
 
   return (
     <main id="content" tabIndex={-1} className="outline-none">
       <div className="mx-auto max-w-6xl px-4 pt-10 pb-16 sm:px-6 sm:pt-14 sm:pb-20">
-        {/* Eyebrow & Header - On-theme editorial typography */}
+        
+        {/* Minimal Editorial Header */}
         <div className="enter enter-1">
           <p className="font-mono text-[0.72rem] tracking-[0.16em] text-muted uppercase">
-            <span className="text-pass">06</span> / Knowledge Base &amp; Engineering Guides
+            <span className="text-pass">06</span> / Engineering Guides &amp; Knowledge Base
           </p>
-          <div className="mt-2 grid gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,22rem)] lg:items-end lg:gap-12">
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink">
-              Choose what you want to learn.
-            </h1>
-            <p className="leading-relaxed text-ink-soft text-sm sm:text-base">
-              10 comprehensive engineering guides and 8 sequential interview Q&amp;A modules from <em>QA Interview.pdf</em>.
-            </p>
-          </div>
-        </div>
+          <div className="mt-2.5 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight text-ink font-normal">
+                Learn with me.
+              </h1>
+              <p className="mt-2 text-sm sm:text-base text-ink-soft max-w-2xl leading-relaxed">
+                Production-grade automation architectures, frameworks, and real-world interview Q&amp;As across the modern QA stack.
+              </p>
+            </div>
 
-        {/* Minimal On-Theme Stats Ribbon */}
-        <div className="enter enter-2 mt-8 grid grid-cols-3 gap-3 sm:gap-6 border-t border-b border-line py-4 sm:py-5">
-          <div>
-            <span className="font-mono text-xs tracking-[0.14em] text-muted uppercase">Guides</span>
-            <div className="mt-1 font-serif text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-              10 <span className="font-mono text-xs font-normal text-muted uppercase">Tracks</span>
+            {/* Quick Count Badge */}
+            <div className="font-mono text-xs text-muted shrink-0 pb-1 flex items-center gap-2">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-pass animate-pulse" />
+              <span>10 Guides · 10 Interview Modules · 860+ Q&amp;As</span>
             </div>
           </div>
-          <div>
-            <span className="font-mono text-xs tracking-[0.14em] text-muted uppercase">Interviews</span>
-            <div className="mt-1 font-serif text-2xl sm:text-3xl font-bold tracking-tight text-pass">
-              8 <span className="font-mono text-xs font-normal text-muted uppercase">Topics</span>
-            </div>
-          </div>
-          <div>
-            <span className="font-mono text-xs tracking-[0.14em] text-muted uppercase">Master Q&amp;As</span>
-            <div className="mt-1 font-serif text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-              860+ <span className="font-mono text-xs font-normal text-muted uppercase">Verified</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Minimal Segmented Section Switcher */}
-        <div className="enter enter-2 mt-6 flex items-center gap-1.5 border-b border-line pb-3 overflow-x-auto scrollbar-none">
-          <button
-            type="button"
-            onClick={() => setActiveSection("all")}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-xs transition cursor-pointer shrink-0 ${
-              activeSection === "all"
-                ? "bg-ink text-paper font-semibold shadow-2xs"
-                : "text-muted hover:text-ink hover:bg-card"
-            }`}
-          >
-            <Layers className="h-3.5 w-3.5" />
-            <span>All Resources</span>
-            <span className="text-[10px] opacity-75">(18)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveSection("guides")}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-xs transition cursor-pointer shrink-0 ${
-              activeSection === "guides"
-                ? "bg-pass text-paper font-semibold shadow-2xs"
-                : "text-muted hover:text-ink hover:bg-card"
-            }`}
-          >
-            <BookOpen className="h-3.5 w-3.5" />
-            <span>1. Guides</span>
-            <span className="text-[10px] opacity-75">(10)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveSection("interviews")}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-xs transition cursor-pointer shrink-0 ${
-              activeSection === "interviews"
-                ? "bg-pass text-paper font-semibold shadow-2xs"
-                : "text-muted hover:text-ink hover:bg-card"
-            }`}
-          >
-            <HelpCircle className="h-3.5 w-3.5" />
-            <span>2. Interview Q&amp;As</span>
-            <span className="text-[10px] opacity-75">(8)</span>
-          </button>
         </div>
 
         {/* ========================================================= */}
-        {/* SECTION 1: GUIDES                                         */}
+        {/* HIGHLIGHTED TOOLS STRIP                                    */}
         {/* ========================================================= */}
-        {(activeSection === "all" || activeSection === "guides") && (
-          <section className="enter enter-2 mt-7 sm:mt-9">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-line">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-pass uppercase tracking-wider">
-                  <BookOpen className="h-3.5 w-3.5" />
-                  Section 01 · Engineering Guides
-                </span>
-                <span className="text-xs font-mono text-muted">/ 10 Guides</span>
-              </div>
-
-              {/* Minimal Category Filter Pills */}
-              <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-none shrink-0 font-mono text-xs">
-                {GUIDE_CATEGORY_TABS.map((tab) => {
-                  const isActive = activeGuideCategory === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveGuideCategory(tab.id)}
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded transition shrink-0 cursor-pointer text-[11px] ${
-                        isActive
-                          ? "bg-ink text-paper font-semibold shadow-2xs"
-                          : "border border-line bg-card text-muted hover:text-ink hover:border-pass/40"
-                      }`}
-                    >
-                      <span>{tab.label}</span>
-                      <span className="text-[9.5px] opacity-70">{tab.count}</span>
-                    </button>
-                  );
-                })}
-              </div>
+        <div className="enter enter-2 mt-8 pt-6 border-t border-line">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-3.5 w-3.5 text-pass" />
+              <span className="font-mono text-xs font-semibold text-ink uppercase tracking-wider">
+                Highlight by Tool &amp; Tech Stack
+              </span>
             </div>
+            {selectedTool !== "all" && (
+              <button
+                type="button"
+                onClick={() => setSelectedTool("all")}
+                className="font-mono text-xs text-pass hover:underline cursor-pointer"
+                data-cursor="Show all tools & frameworks"
+              >
+                Reset tool filter
+              </button>
+            )}
+          </div>
 
-            {/* Responsive 4-Column Guides Grid */}
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-3.5">
-              {filteredGuides.map((track) => {
-                const originalIndex = GUIDE_TRACKS.findIndex((t) => t.id === track.id) + 1;
-                return (
-                  <Link
-                    key={track.id}
-                    href={`/learn/${track.slug}`}
-                    className="group relative flex flex-col justify-between rounded-lg border border-line bg-card p-3.5 sm:p-4 shadow-2xs hover:border-pass/60 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200 overflow-hidden cursor-pointer"
+          {/* Interactive Tool Badges Grid/Carousel */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            {FEATURED_TOOLS.map((tool) => {
+              const isActive = selectedTool === tool.id;
+              return (
+                <button
+                  key={tool.id}
+                  type="button"
+                  onClick={() => setSelectedTool(tool.id)}
+                  data-cursor={`Filter by ${tool.name} (${tool.count} modules)`}
+                  className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg font-mono text-xs transition-all duration-150 cursor-pointer shrink-0 border ${
+                    isActive
+                      ? "bg-ink text-paper border-ink font-semibold shadow-xs scale-[1.02]"
+                      : "bg-card border-line text-ink-soft hover:text-ink hover:border-pass/60 hover:bg-paper"
+                  }`}
+                >
+                  <div className={`h-4 w-4 shrink-0 flex items-center justify-center ${isActive ? "brightness-125" : ""}`}>
+                    {tool.logo && <ToolLogo name={tool.logo} className="h-full w-full object-contain" />}
+                  </div>
+                  <span>{tool.name}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded ${
+                      isActive ? "bg-paper/20 text-paper" : "bg-paper border border-line text-muted"
+                    }`}
                   >
-                    <div>
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="h-8 w-8 rounded-md border border-line bg-paper flex items-center justify-center p-1.5 group-hover:scale-105 group-hover:border-pass/40 transition-transform">
-                          <ToolLogo name={track.logo} className="h-full w-full object-contain" />
-                        </div>
+                    {tool.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-                        <div className="flex items-center gap-1.5 font-mono text-[10px]">
-                          <span className="px-1.5 py-0.5 rounded border border-line bg-paper text-muted">
-                            {track.level}
-                          </span>
-                          <span className="text-muted/60 font-semibold">
-                            #{String(originalIndex).padStart(2, "0")}
-                          </span>
-                        </div>
+        {/* ========================================================= */}
+        {/* MINIMAL CONTROLS: VIEW TOGGLE & SEARCH                     */}
+        {/* ========================================================= */}
+        <div className="enter enter-2 mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-line/60">
+          
+          {/* View Modes */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setActiveSection("all")}
+              data-cursor="View all guides and interview questions"
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-xs cursor-pointer transition ${
+                activeSection === "all"
+                  ? "bg-pass text-paper font-semibold shadow-2xs"
+                  : "text-muted hover:text-ink hover:bg-card"
+              }`}
+            >
+              <Layers className="h-3.5 w-3.5" />
+              <span>All</span>
+              <span className="text-[10px] opacity-80">({filteredGuides.length + filteredInterviews.length})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveSection("guides")}
+              data-cursor="View engineering guides only"
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-xs cursor-pointer transition ${
+                activeSection === "guides"
+                  ? "bg-pass text-paper font-semibold shadow-2xs"
+                  : "text-muted hover:text-ink hover:bg-card"
+              }`}
+            >
+              <BookOpen className="h-3.5 w-3.5" />
+              <span>Guides</span>
+              <span className="text-[10px] opacity-80">({filteredGuides.length})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveSection("interviews")}
+              data-cursor="View interview Q&A modules only"
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-xs cursor-pointer transition ${
+                activeSection === "interviews"
+                  ? "bg-pass text-paper font-semibold shadow-2xs"
+                  : "text-muted hover:text-ink hover:bg-card"
+              }`}
+            >
+              <HelpCircle className="h-3.5 w-3.5" />
+              <span>Interview Q&amp;A</span>
+              <span className="text-[10px] opacity-80">({filteredInterviews.length})</span>
+            </button>
+          </div>
+
+          {/* Quick Search */}
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search tools & topics..."
+              data-cursor="Search across all QA guides & interview questions"
+              className="w-full pl-8 pr-7 py-1.5 rounded-md border border-line bg-card font-mono text-xs text-ink placeholder:text-muted/70 focus:outline-none focus:border-pass focus:ring-1 focus:ring-pass/40 transition"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                data-cursor="Clear search query"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-ink cursor-pointer"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Empty state if search yields 0 */}
+        {totalResults === 0 && (
+          <div className="mt-12 text-center py-12 rounded-lg border border-line bg-card">
+            <p className="font-serif text-lg text-ink">No modules found matching your filter</p>
+            <p className="font-mono text-xs text-muted mt-1">Try clearing your search query or selecting &quot;All Tools&quot;</p>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedTool("all");
+                setSearchQuery("");
+                setActiveSection("all");
+              }}
+              data-cursor="Reset all active filters"
+              className="mt-4 px-3 py-1.5 rounded bg-pass text-paper font-mono text-xs cursor-pointer inline-flex items-center gap-1.5"
+            >
+              Reset Filters
+            </button>
+          </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* SECTION 1: ENGINEERING GUIDES                             */}
+        {/* ========================================================= */}
+        {(activeSection === "all" || activeSection === "guides") && filteredGuides.length > 0 && (
+          <section className="enter enter-2 mt-8">
+            <div className="flex items-center justify-between pb-2.5 border-b border-line">
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-pass" />
+                <h2 className="font-mono text-xs font-semibold text-pass uppercase tracking-wider">
+                  Engineering Guides
+                </h2>
+                <span className="font-mono text-xs text-muted">
+                  / {filteredGuides.length} {filteredGuides.length === 1 ? "Guide" : "Guides"}
+                </span>
+              </div>
+              {selectedTool !== "all" && activeToolDef && (
+                <span className="font-mono text-[11px] text-muted">
+                  Filtered by <strong className="text-ink">{activeToolDef.name}</strong>
+                </span>
+              )}
+            </div>
+
+            {/* Responsive Minimal Guides Grid */}
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-4">
+              {filteredGuides.map((track) => (
+                <Link
+                  key={track.id}
+                  href={`/learn/${track.slug}`}
+                  data-cursor={`Read ${track.shortTitle} guide (${track.docCount} chapters)`}
+                  className="group relative flex flex-col justify-between rounded-lg border border-line bg-card p-4 shadow-2xs hover:border-pass/70 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200 cursor-pointer overflow-hidden"
+                >
+                  <div>
+                    {/* Prominent Tool Header */}
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 shrink-0 rounded-lg border border-line bg-paper flex items-center justify-center p-2 group-hover:scale-105 group-hover:border-pass/50 group-hover:shadow-2xs transition-all">
+                        <ToolLogo name={track.logo} className="h-full w-full object-contain" />
                       </div>
-
-                      <h3 className="mt-2.5 font-serif text-[15px] font-medium tracking-tight text-ink group-hover:text-pass transition-colors leading-snug">
-                        {track.title}
-                      </h3>
-
-                      <p className="mt-1 font-sans text-[11.5px] text-ink-soft leading-relaxed line-clamp-2">
-                        {track.tagline}
-                      </p>
+                      <div className="min-w-0">
+                        <span className="font-mono text-[10.5px] font-semibold text-pass tracking-wide uppercase truncate block">
+                          {track.toolTag}
+                        </span>
+                        <span className="font-mono text-[11px] text-muted">
+                          {track.docCount} Chapters
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="mt-3.5 pt-2.5 border-t border-line/60 flex items-center justify-between text-[11px] font-mono">
-                      <span className="text-muted">
-                        <strong className="text-ink font-semibold">{track.docCount}</strong> Chapters
-                      </span>
-                      <span className="inline-flex items-center gap-1 text-pass font-medium group-hover:translate-x-0.5 transition-transform">
-                        <span>Read Guide</span>
-                        <ArrowRight className="h-3 w-3" />
-                      </span>
-                    </div>
-                  </Link>
-                );
-              })}
+                    {/* Guide Title & Tagline */}
+                    <h3 className="mt-3 font-serif text-[16px] font-medium tracking-tight text-ink group-hover:text-pass transition-colors leading-snug">
+                      {track.title}
+                    </h3>
+
+                    <p className="mt-1.5 font-sans text-xs text-ink-soft leading-relaxed line-clamp-2">
+                      {track.tagline}
+                    </p>
+                  </div>
+
+                  {/* Clean Action Footer */}
+                  <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between font-mono text-xs">
+                    <span className="text-muted text-[11px]">
+                      Complete Guide
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-pass font-medium group-hover:translate-x-1 transition-transform">
+                      <span>Read Guide</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </span>
+                  </div>
+                </Link>
+              ))}
             </div>
           </section>
         )}
 
         {/* ========================================================= */}
-        {/* SECTION 2: INTERVIEWS (FROM QA Interview.pdf)              */}
+        {/* SECTION 2: INTERVIEW Q&A MODULES                           */}
         {/* ========================================================= */}
-        {(activeSection === "all" || activeSection === "interviews") && (
-          <section className={`enter enter-3 ${activeSection === "all" ? "mt-9 sm:mt-11 pt-6 border-t border-line" : "mt-7 sm:mt-9"}`}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-line">
+        {(activeSection === "all" || activeSection === "interviews") && filteredInterviews.length > 0 && (
+          <section className={`enter enter-3 ${activeSection === "all" ? "mt-10 sm:mt-12 pt-8 border-t border-line" : "mt-8"}`}>
+            <div className="flex items-center justify-between pb-2.5 border-b border-line">
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-pass uppercase tracking-wider">
-                  <HelpCircle className="h-3.5 w-3.5" />
-                  Section 02 · Interview Q&amp;A Modules
+                <HelpCircle className="h-4 w-4 text-pass" />
+                <h2 className="font-mono text-xs font-semibold text-pass uppercase tracking-wider">
+                  Interview Q&amp;A Modules
+                </h2>
+                <span className="font-mono text-xs text-muted">
+                  / {filteredInterviews.length} {filteredInterviews.length === 1 ? "Module" : "Modules"}
                 </span>
-                <span className="text-xs font-mono text-muted hidden sm:inline">/ 8 Topics · 860+ Questions</span>
               </div>
-
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-line bg-card text-[11px] font-mono text-muted self-start sm:self-auto">
-                <FileText className="h-3 w-3 text-pass" />
-                <span>Sequenced from QA Interview.pdf</span>
+              <span className="font-mono text-[11px] text-muted hidden sm:inline">
+                Sequenced from Master QA Interview repository
               </span>
             </div>
 
-            {/* Responsive 4-Column Interviews Grid */}
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-3.5">
-              {INTERVIEW_MODULES.map((item, idx) => {
-                return (
-                  <Link
-                    key={item.id}
-                    href={`/learn/${item.slug}`}
-                    className="group relative flex flex-col justify-between rounded-lg border border-line bg-card p-3.5 sm:p-4 shadow-2xs hover:border-pass/60 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200 overflow-hidden cursor-pointer"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="h-8 w-8 rounded-md border border-line bg-paper flex items-center justify-center p-1.5 group-hover:scale-105 group-hover:border-pass/40 transition-transform">
-                          <ToolLogo name={item.logo} className="h-full w-full object-contain" />
-                        </div>
-
-                        <div className="flex items-center gap-1.5 font-mono text-[10px]">
-                          <span className="px-1.5 py-0.5 rounded border border-pass/30 bg-pass/10 text-pass font-semibold">
-                            {item.qCount}
-                          </span>
-                          <span className="text-muted/60 font-semibold">
-                            #{String(idx + 1).padStart(2, "0")}
-                          </span>
-                        </div>
+            {/* Responsive Minimal Interviews Grid */}
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-4">
+              {filteredInterviews.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/learn/${item.slug}`}
+                  data-cursor={`Study ${item.shortTitle} interview questions (${item.qCount})`}
+                  className="group relative flex flex-col justify-between rounded-lg border border-line bg-card p-4 shadow-2xs hover:border-pass/70 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200 cursor-pointer overflow-hidden"
+                >
+                  <div>
+                    {/* Prominent Tool Header */}
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 shrink-0 rounded-lg border border-line bg-paper flex items-center justify-center p-2 group-hover:scale-105 group-hover:border-pass/50 group-hover:shadow-2xs transition-all">
+                        <ToolLogo name={item.logo} className="h-full w-full object-contain" />
                       </div>
-
-                      <h3 className="mt-2.5 font-serif text-[15px] font-medium tracking-tight text-ink group-hover:text-pass transition-colors leading-snug">
-                        {item.title}
-                      </h3>
-
-                      <p className="mt-1 font-sans text-[11.5px] text-ink-soft leading-relaxed line-clamp-2">
-                        {item.tagline}
-                      </p>
-
-                      {/* Compact Chips */}
-                      <div className="mt-2.5 flex flex-wrap gap-1">
-                        {item.highlights.slice(0, 3).map((h) => (
-                          <span
-                            key={h}
-                            className="font-mono text-[9.5px] px-1.5 py-0.5 rounded border border-line/60 bg-paper/60 text-muted"
-                          >
-                            {h}
-                          </span>
-                        ))}
+                      <div className="min-w-0">
+                        <span className="font-mono text-[10.5px] font-semibold text-pass tracking-wide uppercase truncate block">
+                          {item.toolTag}
+                        </span>
+                        <span className="font-mono text-[11px] text-muted">
+                          {item.qCount}
+                        </span>
                       </div>
                     </div>
 
-                    <div className="mt-3.5 pt-2.5 border-t border-line/60 flex items-center justify-between text-[11px] font-mono">
-                      <span className="text-muted">
-                        <strong className="text-ink font-semibold">{item.qCount}</strong> in sequence
-                      </span>
-                      <span className="inline-flex items-center gap-1 text-pass font-medium group-hover:translate-x-0.5 transition-transform">
-                        <span>View Q&amp;As</span>
-                        <ArrowRight className="h-3 w-3" />
-                      </span>
-                    </div>
-                  </Link>
-                );
-              })}
+                    {/* Interview Title & Tagline */}
+                    <h3 className="mt-3 font-serif text-[16px] font-medium tracking-tight text-ink group-hover:text-pass transition-colors leading-snug">
+                      {item.title}
+                    </h3>
+
+                    <p className="mt-1.5 font-sans text-xs text-ink-soft leading-relaxed line-clamp-2">
+                      {item.tagline}
+                    </p>
+                  </div>
+
+                  {/* Clean Action Footer */}
+                  <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between font-mono text-xs">
+                    <span className="text-muted text-[11px]">
+                      Sequential Q&amp;As
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-pass font-medium group-hover:translate-x-1 transition-transform">
+                      <span>View Q&amp;As</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </span>
+                  </div>
+                </Link>
+              ))}
             </div>
           </section>
         )}
+
       </div>
     </main>
   );

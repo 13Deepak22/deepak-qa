@@ -20,6 +20,9 @@ const logoSize: Record<ToolLogoName, { large: string; small: string }> = {
   javascript: { large: "h-8 w-8", small: "h-6 w-6" },
   typescript: { large: "h-8 w-8", small: "h-6 w-6" },
   interview: { large: "h-8 w-8", small: "h-6 w-6" },
+  git: { large: "h-8 w-8", small: "h-6 w-6" },
+  docker: { large: "h-8 w-8", small: "h-6 w-6" },
+  sql: { large: "h-8 w-8", small: "h-6 w-6" },
 };
 
 const typeIcons: Record<TestingTypeIcon, LucideIcon> = {

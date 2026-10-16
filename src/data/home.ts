@@ -14,7 +14,7 @@ export const releaseGate = {
   gate: "ready for review",
 };
 
-export type ToolLogo = "playwright" | "selenium" | "appium" | "postman" | "jmeter" | "jira" | "trello" | "razorpay" | "paytm" | "java" | "javascript" | "typescript" | "manual" | "automation" | "interview";
+export type ToolLogo = "playwright" | "selenium" | "appium" | "postman" | "jmeter" | "jira" | "trello" | "razorpay" | "paytm" | "java" | "javascript" | "typescript" | "manual" | "automation" | "interview" | "git" | "docker" | "sql";
 
 export type TestingTypeIcon = "functional" | "exploratory" | "ux";
 

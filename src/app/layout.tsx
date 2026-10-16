@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { Fraunces, IBM_Plex_Mono, Source_Sans_3 } from "next/font/google";
 import { BackToTop } from "@/components/layout/back-to-top";
 import { HashScrollHandler } from "@/components/layout/hash-scroll-handler";
@@ -94,11 +93,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <Script
+        <script
           id="theme-init"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("theme");var m=window.matchMedia("(prefers-color-scheme: dark)").matches;var theme=(t==="light"||t==="dark")?t:(m?"dark":"light");document.documentElement.setAttribute("data-theme",theme);document.documentElement.style.colorScheme=theme;}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem("theme");var m=window.matchMedia("(prefers-color-scheme: dark)").matches;var theme=(t==="light"||t==="dark")?t:(m?"dark":"light");var d=document.documentElement;d.setAttribute("data-theme",theme);d.style.colorScheme=theme;}catch(e){}})();`,
           }}
         />
       </head>

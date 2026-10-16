@@ -50,7 +50,13 @@ export function ThemeToggle() {
     media.addEventListener("change", sync);
     window.addEventListener("storage", sync);
 
+    // Enable smooth transitions only after initial paint has settled
+    const timer = setTimeout(() => {
+      document.documentElement.classList.add("theme-ready");
+    }, 50);
+
     return () => {
+      clearTimeout(timer);
       media.removeEventListener("change", sync);
       window.removeEventListener("storage", sync);
     };

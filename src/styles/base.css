@@ -39,7 +39,7 @@ html[data-theme="dark"] .theme-icon-dark {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .theme-toggle .theme-icon {
+  html.theme-ready .theme-toggle .theme-icon {
     transition:
       transform 460ms var(--ease),
       opacity 460ms var(--ease);
@@ -50,6 +50,10 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-sans);
+}
+
+/* Enable smooth transitions only after initial load to prevent theme flash */
+html.theme-ready body {
   transition: background-color 280ms var(--ease), color 280ms var(--ease);
 }
 

@@ -8,56 +8,6 @@ import {
   RefreshCw, Zap, Award 
 } from "lucide-react";
 
-export type BugSkinType = "neon" | "classic" | "circuit" | "chip" | "glitch";
-
-export interface BugSkinConfig {
-  id: BugSkinType;
-  name: string;
-  short: string;
-  icon: string;
-  description: string;
-}
-
-export const ALL_BUG_SKINS: BugSkinType[] = ["neon", "classic", "circuit", "chip", "glitch"];
-
-export const BUG_SKIN_CATALOG: Record<BugSkinType, BugSkinConfig> = {
-  neon: {
-    id: "neon",
-    name: "Neon Trace",
-    short: "Neon",
-    icon: "⚡",
-    description: "Glowing cybernetic software bug with circuit trace legs (Image 1)",
-  },
-  classic: {
-    id: "classic",
-    name: "Classic Debug",
-    short: "Debug",
-    icon: "🐞",
-    description: "Iconic flat software defect symbol with diagonal slice & radial legs (Image 2)",
-  },
-  circuit: {
-    id: "circuit",
-    name: "PCB Circuit",
-    short: "PCB",
-    icon: "🖲️",
-    description: "Printed circuit board bug with etched trace lines & solder pads (Image 3)",
-  },
-  chip: {
-    id: "chip",
-    name: "Silicon Chip",
-    short: "Chip",
-    icon: "💾",
-    description: "Integrated circuit defect with silicon microchip core & IC pins",
-  },
-  glitch: {
-    id: "glitch",
-    name: "Matrix Glitch",
-    short: "Glitch",
-    icon: "👾",
-    description: "Cyber software anomaly with digital scanlines & glowing LED matrix",
-  },
-};
-
 interface Defect {
   id: string;
   x: number;
@@ -79,7 +29,6 @@ interface Defect {
   isPulsing?: boolean;
   hungerThreshold?: number;
   wobbleSeed: number;
-  bugSkin: BugSkinType;
   bugCode: string;
   bugLabel: string;
   bugSeverity: "P0" | "P1" | "P2" | "P3";
@@ -181,258 +130,31 @@ export const UI_BUG_TYPES: BugTemplate[] = [
   { code: "#503", label: "SVC_UNAVAIL", defaultSeverity: "P1", color: "#f97316", bgTint: "rgba(249, 115, 22, 0.18)", icon: "🛑", category: "SRV" },
 ];
 
-interface BugSkinProps {
+export interface PcbCircuitBugProps {
   size: number;
   color: string;
-  strideDuration: string;
+  speedScale?: number;
   isEating?: boolean;
   isPulsing?: boolean;
   isFrozen?: boolean;
 }
 
-// 1. NEON TRACE BUG (Image 1): Glowing cybernetic outline with symmetrical split elytra & circuit legs
-function BugSkinNeon({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 44 44"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={`select-none ${isEating ? "bug-eating-tremor" : "bug-waddle"}`}
-      style={{
-        filter: isFrozen
-          ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)"
-          : isPulsing
-            ? "drop-shadow(0 0 8px #ef4444) drop-shadow(0 0 16px rgba(239, 68, 68, 0.8))"
-            : `drop-shadow(0 0 5px ${color}) drop-shadow(0 0 10px ${color}88)`,
-      }}
-    >
-      {/* P0 Critical Pulse Ring */}
-      {isPulsing && (
-        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="1" fill="none" className="bug-pulse-ring" />
-      )}
+// FINAL EXCLUSIVE SOFTWARE BUG MODEL: PCB Circuit Bug (Image 3)
+// Printed circuit board defect with etched copper trace lines, solder pads & angular robotic legs
+export function PcbCircuitBug({ 
+  size, 
+  color, 
+  speedScale = 1, 
+  isEating, 
+  isPulsing, 
+  isFrozen 
+}: PcbCircuitBugProps) {
+  const strideDuration = isFrozen 
+    ? "0s" 
+    : isEating 
+      ? "0.07s" 
+      : `${Math.max(0.05, 0.22 / (speedScale || 1))}s`;
 
-      {/* 6 Circuit-Trace Stepping Legs (bent at clean 90° angles like Image 1) */}
-      <g style={{ transformBox: "view-box" }}>
-        {/* Top Left */}
-        <path
-          className="bug-leg-a"
-          style={{ transformOrigin: "15px 19px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 15 19 L 8 19 L 8 12"
-          stroke={color}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {/* Top Right */}
-        <path
-          className="bug-leg-b"
-          style={{ transformOrigin: "29px 19px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 29 19 L 36 19 L 36 12"
-          stroke={color}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {/* Mid Left */}
-        <path
-          className="bug-leg-b"
-          style={{ transformOrigin: "13px 26px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 13 26 L 6 26 L 6 30"
-          stroke={color}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {/* Mid Right */}
-        <path
-          className="bug-leg-a"
-          style={{ transformOrigin: "31px 26px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 31 26 L 38 26 L 38 30"
-          stroke={color}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {/* Bottom Left */}
-        <path
-          className="bug-leg-a"
-          style={{ transformOrigin: "15px 33px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 15 33 L 8 33 L 8 40"
-          stroke={color}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {/* Bottom Right */}
-        <path
-          className="bug-leg-b"
-          style={{ transformOrigin: "29px 33px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          d="M 29 33 L 36 33 L 36 40"
-          stroke={color}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </g>
-
-      {/* Head Dome */}
-      <path
-        d="M 17 14 C 17 9.5 27 9.5 27 14 Z"
-        stroke={color}
-        strokeWidth="1.8"
-        fill="#0b0b12"
-        strokeLinejoin="round"
-      />
-
-      {/* Antenna Horns (Image 1) */}
-      <path
-        d="M 19 10 C 17 6 14 5.5 12 7"
-        stroke={color}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M 25 10 C 27 6 30 5.5 32 7"
-        stroke={color}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        fill="none"
-      />
-
-      {/* Symmetrical Split Elytra Body (Image 1) */}
-      {/* Left Shell */}
-      <path
-        d="M 21 16 L 16 16 C 13 16 13 36 17 36 L 21 36 Z"
-        stroke={color}
-        strokeWidth="1.8"
-        fill="#0b0b12"
-        strokeLinejoin="round"
-      />
-      {/* Right Shell */}
-      <path
-        d="M 23 16 L 28 16 C 31 16 31 36 27 36 L 23 36 Z"
-        stroke={color}
-        strokeWidth="1.8"
-        fill="#0b0b12"
-        strokeLinejoin="round"
-      />
-
-      {/* Center Seam Glow */}
-      <line x1="22" y1="16" x2="22" y2="36" stroke={color} strokeWidth="1" strokeDasharray="2 2" opacity="0.6" />
-    </svg>
-  );
-}
-
-// 2. CLASSIC DEBUGGER BUG (Image 2): Iconic flat software debug symbol with diagonal slice & radial legs
-function BugSkinClassic({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 44 44"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={`select-none ${isEating ? "bug-eating-tremor" : "bug-waddle"}`}
-      style={{
-        filter: isFrozen
-          ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)"
-          : isPulsing
-            ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.85))"
-            : `drop-shadow(0 2px 6px ${color}66)`,
-      }}
-    >
-      {/* P0 Critical Pulse Ring */}
-      {isPulsing && (
-        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="1" fill="none" className="bug-pulse-ring" />
-      )}
-
-      {/* 6 Straight Radial Legs (Image 2) */}
-      <g style={{ transformBox: "view-box" }}>
-        {/* Top Left */}
-        <line
-          className="bug-leg-a"
-          style={{ transformOrigin: "13px 20px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          x1="13" y1="20" x2="4" y2="17"
-          stroke={color}
-          strokeWidth="2.4"
-          strokeLinecap="round"
-        />
-        {/* Top Right */}
-        <line
-          className="bug-leg-b"
-          style={{ transformOrigin: "31px 20px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          x1="31" y1="20" x2="40" y2="17"
-          stroke={color}
-          strokeWidth="2.4"
-          strokeLinecap="round"
-        />
-        {/* Mid Left */}
-        <line
-          className="bug-leg-b"
-          style={{ transformOrigin: "13px 27px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          x1="13" y1="27" x2="3" y2="27"
-          stroke={color}
-          strokeWidth="2.4"
-          strokeLinecap="round"
-        />
-        {/* Mid Right */}
-        <line
-          className="bug-leg-a"
-          style={{ transformOrigin: "31px 27px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          x1="31" y1="27" x2="41" y2="27"
-          stroke={color}
-          strokeWidth="2.4"
-          strokeLinecap="round"
-        />
-        {/* Bottom Left */}
-        <line
-          className="bug-leg-a"
-          style={{ transformOrigin: "13px 34px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          x1="13" y1="34" x2="4" y2="37"
-          stroke={color}
-          strokeWidth="2.4"
-          strokeLinecap="round"
-        />
-        {/* Bottom Right */}
-        <line
-          className="bug-leg-b"
-          style={{ transformOrigin: "31px 34px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          x1="31" y1="34" x2="40" y2="37"
-          stroke={color}
-          strokeWidth="2.4"
-          strokeLinecap="round"
-        />
-      </g>
-
-      {/* Solid Rounded Dome Head */}
-      <path d="M 16.5 14 C 16.5 8.5 27.5 8.5 27.5 14 Z" fill={color} />
-
-      {/* Two Short Straight Antennae */}
-      <line x1="19" y1="9" x2="16" y2="4.5" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
-      <line x1="25" y1="9" x2="28" y2="4.5" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
-
-      {/* Solid Capsule / Oval Body (Image 2) */}
-      <rect x="13" y="16" width="18" height="22" rx="9" fill={color} />
-
-      {/* Negative Space Diagonal Slice (The iconic signature of software bug logos in Image 2) */}
-      <line
-        x1="16.5"
-        y1="20"
-        x2="28"
-        y2="33.5"
-        stroke="#1a1a24"
-        strokeWidth="2.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-// 3. PCB CIRCUIT BUG (Image 3): Printed circuit board bug with etched trace lines & solder pads
-function BugSkinCircuit({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
   return (
     <svg
       width={size}
@@ -454,7 +176,7 @@ function BugSkinCircuit({ size, color, strideDuration, isEating, isPulsing, isFr
         <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="1" fill="none" className="bug-pulse-ring" />
       )}
 
-      {/* 6 Angular Robotic Circuit Legs (Image 3) */}
+      {/* 6 Angular Robotic Circuit Legs */}
       <g style={{ transformBox: "view-box" }}>
         {/* Top Left */}
         <polyline
@@ -524,7 +246,7 @@ function BugSkinCircuit({ size, color, strideDuration, isEating, isPulsing, isFr
         />
       </g>
 
-      {/* Main Chitin Shell (Image 3) */}
+      {/* Main Chitin Shell */}
       <path
         d="M 16 17 C 12 25 13 35 22 38 C 31 35 32 25 28 17 Z"
         fill="#0d0d14"
@@ -532,7 +254,7 @@ function BugSkinCircuit({ size, color, strideDuration, isEating, isPulsing, isFr
         strokeWidth="1.4"
       />
 
-      {/* Etched PCB Circuit Traces & Solder Nodes (Image 3) */}
+      {/* Etched PCB Circuit Traces & Solder Nodes */}
       <g>
         {/* Trace 1 */}
         <path d="M 16 36 L 16 30 L 18 27" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" />
@@ -560,264 +282,7 @@ function BugSkinCircuit({ size, color, strideDuration, isEating, isPulsing, isFr
   );
 }
 
-// 4. SILICON CHIP BUG: Hex integrated circuit bug with silicon microchip core & IC pins
-function BugSkinChip({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 44 44"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={`select-none ${isEating ? "bug-eating-tremor" : "bug-waddle"}`}
-      style={{
-        filter: isFrozen
-          ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)"
-          : isPulsing
-            ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))"
-            : `drop-shadow(0 2px 6px ${color}55)`,
-      }}
-    >
-      {/* P0 Critical Pulse Ring */}
-      {isPulsing && (
-        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="1" fill="none" className="bug-pulse-ring" />
-      )}
-
-      {/* 6 IC Pin Bus Legs */}
-      <g style={{ transformBox: "view-box" }}>
-        {/* Top Left */}
-        <polyline
-          className="bug-leg-a"
-          style={{ transformOrigin: "13px 20px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="13,20 6,17 3,12"
-          stroke={color}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        {/* Top Right */}
-        <polyline
-          className="bug-leg-b"
-          style={{ transformOrigin: "31px 20px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="31,20 38,17 41,12"
-          stroke={color}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        {/* Mid Left */}
-        <line
-          className="bug-leg-b"
-          style={{ transformOrigin: "13px 26px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          x1="13" y1="26" x2="4" y2="26"
-          stroke={color}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-        {/* Mid Right */}
-        <line
-          className="bug-leg-a"
-          style={{ transformOrigin: "31px 26px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          x1="31" y1="26" x2="40" y2="26"
-          stroke={color}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-        {/* Bottom Left */}
-        <polyline
-          className="bug-leg-a"
-          style={{ transformOrigin: "13px 31px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="13,31 6,34 3,40"
-          stroke={color}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        {/* Bottom Right */}
-        <polyline
-          className="bug-leg-b"
-          style={{ transformOrigin: "31px 31px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="31,31 38,34 41,40"
-          stroke={color}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-      </g>
-
-      {/* Hexagonal Silicon Package Body */}
-      <polygon
-        points="22,14 31,19 31,32 22,37 13,32 13,19"
-        fill="#0d0d16"
-        stroke={color}
-        strokeWidth="1.5"
-      />
-
-      {/* Center Microchip Core */}
-      <rect x="17.5" y="21.5" width="9" height="9" rx="1.5" fill={color} />
-      <rect x="19" y="23" width="6" height="6" fill="#09090f" />
-      <circle cx="20.5" cy="24.5" r="0.75" fill={color} />
-
-      {/* Digital Sensor Head */}
-      <polygon points="18,14 26,14 25,9 19,9" fill="#141422" stroke={color} strokeWidth="1" />
-      <line x1="20" y1="9" x2="20" y2="4" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
-      <line x1="24" y1="9" x2="24" y2="4" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-// 5. MATRIX GLITCH BUG: Cyber software anomaly with digital scanlines & glowing LED matrix
-function BugSkinGlitch({ size, color, strideDuration, isEating, isPulsing, isFrozen }: BugSkinProps) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 44 44"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={`select-none ${isEating ? "bug-eating-tremor" : "bug-waddle"}`}
-      style={{
-        filter: isFrozen
-          ? "drop-shadow(0 0 8px #38bdf8) brightness(1.2)"
-          : isPulsing
-            ? "drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))"
-            : `drop-shadow(0 2px 6px ${color}55)`,
-      }}
-    >
-      {/* P0 Critical Pulse Ring */}
-      {isPulsing && (
-        <circle cx="22" cy="22" r="18" stroke="#ef4444" strokeWidth="1" fill="none" className="bug-pulse-ring" />
-      )}
-
-      {/* 6 Cyber Joint Legs */}
-      <g style={{ transformBox: "view-box" }}>
-        {/* Top Left */}
-        <polyline
-          className="bug-leg-a"
-          style={{ transformOrigin: "15px 18px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="15,18 7,16 4,11"
-          stroke={color}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        {/* Top Right */}
-        <polyline
-          className="bug-leg-b"
-          style={{ transformOrigin: "29px 18px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="29,18 37,16 40,11"
-          stroke={color}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        {/* Mid Left */}
-        <line
-          className="bug-leg-b"
-          style={{ transformOrigin: "14px 26px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          x1="14" y1="26" x2="4" y2="26"
-          stroke={color}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-        {/* Mid Right */}
-        <line
-          className="bug-leg-a"
-          style={{ transformOrigin: "30px 26px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          x1="30" y1="26" x2="40" y2="26"
-          stroke={color}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-        {/* Bottom Left */}
-        <polyline
-          className="bug-leg-a"
-          style={{ transformOrigin: "16px 33px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="16,33 9,35 6,41"
-          stroke={color}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        {/* Bottom Right */}
-        <polyline
-          className="bug-leg-b"
-          style={{ transformOrigin: "28px 33px", animationDuration: strideDuration, animationPlayState: isFrozen ? "paused" : "running" }}
-          points="28,33 35,35 38,41"
-          stroke={color}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-      </g>
-
-      {/* Main Shell */}
-      <path
-        d="M 15 17 C 12 24 13 34 22 37 C 31 34 32 24 29 17 Z"
-        fill="#0e0e18"
-        stroke={color}
-        strokeWidth="1.4"
-      />
-
-      {/* Digital Scanline Ladder */}
-      <line x1="17" y1="21" x2="27" y2="21" stroke={color} strokeWidth="1.2" strokeLinecap="round" opacity="0.85" />
-      <line x1="16" y1="25" x2="28" y2="25" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
-      <line x1="17" y1="29" x2="27" y2="29" stroke={color} strokeWidth="1.2" strokeLinecap="round" opacity="0.85" />
-      <line x1="19" y1="33" x2="25" y2="33" stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.65" />
-
-      {/* Status Core LED */}
-      <circle cx="22" cy="18" r="1.8" fill={color} />
-
-      {/* Tech Head */}
-      <polygon points="18,14 26,14 24,9 20,9" fill="#09090e" stroke={color} strokeWidth="1.1" />
-      <circle cx="20" cy="11.5" r="1" fill={color} />
-      <circle cx="24" cy="11.5" r="1" fill={color} />
-      <line x1="19" y1="9" x2="16" y2="4.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="25" y1="9" x2="28" y2="4.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-// Master Bug Renderer (switches between 5 software bug models)
-interface ModernBugProps {
-  skin: BugSkinType;
-  size: number;
-  color: string;
-  speedScale: number;
-  isEating?: boolean;
-  isPulsing?: boolean;
-  isFrozen?: boolean;
-}
-
-export function ModernBug({ skin, size, color, speedScale, isEating, isPulsing, isFrozen }: ModernBugProps) {
-  const strideDuration = isFrozen 
-    ? "0s" 
-    : isEating 
-      ? "0.07s" 
-      : `${Math.max(0.05, 0.22 / (speedScale || 1))}s`;
-
-  switch (skin) {
-    case "classic":
-      return <BugSkinClassic size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
-    case "circuit":
-      return <BugSkinCircuit size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
-    case "chip":
-      return <BugSkinChip size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
-    case "glitch":
-      return <BugSkinGlitch size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
-    case "neon":
-    default:
-      return <BugSkinNeon size={size} color={color} strideDuration={strideDuration} isEating={isEating} isPulsing={isPulsing} isFrozen={isFrozen} />;
-  }
-}
+export const ModernBug = PcbCircuitBug;
 
 export function QaGame() {
   const pathname = usePathname();
@@ -831,21 +296,8 @@ export function QaGame() {
   const [isMuted, setIsMuted] = useState(false);
   const [systemIntegrity, setSystemIntegrity] = useState(100);
   const [eatenCount, setEatenCount] = useState(0);
-  const [selectedSkin, setSelectedSkin] = useState<BugSkinType | "mixed">("mixed");
-
   const [defects, setDefects] = useState<Defect[]>([]);
   const [particles, setParticles] = useState<{ id: string; x: number; y: number; color: string }[]>([]);
-
-  // Persistent user preference for bug model
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const saved = localStorage.getItem("qa_bug_skin");
-      if (saved && (saved === "mixed" || ALL_BUG_SKINS.includes(saved as BugSkinType))) {
-        setSelectedSkin(saved as BugSkinType | "mixed");
-      }
-    } catch {}
-  }, []);
 
   // Coordinate header space when QA game is active in top-left corner
   useEffect(() => {
@@ -874,7 +326,6 @@ export function QaGame() {
   const isMutedRef = useRef(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const hasCrashedRef = useRef(false);
-  const selectedSkinRef = useRef<BugSkinType | "mixed">("mixed");
 
   // Sync state refs
   useEffect(() => {
@@ -882,23 +333,7 @@ export function QaGame() {
     scoreRef.current = score;
     isMutedRef.current = isMuted;
     hasCrashedRef.current = hasCrashed;
-    selectedSkinRef.current = selectedSkin;
-  }, [defects, score, isMuted, hasCrashed, selectedSkin]);
-
-  // Skin change handler (immediately transforms existing bugs and saves preference)
-  const handleSkinChange = useCallback((skin: BugSkinType | "mixed") => {
-    setSelectedSkin(skin);
-    selectedSkinRef.current = skin;
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("qa_bug_skin", skin);
-      } catch {}
-    }
-    // Instantly morph existing bugs on screen to the newly selected skin
-    if (skin !== "mixed") {
-      setDefects(prev => prev.map(b => ({ ...b, bugSkin: skin })));
-    }
-  }, []);
+  }, [defects, score, isMuted, hasCrashed]);
 
   // Clean Audio Context Manager
   const getAudio = useCallback(() => {
@@ -1207,11 +642,6 @@ export function QaGame() {
     const baseSize = 44;
     const hungerThreshold = 8500 + Math.random() * 4500; // 8.5s to 13s before critical
 
-    const currentSkinSetting = selectedSkinRef.current;
-    const chosenSkin: BugSkinType = currentSkinSetting === "mixed"
-      ? ALL_BUG_SKINS[Math.floor(Math.random() * ALL_BUG_SKINS.length)]
-      : currentSkinSetting;
-    
     const newDefect: Defect = {
       id: Math.random().toString(36).substring(7),
       x,
@@ -1228,7 +658,6 @@ export function QaGame() {
       direction: Math.random() * Math.PI * 2,
       hungerThreshold,
       wobbleSeed: Math.random() * 1000,
-      bugSkin: chosenSkin,
       bugCode: template.code,
       bugLabel: template.label,
       bugSeverity: template.defaultSeverity,
@@ -1502,11 +931,6 @@ export function QaGame() {
           const childTemplate = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
           const childSpeed = 0.95 + Math.random() * 0.35;
           const childSize = 44;
-          const currentSkinSetting = selectedSkinRef.current;
-          const childSkin: BugSkinType = currentSkinSetting === "mixed"
-            ? ALL_BUG_SKINS[Math.floor(Math.random() * ALL_BUG_SKINS.length)]
-            : currentSkinSetting;
-
           newBugsToSpawn.push({
             id: Math.random().toString(36).substring(7),
             x: Math.max(70, Math.min(window.innerWidth - 70, bug.x + (Math.random() - 0.5) * 60)),
@@ -1524,7 +948,6 @@ export function QaGame() {
             direction: Math.random() * Math.PI * 2,
             hungerThreshold: 8500 + Math.random() * 4500,
             wobbleSeed: Math.random() * 1000,
-            bugSkin: childSkin,
             bugCode: childTemplate.code,
             bugLabel: childTemplate.label,
             bugSeverity: childTemplate.defaultSeverity,
@@ -1880,52 +1303,6 @@ export function QaGame() {
               </div>
             </div>
 
-            {/* Row 4: Bug Model Switcher [ALL, 1, 2, 3, 4, 5] */}
-            <div className="pt-1 mt-0.5 border-t border-line">
-              <div className="flex items-center justify-between text-[7px] text-muted mb-0.5 px-0.5">
-                <span className="font-bold tracking-wider">BUG MODEL</span>
-                <span className="text-pass font-semibold truncate max-w-[65px] text-right">
-                  {selectedSkin === "mixed" ? "Mix (1-5)" : BUG_SKIN_CATALOG[selectedSkin].short}
-                </span>
-              </div>
-              <div className="grid grid-cols-6 gap-0.5">
-                <button
-                  type="button"
-                  onClick={() => handleSkinChange("mixed")}
-                  title="All: Random mix of all 5 bug models"
-                  aria-label="All Bug Models"
-                  data-cursor="Spawn random mix of all 5 bug models"
-                  className={`px-0.5 py-0.5 rounded text-[7px] font-bold text-center transition-all ${
-                    selectedSkin === "mixed"
-                      ? "bg-pass text-on-band shadow-[1px_1px_0_var(--ink)]"
-                      : "border border-line text-muted hover:text-ink hover:border-pass"
-                  }`}
-                >
-                  ALL
-                </button>
-                {ALL_BUG_SKINS.map((skinId, idx) => {
-                  const cfg = BUG_SKIN_CATALOG[skinId];
-                  const isSelected = selectedSkin === skinId;
-                  return (
-                    <button
-                      key={skinId}
-                      type="button"
-                      onClick={() => handleSkinChange(skinId)}
-                      title={`${idx + 1}: ${cfg.name} - ${cfg.description}`}
-                      aria-label={`${idx + 1}: ${cfg.name}`}
-                      data-cursor={`Select bug model ${idx + 1}: ${cfg.name}`}
-                      className={`px-0.5 py-0.5 rounded text-[8px] font-bold text-center transition-all flex flex-col items-center justify-center ${
-                        isSelected
-                          ? "bg-pass text-on-band shadow-[1px_1px_0_var(--ink)]"
-                          : "border border-line text-muted hover:text-ink hover:border-pass"
-                      }`}
-                    >
-                      <span className="leading-none text-[8px]">{idx + 1}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
           </aside>
 
           {/* Frozen Debugger Overlay Banner */}
@@ -1971,20 +1348,6 @@ export function QaGame() {
                   aria-hidden={bug.squashed ? "true" : undefined}
                   disabled={bug.squashed}
                 >
-                  {/* Floating Upright Technical Tag */}
-                  {!bug.squashed && (
-                    <div 
-                      className="absolute -top-3.5 left-1/2 -translate-x-1/2 pointer-events-none flex items-center gap-1 px-1.5 py-0.2 rounded bg-ink/90 text-paper border border-line text-[8px] font-mono font-bold whitespace-nowrap shadow-sm backdrop-blur-xs transition-opacity duration-150 z-10"
-                      style={{
-                        borderColor: `${bug.color}70`,
-                        color: bug.isPulsing ? "#ef4444" : bug.color,
-                      }}
-                    >
-                      <span className="text-[7px] opacity-75">{bug.bugSeverity}</span>
-                      <span>{bug.bugCode}</span>
-                    </div>
-                  )}
-
                   {/* Rotated Bug Model Body */}
                   <div 
                     className="relative flex items-center justify-center"
@@ -1993,8 +1356,7 @@ export function QaGame() {
                       transformOrigin: "center",
                     }}
                   >
-                    <ModernBug
-                      skin={bug.bugSkin || "neon"}
+                    <PcbCircuitBug
                       size={bug.size}
                       color={bug.color}
                       speedScale={bug.speedScale || 1}

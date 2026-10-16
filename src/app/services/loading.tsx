@@ -23,21 +23,7 @@ export default function ServicesLoading() {
           <SkeletonGrid count={4} columns={2} />
         </div>
 
-        {/* Deliverables Section Skeleton */}
-        <div className="mt-16 border-t border-line pt-10 space-y-6">
-          <Skeleton className="h-5 w-48 rounded-xs" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-xl border border-line bg-card p-6 space-y-3">
-                <div className="flex items-center gap-3">
-                  <Skeleton className="h-7 w-7 rounded-md" />
-                  <Skeleton className="h-5 w-40 rounded-xs" />
-                </div>
-                <SkeletonText lines={2} lastLineWidth="w-3/4" />
-              </div>
-            ))}
-          </div>
-        </div>
+
       </div>
     </main>
   );

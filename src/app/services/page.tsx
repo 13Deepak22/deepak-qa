@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  Activity,
   ArrowRight,
   CheckCircle2,
-  FileSpreadsheet,
-  Layers,
-  ShieldCheck,
   Smartphone,
 } from "lucide-react";
-import { InteractiveDeliverables } from "@/components/services/interactive-deliverables";
 import { MobileDeviceMatrix } from "@/components/services/mobile-device-matrix";
 import { ServicesSection } from "@/components/home/services";
 import { RcaCaseStudy } from "@/components/home/rca-case-study";
@@ -49,32 +44,6 @@ export default function ServicesPage() {
     { label: "Critical Escapes", value: "0", hint: "On cleared production gates" },
   ];
 
-  const deliverables = [
-    {
-      num: "01",
-      title: "Test Strategy & Plan",
-      icon: FileSpreadsheet,
-      body: "Comprehensive scope definition, device/browser coverage matrix, environmental topology, risk assessment, and clear entry/exit criteria for every milestone.",
-    },
-    {
-      num: "02",
-      title: "Traceability Matrix (RTM)",
-      icon: Layers,
-      body: "Bidirectional traceability linking PRD/FRD user stories and business rules directly to executed test cases and automated regression scripts.",
-    },
-    {
-      num: "03",
-      title: "Actionable Bug Reports & RCA",
-      icon: Activity,
-      body: "Structured Jira defect tickets with clear reproduction steps, network HAR files, request/response payloads, video captures, and root cause isolation.",
-    },
-    {
-      num: "04",
-      title: "Release Sign-off Certificate",
-      icon: ShieldCheck,
-      body: "Formal deployment authorization summarizing test pass rates, open risk waivers, performance benchmarks, and explicit go/no-go recommendations.",
-    },
-  ];
 
   const phases = [
     {
@@ -136,26 +105,6 @@ export default function ServicesPage() {
       {/* Main Services Section with Toolkit Enabled */}
       <ServicesSection showToolkit={true} showHeader={false} id="core-services" />
 
-      {/* QA Deliverables & Artefacts (Interactive Documentation Inspector) */}
-      <section className="border-t border-line bg-paper py-16 sm:py-20 lg:py-24">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <div>
-              <p className="font-mono text-[0.72rem] tracking-[0.16em] text-pass uppercase">
-                Deliverables &amp; Documentation
-              </p>
-              <h2 className="mt-2 font-serif text-3xl tracking-tight text-balance sm:text-4xl text-ink">
-                Tangible proof at every release milestone.
-              </h2>
-            </div>
-            <p className="max-w-md text-sm leading-relaxed text-ink-soft">
-              Every QA engagement yields clear, auditable documentation that gives engineering leaders complete confidence. Select an artifact below to inspect live mock data.
-            </p>
-          </div>
-
-          <InteractiveDeliverables />
-        </div>
-      </section>
 
       {/* 4-Stage Quality Lifecycle */}
       <section className="border-t border-line bg-paper-deep py-16 sm:py-20 lg:py-24">

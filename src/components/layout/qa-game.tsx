@@ -19,10 +19,14 @@ interface Defect {
   targetElement?: HTMLElement | null;
   targetX?: number;
   targetY?: number;
+  roamTargetX?: number;
+  roamTargetY?: number;
+  roamChangeTime?: number;
   eatStartTime?: number;
   lastHitTest?: number;
   originalSpeed: number;
   spawnTime: number;
+  hasAlertedCritical?: boolean;
   size: number;
   baseSize: number;
   speed: number;
@@ -126,6 +130,9 @@ export interface PriorityConfig {
   size: number;
   speedScale: number;
 }
+
+export const STAGE_DURATION_MS = 7000; // 7 seconds per priority tier (0-7s: Low, 7-14s: Med, 14-21s: High, 21s+: Critical)
+export const CRITICAL_ATTACK_DELAY_MS = 2500; // 2.5 seconds in Critical state before locking target and attacking
 
 export const BUG_PRIORITY_CONFIG: Record<BugPriorityTier, PriorityConfig> = {
   low: {
@@ -430,6 +437,7 @@ export function QaGame() {
   const hasCrashedRef = useRef(false);
   const hasWonRef = useRef(false);
   const waveRef = useRef(1);
+  const spawnDefectRef = useRef<() => void>(() => {});
 
   // Sync state refs
   useEffect(() => {
@@ -600,6 +608,25 @@ export function QaGame() {
     } catch {}
   }, [getAudio]);
 
+  const playAlertAudio = useCallback(() => {
+    const ctx = getAudio();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(520, now);
+      osc.frequency.exponentialRampToValueAtTime(1040, now + 0.12);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } catch {}
+  }, [getAudio]);
+
   // Clean DOM restoration helper
   const restoreAllEatenElements = useCallback(() => {
     if (typeof document === "undefined") return;
@@ -729,6 +756,9 @@ export function QaGame() {
 
     setTimeout(() => {
       setDefects(prev => prev.filter(b => b.id !== id));
+      if (!hasCrashedRef.current && !hasWonRef.current) {
+        spawnDefectRef.current?.();
+      }
     }, 400);
 
     setTimeout(() => {
@@ -736,11 +766,11 @@ export function QaGame() {
     }, 800);
 
     // Generate procedural QA bug log
-    const urgency = progress >= 1.0 
+    const urgency = targetBug.bugSeverity === "P0" 
       ? "prevented production outage!" 
-      : progress >= 0.70 
+      : targetBug.bugSeverity === "P1" 
         ? "prevented critical data loss." 
-        : progress >= 0.35 
+        : targetBug.bugSeverity === "P2" 
           ? "system stability preserved." 
           : "routine maintenance.";
 
@@ -869,7 +899,7 @@ export function QaGame() {
     return null;
   }, []);
 
-  // Spawn Defect from Perimeter Edges (Top, Right, Bottom, Left)
+  // Spawn Defect from Perimeter Edges (Always Low & Green on spawn)
   const spawnDefect = useCallback(() => {
     if (defectsRef.current.length >= 5) return; // balanced defect concurrency
     if (hasCrashedRef.current || hasWonRef.current) return;
@@ -894,23 +924,17 @@ export function QaGame() {
 
     // Choose template from technical bug catalog
     const template = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
-    const initialTier: BugPriorityTier = 
-      template.defaultSeverity === "P0" ? "critical" :
-      template.defaultSeverity === "P1" ? "high" :
-      template.defaultSeverity === "P2" ? "med" : "low";
-    const initialCfg = BUG_PRIORITY_CONFIG[initialTier];
+    // Always start at Low priority & green (User rule: first a bug will spawn with low and green)
+    const initialCfg = BUG_PRIORITY_CONFIG.low;
     const waveMultiplier = 1 + (waveRef.current - 1) * 0.15;
     const baseSpeed = (1.15 + Math.random() * 0.25) * waveMultiplier;
     const baseSize = initialCfg.size;
-    const hungerThreshold = 8500 + Math.random() * 4500;
     const bugId = Math.random().toString(36).substring(7);
 
-    // Acquire distinct locked target element across the page
-    const target = acquireNewTarget(bugId, x, y);
-
-    const initialDirection = target 
-      ? Math.atan2(target.ty - y, target.tx - x)
-      : Math.random() * Math.PI * 2;
+    // Initial roaming waypoint across the page
+    const roamTargetX = 60 + Math.random() * (window.innerWidth - 120);
+    const roamTargetY = 60 + Math.random() * (window.innerHeight - 120);
+    const initialDirection = Math.atan2(roamTargetY - y, roamTargetX - x);
 
     const newDefect: Defect = {
       id: bugId,
@@ -918,30 +942,36 @@ export function QaGame() {
       y,
       squashed: false,
       eating: false,
-      targetElement: target?.el || null,
-      targetX: target?.tx,
-      targetY: target?.ty,
+      targetElement: null,
+      targetX: undefined,
+      targetY: undefined,
+      roamTargetX,
+      roamTargetY,
+      roamChangeTime: Date.now(),
       spawnTime: Date.now(),
+      hasAlertedCritical: false,
       originalSpeed: baseSpeed,
-      speed: baseSpeed,
+      speed: baseSpeed * initialCfg.speedScale,
       size: baseSize,
       baseSize,
       speedScale: initialCfg.speedScale,
       color: initialCfg.color,
-      isPulsing: initialTier === "critical",
+      isPulsing: false,
       direction: initialDirection,
-      hungerThreshold,
       wobbleSeed: Math.random() * 1000,
       bugCode: template.code,
       bugLabel: template.label,
-      bugSeverity: template.defaultSeverity,
-      initialSeverity: template.defaultSeverity,
+      bugSeverity: "P3",
       bugIcon: template.icon,
       bugCategory: template.category,
     };
     
     setDefects(prev => [...prev, newDefect]);
-  }, [acquireNewTarget]);
+  }, []);
+
+  useEffect(() => {
+    spawnDefectRef.current = spawnDefect;
+  }, [spawnDefect]);
 
   // Movement, Target Navigation & Game Physics Loop
   const updatePositions = useCallback(() => {
@@ -957,17 +987,18 @@ export function QaGame() {
       if (bug.squashed) return bug;
       
       const age = now - bug.spawnTime;
-      const threshold = bug.hungerThreshold || 10000;
-      const progress = Math.min(age / threshold, 1.2);
       
-      // Reactive priority progression (Low -> Med -> High -> Critical)
-      const initialSeverity = bug.initialSeverity || bug.bugSeverity;
+      // Determine priority tier strictly by age timeline:
+      // 0 to 7s: Low (Green)
+      // 7s to 14s: Med (Yellow)
+      // 14s to 21s: High (Orange)
+      // 21s+: Critical (Red)
       let tier: BugPriorityTier = "low";
-      if (bug.eating || progress >= 0.90 || initialSeverity === "P0") {
+      if (bug.eating || age >= STAGE_DURATION_MS * 3) {
         tier = "critical";
-      } else if (progress >= 0.60 || initialSeverity === "P1") {
+      } else if (age >= STAGE_DURATION_MS * 2) {
         tier = "high";
-      } else if (progress >= 0.25 || initialSeverity === "P2") {
+      } else if (age >= STAGE_DURATION_MS) {
         tier = "med";
       } else {
         tier = "low";
@@ -981,6 +1012,13 @@ export function QaGame() {
       const severity: "P0" | "P1" | "P2" | "P3" = 
         tier === "critical" ? "P0" : tier === "high" ? "P1" : tier === "med" ? "P2" : "P3";
 
+      // If just transitioned to critical, play warning alert audio once
+      let hasAlerted = bug.hasAlertedCritical;
+      if (tier === "critical" && !hasAlerted) {
+        hasAlerted = true;
+        playAlertAudio();
+      }
+
       // Smooth exponential lerp (0.08) for physical scaling & speed:
       const currentSize = bug.size || targetSize;
       const smoothSize = currentSize + (targetSize - currentSize) * 0.08;
@@ -989,30 +1027,6 @@ export function QaGame() {
       const smoothSpeedScale = currentSpeedScale + (targetSpeedScale - currentSpeedScale) * 0.08;
 
       const activeSpeed = isFrozen ? 0 : bug.originalSpeed * smoothSpeedScale;
-
-      // --- TARGET TRACKING & RESOLUTION ---
-      let targetEl = bug.targetElement;
-      let targetX = bug.targetX;
-      let targetY = bug.targetY;
-
-      // Re-validate target (ensure still exists and is not eaten)
-      if (!targetEl || !targetEl.isConnected || targetEl.hasAttribute('data-eaten')) {
-        const fresh = acquireNewTarget(bug.id, bug.x, bug.y);
-        if (fresh) {
-          targetEl = fresh.el;
-          targetX = fresh.tx;
-          targetY = fresh.ty;
-        } else {
-          targetEl = null;
-          targetX = undefined;
-          targetY = undefined;
-        }
-      } else {
-        // Track live element coordinates in case of scroll or dynamic layout
-        const rect = targetEl.getBoundingClientRect();
-        targetX = rect.left + rect.width / 2;
-        targetY = rect.top + rect.height / 2;
-      }
 
       // --- ATTACK / CORRUPTION LOGIC ---
       if (bug.eating) {
@@ -1045,8 +1059,8 @@ export function QaGame() {
 
           playCrashAudio();
 
-          // Spawn crash debris particles
-          const crashParticles = Array.from({ length: 8 }).map(() => ({
+          // Spawn death debris particles at bug position (the critical bug dies!)
+          const crashParticles = Array.from({ length: 9 }).map(() => ({
             id: Math.random().toString(36).substring(7),
             x: bug.x,
             y: bug.y,
@@ -1071,34 +1085,62 @@ export function QaGame() {
 
           const newLog: TerminalLog = {
             id: Date.now(),
-            text: `💥 Defect ${bug.bugCode} breached content. Integrity at ${integrityLeft}%.`,
+            text: `💥 Defect ${bug.bugCode} breached content. Critical bug terminated & reborn as Low priority. Integrity at ${integrityLeft}%.`,
             priority: "P0 [BREACH]",
             icon: "💥",
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
           };
           setTerminalLogs(prev => [newLog, ...prev.slice(0, 2)]);
 
-          // ACQUIRE BRAND NEW TARGET across the screen!
-          const nextTarget = acquireNewTarget(bug.id, bug.x, bug.y);
-          const newDir = nextTarget 
-            ? Math.atan2(nextTarget.ty - bug.y, nextTarget.tx - bug.x)
-            : bug.direction + Math.PI * 0.75;
+          // "after atachking the crirtical bug die and born as low proityigy bug then samme with all bugs"
+          // CRITICAL BUG DIES AND IS REBORN AS LOW PRIORITY BUG:
+          const edge = Math.floor(Math.random() * 4);
+          let rx = 0;
+          let ry = 0;
+          if (edge === 0) { rx = 80 + Math.random() * (window.innerWidth - 160); ry = -26; }
+          else if (edge === 1) { rx = window.innerWidth + 26; ry = 80 + Math.random() * (window.innerHeight - 160); }
+          else if (edge === 2) { rx = 80 + Math.random() * (window.innerWidth - 160); ry = window.innerHeight + 26; }
+          else { rx = -26; ry = 80 + Math.random() * (window.innerHeight - 160); }
+
+          const template = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
+          const lowCfg = BUG_PRIORITY_CONFIG.low;
+          const waveMultiplier = 1 + (waveRef.current - 1) * 0.15;
+          const baseSpeed = (1.15 + Math.random() * 0.25) * waveMultiplier;
+          const newRoamX = 60 + Math.random() * (window.innerWidth - 120);
+          const newRoamY = 60 + Math.random() * (window.innerHeight - 120);
 
           return {
-            ...bug,
+            id: Math.random().toString(36).substring(7),
+            x: rx,
+            y: ry,
+            squashed: false,
             eating: false,
             eatingTarget: null,
-            eatStartTime: undefined,
-            targetElement: nextTarget?.el || null,
-            targetX: nextTarget?.tx,
-            targetY: nextTarget?.ty,
-            direction: newDir,
-            speed: activeSpeed,
-            color: targetColor,
-            size: smoothSize,
-            bugSeverity: severity,
+            targetElement: null,
+            targetX: undefined,
+            targetY: undefined,
+            roamTargetX: newRoamX,
+            roamTargetY: newRoamY,
+            roamChangeTime: now,
+            spawnTime: now,
+            hasAlertedCritical: false,
+            originalSpeed: baseSpeed,
+            speed: baseSpeed * lowCfg.speedScale,
+            size: lowCfg.size,
+            baseSize: lowCfg.size,
+            speedScale: lowCfg.speedScale,
+            color: lowCfg.color,
+            isPulsing: false,
+            direction: Math.atan2(newRoamY - ry, newRoamX - rx),
+            wobbleSeed: Math.random() * 1000,
+            bugCode: template.code,
+            bugLabel: template.label,
+            bugSeverity: "P3",
+            bugIcon: template.icon,
+            bugCategory: template.category,
           };
         }
+
         return { 
           ...bug, 
           color: targetColor, 
@@ -1109,16 +1151,64 @@ export function QaGame() {
         };
       }
 
-      let nextDirection = bug.direction;
-      let nextSpeed = activeSpeed;
+      // --- TARGET RESOLUTION & ROAMING ---
+      let targetEl = bug.targetElement;
+      let targetX = bug.targetX;
+      let targetY = bug.targetY;
+      let roamTargetX = bug.roamTargetX ?? (window.innerWidth / 2);
+      let roamTargetY = bug.roamTargetY ?? (window.innerHeight / 2);
+      let roamChangeTime = bug.roamChangeTime ?? now;
 
-      // Distance to locked target
-      const distToTarget = targetX !== undefined && targetY !== undefined 
-        ? Math.hypot(targetX - bug.x, targetY - bug.y) 
+      const isCritical = tier === "critical";
+      const criticalAge = age - STAGE_DURATION_MS * 3;
+      // "when its crital after few seconds it will attack a target"
+      const shouldAttackTarget = isCritical && criticalAge >= CRITICAL_ATTACK_DELAY_MS;
+
+      if (shouldAttackTarget) {
+        // Critical attack mode: acquire and lock onto a distinct leaf target element
+        if (!targetEl || !targetEl.isConnected || targetEl.hasAttribute('data-eaten')) {
+          const fresh = acquireNewTarget(bug.id, bug.x, bug.y);
+          if (fresh) {
+            targetEl = fresh.el;
+            targetX = fresh.tx;
+            targetY = fresh.ty;
+          } else {
+            targetEl = null;
+            targetX = undefined;
+            targetY = undefined;
+          }
+        } else {
+          // Track live element coordinates in case of scroll or dynamic layout
+          const rect = targetEl.getBoundingClientRect();
+          targetX = rect.left + rect.width / 2;
+          targetY = rect.top + rect.height / 2;
+        }
+      } else {
+        // Scouting / Patrol mode (Low, Med, High, or early Critical priming):
+        // Does NOT attack elements. Release any target if previously held.
+        if (targetEl) {
+          targetEl.removeAttribute('data-targeted-by');
+          targetEl = null;
+          targetX = undefined;
+          targetY = undefined;
+        }
+
+        // Periodic roam waypoint selection (every 3.5 - 4.5 seconds or when arrived)
+        const distToRoam = Math.hypot(roamTargetX - bug.x, roamTargetY - bug.y);
+        if (distToRoam < 50 || now - roamChangeTime > 4200) {
+          roamTargetX = 60 + Math.random() * (window.innerWidth - 120);
+          roamTargetY = 60 + Math.random() * (window.innerHeight - 120);
+          roamChangeTime = now;
+        }
+      }
+
+      // Distance to locked target (only if in attack mode)
+      const distToTarget = (shouldAttackTarget && targetX !== undefined && targetY !== undefined)
+        ? Math.hypot(targetX - bug.x, targetY - bug.y)
         : Infinity;
 
       // Arrived at target: initiate corruption attack!
-      if (!bug.eating && distToTarget < 22 && targetEl && !isFrozen) {
+      if (!bug.eating && distToTarget < 22 && targetEl && !isFrozen && shouldAttackTarget) {
         targetEl.setAttribute('data-eating-by', bug.id);
         targetEl.style.transition = 'color 0.2s ease, text-decoration 0.2s ease, outline 0.2s ease, transform 0.2s ease';
         targetEl.style.color = '#ef4444';
@@ -1143,13 +1233,21 @@ export function QaGame() {
         };
       }
 
-      // Steer towards assigned target
-      if (targetX !== undefined && targetY !== undefined && !isFrozen) {
-        const angleToTarget = Math.atan2(targetY - bug.y, targetX - bug.x);
-        let diff = angleToTarget - nextDirection;
+      // --- DIRECTION & STEERING ---
+      let nextDirection = bug.direction;
+      let nextSpeed = activeSpeed;
+
+      const steerDestX = (shouldAttackTarget && targetX !== undefined) ? targetX : roamTargetX;
+      const steerDestY = (shouldAttackTarget && targetY !== undefined) ? targetY : roamTargetY;
+
+      if (!isFrozen) {
+        const angleToDest = Math.atan2(steerDestY - bug.y, steerDestX - bug.x);
+        let diff = angleToDest - nextDirection;
         while (diff > Math.PI) diff -= Math.PI * 2;
         while (diff < -Math.PI) diff += Math.PI * 2;
-        nextDirection += diff * 0.08;
+        // Aggressive turn when attacking; smooth wander turn when roaming
+        const steerRate = shouldAttackTarget ? 0.16 : 0.055;
+        nextDirection += diff * steerRate;
       }
 
       // --- ANTI-STACKING FLOCKING REPULSION FORCE ---
@@ -1193,6 +1291,10 @@ export function QaGame() {
         targetElement: targetEl,
         targetX,
         targetY,
+        roamTargetX,
+        roamTargetY,
+        roamChangeTime,
+        hasAlertedCritical: hasAlerted,
         size: smoothSize, 
         speed: nextSpeed, 
         speedScale: smoothSpeedScale,
@@ -1205,20 +1307,26 @@ export function QaGame() {
     const activeDefects = nextDefects.filter((b): b is Defect => b !== null);
     setDefects(activeDefects);
     requestRef.current = requestAnimationFrame(updatePositions);
-  }, [isFrozen, acquireNewTarget, playGlitchAudio, playCrashAudio]);
+  }, [isFrozen, acquireNewTarget, playGlitchAudio, playCrashAudio, playAlertAudio]);
 
   // Main game lifecycle
   useEffect(() => {
     if (isOpen) {
       document.documentElement.dataset.game = "on";
+      
+      // Spawn initial defect immediately as Low & Green
+      spawnDefect();
+
       let timeoutId: NodeJS.Timeout;
       const scheduleNext = () => {
         timeoutId = setTimeout(() => {
-          if (!hasCrashedRef.current) {
-            spawnDefect();
+          if (!hasCrashedRef.current && !hasWonRef.current) {
+            if (defectsRef.current.length < 4) {
+              spawnDefect();
+            }
           }
           scheduleNext();
-        }, 600 + Math.random() * 1800);
+        }, 2200 + Math.random() * 800);
       };
       scheduleNext();
 

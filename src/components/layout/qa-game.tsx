@@ -16,6 +16,9 @@ interface Defect {
   scanning?: boolean;
   eating?: boolean;
   eatingTarget?: HTMLElement | null;
+  targetElement?: HTMLElement | null;
+  targetX?: number;
+  targetY?: number;
   eatStartTime?: number;
   lastHitTest?: number;
   originalSpeed: number;
@@ -384,6 +387,8 @@ export function QaGame() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [hasCrashed, setHasCrashed] = useState(false);
+  const [hasWon, setHasWon] = useState(false);
+  const [wave, setWave] = useState(1);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
@@ -423,6 +428,8 @@ export function QaGame() {
   const isMutedRef = useRef(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const hasCrashedRef = useRef(false);
+  const hasWonRef = useRef(false);
+  const waveRef = useRef(1);
 
   // Sync state refs
   useEffect(() => {
@@ -430,7 +437,9 @@ export function QaGame() {
     scoreRef.current = score;
     isMutedRef.current = isMuted;
     hasCrashedRef.current = hasCrashed;
-  }, [defects, score, isMuted, hasCrashed]);
+    hasWonRef.current = hasWon;
+    waveRef.current = wave;
+  }, [defects, score, isMuted, hasCrashed, hasWon, wave]);
 
   // Clean Audio Context Manager
   const getAudio = useCallback(() => {
@@ -571,13 +580,34 @@ export function QaGame() {
     } catch {}
   }, [getAudio]);
 
+  const playVictoryAudio = useCallback(() => {
+    const ctx = getAudio();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+        gain.gain.setValueAtTime(0.08, now + idx * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.1);
+        osc.stop(now + idx * 0.1 + 0.35);
+      });
+    } catch {}
+  }, [getAudio]);
+
   // Clean DOM restoration helper
   const restoreAllEatenElements = useCallback(() => {
     if (typeof document === "undefined") return;
-    document.querySelectorAll('[data-eaten="true"], [data-eating-by]').forEach(el => {
+    document.querySelectorAll('[data-eaten="true"], [data-eating-by], [data-targeted-by]').forEach(el => {
       const targetEl = el as HTMLElement;
       targetEl.removeAttribute('data-eaten');
       targetEl.removeAttribute('data-eating-by');
+      targetEl.removeAttribute('data-targeted-by');
       targetEl.style.transition = "opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease, outline 0.4s ease, color 0.4s ease, text-decoration 0.4s ease";
       targetEl.style.opacity = "";
       targetEl.style.pointerEvents = "";
@@ -637,24 +667,46 @@ export function QaGame() {
     // Audio
     playResolveAudio(newCombo);
 
-    // Award Breakpoint charge every 8 squashes
+    // Award Breakpoint charge every 6 squashes & check Win Quota
     setScore(s => {
       const nextScore = s + 1;
-      if (nextScore > 0 && nextScore % 8 === 0) {
+      scoreRef.current = nextScore;
+      if (nextScore > 0 && nextScore % 6 === 0) {
         setBreakpoints(b => Math.min(3, b + 1));
+      }
+      const quota = 10 + (waveRef.current - 1) * 5;
+      if (nextScore >= quota && !hasWonRef.current && !hasCrashedRef.current) {
+        setHasWon(true);
+        hasWonRef.current = true;
+        playVictoryAudio();
       }
       return nextScore;
     });
 
-    // If bug was eating an element, save and restore the element from being eaten
-    if (targetBug.eatingTarget) {
+    // If bug was targeting or eating an element, save and restore the element from being eaten
+    if (targetBug.targetElement) {
+      const targetEl = targetBug.targetElement;
+      targetEl.removeAttribute('data-targeted-by');
+      targetEl.removeAttribute('data-eating-by');
+      if (!targetEl.hasAttribute('data-eaten')) {
+        targetEl.style.color = "";
+        targetEl.style.outline = "";
+        targetEl.style.outlineOffset = "";
+        targetEl.style.textDecoration = "";
+        targetEl.style.transform = "";
+      }
+    }
+    if (targetBug.eatingTarget && targetBug.eatingTarget !== targetBug.targetElement) {
       const targetEl = targetBug.eatingTarget;
       targetEl.removeAttribute('data-eating-by');
-      targetEl.style.color = "";
-      targetEl.style.outline = "";
-      targetEl.style.outlineOffset = "";
-      targetEl.style.textDecoration = "";
-      targetEl.style.transform = "";
+      targetEl.removeAttribute('data-targeted-by');
+      if (!targetEl.hasAttribute('data-eaten')) {
+        targetEl.style.color = "";
+        targetEl.style.outline = "";
+        targetEl.style.outlineOffset = "";
+        targetEl.style.textDecoration = "";
+        targetEl.style.transform = "";
+      }
     }
 
     // Cancel hover squash timeout if pending
@@ -726,13 +778,120 @@ export function QaGame() {
     setDefects(prev => prev.map(b => b.id === bugId ? { ...b, scanning: false } : b));
   }, []);
 
-  // Spawn Defect
-  const spawnDefect = useCallback(() => {
-    if (defectsRef.current.length >= 6) return; // max simultaneous defects
-    const margin = 80;
-    const x = margin + Math.random() * (window.innerWidth - margin * 2);
-    const y = margin + Math.random() * (window.innerHeight - margin * 2);
+  // Universal leaf content selector covering text, headings, badges, lists, code, buttons across all sections
+  const LEAF_SELECTOR = [
+    'p:not([data-eaten])',
+    'h1:not([data-eaten])',
+    'h2:not([data-eaten])',
+    'h3:not([data-eaten])',
+    'h4:not([data-eaten])',
+    'h5:not([data-eaten])',
+    'h6:not([data-eaten])',
+    'li:not([data-eaten])',
+    'button:not([data-eaten]):not([data-game-ui]):not(.press)',
+    'a:not([data-eaten]):not([data-game-ui]):not(.press)',
+    'code:not([data-eaten])',
+    'pre:not([data-eaten])',
+    'span.font-mono:not([data-eaten])',
+    'span[data-badge]:not([data-eaten])'
+  ].join(', ');
+
+  // Helper: Acquire a DISTINCT, non-overlapping target element across different sections of the page
+  const acquireNewTarget = useCallback((bugId: string, currentX: number, currentY: number): { el: HTMLElement; tx: number; ty: number } | null => {
+    if (typeof document === "undefined") return null;
+
+    const allCandidates = Array.from(document.querySelectorAll<HTMLElement>(LEAF_SELECTOR));
     
+    // Filter available candidates
+    const available = allCandidates.filter(el => {
+      if (el.closest('[data-game-ui="true"], [role="dialog"], [aria-modal="true"], aside, .press, .site-cursor') || el.closest('.z-\\[60\\]')) return false;
+      if (el.id === '__next' || el.id === 'root') return false;
+      if (el.hasAttribute('data-eaten') || el.closest('[data-eaten="true"]')) return false;
+      
+      const targetedBy = el.getAttribute('data-targeted-by');
+      if (targetedBy && targetedBy !== bugId) return false;
+      if (el.hasAttribute('data-eating-by') && el.getAttribute('data-eating-by') !== bugId) return false;
+
+      const rect = el.getBoundingClientRect();
+      if (rect.width < 12 || rect.height < 10) return false;
+      if (rect.top > window.innerHeight - 20 || rect.bottom < 20) return false;
+      if (rect.left > window.innerWidth - 20 || rect.right < 20) return false;
+      if (!Boolean(el.textContent?.trim())) return false;
+
+      return true;
+    });
+
+    if (available.length === 0) return null;
+
+    // Get positions of other bugs' targets to enforce cross-page spreading
+    const otherTargetCoords: { x: number; y: number }[] = [];
+    defectsRef.current.forEach(other => {
+      if (other.id !== bugId && !other.squashed && other.targetX !== undefined && other.targetY !== undefined) {
+        otherTargetCoords.push({ x: other.targetX, y: other.targetY });
+      }
+    });
+
+    let bestEl: HTMLElement | null = null;
+    let bestScore = -Infinity;
+    let bestCoords = { tx: 0, ty: 0 };
+
+    // Randomize sample order for organic section spread
+    const shuffled = [...available].sort(() => Math.random() - 0.5);
+
+    for (const el of shuffled) {
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const distToBug = Math.hypot(cx - currentX, cy - currentY);
+
+      let minDistanceToOther = Infinity;
+      for (const ot of otherTargetCoords) {
+        const d = Math.hypot(cx - ot.x, cy - ot.y);
+        if (d < minDistanceToOther) minDistanceToOther = d;
+      }
+
+      // Strong anti-clumping spread bonus (up to 280px)
+      const spreadBonus = Math.min(minDistanceToOther, 280);
+      const totalScore = spreadBonus * 1.8 - distToBug * 0.3;
+
+      if (totalScore > bestScore) {
+        bestScore = totalScore;
+        bestEl = el;
+        bestCoords = { tx: cx, ty: cy };
+      }
+    }
+
+    if (bestEl) {
+      bestEl.setAttribute('data-targeted-by', bugId);
+      return { el: bestEl, tx: bestCoords.tx, ty: bestCoords.ty };
+    }
+
+    return null;
+  }, []);
+
+  // Spawn Defect from Perimeter Edges (Top, Right, Bottom, Left)
+  const spawnDefect = useCallback(() => {
+    if (defectsRef.current.length >= 5) return; // balanced defect concurrency
+    if (hasCrashedRef.current || hasWonRef.current) return;
+    
+    // Spawn at perimeter borders outside visible area and crawl inwards
+    const edge = Math.floor(Math.random() * 4);
+    let x = 0;
+    let y = 0;
+    if (edge === 0) { // top edge
+      x = 80 + Math.random() * (window.innerWidth - 160);
+      y = -26;
+    } else if (edge === 1) { // right edge
+      x = window.innerWidth + 26;
+      y = 80 + Math.random() * (window.innerHeight - 160);
+    } else if (edge === 2) { // bottom edge
+      x = 80 + Math.random() * (window.innerWidth - 160);
+      y = window.innerHeight + 26;
+    } else { // left edge
+      x = -26;
+      y = 80 + Math.random() * (window.innerHeight - 160);
+    }
+
     // Choose template from technical bug catalog
     const template = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
     const initialTier: BugPriorityTier = 
@@ -740,16 +899,28 @@ export function QaGame() {
       template.defaultSeverity === "P1" ? "high" :
       template.defaultSeverity === "P2" ? "med" : "low";
     const initialCfg = BUG_PRIORITY_CONFIG[initialTier];
-    const baseSpeed = 1.05 + Math.random() * 0.25;
+    const waveMultiplier = 1 + (waveRef.current - 1) * 0.15;
+    const baseSpeed = (1.15 + Math.random() * 0.25) * waveMultiplier;
     const baseSize = initialCfg.size;
     const hungerThreshold = 8500 + Math.random() * 4500;
+    const bugId = Math.random().toString(36).substring(7);
+
+    // Acquire distinct locked target element across the page
+    const target = acquireNewTarget(bugId, x, y);
+
+    const initialDirection = target 
+      ? Math.atan2(target.ty - y, target.tx - x)
+      : Math.random() * Math.PI * 2;
 
     const newDefect: Defect = {
-      id: Math.random().toString(36).substring(7),
+      id: bugId,
       x,
       y,
       squashed: false,
       eating: false,
+      targetElement: target?.el || null,
+      targetX: target?.tx,
+      targetY: target?.ty,
       spawnTime: Date.now(),
       originalSpeed: baseSpeed,
       speed: baseSpeed,
@@ -758,7 +929,7 @@ export function QaGame() {
       speedScale: initialCfg.speedScale,
       color: initialCfg.color,
       isPulsing: initialTier === "critical",
-      direction: Math.random() * Math.PI * 2,
+      direction: initialDirection,
       hungerThreshold,
       wobbleSeed: Math.random() * 1000,
       bugCode: template.code,
@@ -770,191 +941,17 @@ export function QaGame() {
     };
     
     setDefects(prev => [...prev, newDefect]);
-  }, []);
+  }, [acquireNewTarget]);
 
-  // Universal leaf content selector covering text, headings, badges, lists, code, buttons across all sections
-  const LEAF_SELECTOR = [
-    'p:not([data-eaten]):not([data-eating-by])',
-    'h1:not([data-eaten]):not([data-eating-by])',
-    'h2:not([data-eaten]):not([data-eating-by])',
-    'h3:not([data-eaten]):not([data-eating-by])',
-    'h4:not([data-eaten]):not([data-eating-by])',
-    'h5:not([data-eaten]):not([data-eating-by])',
-    'h6:not([data-eaten]):not([data-eating-by])',
-    'li:not([data-eaten]):not([data-eating-by])',
-    'button:not([data-eaten]):not([data-eating-by])',
-    'a:not([data-eaten]):not([data-eating-by])',
-    'code:not([data-eaten]):not([data-eating-by])',
-    'pre:not([data-eaten]):not([data-eating-by])',
-    'span:not([data-eaten]):not([data-eating-by])',
-    'strong:not([data-eaten]):not([data-eating-by])',
-    'em:not([data-eaten]):not([data-eating-by])',
-    'td:not([data-eaten]):not([data-eating-by])',
-    'th:not([data-eaten]):not([data-eating-by])',
-    'blockquote:not([data-eaten]):not([data-eating-by])',
-    'figcaption:not([data-eaten]):not([data-eating-by])',
-    'time:not([data-eaten]):not([data-eating-by])',
-    'label:not([data-eaten]):not([data-eating-by])'
-  ].join(', ');
-
-  // Helper: Check if an element belongs to the site header or footer
-  const isHeaderOrFooterElement = (el: HTMLElement): boolean => {
-    return !!(
-      el.closest('header') || 
-      el.closest('.site-header') || 
-      el.closest('footer') || 
-      el.closest('.site-footer')
-    );
-  };
-
-  // Helper: Check if active main page content (outside header/footer) still remains uneaten
-  const hasActiveMainPageContent = (): boolean => {
-    if (typeof document === "undefined") return false;
-    const candidates = document.querySelectorAll<HTMLElement>(`main ${LEAF_SELECTOR}`);
-
-    for (let i = 0; i < candidates.length; i++) {
-      const el = candidates[i];
-      if (el.closest('[data-game-ui="true"]') || el.closest('.z-\\[60\\]') || el.closest('.site-cursor')) continue;
-      if (isHeaderOrFooterElement(el)) continue;
-      if (el.offsetWidth >= 8 && el.offsetHeight >= 8 && Boolean(el.textContent?.trim())) {
-        return true; // Still have main section content to eat!
-      }
-    }
-    return false; // Main content is fully consumed, now header/footer can be targeted
-  };
-
-  // Helper: Find discrete leaf content element under point (never container or whole section)
-  // Header and footer are strictly the LAST targets on the active page
-  const findContentLeafTarget = (x: number, y: number): HTMLElement | null => {
-    if (typeof document === "undefined") return null;
-
-    // Multi-point sampling around bug center to catch text lines immediately
-    const samplePoints = [
-      { px: x, py: y },
-      { px: x + 8, py: y },
-      { px: x - 8, py: y },
-      { px: x, py: y + 8 },
-      { px: x, py: y - 8 }
-    ];
-
-    const FORBIDDEN_CONTAINERS = new Set([
-      'HTML', 'BODY', 'MAIN', 'SECTION', 'ARTICLE', 'NAV', 
-      'HEADER', 'FOOTER', 'ASIDE', 'DIALOG', 'HEAD', 'SCRIPT', 'STYLE'
-    ]);
-
-    const LEAF_TAGS = new Set([
-      'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 
-      'LI', 'BUTTON', 'A', 'SPAN', 'CODE', 'PRE', 
-      'TD', 'TH', 'LABEL', 'STRONG', 'EM', 'B', 'I', 
-      'IMG', 'SVG', 'BLOCKQUOTE', 'CITE', 'TIME', 'FIGCAPTION'
-    ]);
-
-    const mainContentRemains = hasActiveMainPageContent();
-
-    for (const pt of samplePoints) {
-      if (pt.px < 0 || pt.px > window.innerWidth || pt.py < 0 || pt.py > window.innerHeight) continue;
-      const elements = document.elementsFromPoint(pt.px, pt.py);
-
-      for (const el of elements) {
-        if (!(el instanceof HTMLElement)) continue;
-        if (el.closest('[data-game-ui="true"], [role="dialog"], [aria-modal="true"], aside, .press, .site-cursor') || el.closest('.z-\\[60\\]')) continue;
-        if (el.id === '__next' || el.id === 'root') continue;
-        if (el.hasAttribute('data-eaten') || el.closest('[data-eaten="true"]')) continue;
-        if (el.hasAttribute('data-eating-by')) continue;
-
-        // RULE: Header and Footer are strictly the LAST targets on the active page
-        if (mainContentRemains && isHeaderOrFooterElement(el)) {
-          continue;
-        }
-
-        const tag = el.tagName.toUpperCase();
-        if (FORBIDDEN_CONTAINERS.has(tag)) continue;
-
-        // Direct leaf elements
-        if (LEAF_TAGS.has(tag)) {
-          const rect = el.getBoundingClientRect();
-          if (rect.width >= 6 && rect.height >= 6 && (Boolean(el.textContent?.trim()) || tag === 'IMG' || tag === 'SVG')) {
-            return el;
-          }
-        }
-
-        // Small content divs (badges, counters, tags, chips)
-        if (tag === 'DIV') {
-          const rect = el.getBoundingClientRect();
-          if (rect.width > 550 || rect.height > 350) continue;
-          
-          if (el.childElementCount > 0) {
-            const leafChild = el.querySelector<HTMLElement>(LEAF_SELECTOR);
-            if (leafChild && !leafChild.hasAttribute('data-eaten') && !leafChild.hasAttribute('data-eating-by')) {
-              if (mainContentRemains && isHeaderOrFooterElement(leafChild)) {
-                continue;
-              }
-              return leafChild;
-            }
-          }
-          
-          if (Boolean(el.textContent?.trim()) && rect.width >= 8 && rect.height >= 8) {
-            return el;
-          }
-        }
-      }
-    }
-
-    return null;
-  };
-
-  // Helper: Find nearest visible uneaten leaf content element on screen to steer hungry bugs towards
-  // Header and footer are strictly the LAST targets on the active page
-  const findNearbyLeafElement = (x: number, y: number): HTMLElement | null => {
-    if (typeof document === "undefined") return null;
-    const mainContentRemains = hasActiveMainPageContent();
-
-    const candidates = document.querySelectorAll<HTMLElement>(LEAF_SELECTOR);
-
-    let closest: HTMLElement | null = null;
-    let minDistance = Infinity;
-
-    for (let i = 0; i < candidates.length; i++) {
-      const el = candidates[i];
-      if (el.closest('[data-game-ui="true"], [role="dialog"], [aria-modal="true"], aside, .press') || el.closest('.z-\\[60\\]')) continue;
-
-      // RULE: Do not steer toward header or footer if main page section content still remains
-      if (mainContentRemains && isHeaderOrFooterElement(el)) {
-        continue;
-      }
-
-      const rect = el.getBoundingClientRect();
-      // Detect if element is visible in the viewport across any scrolled section
-      if (
-        rect.top < window.innerHeight - 15 && 
-        rect.bottom > 15 && 
-        rect.left < window.innerWidth - 15 && 
-        rect.right > 15 && 
-        rect.width >= 6 && 
-        rect.height >= 6 &&
-        Boolean(el.textContent?.trim())
-      ) {
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dist = Math.hypot(cx - x, cy - y);
-        if (dist < minDistance) {
-          minDistance = dist;
-          closest = el;
-        }
-      }
-    }
-    return closest;
-  };
-
-  // Movement & Game Physics Loop
+  // Movement, Target Navigation & Game Physics Loop
   const updatePositions = useCallback(() => {
-    if (hasCrashedRef.current) {
+    if (hasCrashedRef.current || hasWonRef.current) {
       requestRef.current = requestAnimationFrame(updatePositions);
       return;
     }
 
     const now = Date.now();
-    const newBugsToSpawn: Defect[] = [];
+    const activeDefectsList = defectsRef.current.filter(b => !b.squashed);
 
     const nextDefects: (Defect | null)[] = defectsRef.current.map(bug => {
       if (bug.squashed) return bug;
@@ -963,7 +960,7 @@ export function QaGame() {
       const threshold = bug.hungerThreshold || 10000;
       const progress = Math.min(age / threshold, 1.2);
       
-      // Fully reactive priority progression (Low -> Med -> High -> Critical)
+      // Reactive priority progression (Low -> Med -> High -> Critical)
       const initialSeverity = bug.initialSeverity || bug.bugSeverity;
       let tier: BugPriorityTier = "low";
       if (bug.eating || progress >= 0.90 || initialSeverity === "P0") {
@@ -984,7 +981,7 @@ export function QaGame() {
       const severity: "P0" | "P1" | "P2" | "P3" = 
         tier === "critical" ? "P0" : tier === "high" ? "P1" : tier === "med" ? "P2" : "P3";
 
-      // Frame-by-frame smooth exponential lerp (0.08) for physical scaling & speed:
+      // Smooth exponential lerp (0.08) for physical scaling & speed:
       const currentSize = bug.size || targetSize;
       const smoothSize = currentSize + (targetSize - currentSize) * 0.08;
 
@@ -992,116 +989,115 @@ export function QaGame() {
       const smoothSpeedScale = currentSpeedScale + (targetSpeedScale - currentSpeedScale) * 0.08;
 
       const activeSpeed = isFrozen ? 0 : bug.originalSpeed * smoothSpeedScale;
-      
-      // Eating handling
-      if (bug.eating) {
-        if (now - (bug.eatStartTime || 0) > 950) {
-          // Finished eating!
-          // 1. Mark target element eaten with smooth dissolve & layout preservation
-          if (bug.eatingTarget && !bug.eatingTarget.hasAttribute('data-eaten')) {
-            const targetEl = bug.eatingTarget;
-            targetEl.removeAttribute('data-eating-by');
-            targetEl.setAttribute('data-eaten', 'true');
-            targetEl.style.transition = "opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), filter 0.65s ease, transform 0.65s ease, color 0.4s ease, outline 0.4s ease";
-            targetEl.style.opacity = "0.08";
-            targetEl.style.pointerEvents = "none";
-            if (window.getComputedStyle(targetEl).position === 'static') {
-              targetEl.style.position = "relative";
-            }
-            targetEl.style.filter = "blur(1.2px) grayscale(0.8) contrast(1.1)";
-            targetEl.style.color = "#ef4444";
-            targetEl.style.outline = "1.5px dashed rgba(239, 68, 68, 0.4)";
-            targetEl.style.outlineOffset = "2px";
-            targetEl.style.textDecoration = "line-through 2px #ef4444";
-            targetEl.style.transform = "scale(0.97)";
 
-            // Trigger section glitch crash tremor on closest section or card container
-            const parentSection = targetEl.closest('section, article, [data-section], [id^="section"], .card, div.border, main, header, footer');
+      // --- TARGET TRACKING & RESOLUTION ---
+      let targetEl = bug.targetElement;
+      let targetX = bug.targetX;
+      let targetY = bug.targetY;
+
+      // Re-validate target (ensure still exists and is not eaten)
+      if (!targetEl || !targetEl.isConnected || targetEl.hasAttribute('data-eaten')) {
+        const fresh = acquireNewTarget(bug.id, bug.x, bug.y);
+        if (fresh) {
+          targetEl = fresh.el;
+          targetX = fresh.tx;
+          targetY = fresh.ty;
+        } else {
+          targetEl = null;
+          targetX = undefined;
+          targetY = undefined;
+        }
+      } else {
+        // Track live element coordinates in case of scroll or dynamic layout
+        const rect = targetEl.getBoundingClientRect();
+        targetX = rect.left + rect.width / 2;
+        targetY = rect.top + rect.height / 2;
+      }
+
+      // --- ATTACK / CORRUPTION LOGIC ---
+      if (bug.eating) {
+        if (now - (bug.eatStartTime || 0) > 1600) {
+          // Finished eating target element!
+          if (bug.eatingTarget && !bug.eatingTarget.hasAttribute('data-eaten')) {
+            const el = bug.eatingTarget;
+            el.removeAttribute('data-eating-by');
+            el.removeAttribute('data-targeted-by');
+            el.setAttribute('data-eaten', 'true');
+            el.style.transition = "opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), filter 0.65s ease, transform 0.65s ease, color 0.4s ease, outline 0.4s ease";
+            el.style.opacity = "0.12";
+            el.style.pointerEvents = "none";
+            el.style.filter = "blur(1.2px) grayscale(0.8) contrast(1.1)";
+            el.style.color = "#ef4444";
+            el.style.outline = "1.5px dashed rgba(239, 68, 68, 0.4)";
+            el.style.outlineOffset = "2px";
+            el.style.textDecoration = "line-through 2px #ef4444";
+            el.style.transform = "scale(0.97)";
+
+            // Parent container tremor
+            const parentSection = el.closest('section, article, [data-section], [id^="section"], .card, div.border, main, header, footer');
             if (parentSection instanceof HTMLElement) {
               parentSection.style.animation = "sectionGlitchCrash 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97)";
               setTimeout(() => {
-                if (parentSection instanceof HTMLElement) {
-                  parentSection.style.animation = "";
-                }
+                if (parentSection instanceof HTMLElement) parentSection.style.animation = "";
               }, 600);
             }
           }
 
-          // 2. Play crash detonation audio
           playCrashAudio();
 
-          // 3. Child bug logic: Spawn brand new defect from catalog
-          const childTemplate = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
-          const childTier: BugPriorityTier = 
-            childTemplate.defaultSeverity === "P0" ? "critical" :
-            childTemplate.defaultSeverity === "P1" ? "high" :
-            childTemplate.defaultSeverity === "P2" ? "med" : "low";
-          const childCfg = BUG_PRIORITY_CONFIG[childTier];
-          const childSpeed = 1.0 + Math.random() * 0.3;
-          newBugsToSpawn.push({
-            id: Math.random().toString(36).substring(7),
-            x: Math.max(70, Math.min(window.innerWidth - 70, bug.x + (Math.random() - 0.5) * 60)),
-            y: Math.max(70, Math.min(window.innerHeight - 70, bug.y + (Math.random() - 0.5) * 60)),
-            squashed: false,
-            eating: false,
-            eatingTarget: null,
-            spawnTime: now,
-            originalSpeed: childSpeed,
-            speed: childSpeed,
-            size: childCfg.size,
-            baseSize: childCfg.size,
-            speedScale: childCfg.speedScale,
-            color: childCfg.color,
-            isPulsing: childTier === "critical",
-            direction: Math.random() * Math.PI * 2,
-            hungerThreshold: 8500 + Math.random() * 4500,
-            wobbleSeed: Math.random() * 1000,
-            bugCode: childTemplate.code,
-            bugLabel: childTemplate.label,
-            bugSeverity: childTemplate.defaultSeverity,
-            initialSeverity: childTemplate.defaultSeverity,
-            bugIcon: childTemplate.icon,
-            bugCategory: childTemplate.category,
-          });
-
-          playBirthAudio();
-
-          // Spawn crash explosion debris particles
-          const crashParticles = Array.from({ length: 12 }).map(() => ({
+          // Spawn crash debris particles
+          const crashParticles = Array.from({ length: 8 }).map(() => ({
             id: Math.random().toString(36).substring(7),
             x: bug.x,
             y: bug.y,
-            color: targetColor || "#ef4444"
+            color: "#ef4444"
           }));
           setParticles(prev => [...prev, ...crashParticles]);
           setTimeout(() => {
             setParticles(prev => prev.filter(p => !crashParticles.find(cp => cp.id === p.id)));
           }, 800);
 
-          // Update integrity and log
+          // Update integrity
           const corruptedCount = document.querySelectorAll('[data-eaten="true"]').length;
           setEatenCount(corruptedCount);
-          const integrityLeft = Math.max(0, Math.round(100 - corruptedCount * 3.5));
+          const integrityLeft = Math.max(0, Math.round(100 - corruptedCount * 5));
           setSystemIntegrity(integrityLeft);
 
-          const remainingTextElements = document.querySelectorAll(
-            'h1:not([data-eaten]), h2:not([data-eaten]), h3:not([data-eaten]), p:not([data-eaten])'
-          );
-          if (integrityLeft <= 0 || remainingTextElements.length === 0) {
+          if (integrityLeft <= 0) {
             setHasCrashed(true);
+            hasCrashedRef.current = true;
+            return null;
           }
 
           const newLog: TerminalLog = {
             id: Date.now(),
-            text: `💥 Critical defect ${bug.bugCode} crashed section content and burned out. Spawned child ${childTemplate.code}.`,
-            priority: "P0 [CRASH]",
+            text: `💥 Defect ${bug.bugCode} breached content. Integrity at ${integrityLeft}%.`,
+            priority: "P0 [BREACH]",
             icon: "💥",
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
           };
           setTerminalLogs(prev => [newLog, ...prev.slice(0, 2)]);
 
-          // 4. Old critical bug DIES! Returning null removes it from defects list.
-          return null;
+          // ACQUIRE BRAND NEW TARGET across the screen!
+          const nextTarget = acquireNewTarget(bug.id, bug.x, bug.y);
+          const newDir = nextTarget 
+            ? Math.atan2(nextTarget.ty - bug.y, nextTarget.tx - bug.x)
+            : bug.direction + Math.PI * 0.75;
+
+          return {
+            ...bug,
+            eating: false,
+            eatingTarget: null,
+            eatStartTime: undefined,
+            targetElement: nextTarget?.el || null,
+            targetX: nextTarget?.tx,
+            targetY: nextTarget?.ty,
+            direction: newDir,
+            speed: activeSpeed,
+            color: targetColor,
+            size: smoothSize,
+            bugSeverity: severity,
+          };
         }
         return { 
           ...bug, 
@@ -1110,66 +1106,74 @@ export function QaGame() {
           size: smoothSize, 
           speedScale: 0,
           bugSeverity: "P0",
-        }; // Stay still while corrupting
+        };
       }
 
-      let nextLastHitTest = bug.lastHitTest || 0;
       let nextDirection = bug.direction;
       let nextSpeed = activeSpeed;
 
-      // Food seeking and section consumption:
-      // Starts seeking at P2 (progress >= 0.40), actively eating at P1 (>= 0.70) and P0 (>= 1.0)
-      const isSeekingFood = progress >= 0.40;
-      if (isSeekingFood && !bug.scanning && !isFrozen) {
-        if (now - nextLastHitTest > 260) {
-          nextLastHitTest = now;
-          const leafTarget = findContentLeafTarget(bug.x, bug.y);
-          if (leafTarget) {
-            const rect = leafTarget.getBoundingClientRect();
-            const targetAngle = Math.atan2((rect.top + rect.height / 2) - bug.y, (rect.left + rect.width / 2) - bug.x);
+      // Distance to locked target
+      const distToTarget = targetX !== undefined && targetY !== undefined 
+        ? Math.hypot(targetX - bug.x, targetY - bug.y) 
+        : Infinity;
 
-            leafTarget.setAttribute('data-eating-by', bug.id);
-            leafTarget.style.transition = 'color 0.2s ease, text-decoration 0.2s ease, outline 0.2s ease, transform 0.2s ease';
-            leafTarget.style.color = '#ef4444';
-            leafTarget.style.outline = '1.5px dashed #ef4444';
-            leafTarget.style.outlineOffset = '2px';
-            leafTarget.style.textDecoration = 'line-through 2px #ef4444';
-            leafTarget.style.transform = 'scale(0.98)';
+      // Arrived at target: initiate corruption attack!
+      if (!bug.eating && distToTarget < 22 && targetEl && !isFrozen) {
+        targetEl.setAttribute('data-eating-by', bug.id);
+        targetEl.style.transition = 'color 0.2s ease, text-decoration 0.2s ease, outline 0.2s ease, transform 0.2s ease';
+        targetEl.style.color = '#ef4444';
+        targetEl.style.outline = '1.5px dashed #ef4444';
+        targetEl.style.outlineOffset = '2px';
+        targetEl.style.textDecoration = 'line-through 2px #ef4444';
+        targetEl.style.transform = 'scale(0.98)';
 
-            playGlitchAudio();
+        playGlitchAudio();
 
-            return {
-              ...bug,
-              direction: targetAngle,
-              eating: true,
-              eatingTarget: leafTarget,
-              eatStartTime: now,
-              speed: 0,
-              speedScale: 0,
-              lastHitTest: nextLastHitTest,
-              color: "#ef4444",
-              isPulsing: true,
-              size: smoothSize,
-              bugSeverity: "P0",
-            };
-          } else {
-            // Steer towards nearest leaf in section/viewport
-            const nearby = findNearbyLeafElement(bug.x, bug.y);
-            if (nearby) {
-              const rect = nearby.getBoundingClientRect();
-              const targetAngle = Math.atan2((rect.top + rect.height / 2) - bug.y, (rect.left + rect.width / 2) - bug.x);
-              nextDirection = targetAngle + (Math.random() - 0.5) * 0.28;
-            }
-          }
+        return {
+          ...bug,
+          eating: true,
+          eatingTarget: targetEl,
+          eatStartTime: now,
+          speed: 0,
+          speedScale: 0,
+          color: "#ef4444",
+          isPulsing: true,
+          size: smoothSize,
+          bugSeverity: "P0",
+        };
+      }
+
+      // Steer towards assigned target
+      if (targetX !== undefined && targetY !== undefined && !isFrozen) {
+        const angleToTarget = Math.atan2(targetY - bug.y, targetX - bug.x);
+        let diff = angleToTarget - nextDirection;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        nextDirection += diff * 0.08;
+      }
+
+      // --- ANTI-STACKING FLOCKING REPULSION FORCE ---
+      let repelX = 0;
+      let repelY = 0;
+      for (let j = 0; j < activeDefectsList.length; j++) {
+        const other = activeDefectsList[j];
+        if (other.id === bug.id || other.squashed) continue;
+        const dx = bug.x - other.x;
+        const dy = bug.y - other.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist > 0 && dist < 58) {
+          const force = (58 - dist) / 58;
+          repelX += (dx / dist) * force * 2.5;
+          repelY += (dy / dist) * force * 2.5;
         }
       }
 
       // Smooth floating stride oscillation
       const scuttleStride = isFrozen ? 0 : nextSpeed * (1 + 0.15 * Math.sin(now * 0.02 + bug.wobbleSeed));
-      let newX = bug.x + Math.cos(nextDirection) * scuttleStride;
-      let newY = bug.y + Math.sin(nextDirection) * scuttleStride;
+      let newX = bug.x + Math.cos(nextDirection) * scuttleStride + repelX;
+      let newY = bug.y + Math.sin(nextDirection) * scuttleStride + repelY;
 
-      // Bounce off viewport boundaries (keeping bug fully visible on screen)
+      // Bounce off screen boundaries
       const halfW = 28;
       const halfH = 28;
       if (newX < halfW || newX > window.innerWidth - halfW) {
@@ -1181,17 +1185,14 @@ export function QaGame() {
         newY = Math.max(halfH, Math.min(newY, window.innerHeight - halfH));
       }
 
-      // Random gentle wander
-      if (Math.random() < 0.02 && !isFrozen && progress < 1.0) {
-        nextDirection += (Math.random() - 0.5);
-      }
-
       return { 
         ...bug, 
         x: newX, 
         y: newY, 
         direction: nextDirection, 
-        lastHitTest: nextLastHitTest, 
+        targetElement: targetEl,
+        targetX,
+        targetY,
         size: smoothSize, 
         speed: nextSpeed, 
         speedScale: smoothSpeedScale,
@@ -1202,9 +1203,9 @@ export function QaGame() {
     });
 
     const activeDefects = nextDefects.filter((b): b is Defect => b !== null);
-    setDefects([...activeDefects, ...newBugsToSpawn]);
+    setDefects(activeDefects);
     requestRef.current = requestAnimationFrame(updatePositions);
-  }, [isFrozen, playGlitchAudio, playCrashAudio, playBirthAudio]);
+  }, [isFrozen, acquireNewTarget, playGlitchAudio, playCrashAudio]);
 
   // Main game lifecycle
   useEffect(() => {
@@ -1311,16 +1312,18 @@ export function QaGame() {
       {isOpen && (
         <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden selection:bg-transparent" data-game-ui="true">
           
-          {/* QA Defect Hunter Stat HUD - Optimized, minimal, with Bug Detector Count, Health Bar & Settings Button */}
+          {/* QA Defect Hunter Stat HUD - Optimized, minimal, with Quota, Wave, Health Bar & Settings Button */}
           <aside 
             aria-label="QA Game Stats"
-            className="fixed z-[60] flex flex-col gap-1 bg-paper/95 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-pass text-ink shadow-[2.5px_2.5px_0_var(--ink)] font-mono select-none pointer-events-auto animate-fade-in w-[138px] sm:w-[144px] top-3 left-3 sm:top-3.5 sm:left-4"
+            className="fixed z-[60] flex flex-col gap-1 bg-paper/95 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-pass text-ink shadow-[2.5px_2.5px_0_var(--ink)] font-mono select-none pointer-events-auto animate-fade-in w-[150px] sm:w-[158px] top-3 left-3 sm:top-3.5 sm:left-4"
           >
-            {/* Top Row: Bug Detector Count + Setting Button */}
+            {/* Top Row: Bug Detector Count / Quota + Wave Badge + Setting Button */}
             <div className="flex items-center justify-between gap-1 pb-0.5">
-              <div className="flex items-baseline gap-1" title="Defects squashed">
-                <Bug size={12} className="text-pass shrink-0 self-center" />
-                <span className="text-sm font-black text-pass leading-none">{score}</span>
+              <div className="flex items-baseline gap-1" title="Defects neutralized / Quota">
+                <Bug size={11} className="text-pass shrink-0 self-center" />
+                <span className="text-xs font-black text-pass leading-none">
+                  {score}/{10 + (wave - 1) * 5}
+                </span>
                 {combo > 1 && (
                   <span className="text-[7.5px] font-bold text-amber-500 animate-pulse leading-none">
                     x{combo}
@@ -1329,6 +1332,9 @@ export function QaGame() {
               </div>
 
               <div className="flex items-center gap-1">
+                <span className="text-[8px] font-mono font-bold text-muted uppercase tracking-wider bg-card px-1 py-0.5 rounded border border-line">
+                  W{wave}
+                </span>
                 {/* Setting Button */}
                 <button
                   type="button"
@@ -1411,11 +1417,17 @@ export function QaGame() {
                     restoreAllEatenElements();
                     setDefects([]);
                     setScore(0);
+                    scoreRef.current = 0;
                     setCombo(0);
                     setMaxCombo(0);
                     setBreakpoints(1);
                     setIsFrozen(false);
                     setHasCrashed(false);
+                    hasCrashedRef.current = false;
+                    setHasWon(false);
+                    hasWonRef.current = false;
+                    setWave(1);
+                    waveRef.current = 1;
                     setSystemIntegrity(100);
                     spawnDefect();
                   }}
@@ -1646,7 +1658,11 @@ export function QaGame() {
                     onClick={() => {
                       restoreAllEatenElements();
                       setHasCrashed(false);
+                      hasCrashedRef.current = false;
+                      setHasWon(false);
+                      hasWonRef.current = false;
                       setScore(0);
+                      scoreRef.current = 0;
                       setCombo(0);
                       setMaxCombo(0);
                       setBreakpoints(1);
@@ -1665,8 +1681,135 @@ export function QaGame() {
                     onClick={() => {
                       restoreAllEatenElements();
                       setHasCrashed(false);
+                      hasCrashedRef.current = false;
+                      setHasWon(false);
+                      hasWonRef.current = false;
                       setDefects([]);
                       setScore(0);
+                      scoreRef.current = 0;
+                      setCombo(0);
+                      setMaxCombo(0);
+                      setIsOpen(false);
+                    }}
+                    data-cursor="Close mini-game & restore UI"
+                    className="press inline-flex items-center justify-center border border-line bg-card text-ink hover:border-ink hover:text-ink font-semibold py-3 px-5 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer"
+                  >
+                    Close Game
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Quality Gate Certified / Mission Victory Incident Screen */}
+          {hasWon && (
+            <div 
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="victory-title"
+              className="fixed inset-0 z-[100] bg-ink/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 font-mono pointer-events-auto animate-fade-in overflow-y-auto"
+            >
+              <div className="relative max-w-lg w-full bg-paper border-2 border-pass text-ink rounded-2xl p-6 sm:p-8 shadow-[6px_6px_0_var(--ink)] overflow-hidden font-mono">
+                {/* Header Badge */}
+                <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-line">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-pass/10 border border-pass/30 text-pass text-[10.5px] font-bold font-mono tracking-wider whitespace-nowrap">
+                    <ShieldCheck size={12} className="text-pass shrink-0" />
+                    <span>ALL TESTS PASSED · ZERO REGRESSIONS</span>
+                  </div>
+                  <span className="text-[11px] text-muted font-mono tracking-wider uppercase font-semibold">
+                    WAVE {wave} CLEAR
+                  </span>
+                </div>
+
+                {/* Title & Description */}
+                <h2 id="victory-title" className="font-serif text-2xl sm:text-3xl text-ink tracking-tight font-bold mb-2 leading-tight">
+                  Quality Gate Certified
+                </h2>
+                <p className="text-ink-soft text-xs sm:text-sm leading-relaxed mb-6 font-sans">
+                  All critical defects intercepted before customer impact. System integrity preserved at {systemIntegrity}%. Build promoted to Production.
+                </p>
+
+                {/* 4-Box Metrics Grid */}
+                <div className="grid grid-cols-2 gap-2.5 mb-6">
+                  {/* Metric 1: Bugs Intercepted */}
+                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
+                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
+                      Neutralized
+                    </span>
+                    <span className="text-2xl font-black text-pass leading-none">
+                      {score} <span className="text-xs font-normal text-muted">defects</span>
+                    </span>
+                  </div>
+
+                  {/* Metric 2: QA Rank */}
+                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
+                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
+                      Hunter Rank
+                    </span>
+                    <div className="text-sm font-bold text-ink truncate leading-none mt-1" title={currentRank.title}>
+                      <span className="mr-1">{currentRank.badge}</span>
+                      <span className="text-ink-soft font-normal">{currentRank.title}</span>
+                    </div>
+                  </div>
+
+                  {/* Metric 3: Peak Streak */}
+                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
+                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
+                      Peak Streak
+                    </span>
+                    <span className="text-2xl font-black text-amber-600 dark:text-amber-400 leading-none">
+                      {maxCombo > 1 ? `${maxCombo}x` : "1x"}
+                    </span>
+                  </div>
+
+                  {/* Metric 4: Integrity Retained */}
+                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
+                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
+                      Integrity Retained
+                    </span>
+                    <span className="text-2xl font-black text-pass leading-none">
+                      {systemIntegrity}%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      restoreAllEatenElements();
+                      setHasWon(false);
+                      hasWonRef.current = false;
+                      setWave(w => {
+                        const nextW = w + 1;
+                        waveRef.current = nextW;
+                        return nextW;
+                      });
+                      setScore(0);
+                      scoreRef.current = 0;
+                      setCombo(0);
+                      setMaxCombo(0);
+                      setBreakpoints(b => Math.min(3, b + 1));
+                      setSystemIntegrity(100);
+                      setDefects([]);
+                      spawnDefect();
+                    }}
+                    data-cursor="Proceed to next incident wave"
+                    className="press flex-1 inline-flex items-center justify-center gap-2 border border-pass bg-pass text-on-band hover:bg-pass-fill font-bold py-3 px-4 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm tracking-wide transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer whitespace-nowrap"
+                  >
+                    <Zap size={14} className="shrink-0" />
+                    Next Wave (Wave {wave + 1})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      restoreAllEatenElements();
+                      setHasWon(false);
+                      hasWonRef.current = false;
+                      setDefects([]);
+                      setScore(0);
+                      scoreRef.current = 0;
                       setCombo(0);
                       setMaxCombo(0);
                       setIsOpen(false);

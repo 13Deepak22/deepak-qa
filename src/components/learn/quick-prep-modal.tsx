@@ -238,24 +238,24 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/55 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-xl border border-line bg-card shadow-xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-6 bg-black/55 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="relative w-full max-w-2xl max-h-[92vh] sm:max-h-[90vh] flex flex-col rounded-xl border border-line bg-card shadow-xl overflow-hidden">
         
         {/* Minimal Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-line bg-paper/60">
-          <div className="flex items-center gap-2.5">
-            <span className="font-mono text-[10px] tracking-wider uppercase text-pass font-semibold">
+        <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 border-b border-line bg-paper/60">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <span className="font-mono text-[10px] tracking-wider uppercase text-pass font-semibold shrink-0">
               01 / Quick Prep
             </span>
             <span className="text-muted/40">•</span>
-            <span className="font-mono text-[11px] text-muted">
+            <span className="font-mono text-[11px] text-muted truncate">
               {viewState === "config"
                 ? `${activePool.length} Q&As in pool`
                 : `${historyIndex + 1} explored`}
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {viewState === "active" ? (
               <button
                 type="button"
@@ -268,7 +268,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
               <button
                 type="button"
                 onClick={handleClose}
-                className="p-1 rounded-md text-muted hover:text-ink hover:bg-paper transition cursor-pointer"
+                className="p-1.5 rounded-md text-muted hover:text-ink hover:bg-paper transition cursor-pointer"
                 aria-label="Close"
               >
                 <X className="w-4 h-4" />
@@ -282,8 +282,8 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
         {/* 1. FIRST PAGE: ONLY FILTER SECTIONS TO SELECT THEN START  */}
         {/* ========================================================= */}
         {viewState === "config" && (
-          <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-4 sm:p-5 flex flex-col justify-between">
-            <div className="space-y-3.5">
+          <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-3.5 sm:p-5 flex flex-col justify-between">
+            <div className="space-y-3 sm:space-y-3.5">
               <div>
                 <h3 className="font-serif text-lg sm:text-xl text-ink font-normal">
                   Select Quick Prep Tracks
@@ -295,13 +295,13 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
 
               {/* Continue Saved Quick Prep Session */}
               {savedPrepSession && (
-                <div className="rounded-xl border border-pass/35 bg-pass/10 p-3 sm:p-3.5 flex items-center justify-between gap-3 animate-in fade-in duration-150">
+                <div className="rounded-xl border border-pass/35 bg-pass/10 p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 animate-in fade-in duration-150">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className="w-8 h-8 rounded-lg bg-pass/20 border border-pass/40 text-pass flex items-center justify-center shrink-0">
                       <RotateCcw className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-mono text-xs font-semibold text-ink">
                           Resume Previous Prep
                         </span>
@@ -315,7 +315,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center justify-end gap-2 shrink-0 border-t border-pass/20 sm:border-0 pt-2 sm:pt-0">
                     <button
                       type="button"
                       onClick={handleDiscardSavedPrepSession}
@@ -388,8 +388,8 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
             </div>
 
             {/* Launch CTA */}
-            <div className="mt-5 pt-3 border-t border-line flex items-center justify-between">
-              <span className="font-mono text-[11px] text-muted">
+            <div className="mt-4 sm:mt-5 pt-3 border-t border-line flex flex-col sm:flex-row gap-2.5 sm:items-center justify-between">
+              <span className="font-mono text-[11px] text-muted text-center sm:text-left">
                 Pool contains <span className="font-semibold text-pass">{activePool.length}</span> questions
               </span>
 
@@ -397,7 +397,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
                 type="button"
                 onClick={handleStartPrep}
                 disabled={activePool.length === 0}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs disabled:opacity-40"
+                className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs disabled:opacity-40 w-full sm:w-auto"
               >
                 <span>Start Quick Prep</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -410,7 +410,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
         {/* 2. SECOND PAGE: ACTIVE RANDOM Q&A FLASHCARD               */}
         {/* ========================================================= */}
         {viewState === "active" && (
-          <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-4 sm:p-5 flex flex-col justify-between min-h-[260px]">
+          <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-3.5 sm:p-5 flex flex-col justify-between min-h-[240px] sm:min-h-[260px]">
             {currentQuestion ? (
               <div className="space-y-3">
                 
@@ -511,7 +511,8 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
                   type="button"
                   onClick={handlePrev}
                   disabled={historyIndex <= 0}
-                  className="px-2 py-1 rounded border border-line bg-paper hover:border-pass/60 text-ink disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer"
+                  className="px-2.5 py-1.5 rounded border border-line bg-paper hover:border-pass/60 text-ink disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer"
+                  aria-label="Previous question"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                 </button>

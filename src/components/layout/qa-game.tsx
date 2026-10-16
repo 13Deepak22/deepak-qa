@@ -514,6 +514,7 @@ export function QaGame() {
   useEffect(() => {
     if (!isOpen) return;
     const onPointerMove = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return;
       mousePosRef.current = { x: e.clientX, y: e.clientY, active: true };
       setMousePos({ x: e.clientX, y: e.clientY, active: true });
       const near = defectsRef.current.some(
@@ -1883,6 +1884,10 @@ export function QaGame() {
                   data-born={isBorn ? "true" : undefined}
                   data-cursor={isDying ? undefined : `Squash defect ${bug.bugCode}: ${bug.bugLabel}`}
                   onClick={() => !isDying && squashDefect(bug.id, bug.x, bug.y)}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    if (!isDying) squashDefect(bug.id, bug.x, bug.y);
+                  }}
                   onPointerEnter={() => !isDying && handlePointerEnter(bug.id)}
                   onPointerLeave={() => !isDying && handlePointerLeave(bug.id)}
                   className={`absolute flex items-center justify-center group border-none bg-transparent outline-none ring-0 focus:outline-none focus:ring-0 select-none ${
@@ -1893,8 +1898,8 @@ export function QaGame() {
                     top: bug.y,
                     width: `${bug.size}px`,
                     height: `${bug.size}px`,
-                    minWidth: "32px",
-                    minHeight: "32px",
+                    minWidth: "36px",
+                    minHeight: "36px",
                     transform: `translate(-50%, -50%) ${
                       bug.squashed ? "scale(1.45, 0.22)" : ""
                     }`,
@@ -2059,15 +2064,15 @@ export function QaGame() {
                   : "top-4 left-4 -translate-x-0 -translate-y-0 scale-[0.25] opacity-0"
               }`}
             >
-              <div className="bg-paper/85 dark:bg-card/85 backdrop-blur-md border border-pass/50 px-6 py-4 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] font-mono text-center flex flex-col items-center gap-2 min-w-[280px]">
+              <div className="bg-paper/85 dark:bg-card/85 backdrop-blur-md border border-pass/50 px-4 sm:px-6 py-3.5 sm:py-4 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] font-mono text-center flex flex-col items-center gap-2 max-w-[92vw] min-w-[260px] sm:min-w-[280px]">
                 <div className="flex items-center gap-2 text-pass text-[10px] uppercase font-bold tracking-widest">
                   <Zap size={12} className="text-pass animate-bounce" />
                   <span>System Upgrade · Wave {waveBanner.clearedWave} Cleared</span>
                 </div>
-                <h3 className="font-serif text-2xl font-bold text-ink tracking-tight">
+                <h3 className="font-serif text-xl sm:text-2xl font-bold text-ink tracking-tight">
                   Advancing to Wave {waveBanner.nextWave}
                 </h3>
-                <div className="flex items-center gap-2 pt-1 border-t border-line/60 text-[11px] text-muted">
+                <div className="flex items-center gap-2 pt-1 border-t border-line/60 text-[11px] text-muted flex-wrap justify-center">
                   <span className="px-2 py-0.5 rounded bg-pass/10 text-pass font-bold border border-pass/30">
                     Speed +0.2x ({(1 + (waveBanner.nextWave - 1) * 0.2).toFixed(1)}x)
                   </span>
@@ -2085,9 +2090,9 @@ export function QaGame() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="crash-title"
-              className="fixed inset-0 z-[100] bg-ink/65 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 font-mono pointer-events-auto animate-fade-in overflow-y-auto"
+              className="fixed inset-0 z-[100] bg-ink/65 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 font-mono pointer-events-auto animate-fade-in overflow-y-auto"
             >
-              <div className="relative max-w-xl w-full bg-paper border border-line text-ink rounded-2xl p-6 sm:p-8 shadow-[8px_8px_0_var(--ink)] overflow-hidden font-mono">
+              <div className="relative max-w-xl w-full max-h-[92vh] overflow-y-auto bg-paper border border-line text-ink rounded-2xl p-4 sm:p-8 shadow-[8px_8px_0_var(--ink)] font-mono">
                 {/* Header Badge */}
                 <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-line">
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-[10.5px] font-bold font-mono tracking-wider whitespace-nowrap">

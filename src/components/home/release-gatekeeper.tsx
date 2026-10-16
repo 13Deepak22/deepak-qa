@@ -122,28 +122,28 @@ export function ReleaseGatekeeper() {
         <div className="mt-10 border border-line bg-paper shadow-sm">
           {/* Top Status Banner */}
           <div
-            className={`p-6 sm:px-8 border-b transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+            className={`p-4 sm:p-6 sm:px-8 border-b transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
               isApproved
                 ? "bg-pass-fill/15 border-pass/40 text-ink"
                 : "bg-red-500/10 border-red-500/30 text-ink"
             }`}
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
               <span
-                className={`inline-flex h-14 w-14 shrink-0 items-center justify-center border ${
+                className={`inline-flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center border ${
                   isApproved
                     ? "border-pass bg-card text-pass"
                     : "border-red-500 bg-card text-red-600 dark:text-red-400"
                 }`}
               >
                 {isApproved ? (
-                  <Unlock className="h-7 w-7" />
+                  <Unlock className="h-6 w-6 sm:h-7 sm:w-7" />
                 ) : (
-                  <Lock className="h-7 w-7" />
+                  <Lock className="h-6 w-6 sm:h-7 sm:w-7" />
                 )}
               </span>
-              <div>
-                <div className="flex items-center gap-2">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span
                     className={`font-mono text-[0.7rem] uppercase tracking-wider px-2 py-0.5 font-bold ${
                       isApproved
@@ -157,7 +157,7 @@ export function ReleaseGatekeeper() {
                     {passedCount}/4 Checks Green
                   </span>
                 </div>
-                <h3 className="mt-1 font-serif text-xl sm:text-2xl font-bold tracking-tight truncate">
+                <h3 className="mt-1 font-serif text-lg sm:text-2xl font-bold tracking-tight truncate">
                   {isApproved
                     ? "Production Deployment Approved"
                     : "Deployment Halted — Blockers Caught"}
@@ -166,7 +166,7 @@ export function ReleaseGatekeeper() {
             </div>
 
             {/* Quick Presets */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
               <button
                 type="button"
                 data-testid="gatekeeper-preset-all-green"
@@ -191,9 +191,9 @@ export function ReleaseGatekeeper() {
           </div>
 
           {/* Interactive Toggle Grid: Balanced equal heights with zero layout shift */}
-          <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-line items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-line items-stretch">
             {/* Left: 4 Interactive Switches (Fixed Invariant Box Height) */}
-            <div className="p-5 sm:p-6 space-y-3 flex flex-col justify-between">
+            <div className="p-4 sm:p-6 space-y-3 flex flex-col justify-between min-w-0">
               <span className="font-mono text-[0.68rem] tracking-[0.16em] text-muted uppercase block">
                 Click Any Check to Toggle Its State:
               </span>
@@ -270,7 +270,7 @@ export function ReleaseGatekeeper() {
             </div>
 
             {/* Right: Live Gate Decision Log */}
-            <div className="p-5 sm:p-6 flex flex-col justify-between bg-card/40">
+            <div className="p-4 sm:p-6 flex flex-col justify-between bg-card/40 min-w-0">
               <div className="flex-1 flex flex-col">
                 <div className="flex items-center justify-between border-b border-line pb-3 mb-3.5">
                   <span className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted">

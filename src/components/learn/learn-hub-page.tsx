@@ -635,7 +635,7 @@ export function LearnHubPage() {
           </div>
 
           {/* Minimal, Theme-Matching Action Controls */}
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-2.5 shrink-0">
             <button
               type="button"
               onClick={() => setIsQuickPrepOpen(true)}

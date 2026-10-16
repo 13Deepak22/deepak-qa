@@ -280,9 +280,9 @@ export function InteractiveServices() {
             </div>
 
             {/* Split Grid: Left Details & Right Themed Test Runner */}
-            <div className="mt-6 grid lg:grid-cols-12 gap-6 items-stretch">
+            <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
               {/* LEFT SIDE (5 Columns): Highlights, Outcome & Methodology Link */}
-              <div className="lg:col-span-5 flex flex-col justify-between space-y-5">
+              <div className="lg:col-span-5 min-w-0 flex flex-col justify-between space-y-5">
                 <div className="space-y-4">
                   <div>
                     <span className="font-mono text-[0.68rem] uppercase tracking-wider text-muted block mb-2.5">
@@ -335,7 +335,7 @@ export function InteractiveServices() {
               </div>
 
               {/* RIGHT SIDE (7 Columns): Themed Dynamic Test Runner */}
-              <div className="lg:col-span-7 flex flex-col">
+              <div className="lg:col-span-7 min-w-0 flex flex-col">
                 <div
                   className="border border-line bg-card flex-1 flex flex-col justify-between shadow-2xs overflow-hidden"
                   data-testid="services-test-runner-panel"

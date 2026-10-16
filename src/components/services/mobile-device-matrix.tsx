@@ -187,10 +187,10 @@ export function MobileDeviceMatrix() {
       </div>
 
       {/* Simulator Execution Workbench */}
-      <div className="mt-5 border border-line bg-card p-5 sm:p-6">
-        <div className="grid lg:grid-cols-12 gap-5 items-stretch">
+      <div className="mt-5 border border-line bg-card p-4 sm:p-6 min-w-0 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           {/* Left 4 Cols: Active Device Metadata & Scenario Selector */}
-          <div className="lg:col-span-4 flex flex-col justify-between space-y-4">
+          <div className="lg:col-span-4 min-w-0 flex flex-col justify-between space-y-4">
             <div className="space-y-3 font-mono text-xs">
               <div className="border border-line bg-paper p-3 space-y-1.5">
                 <span className="text-[0.62rem] uppercase tracking-wider text-muted block">
@@ -265,7 +265,7 @@ export function MobileDeviceMatrix() {
           </div>
 
           {/* Right 8 Cols: Live Device Terminal & Step Assertions */}
-          <div className="lg:col-span-8 flex flex-col justify-between border border-line bg-paper p-4 font-mono text-xs">
+          <div className="lg:col-span-8 min-w-0 flex flex-col justify-between border border-line bg-paper p-4 font-mono text-xs overflow-hidden">
             <div>
               <div className="flex items-center justify-between border-b border-line/60 pb-2 mb-3">
                 <div className="flex items-center gap-2">

@@ -293,7 +293,7 @@ export function InteractiveDeliverables() {
       </div>
 
       {/* Interactive Artifact Preview Container */}
-      <div className="p-5 sm:p-7">
+      <div className="p-4 sm:p-7 min-w-0 overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line/60 pb-4 mb-5">
           <div className="flex items-center gap-3">
             <span className="inline-flex h-9 w-9 items-center justify-center border border-pass/30 bg-pass-fill/10 text-pass shrink-0">

@@ -136,6 +136,8 @@ export interface PriorityConfig {
 }
 
 export const STAGE_DURATION_MS = 7000; // 7 seconds per priority tier (0-7s: Low, 7-14s: Med, 14-21s: High, 21s+: Critical)
+export const COLOR_PHASE_MS = 650; // Phase 1: Color changes first over 650ms
+export const SIZE_PHASE_MS = 800; // Phase 2: Size reduces next over 800ms
 export const CRITICAL_ATTACK_DELAY_MS = 2500; // 2.5 seconds in Critical state before locking target and attacking
 
 export const BUG_PRIORITY_CONFIG: Record<BugPriorityTier, PriorityConfig> = {
@@ -168,6 +170,170 @@ export const BUG_PRIORITY_CONFIG: Record<BugPriorityTier, PriorityConfig> = {
     speedScale: 4.1,
   },
 };
+
+export interface SimulatedState {
+  tier: BugPriorityTier;
+  color: string;
+  size: number;
+  speedScale: number;
+  severity: "P0" | "P1" | "P2" | "P3";
+  isPulsing: boolean;
+}
+
+export function interpolateColor(color1: string, color2: string, factor: number): string {
+  const t = Math.max(0, Math.min(1, factor));
+  const parseHex = (hex: string) => {
+    const c = hex.replace("#", "");
+    return [
+      parseInt(c.substring(0, 2), 16),
+      parseInt(c.substring(2, 4), 16),
+      parseInt(c.substring(4, 6), 16),
+    ];
+  };
+
+  const [r1, g1, b1] = parseHex(color1);
+  const [r2, g2, b2] = parseHex(color2);
+
+  const r = Math.round(r1 + (r2 - r1) * t);
+  const g = Math.round(g1 + (g2 - g1) * t);
+  const b = Math.round(b1 + (b2 - b1) * t);
+
+  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+}
+
+export const easeInOutQuad = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+export const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+// Exact Simulation: Color changes FIRST over COLOR_PHASE_MS, then Size reduces NEXT over SIZE_PHASE_MS
+export function getSimulatedBugState(age: number): SimulatedState {
+  const lowCfg = BUG_PRIORITY_CONFIG.low;
+  const medCfg = BUG_PRIORITY_CONFIG.med;
+  const highCfg = BUG_PRIORITY_CONFIG.high;
+  const critCfg = BUG_PRIORITY_CONFIG.critical;
+
+  // 1. Low Tier: age < 7000ms
+  if (age < STAGE_DURATION_MS) {
+    return {
+      tier: "low",
+      color: lowCfg.color,
+      size: lowCfg.size,
+      speedScale: lowCfg.speedScale,
+      severity: "P3",
+      isPulsing: false,
+    };
+  }
+
+  // 2. Transition from Low to Medium (7000ms <= age < 14000ms)
+  const medAge = age - STAGE_DURATION_MS;
+  if (medAge < COLOR_PHASE_MS) {
+    // PHASE 1: COLOR CHANGES FIRST! Size remains at Low (54px)
+    const t = medAge / COLOR_PHASE_MS;
+    return {
+      tier: "med",
+      color: interpolateColor(lowCfg.color, medCfg.color, easeInOutQuad(t)),
+      size: lowCfg.size, // Size does not reduce yet!
+      speedScale: lowCfg.speedScale,
+      severity: "P2",
+      isPulsing: false,
+    };
+  } else if (medAge < COLOR_PHASE_MS + SIZE_PHASE_MS) {
+    // PHASE 2: SIZE REDUCES NEXT! Color is now fully Yellow
+    const t = (medAge - COLOR_PHASE_MS) / SIZE_PHASE_MS;
+    const progress = easeOutCubic(t);
+    return {
+      tier: "med",
+      color: medCfg.color,
+      size: Math.round((lowCfg.size + (medCfg.size - lowCfg.size) * progress) * 100) / 100,
+      speedScale: lowCfg.speedScale + (medCfg.speedScale - lowCfg.speedScale) * progress,
+      severity: "P2",
+      isPulsing: false,
+    };
+  } else if (age < STAGE_DURATION_MS * 2) {
+    // Stable Medium
+    return {
+      tier: "med",
+      color: medCfg.color,
+      size: medCfg.size,
+      speedScale: medCfg.speedScale,
+      severity: "P2",
+      isPulsing: false,
+    };
+  }
+
+  // 3. Transition from Medium to High (14000ms <= age < 21000ms)
+  const highAge = age - STAGE_DURATION_MS * 2;
+  if (highAge < COLOR_PHASE_MS) {
+    // PHASE 1: COLOR CHANGES FIRST! Size remains at Medium (44px)
+    const t = highAge / COLOR_PHASE_MS;
+    return {
+      tier: "high",
+      color: interpolateColor(medCfg.color, highCfg.color, easeInOutQuad(t)),
+      size: medCfg.size, // Size does not reduce yet!
+      speedScale: medCfg.speedScale,
+      severity: "P1",
+      isPulsing: false,
+    };
+  } else if (highAge < COLOR_PHASE_MS + SIZE_PHASE_MS) {
+    // PHASE 2: SIZE REDUCES NEXT! Color is now fully Orange
+    const t = (highAge - COLOR_PHASE_MS) / SIZE_PHASE_MS;
+    const progress = easeOutCubic(t);
+    return {
+      tier: "high",
+      color: highCfg.color,
+      size: Math.round((medCfg.size + (highCfg.size - medCfg.size) * progress) * 100) / 100,
+      speedScale: medCfg.speedScale + (highCfg.speedScale - medCfg.speedScale) * progress,
+      severity: "P1",
+      isPulsing: false,
+    };
+  } else if (age < STAGE_DURATION_MS * 3) {
+    // Stable High
+    return {
+      tier: "high",
+      color: highCfg.color,
+      size: highCfg.size,
+      speedScale: highCfg.speedScale,
+      severity: "P1",
+      isPulsing: false,
+    };
+  }
+
+  // 4. Transition from High to Critical (age >= 21000ms)
+  const critAge = age - STAGE_DURATION_MS * 3;
+  if (critAge < COLOR_PHASE_MS) {
+    // PHASE 1: COLOR CHANGES FIRST! Size remains at High (36px)
+    const t = critAge / COLOR_PHASE_MS;
+    return {
+      tier: "critical",
+      color: interpolateColor(highCfg.color, critCfg.color, easeInOutQuad(t)),
+      size: highCfg.size, // Size does not reduce yet!
+      speedScale: highCfg.speedScale,
+      severity: "P0",
+      isPulsing: true,
+    };
+  } else if (critAge < COLOR_PHASE_MS + SIZE_PHASE_MS) {
+    // PHASE 2: SIZE REDUCES NEXT! Color is now fully Red
+    const t = (critAge - COLOR_PHASE_MS) / SIZE_PHASE_MS;
+    const progress = easeOutCubic(t);
+    return {
+      tier: "critical",
+      color: critCfg.color,
+      size: Math.round((highCfg.size + (critCfg.size - highCfg.size) * progress) * 100) / 100,
+      speedScale: highCfg.speedScale + (critCfg.speedScale - highCfg.speedScale) * progress,
+      severity: "P0",
+      isPulsing: true,
+    };
+  }
+
+  // Stable Critical
+  return {
+    tier: "critical",
+    color: critCfg.color,
+    size: critCfg.size,
+    speedScale: critCfg.speedScale,
+    severity: "P0",
+    isPulsing: true,
+  };
+}
 
 export const UI_BUG_TYPES: BugTemplate[] = [
   { code: "#404", label: "NOT_FOUND", defaultSeverity: "P2", color: "#eab308", bgTint: "rgba(234, 179, 8, 0.16)", icon: "⚠️", category: "HTTP" },
@@ -225,7 +391,6 @@ export function PcbCircuitBug({
       style={{
         width: `${size}px`,
         height: `${size}px`,
-        transition: "width 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.65s ease",
         filter: isFrozen
           ? "drop-shadow(0 0 10px #38bdf8) brightness(1.25)"
           : isPulsing
@@ -233,14 +398,6 @@ export function PcbCircuitBug({
             : `drop-shadow(0 2px 7px ${color}77)`,
       }}
     >
-      <style>{`
-        .pcb-bug-circuit polyline,
-        .pcb-bug-circuit path,
-        .pcb-bug-circuit circle,
-        .pcb-bug-circuit polygon {
-          transition: stroke 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), fill 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-      `}</style>
       {/* P0 Critical Pulse Ring */}
       {isPulsing && (
         <circle 
@@ -251,7 +408,6 @@ export function PcbCircuitBug({
           strokeWidth="1.2" 
           fill="none" 
           className="bug-pulse-ring" 
-          style={{ transition: "stroke 0.75s ease" }}
         />
       )}
 
@@ -264,7 +420,6 @@ export function PcbCircuitBug({
             transformOrigin: "17px 16px", 
             animationDuration: strideDuration, 
             animationPlayState: isFrozen ? "paused" : "running",
-            transition: "stroke 0.75s ease",
           }}
           points="17,16 9,13 5,8"
           stroke={color}
@@ -280,7 +435,6 @@ export function PcbCircuitBug({
             transformOrigin: "27px 16px", 
             animationDuration: strideDuration, 
             animationPlayState: isFrozen ? "paused" : "running",
-            transition: "stroke 0.75s ease",
           }}
           points="27,16 35,13 39,8"
           stroke={color}
@@ -296,7 +450,6 @@ export function PcbCircuitBug({
             transformOrigin: "15px 24px", 
             animationDuration: strideDuration, 
             animationPlayState: isFrozen ? "paused" : "running",
-            transition: "stroke 0.75s ease",
           }}
           points="15,24 7,23 4,29"
           stroke={color}
@@ -312,7 +465,6 @@ export function PcbCircuitBug({
             transformOrigin: "29px 24px", 
             animationDuration: strideDuration, 
             animationPlayState: isFrozen ? "paused" : "running",
-            transition: "stroke 0.75s ease",
           }}
           points="29,24 37,23 40,29"
           stroke={color}
@@ -328,7 +480,6 @@ export function PcbCircuitBug({
             transformOrigin: "17px 32px", 
             animationDuration: strideDuration, 
             animationPlayState: isFrozen ? "paused" : "running",
-            transition: "stroke 0.75s ease",
           }}
           points="17,32 10,34 6,41"
           stroke={color}
@@ -344,7 +495,6 @@ export function PcbCircuitBug({
             transformOrigin: "27px 32px", 
             animationDuration: strideDuration, 
             animationPlayState: isFrozen ? "paused" : "running",
-            transition: "stroke 0.75s ease",
           }}
           points="27,32 34,34 38,41"
           stroke={color}
@@ -361,33 +511,32 @@ export function PcbCircuitBug({
         fill="#0d0d14"
         stroke={color}
         strokeWidth="1.4"
-        style={{ transition: "stroke 0.75s ease, fill 0.75s ease" }}
       />
 
       {/* Etched PCB Circuit Traces & Solder Nodes */}
       <g>
         {/* Trace 1 */}
-        <path d="M 16 36 L 16 30 L 18 27" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" style={{ transition: "stroke 0.75s ease" }} />
-        <circle cx="18" cy="27" r="1.5" fill={color} style={{ transition: "fill 0.75s ease" }} />
+        <path d="M 16 36 L 16 30 L 18 27" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" />
+        <circle cx="18" cy="27" r="1.5" fill={color} />
 
         {/* Trace 2 */}
-        <path d="M 22 37 L 22 23" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" style={{ transition: "stroke 0.75s ease" }} />
-        <circle cx="22" cy="23" r="1.5" fill={color} style={{ transition: "fill 0.75s ease" }} />
+        <path d="M 22 37 L 22 23" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" />
+        <circle cx="22" cy="23" r="1.5" fill={color} />
 
         {/* Trace 3 */}
-        <path d="M 28 36 L 28 30 L 26 27" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" style={{ transition: "stroke 0.75s ease" }} />
-        <circle cx="26" cy="27" r="1.5" fill={color} style={{ transition: "fill 0.75s ease" }} />
+        <path d="M 28 36 L 28 30 L 26 27" stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none" />
+        <circle cx="26" cy="27" r="1.5" fill={color} />
       </g>
 
       {/* Thorax Plate */}
-      <polygon points="17,17 27,17 25,12 19,12" fill="#141420" stroke={color} strokeWidth="1.1" style={{ transition: "stroke 0.75s ease, fill 0.75s ease" }} />
+      <polygon points="17,17 27,17 25,12 19,12" fill="#141420" stroke={color} strokeWidth="1.1" />
 
       {/* Head */}
-      <polygon points="19,12 25,12 24,8 20,8" fill="#09090e" stroke={color} strokeWidth="1.1" style={{ transition: "stroke 0.75s ease, fill 0.75s ease" }} />
+      <polygon points="19,12 25,12 24,8 20,8" fill="#09090e" stroke={color} strokeWidth="1.1" />
 
       {/* Antenna Pins */}
-      <polyline points="20,8 15,3" stroke={color} strokeWidth="1.5" strokeLinecap="round" fill="none" style={{ transition: "stroke 0.75s ease" }} />
-      <polyline points="24,8 29,3" stroke={color} strokeWidth="1.5" strokeLinecap="round" fill="none" style={{ transition: "stroke 0.75s ease" }} />
+      <polyline points="20,8 15,3" stroke={color} strokeWidth="1.5" strokeLinecap="round" fill="none" />
+      <polyline points="24,8 29,3" stroke={color} strokeWidth="1.5" strokeLinecap="round" fill="none" />
     </svg>
   );
 }
@@ -1008,29 +1157,17 @@ export function QaGame() {
       
       const age = now - bug.spawnTime;
       
-      // Determine priority tier strictly by age timeline:
-      // 0 to 7s: Low (Green)
-      // 7s to 14s: Med (Yellow)
-      // 14s to 21s: High (Orange)
-      // 21s+: Critical (Red)
-      let tier: BugPriorityTier = "low";
-      if (bug.eating || age >= STAGE_DURATION_MS * 3) {
-        tier = "critical";
-      } else if (age >= STAGE_DURATION_MS * 2) {
-        tier = "high";
-      } else if (age >= STAGE_DURATION_MS) {
-        tier = "med";
-      } else {
-        tier = "low";
-      }
-
-      const cfg = BUG_PRIORITY_CONFIG[tier];
-      const targetColor = cfg.color;
-      const targetSize = cfg.size;
-      const targetSpeedScale = cfg.speedScale;
-      const isPulsing = tier === "critical";
+      // Choreographed priority simulation:
+      // Phase 1: Color changes FIRST (COLOR_PHASE_MS = 650ms) while size remains locked at previous tier.
+      // Phase 2: Size contracts NEXT (SIZE_PHASE_MS = 800ms) with smooth easeOutCubic curve, accelerating speed.
+      const sim = getSimulatedBugState(age);
+      const tier: BugPriorityTier = bug.eating ? "critical" : sim.tier;
+      const targetColor = bug.eating ? "#ef4444" : sim.color;
+      const targetSize = bug.eating ? BUG_PRIORITY_CONFIG.critical.size : sim.size;
+      const targetSpeedScale = bug.eating ? 0 : sim.speedScale;
+      const isPulsing = bug.eating ? true : sim.isPulsing;
       const severity: "P0" | "P1" | "P2" | "P3" = 
-        tier === "critical" ? "P0" : tier === "high" ? "P1" : tier === "med" ? "P2" : "P3";
+        bug.eating ? "P0" : sim.severity;
 
       // If just transitioned to critical, play warning alert audio once
       let hasAlerted = bug.hasAlertedCritical;
@@ -1039,14 +1176,7 @@ export function QaGame() {
         playAlertAudio();
       }
 
-      // Smooth exponential lerp (0.08) for physical scaling & speed:
-      const currentSize = bug.size || targetSize;
-      const smoothSize = currentSize + (targetSize - currentSize) * 0.08;
-
-      const currentSpeedScale = bug.speedScale ?? targetSpeedScale;
-      const smoothSpeedScale = currentSpeedScale + (targetSpeedScale - currentSpeedScale) * 0.08;
-
-      const activeSpeed = isFrozen ? 0 : bug.originalSpeed * smoothSpeedScale;
+      const activeSpeed = isFrozen ? 0 : bug.originalSpeed * targetSpeedScale;
 
       // --- ATTACK / CORRUPTION LOGIC ---
       if (bug.eating) {
@@ -1190,7 +1320,7 @@ export function QaGame() {
           ...bug, 
           color: targetColor, 
           isPulsing: true, 
-          size: smoothSize, 
+          size: targetSize, 
           speedScale: 0,
           bugSeverity: "P0",
         });
@@ -1274,7 +1404,7 @@ export function QaGame() {
           speedScale: 0,
           color: "#ef4444",
           isPulsing: true,
-          size: smoothSize,
+          size: targetSize,
           bugSeverity: "P0",
         });
         continue;
@@ -1342,9 +1472,9 @@ export function QaGame() {
         roamTargetY,
         roamChangeTime,
         hasAlertedCritical: hasAlerted,
-        size: smoothSize, 
+        size: targetSize, 
         speed: nextSpeed, 
-        speedScale: smoothSpeedScale,
+        speedScale: targetSpeedScale,
         color: targetColor, 
         isPulsing,
         bugSeverity: severity,
@@ -1661,9 +1791,7 @@ export function QaGame() {
                         : undefined,
                     transition: bug.squashed 
                       ? "transform 320ms cubic-bezier(0.1, 0.9, 0.2, 1), opacity 320ms ease" 
-                      : isDying || isBorn
-                        ? "none"
-                        : "width 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.65s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 150ms ease",
+                      : "opacity 150ms ease",
                     opacity: bug.squashed ? 0 : 1,
                     cursor: isDying ? "default" : "crosshair",
                     pointerEvents: bug.squashed || isDying ? "none" : "auto",

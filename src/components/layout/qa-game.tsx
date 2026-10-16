@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { 
   Gamepad2, Bug, X, Target, ShieldCheck, 
   Volume2, VolumeX, Pause, Play, AlertTriangle, 
-  RefreshCw, Zap, Award 
+  RefreshCw, Zap, Award, Settings 
 } from "lucide-react";
 
 interface Defect {
@@ -296,6 +296,7 @@ export function QaGame() {
   const [isMuted, setIsMuted] = useState(false);
   const [systemIntegrity, setSystemIntegrity] = useState(100);
   const [eatenCount, setEatenCount] = useState(0);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [defects, setDefects] = useState<Defect[]>([]);
   const [particles, setParticles] = useState<{ id: string; x: number; y: number; color: string }[]>([]);
 
@@ -1194,25 +1195,15 @@ export function QaGame() {
       {isOpen && (
         <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden selection:bg-transparent" data-game-ui="true">
           
-          {/* QA Defect Hunter Stat HUD - Relocated to top-left corner along header, compact & brand-aligned */}
+          {/* QA Defect Hunter Stat HUD - Optimized, minimal, with Bug Detector Count, Health Bar & Settings Button */}
           <aside 
             aria-label="QA Game Stats"
             className="fixed z-[60] flex flex-col gap-1 bg-paper/95 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-pass text-ink shadow-[2.5px_2.5px_0_var(--ink)] font-mono select-none pointer-events-auto animate-fade-in w-[138px] sm:w-[144px] top-3 left-3 sm:top-3.5 sm:left-4"
           >
-            {/* Row 1: Header QA + Tier Badge + Score */}
-            <div className="flex items-center justify-between gap-1 pb-1 border-b border-line">
-              <div className="flex items-center gap-1 font-bold text-pass text-[10px] tracking-tight">
-                <ShieldCheck size={11} className="text-pass animate-pulse shrink-0" />
-                <span>QA</span>
-                <span 
-                  className="px-1 py-0.2 rounded bg-pass/10 text-pass font-bold text-[8px] border border-pass/30 shrink-0 cursor-help" 
-                  title={currentRank.title}
-                >
-                  {currentRank.badge}
-                </span>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <Bug size={11} className="text-pass shrink-0 self-center" />
+            {/* Top Row: Bug Detector Count + Setting Button */}
+            <div className="flex items-center justify-between gap-1 pb-0.5">
+              <div className="flex items-baseline gap-1" title="Defects squashed">
+                <Bug size={12} className="text-pass shrink-0 self-center" />
                 <span className="text-sm font-black text-pass leading-none">{score}</span>
                 {combo > 1 && (
                   <span className="text-[7.5px] font-bold text-amber-500 animate-pulse leading-none">
@@ -1220,32 +1211,51 @@ export function QaGame() {
                   </span>
                 )}
               </div>
+
+              <div className="flex items-center gap-1">
+                {/* Setting Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsSettingsOpen(prev => !prev)}
+                  className={`p-0.5 rounded border transition-colors ${
+                    isSettingsOpen 
+                      ? "bg-pass/15 border-pass text-pass" 
+                      : "border-line text-muted hover:text-ink hover:border-pass"
+                  }`}
+                  title={isSettingsOpen ? "Close Settings" : "Game Settings (Freeze, Sound, Reset)"}
+                  aria-label="Game Settings"
+                  data-cursor="Toggle game settings"
+                >
+                  <Settings size={9} className={`transition-transform duration-200 ${isSettingsOpen ? "rotate-45 text-pass" : ""}`} />
+                </button>
+              </div>
             </div>
 
-            {/* Row 2: Micro Integrity Bar */}
-            <div className="w-full h-1 bg-line rounded-full overflow-hidden my-0.2">
-              <div 
-                className={`h-full transition-all duration-300 rounded-full ${
-                  systemIntegrity < 30 ? "bg-red-500" : systemIntegrity < 65 ? "bg-amber-500" : "bg-pass"
-                }`} 
-                style={{ width: `${systemIntegrity}%` }} 
-              />
-            </div>
-
-            {/* Row 3: Integrity % + Action Controls (Breakpoint, Sound, Reset) */}
-            <div className="flex items-center justify-between gap-1 pt-0.5 border-t border-line">
-              <div className="flex items-center gap-0.5">
-                <AlertTriangle size={8} className={systemIntegrity < 40 ? "text-red-500 animate-pulse shrink-0" : "text-pass shrink-0"} />
+            {/* Health Bar + Percentage */}
+            <div className="flex items-center gap-1.5 pt-0.5 border-t border-line">
+              <div className="flex-1 h-1 bg-line rounded-full overflow-hidden">
+                <div 
+                  className={`h-full transition-all duration-300 rounded-full ${
+                    systemIntegrity < 30 ? "bg-red-500" : systemIntegrity < 65 ? "bg-amber-500" : "bg-pass"
+                  }`} 
+                  style={{ width: `${systemIntegrity}%` }} 
+                />
+              </div>
+              <div className="flex items-center gap-0.5 shrink-0">
+                <AlertTriangle size={7} className={systemIntegrity < 40 ? "text-red-500 animate-pulse shrink-0" : "text-pass shrink-0"} />
                 <span 
-                  className={`text-[9.5px] font-extrabold leading-none ${
+                  className={`text-[9px] font-extrabold leading-none ${
                     systemIntegrity < 30 ? "text-red-500 animate-pulse" : systemIntegrity < 65 ? "text-amber-500" : "text-pass"
                   }`}
                 >
                   {systemIntegrity}%
                 </span>
               </div>
+            </div>
 
-              <div className="flex items-center gap-1">
+            {/* Collapsible Settings Drawer */}
+            {isSettingsOpen && (
+              <div className="flex items-center justify-between gap-1 pt-1 mt-0.5 border-t border-line animate-fade-in">
                 {/* Breakpoint Powerup */}
                 <button
                   type="button"
@@ -1275,7 +1285,7 @@ export function QaGame() {
                   aria-label={isMuted ? "Unmute Sound" : "Mute Sound"}
                   data-cursor={isMuted ? "Unmute game audio effects" : "Mute game audio effects"}
                 >
-                  {isMuted ? <VolumeX size={9} /> : <Volume2 size={9} />}
+                  {isMuted ? <VolumeX size={8} /> : <Volume2 size={8} />}
                 </button>
 
                 {/* Reset */}
@@ -1300,9 +1310,23 @@ export function QaGame() {
                 >
                   <RefreshCw size={8} />
                 </button>
-              </div>
-            </div>
 
+                {/* Exit Game */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    restoreAllEatenElements();
+                    setIsOpen(false);
+                  }}
+                  className="text-muted hover:text-red-500 hover:border-red-500 transition-colors p-0.5 rounded border border-line"
+                  title="Exit Game"
+                  aria-label="Exit Game"
+                  data-cursor="Exit defect hunter"
+                >
+                  <X size={8} />
+                </button>
+              </div>
+            )}
           </aside>
 
           {/* Frozen Debugger Overlay Banner */}

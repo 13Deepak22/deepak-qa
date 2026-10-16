@@ -8,7 +8,7 @@ import { profile } from "@/data";
 
 type Result = { status: "sent" | "invalid" | "error" | "mailto"; message: string };
 
-export function ContactPanel({ direct }: { direct: boolean }) {
+export function ContactPanel({ direct = true }: { direct?: boolean }) {
   const [result, setResult] = useState<Result | null>(null);
   const [pending, startTransition] = useTransition();
   const startedAt = useRef(0);
@@ -139,7 +139,7 @@ export function ContactPanel({ direct }: { direct: boolean }) {
         <div className="flex items-baseline justify-between gap-4">
           <h3 className="font-serif text-xl tracking-tight text-on-band">Connect me.</h3>
           <span className="hidden font-mono text-[0.62rem] tracking-[0.14em] text-pass uppercase sm:inline">
-            {direct ? "Lands in my inbox" : "Opens your mail app"}
+            {direct ? "Direct Query • Private Log" : "Opens your mail app"}
           </span>
         </div>
         <label className="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">

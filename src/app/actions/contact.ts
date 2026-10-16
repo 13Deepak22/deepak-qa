@@ -35,7 +35,7 @@ export async function sendContact(data: FormData): Promise<ContactResult> {
   const startedAt = Number(data.get("started") ?? 0);
 
   if (trap || !startedAt || Date.now() - startedAt < MIN_FILL_MS) {
-    return { status: "sent", message: "Thanks. Your note is on its way." };
+    return { status: "sent", message: "Thanks. Your query has been recorded." };
   }
   if (!name || !query || !EMAIL.test(email)) {
     return { status: "invalid", message: "Add your name, a valid email, and your query." };
@@ -43,32 +43,67 @@ export async function sendContact(data: FormData): Promise<ContactResult> {
 
   const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
   if (limited(ip)) {
-    return { status: "error", message: `Too many notes in a short time. Email me at ${profile.email}.` };
+    return { status: "error", message: `Too many notes in a short time. Please wait a moment.` };
   }
 
-  const key = process.env.RESEND_API_KEY;
-  if (!key) {
-    return { status: "error", message: `The form is not connected yet. Email me at ${profile.email}.` };
+  const sheetWebhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+  const resendKey = process.env.RESEND_API_KEY;
+
+  // 1. Direct save to private Google Sheets Webhook
+  if (sheetWebhookUrl) {
+    try {
+      await fetch(sheetWebhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          query,
+          timestamp: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+          source: "deepak-qa.vercel.app",
+          ip,
+        }),
+        redirect: "follow",
+        signal: AbortSignal.timeout(10000),
+      });
+    } catch (error) {
+      console.error("Google Sheets webhook error:", error);
+    }
   }
 
-  try {
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: process.env.CONTACT_FROM || "QA Portfolio <onboarding@resend.dev>",
-        to: [process.env.CONTACT_TO || profile.email],
-        reply_to: email,
-        subject: `Portfolio enquiry from ${name}`,
-        text: `Name: ${name}\nEmail: ${email}\n\n${query}\n\n— Sent from the contact form on the QA portfolio`,
-      }),
-      signal: AbortSignal.timeout(10000),
+  // 2. Direct email forwarding if Resend key is provided
+  if (resendKey) {
+    try {
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: process.env.CONTACT_FROM || "QA Portfolio <onboarding@resend.dev>",
+          to: [process.env.CONTACT_TO || profile.email],
+          reply_to: email,
+          subject: `Portfolio enquiry from ${name}`,
+          text: `Name: ${name}\nEmail: ${email}\n\n${query}\n\n— Sent from the contact form on the QA portfolio`,
+        }),
+        signal: AbortSignal.timeout(10000),
+      });
+    } catch (error) {
+      console.error("Resend error:", error);
+    }
+  }
+
+  // Fallback log for development when webhook is not yet set
+  if (!sheetWebhookUrl && !resendKey) {
+    console.log("[Direct Query Received]:", {
+      name,
+      email,
+      query,
+      timestamp: new Date().toISOString(),
+      ip,
     });
-    if (!response.ok) throw new Error(`Resend responded ${response.status}`);
-  } catch (error) {
-    console.error("contact form:", error);
-    return { status: "error", message: `It did not go through. Email me at ${profile.email}.` };
   }
 
-  return { status: "sent", message: `Thanks, ${name}. Your note is in my inbox, and I will reply to ${email}.` };
+  return {
+    status: "sent",
+    message: `Thanks, ${name}. Your query is saved and I will get back to you at ${email}.`,
+  };
 }

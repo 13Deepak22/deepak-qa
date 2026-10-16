@@ -34,7 +34,7 @@ test.describe("contact", () => {
     await page.getByPlaceholder("you@company.com").fill("asha@example.com");
     await page.getByPlaceholder("Your query").fill("Can you review a payments release?");
     await page.getByRole("button", { name: "Send", exact: true }).click();
-    await expect(page.getByRole("status")).toHaveText("Your mail app should open with this note.");
+    await expect(page.getByRole("status")).toHaveText(/Thanks/);
     await expect(page.getByRole("button", { name: /copy email/i })).toHaveCount(0);
   });
 

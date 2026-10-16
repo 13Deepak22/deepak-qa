@@ -5,7 +5,7 @@ export function SiteFooter() {
   return (
     <footer id="contact" className="band scroll-mt-20 bg-band text-on-band">
       <div className="mx-auto max-w-6xl px-4 pt-8 pb-5 sm:px-6 sm:pt-10">
-        <ContactPanel direct={Boolean(process.env.RESEND_API_KEY)} />
+        <ContactPanel direct={true} />
 
         <div className="mt-8 border-t border-on-band/15 pt-4 text-xs text-on-band/55 lg:pr-16 xl:pr-0">
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">

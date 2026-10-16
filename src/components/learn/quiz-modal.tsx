@@ -252,8 +252,8 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
         {/* 1. CONFIGURATION VIEW                                      */}
         {/* ========================================================= */}
         {quizState === "config" && (
-          <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col justify-between">
-            <div className="space-y-5">
+          <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-4 sm:p-5 flex flex-col justify-between">
+            <div className="space-y-4">
               
               <div>
                 <h3 className="font-serif text-lg sm:text-xl text-ink font-normal">
@@ -377,8 +377,8 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
         {/* 2. ACTIVE QUIZ SESSION                                    */}
         {/* ========================================================= */}
         {quizState === "active" && currentQ && (
-          <div className="flex-1 overflow-y-auto p-5 sm:p-7 flex flex-col justify-between">
-            <div className="space-y-4">
+          <div className="flex-1 p-4 sm:p-5 flex flex-col justify-between overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="space-y-2.5 sm:space-y-3">
               
               {/* Question metadata & Live Stats */}
               <div className="flex items-center justify-between gap-2">
@@ -407,13 +407,13 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
 
               {/* Big Question Prompt */}
               <div>
-                <h3 className="font-serif text-lg sm:text-xl text-ink font-normal leading-relaxed">
+                <h3 className="font-serif text-base sm:text-[17px] text-ink font-normal leading-snug">
                   {currentQ.question}
                 </h3>
               </div>
 
               {/* 4 Interactive MCQ Options */}
-              <div className="grid grid-cols-1 gap-2 pt-1">
+              <div className="grid grid-cols-1 gap-1.5 pt-0.5">
                 {currentQ.options.map((option, idx) => {
                   const letter = String.fromCharCode(65 + idx);
                   const isSelected = selectedOption === idx;
@@ -440,10 +440,10 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
                       type="button"
                       onClick={() => handleSelectOption(idx)}
                       disabled={isAnswerSubmitted}
-                      className={`w-full text-left p-3 rounded-lg border transition-all flex items-start gap-3 cursor-pointer ${cardStyle}`}
+                      className={`w-full text-left py-2 px-3 sm:py-2.5 sm:px-3.5 rounded-lg border transition-all flex items-start gap-2.5 cursor-pointer ${cardStyle}`}
                     >
                       <div
-                        className={`w-5.5 h-5.5 rounded font-mono text-xs font-semibold flex items-center justify-center shrink-0 border transition ${
+                        className={`w-5 h-5 rounded font-mono text-[11px] font-semibold flex items-center justify-center shrink-0 border transition ${
                           isAnswerSubmitted && isCorrect
                             ? "bg-pass text-paper border-pass"
                             : isAnswerSubmitted && isSelected && !isCorrect
@@ -460,7 +460,7 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
                         )}
                       </div>
 
-                      <div className="flex-1 font-sans text-xs sm:text-sm leading-relaxed">
+                      <div className="flex-1 font-sans text-xs sm:text-[13px] leading-snug">
                         {option}
                       </div>
                     </button>
@@ -470,18 +470,18 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
 
               {/* Technical Explanation Callout */}
               {isAnswerSubmitted && (
-                <div className="rounded-lg border-l-2 border-pass bg-paper/60 p-3.5 text-xs text-ink-soft leading-relaxed animate-in fade-in duration-150">
-                  <p className="font-mono text-[10px] text-pass font-semibold uppercase tracking-wider mb-1">
+                <div className="rounded-lg border-l-2 border-pass bg-paper/60 px-3 py-2 text-xs text-ink-soft leading-relaxed animate-in fade-in duration-150">
+                  <p className="font-mono text-[10px] text-pass font-semibold uppercase tracking-wider mb-0.5">
                     {selectedOption === currentQ.answerIndex ? "Correct" : "Explanation"}
                   </p>
-                  <p>{currentQ.explanation}</p>
+                  <p className="line-clamp-3 sm:line-clamp-none">{currentQ.explanation}</p>
                 </div>
               )}
 
             </div>
 
             {/* Bottom Actions */}
-            <div className="mt-6 pt-3.5 border-t border-line flex items-center justify-between">
+            <div className="mt-3 pt-2.5 border-t border-line flex items-center justify-between">
               <span className="font-mono text-[11px] text-muted">
                 Question {currentIndex + 1} of {activeQuestions.length}
               </span>
@@ -490,7 +490,7 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
                 <button
                   type="button"
                   onClick={handleNextQuestion}
-                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs animate-in fade-in duration-150"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs animate-in fade-in duration-150"
                 >
                   <span>
                     {currentIndex < activeQuestions.length - 1
@@ -508,11 +508,11 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
         {/* 3. SCORECARD & REVIEW                                      */}
         {/* ========================================================= */}
         {quizState === "scorecard" && (
-          <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col justify-between">
-            <div className="space-y-5">
+          <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-4 sm:p-5 flex flex-col justify-between">
+            <div className="space-y-4">
               
               {/* Score Header */}
-              <div className="p-4 rounded-xl border border-line bg-paper/50 flex items-center justify-between gap-4">
+              <div className="p-3.5 rounded-xl border border-line bg-paper/50 flex items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-serif text-xl sm:text-2xl font-normal text-ink">
@@ -527,13 +527,13 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
                   </p>
                 </div>
 
-                <div className="w-12 h-12 rounded-xl bg-pass/10 border border-pass/30 flex items-center justify-center text-pass shrink-0">
-                  <Trophy className="w-6 h-6" />
+                <div className="w-11 h-11 rounded-xl bg-pass/10 border border-pass/30 flex items-center justify-center text-pass shrink-0">
+                  <Trophy className="w-5.5 h-5.5" />
                 </div>
               </div>
 
               {/* Review Filter Tabs */}
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between pb-1 border-b border-line/60">
                   <span className="font-mono text-[11px] text-muted uppercase tracking-wider">
                     Review Questions
@@ -570,7 +570,7 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
                 </div>
 
                 {/* Question List */}
-                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                <div className="space-y-2 max-h-56 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pr-1">
                   {answersHistory
                     .filter((ans) => {
                       if (reviewFilter === "incorrect") return !ans.isCorrect;

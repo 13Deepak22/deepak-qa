@@ -197,11 +197,12 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
         </div>
 
         {/* ========================================================= */}
+        {/* ========================================================= */}
         {/* 1. FIRST PAGE: ONLY FILTER SECTIONS TO SELECT THEN START  */}
         {/* ========================================================= */}
         {viewState === "config" && (
-          <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col justify-between">
-            <div className="space-y-4">
+          <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-4 sm:p-5 flex flex-col justify-between">
+            <div className="space-y-3.5">
               <div>
                 <h3 className="font-serif text-lg sm:text-xl text-ink font-normal">
                   Select Quick Prep Tracks
@@ -212,8 +213,8 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
               </div>
 
               {/* Section Checkbox Chips (All 12 auto-selected by default) */}
-              <div className="pt-1">
-                <div className="flex items-center justify-between pb-1.5 mb-2.5 border-b border-line/50">
+              <div className="pt-0.5">
+                <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-line/50">
                   <span className="font-mono text-[11px] text-muted">
                     Selected Tracks ({selectedSectionIds.size} of {QUICK_PREP_SECTIONS.length}):
                   </span>
@@ -264,9 +265,9 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
             </div>
 
             {/* Launch CTA */}
-            <div className="mt-8 pt-3.5 border-t border-line flex items-center justify-between">
+            <div className="mt-5 pt-3 border-t border-line flex items-center justify-between">
               <span className="font-mono text-[11px] text-muted">
-                Pool contains <span className="font-semibold text-pass">{activePool.length}</span> randomized questions
+                Pool contains <span className="font-semibold text-pass">{activePool.length}</span> questions
               </span>
 
               <button
@@ -286,9 +287,9 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
         {/* 2. SECOND PAGE: ACTIVE RANDOM Q&A FLASHCARD               */}
         {/* ========================================================= */}
         {viewState === "active" && (
-          <div className="flex-1 overflow-y-auto p-5 sm:p-7 flex flex-col justify-between min-h-[300px]">
+          <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-4 sm:p-5 flex flex-col justify-between min-h-[260px]">
             {currentQuestion ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 
                 {/* Meta row */}
                 <div className="flex items-center justify-between gap-2">
@@ -314,25 +315,25 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
 
                 {/* Question Headline */}
                 <div>
-                  <h3 className="font-serif text-lg sm:text-xl text-ink font-normal leading-relaxed">
+                  <h3 className="font-serif text-base sm:text-[17px] text-ink font-normal leading-snug">
                     {currentQuestion.question}
                   </h3>
                 </div>
 
                 {/* Reveal Technical Answer */}
-                <div className="pt-2">
+                <div className="pt-1">
                   {!isAnswerRevealed ? (
                     <button
                       type="button"
                       onClick={() => setIsAnswerRevealed(true)}
-                      className="w-full py-3 px-4 rounded-lg border border-dashed border-line hover:border-pass/60 bg-paper/40 hover:bg-pass/5 text-ink-soft hover:text-pass transition flex items-center justify-center gap-2 font-mono text-xs cursor-pointer"
+                      className="w-full py-2.5 px-3.5 rounded-lg border border-dashed border-line hover:border-pass/60 bg-paper/40 hover:bg-pass/5 text-ink-soft hover:text-pass transition flex items-center justify-center gap-2 font-mono text-xs cursor-pointer"
                     >
                       <Eye className="w-3.5 h-3.5 text-pass" />
                       <span>Reveal Technical Answer (or press Space)</span>
                     </button>
                   ) : (
-                    <div className="rounded-lg border border-line bg-paper/50 p-4 sm:p-5 animate-in fade-in duration-150">
-                      <div className="flex items-center justify-between pb-2 mb-3 border-b border-line/50">
+                    <div className="rounded-lg border border-line bg-paper/50 p-3 sm:p-4 animate-in fade-in duration-150">
+                      <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-line/50">
                         <span className="font-mono text-[10px] uppercase tracking-wider text-pass font-semibold">
                           Key Points &amp; Answer
                         </span>
@@ -346,7 +347,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
                         </button>
                       </div>
 
-                      <div className="space-y-2.5 font-sans text-xs sm:text-sm text-ink-soft leading-relaxed">
+                      <div className="space-y-1.5 font-sans text-xs sm:text-[13px] text-ink-soft leading-relaxed">
                         {currentQuestion.answers.map((line, idx) => {
                           const trimmed = line.trim();
                           const isBullet =
@@ -381,7 +382,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
             ) : null}
 
             {/* Bottom Navigation Bar */}
-            <div className="mt-6 pt-3.5 border-t border-line flex items-center justify-between">
+            <div className="mt-3 pt-2.5 border-t border-line flex items-center justify-between">
               <div className="flex items-center gap-2 font-mono text-[11px] text-muted">
                 <button
                   type="button"

@@ -45,6 +45,16 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
     } catch {}
   }, [isOpen]);
 
+  // Lock background scroll when modal is open
+  useEffect(() => {
+    if (!isOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isOpen]);
+
   // Section toggle handlers
   const toggleSection = (id: string) => {
     setSelectedSectionIds((prev) => {
@@ -160,10 +170,10 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-6 bg-black/55 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="relative w-full max-w-2xl max-h-[92vh] sm:max-h-[90vh] flex flex-col rounded-xl border border-line bg-card shadow-xl overflow-hidden">
+      <div className="relative w-full max-w-2xl h-[560px] sm:h-[600px] max-h-[90vh] flex flex-col rounded-xl border border-line bg-card shadow-2xl overflow-hidden">
         
-        {/* Minimal Header */}
-        <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 border-b border-line bg-paper/60">
+        {/* Minimal Frozen Top Bar */}
+        <div className="shrink-0 flex items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 border-b border-line bg-paper/60">
           <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             <span className="font-mono text-[10px] tracking-wider uppercase text-pass font-semibold shrink-0">
               01 / Quick Prep
@@ -199,12 +209,11 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
         </div>
 
         {/* ========================================================= */}
-        {/* ========================================================= */}
         {/* 1. FIRST PAGE: ONLY FILTER SECTIONS TO SELECT THEN START  */}
         {/* ========================================================= */}
         {viewState === "config" && (
-          <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-3.5 sm:p-5 flex flex-col justify-between">
-            <div className="space-y-3 sm:space-y-3.5">
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <div className="flex-1 overflow-y-auto p-3.5 sm:p-5 space-y-3 sm:space-y-3.5">
               <div>
                 <h3 className="font-serif text-lg sm:text-xl text-ink font-normal">
                   Select Quick Prep Tracks
@@ -266,8 +275,8 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
               </div>
             </div>
 
-            {/* Launch CTA */}
-            <div className="mt-4 sm:mt-5 pt-3 border-t border-line flex flex-col sm:flex-row gap-2.5 sm:items-center justify-between">
+            {/* Frozen Launch CTA Footer */}
+            <div className="shrink-0 px-4 sm:px-5 py-3 border-t border-line bg-card flex flex-col sm:flex-row gap-2.5 sm:items-center justify-between">
               <span className="font-mono text-[11px] text-muted text-center sm:text-left">
                 Pool contains <span className="font-semibold text-pass">{activePool.length}</span> questions
               </span>
@@ -289,49 +298,49 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
         {/* 2. SECOND PAGE: ACTIVE RANDOM Q&A FLASHCARD               */}
         {/* ========================================================= */}
         {viewState === "active" && (
-          <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-3.5 sm:p-5 flex flex-col justify-between min-h-[240px] sm:min-h-[260px]">
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
             {currentQuestion ? (
-              <div className="space-y-3">
-                
-                {/* Meta row */}
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-[11px] text-pass font-medium">
-                      {currentQuestion.sectionTitle}
-                    </span>
-                    <span className="text-muted/40">•</span>
-                    <span className="font-mono text-[10px] text-muted">
-                      {currentQuestion.category}
-                    </span>
+              <>
+                {/* FROZEN QUESTION HEADER */}
+                <div className="shrink-0 px-4 sm:px-5 py-3 sm:py-3.5 border-b border-line/60 bg-paper/30 space-y-1.5">
+                  {/* Meta row */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[11px] text-pass font-semibold">
+                        {currentQuestion.sectionTitle}
+                      </span>
+                      <span className="text-muted/40">•</span>
+                      <span className="font-mono text-[10px] text-muted">
+                        {currentQuestion.category}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleCopy}
+                      className="p-1 rounded text-muted hover:text-ink hover:bg-paper transition cursor-pointer"
+                      title="Copy Q&A"
+                    >
+                      {copied ? <Check className="w-3.5 h-3.5 text-pass" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleCopy}
-                    className="p-1 rounded text-muted hover:text-ink transition cursor-pointer"
-                    title="Copy Q&A"
-                  >
-                    {copied ? <Check className="w-4 h-4 text-pass" /> : <Copy className="w-4 h-4" />}
-                  </button>
-                </div>
-
-                {/* Question Headline */}
-                <div>
-                  <h3 className="font-serif text-base sm:text-[17px] text-ink font-normal leading-snug">
+                  {/* Question Headline (Frozen) */}
+                  <h3 className="font-serif text-base sm:text-lg text-ink font-normal leading-snug">
                     {currentQuestion.question}
                   </h3>
                 </div>
 
-                {/* Technical Answer (Always Open) */}
-                <div className="pt-1">
+                {/* SCROLLABLE INNER TECHNICAL ANSWER */}
+                <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-3.5 min-h-0">
                   <div className="rounded-lg border border-line bg-paper/50 p-3 sm:p-4">
-                    <div className="pb-1.5 mb-2 border-b border-line/50">
+                    <div className="pb-1.5 mb-2.5 border-b border-line/50">
                       <span className="font-mono text-[10px] uppercase tracking-wider text-pass font-semibold">
                         Key Points &amp; Answer
                       </span>
                     </div>
 
-                    <div className="space-y-1.5 font-sans text-xs sm:text-[13px] text-ink-soft leading-relaxed">
+                    <div className="space-y-2 font-sans text-xs sm:text-[13px] text-ink-soft leading-relaxed">
                       {currentQuestion.answers.map((line, idx) => {
                         const trimmed = line.trim();
                         const isBullet =
@@ -352,7 +361,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
                                 : ""
                             }`}
                           >
-                            {isBullet && <span className="text-pass shrink-0">•</span>}
+                            {isBullet && <span className="text-pass shrink-0 font-bold">•</span>}
                             <span className="flex-1">{line.replace(/^[•\-o]\s*/, "")}</span>
                           </div>
                         );
@@ -361,34 +370,32 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
                   </div>
                 </div>
 
-              </div>
+                {/* FROZEN BOTTOM NAVIGATION BAR */}
+                <div className="shrink-0 px-4 sm:px-5 py-3 border-t border-line bg-card flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-mono text-[11px] text-muted">
+                    <button
+                      type="button"
+                      onClick={handlePrev}
+                      disabled={historyIndex <= 0}
+                      className="px-2.5 py-1.5 rounded border border-line bg-paper hover:border-pass/60 text-ink disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer"
+                      aria-label="Previous question"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                    </button>
+                    <span>{historyIndex + 1} explored</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs"
+                  >
+                    <span>Next</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </>
             ) : null}
-
-            {/* Bottom Navigation Bar */}
-            <div className="mt-3 pt-2.5 border-t border-line flex items-center justify-between">
-              <div className="flex items-center gap-2 font-mono text-[11px] text-muted">
-                <button
-                  type="button"
-                  onClick={handlePrev}
-                  disabled={historyIndex <= 0}
-                  className="px-2.5 py-1.5 rounded border border-line bg-paper hover:border-pass/60 text-ink disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer"
-                  aria-label="Previous question"
-                >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                </button>
-                <span>{historyIndex + 1} explored</span>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleNext}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs"
-              >
-                <span>Next</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
           </div>
         )}
 

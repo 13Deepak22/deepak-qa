@@ -269,6 +269,91 @@ export function getReactiveIntegrityColor(integrity: number): string {
   return `hsl(${hue}, 80%, 42%)`;
 }
 
+export interface BugDefenseProfile {
+  evasionRadius: number;
+  fleeForce: number;
+  steerRate: number;
+  lateralJitter: number;
+}
+
+// Dynamic Evasion Defense: Very low priority bugs have minimal defense/awareness,
+// while higher priority & critical bugs have enhanced awareness, agility & flee defense.
+export function getBugDefenseProfile(
+  age: number,
+  tier: BugPriorityTier,
+  category: string,
+  initialSeverity?: "P0" | "P1" | "P2" | "P3",
+  wave: number = 1
+): BugDefenseProfile {
+  // 1. Intrinsic Category Defense Multiplier based on technical bug severity & category
+  let categoryMult = 1.0;
+  if (["LOG", "CODE", "CACHE", "TEST"].includes(category) || initialSeverity === "P3") {
+    categoryMult = 0.65; // Very low intrinsic defense (lint warnings, logs, flaky tests)
+  } else if (["HTTP", "RATE", "WAIT", "AUTH", "SSR"].includes(category)) {
+    categoryMult = 1.0;  // Standard medium defense (404, rate limits, timeouts)
+  } else if (["MEM", "NET", "LOCK", "CALL", "SRV"].includes(category)) {
+    categoryMult = 1.25; // High defense (null ptrs, deadlocks, bad gateways)
+  } else if (["SYS", "SYNC", "HEAP"].includes(category) || initialSeverity === "P0") {
+    categoryMult = 1.45; // Maximum defense (internal err, race condition, mem leaks)
+  }
+
+  // Wave speed scaling (+0.2x per wave)
+  const waveMult = 1.0 + (wave - 1) * 0.2;
+
+  // 2. Base Defense Matrix by Tier:
+  // Low (P3): Minimal defense. Detection zone only touches bug body (34px-44px), crawl force is 0.20-0.45, steer is sluggish 0.03-0.07, zero jitter.
+  // Med (P2): Moderate defense. Radius 50px-74px, force 0.75-1.75, steer 0.12-0.30, gentle jitter 0.1-0.25.
+  // High (P1): Strong defense. Radius 78px-104px, force 2.0-3.3, steer 0.35-0.65, agile jitter 0.3-0.55.
+  // Critical (P0): Elite defense. Radius 126px, force 4.4, steer 0.88, erratic panic jitter 0.72.
+
+  let baseRadius = 36;
+  let baseForce = 0.25;
+  let baseSteer = 0.035;
+  let baseJitter = 0.0;
+
+  if (tier === "low") {
+    // Smooth ramp within low tier as it approaches medium (0 - 7000ms)
+    const t = Math.max(0, Math.min(1, age / STAGE_DURATION_MS));
+    baseRadius = 34 + t * 10;     // 34px -> 44px
+    baseForce = 0.20 + t * 0.25;   // 0.20 -> 0.45 (very sluggish crawl)
+    baseSteer = 0.03 + t * 0.04;   // 0.03 -> 0.07 (barely swerves, very easy to squash)
+    baseJitter = 0.0;             // Zero lateral dodging in low priority
+  } else if (tier === "med") {
+    // Medium tier: 7000ms - 14000ms
+    const t = Math.max(0, Math.min(1, (age - STAGE_DURATION_MS) / STAGE_DURATION_MS));
+    baseRadius = 50 + t * 24;     // 50px -> 74px
+    baseForce = 0.75 + t * 1.0;   // 0.75 -> 1.75
+    baseSteer = 0.12 + t * 0.18;  // 0.12 -> 0.30
+    baseJitter = 0.1 + t * 0.15;  // 0.10 -> 0.25
+  } else if (tier === "high") {
+    // High tier: 14000ms - 21000ms
+    const t = Math.max(0, Math.min(1, (age - STAGE_DURATION_MS * 2) / STAGE_DURATION_MS));
+    baseRadius = 78 + t * 26;     // 78px -> 104px
+    baseForce = 2.0 + t * 1.3;    // 2.0 -> 3.3
+    baseSteer = 0.35 + t * 0.30;  // 0.35 -> 0.65
+    baseJitter = 0.3 + t * 0.25;  // 0.30 -> 0.55
+  } else {
+    // Critical tier: 21000ms+
+    baseRadius = 126;
+    baseForce = 4.4;
+    baseSteer = 0.88;
+    baseJitter = 0.72;
+  }
+
+  // Calculate final dynamic parameters
+  const finalRadius = Math.max(28, Math.min(135, Math.round(baseRadius * Math.sqrt(categoryMult))));
+  const finalForce = baseForce * categoryMult * waveMult;
+  const finalSteer = Math.max(0.025, Math.min(0.95, baseSteer * categoryMult));
+  const finalJitter = baseJitter * categoryMult;
+
+  return {
+    evasionRadius: finalRadius,
+    fleeForce: finalForce,
+    steerRate: finalSteer,
+    lateralJitter: finalJitter,
+  };
+}
+
 export const UI_BUG_TYPES: BugTemplate[] = [
   { code: "#404", label: "NOT_FOUND", defaultSeverity: "P2", color: "#eab308", bgTint: "rgba(234, 179, 8, 0.16)", icon: "⚠️", category: "HTTP" },
   { code: "#500", label: "INTERNAL_ERR", defaultSeverity: "P0", color: "#ef4444", bgTint: "rgba(239, 68, 68, 0.22)", icon: "💥", category: "SYS" },
@@ -944,15 +1029,25 @@ export function QaGame() {
 
   const handlePointerEnter = useCallback((bugId: string) => {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    const targetBug = defectsRef.current.find(b => b.id === bugId);
     setDefects(prev => prev.map(b => b.id === bugId ? { ...b, scanning: true } : b));
 
-    // Target hover squash (100ms)
+    // Dynamic hover squash lock time based on defect severity/tier:
+    // P3 (Low): 75ms (instant effortless squish)
+    // P2 (Med): 95ms
+    // P1 (High): 115ms
+    // P0 (Critical): 135ms
+    const lockTime = targetBug?.bugSeverity === "P3" ? 75
+      : targetBug?.bugSeverity === "P2" ? 95
+      : targetBug?.bugSeverity === "P1" ? 115
+      : 135;
+
     hoverTimeoutRef.current = setTimeout(() => {
       const bug = defectsRef.current.find(b => b.id === bugId);
       if (bug && !bug.squashed) {
         squashDefect(bugId, bug.x, bug.y);
       }
-    }, 100);
+    }, lockTime);
   }, [squashDefect]);
 
   const handlePointerLeave = useCallback((bugId: string) => {
@@ -1140,6 +1235,7 @@ export function QaGame() {
       bugCode: template.code,
       bugLabel: template.label,
       bugSeverity: "P3",
+      initialSeverity: template.defaultSeverity,
       bugIcon: template.icon,
       bugCategory: template.category,
     };
@@ -1348,6 +1444,7 @@ export function QaGame() {
             bugCode: template.code,
             bugLabel: template.label,
             bugSeverity: "P3",
+            initialSeverity: template.defaultSeverity,
             bugIcon: template.icon,
             bugCategory: template.category,
           });
@@ -1480,30 +1577,40 @@ export function QaGame() {
         nextDirection += diff * steerRate;
       }
 
-      // --- CURSOR HOVER EVASION AS PER DIFFICULTY ---
+      // --- CURSOR HOVER EVASION WITH DYNAMIC DEFENSE (P3: MINIMAL DEFENSE, P0: ELITE DEFENSE) ---
       let evadeDx = 0;
       let evadeDy = 0;
       const mouse = mousePosRef.current;
       if (mouse.active && !isFrozen && !bug.eating && !bug.isDying) {
+        const defense = getBugDefenseProfile(
+          age,
+          tier,
+          bug.bugCategory,
+          bug.initialSeverity,
+          waveRef.current
+        );
         const distToMouse = Math.hypot(bug.x - mouse.x, bug.y - mouse.y);
-        const EVASION_RADIUS = 100;
-        if (distToMouse > 0 && distToMouse < EVASION_RADIUS) {
-          const proximity = (EVASION_RADIUS - distToMouse) / EVASION_RADIUS; // 0 (edge) to 1 (cursor center)
-          // Tier/Difficulty scaling: P0 > P1 > P2 > P3
-          const tierMultiplier = tier === "critical" ? 3.2 : tier === "high" ? 2.4 : tier === "med" ? 1.6 : 0.85;
-          // Wave speed scaling (+0.2x per wave)
-          const waveMultiplier = 1.0 + (waveRef.current - 1) * 0.2;
-          const fleeForce = proximity * 5.2 * tierMultiplier * waveMultiplier;
+
+        if (distToMouse > 0 && distToMouse < defense.evasionRadius) {
+          const proximity = (defense.evasionRadius - distToMouse) / defense.evasionRadius; // 0 (edge) to 1 (cursor center)
+
+          // Dynamic flee force scaled by proximity, priority tier, bug category & wave
+          const fleeForce = proximity * defense.fleeForce;
 
           const fleeAngle = Math.atan2(bug.y - mouse.y, bug.x - mouse.x);
-          const lateralJitter = Math.sin(now * 0.025 + bug.wobbleSeed) * 0.45;
+          const lateralJitter = defense.lateralJitter > 0 
+            ? Math.sin(now * 0.025 + bug.wobbleSeed) * defense.lateralJitter 
+            : 0;
           const finalFleeAngle = fleeAngle + lateralJitter;
 
           evadeDx = Math.cos(finalFleeAngle) * fleeForce;
           evadeDy = Math.sin(finalFleeAngle) * fleeForce;
 
-          // Steer rapidly towards escape vector
-          nextDirection = fleeAngle;
+          // Steer towards escape vector based on bug's dynamic agility/reaction rate
+          let diffAngle = fleeAngle - nextDirection;
+          while (diffAngle > Math.PI) diffAngle -= Math.PI * 2;
+          while (diffAngle < -Math.PI) diffAngle += Math.PI * 2;
+          nextDirection += diffAngle * defense.steerRate;
         }
       }
 

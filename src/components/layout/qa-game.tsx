@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { 
-  Gamepad2, Bug, X, Target, ShieldCheck, 
+  Gamepad2, Bug, X, ShieldCheck, 
   Volume2, VolumeX, Pause, Play, AlertTriangle, 
   RefreshCw, Zap, Award, Settings 
 } from "lucide-react";
@@ -504,28 +504,18 @@ export function QaGame() {
   const [hudPulse, setHudPulse] = useState(false);
   const isWaveAdvancingRef = useRef(false);
 
-  // Mouse detector tracking
+  // Mouse coordinates ref for evasion physics (zero React re-renders)
   const mousePosRef = useRef({ x: -1000, y: -1000, active: false });
-  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000, active: false });
-  const [isNearBug, setIsNearBug] = useState(false);
-  const [detectorHits, setDetectorHits] = useState<{ id: string; x: number; y: number }[]>([]);
 
-  // Track mouse coordinates for evasion physics and detector reticle
+  // Track mouse coordinates for evasion physics
   useEffect(() => {
     if (!isOpen) return;
     const onPointerMove = (e: PointerEvent) => {
       if (e.pointerType === "touch") return;
       mousePosRef.current = { x: e.clientX, y: e.clientY, active: true };
-      setMousePos({ x: e.clientX, y: e.clientY, active: true });
-      const near = defectsRef.current.some(
-        b => !b.squashed && !b.isDying && Math.hypot(b.x - e.clientX, b.y - e.clientY) < 65
-      );
-      setIsNearBug(near);
     };
     const onPointerLeave = () => {
       mousePosRef.current = { x: -1000, y: -1000, active: false };
-      setMousePos({ x: -1000, y: -1000, active: false });
-      setIsNearBug(false);
     };
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerleave", onPointerLeave);
@@ -535,17 +525,20 @@ export function QaGame() {
     };
   }, [isOpen]);
 
-  // Coordinate header space when QA game is active in top-left corner
+  // Coordinate header space and game cursor when QA game is active in top-left corner
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (isOpen) {
+      document.documentElement.setAttribute("data-game", "on");
       document.documentElement.setAttribute("data-qa-game-open", "true");
       window.dispatchEvent(new CustomEvent("qa-game-state-change", { detail: { open: true } }));
     } else {
+      document.documentElement.removeAttribute("data-game");
       document.documentElement.removeAttribute("data-qa-game-open");
       window.dispatchEvent(new CustomEvent("qa-game-state-change", { detail: { open: false } }));
     }
     return () => {
+      document.documentElement.removeAttribute("data-game");
       document.documentElement.removeAttribute("data-qa-game-open");
     };
   }, [isOpen]);
@@ -847,12 +840,6 @@ export function QaGame() {
 
     const progress = (Date.now() - targetBug.spawnTime) / (targetBug.hungerThreshold || 10000);
 
-    // Minimal detector hit ripple effect at kill coordinates
-    const hitId = Math.random().toString(36).substring(7);
-    setDetectorHits(prev => [...prev.slice(-3), { id: hitId, x, y }]);
-    setTimeout(() => {
-      setDetectorHits(prev => prev.filter(h => h.id !== hitId));
-    }, 240);
 
     // Update combo
     if (comboTimerRef.current) clearTimeout(comboTimerRef.current);
@@ -1912,7 +1899,6 @@ export function QaGame() {
                       ? "transform 320ms cubic-bezier(0.1, 0.9, 0.2, 1), opacity 320ms ease" 
                       : "opacity 150ms ease",
                     opacity: bug.squashed ? 0 : 1,
-                    cursor: isDying ? "default" : "crosshair",
                     pointerEvents: bug.squashed || isDying ? "none" : "auto",
                   }}
                   aria-label={bug.squashed || isDying ? undefined : `Squash defect ${bug.bugCode} ${bug.bugLabel}`}
@@ -2016,44 +2002,7 @@ export function QaGame() {
             </aside>
           )}
 
-          {/* Minimal QA Detector Reticle tracking the cursor */}
-          {mousePos.active && (
-            <div 
-              className={`fixed pointer-events-none z-[85] -translate-x-1/2 -translate-y-1/2 rounded-full border transition-transform duration-100 ease-out flex items-center justify-center ${
-                isNearBug 
-                  ? "w-8 h-8 border-pass scale-90" 
-                  : "w-9 h-9 border-pass/45 scale-100"
-              }`}
-              style={{ left: mousePos.x, top: mousePos.y }}
-            >
-              {/* 4 hairline crosshair marks */}
-              <span className="absolute -top-1 w-[1px] h-1.5 bg-pass/70" />
-              <span className="absolute -bottom-1 w-[1px] h-1.5 bg-pass/70" />
-              <span className="absolute -left-1 h-[1px] w-1.5 bg-pass/70" />
-              <span className="absolute -right-1 h-[1px] w-1.5 bg-pass/70" />
-              {/* Center micro dot */}
-              <span className={`w-1 h-1 rounded-full ${isNearBug ? "bg-pass animate-ping" : "bg-pass/50"}`} />
-            </div>
-          )}
 
-          {/* Minimal Detector Hit-Snap Ripple on Bug Kill */}
-          {detectorHits.map(hit => (
-            <div
-              key={hit.id}
-              className="fixed pointer-events-none z-[86] -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
-              style={{
-                left: hit.x,
-                top: hit.y,
-                animation: "detectorSnap 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards"
-              }}
-            >
-              <div className="w-8 h-8 rounded-full border border-pass/80" />
-              <span className="absolute w-2 h-[1px] bg-pass/90 -left-1" />
-              <span className="absolute w-2 h-[1px] bg-pass/90 -right-1" />
-              <span className="absolute h-2 w-[1px] bg-pass/90 -top-1" />
-              <span className="absolute h-2 w-[1px] bg-pass/90 -bottom-1" />
-            </div>
-          ))}
 
           {/* Transparent Non-Skippable Wave Upgrade Banner Merging into HUD Stats */}
           {waveBanner && (
@@ -2344,20 +2293,6 @@ export function QaGame() {
               }
             }
 
-            /* --- Minimal Detector Crosshair & Hit Snap Keyframes --- */
-            @keyframes detectorSnap {
-              0% {
-                transform: translate(-50%, -50%) scale(0.65);
-                opacity: 1;
-              }
-              50% {
-                opacity: 0.8;
-              }
-              100% {
-                transform: translate(-50%, -50%) scale(1.45);
-                opacity: 0;
-              }
-            }
           `}} />
         </div>
       )}

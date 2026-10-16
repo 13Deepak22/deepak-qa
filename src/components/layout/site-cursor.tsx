@@ -411,8 +411,6 @@ export function SiteCursor() {
           <path d="M14 14 A 4 4 0 0 1 13 16" stroke="var(--ink)" strokeWidth="1.5" strokeOpacity="0.3" strokeLinecap="round" />
           {/* Handle (black/ink) */}
           <line x1="22" y1="22" x2="16.65" y2="16.65" stroke="var(--ink)" strokeWidth="3" />
-          {/* Inner target circle */}
-          <circle cx="11" cy="11" r="2.5" stroke="var(--pass)" strokeWidth="1.5" strokeOpacity="0.8" />
         </svg>
       </span>
     </div>

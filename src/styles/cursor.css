@@ -316,6 +316,7 @@ html[data-site-cursor="active"] .site-cursor[data-hide] {
   width: 28px;
   height: 28px;
   transform: translate(-2px, -2px) scale(0.5) rotate(-45deg);
+  transition: opacity 0.3s var(--ease), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), filter 0.18s ease;
 }
 
 html[data-game="on"] .bug-svg {
@@ -326,6 +327,15 @@ html[data-game="on"] .bug-svg {
 html[data-game="on"] .detector-svg {
   opacity: 1;
   transform: translate(-2px, -2px) scale(1) rotate(0deg);
+}
+
+html[data-game="on"] .site-cursor-box {
+  display: none !important;
+}
+
+html[data-game="on"] .site-cursor[data-hot] .detector-svg {
+  transform: translate(-2px, -2px) scale(1.15) rotate(0deg);
+  filter: drop-shadow(0 0 6px var(--pass));
 }
 
 @media (hover: hover) and (pointer: fine) {

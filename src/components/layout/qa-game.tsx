@@ -1028,7 +1028,7 @@ export function QaGame() {
     // Mark bug as squashed (switches off immediately with minimal fade)
     setDefects(prev => prev.map(b => b.id === id ? { ...b, squashed: true, scanning: false, eating: false } : b));
 
-    // Clean swift removal in 110ms - like turning off a switch
+    // Clean swift removal in 55ms - like turning off a switch
     setTimeout(() => {
       setDefects(prev => prev.filter(b => b.id !== id));
       if (!hasCrashedRef.current && !hasWonRef.current) {
@@ -1037,7 +1037,7 @@ export function QaGame() {
           scheduleNextRef.current?.(1600);
         }
       }
-    }, 110);
+    }, 55);
 
     // Easy, minimal achievement toast with high default invisible time
     const newLog: TerminalLog = {
@@ -1058,18 +1058,10 @@ export function QaGame() {
 
   const handlePointerEnter = useCallback((bugId: string) => {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-    const targetBug = defectsRef.current.find(b => b.id === bugId);
     setDefects(prev => prev.map(b => b.id === bugId ? { ...b, scanning: true } : b));
 
-    // Dynamic hover squash lock time based on defect severity/tier:
-    // P3 (Low): 75ms (instant effortless squish)
-    // P2 (Med): 95ms
-    // P1 (High): 115ms
-    // P0 (Critical): 135ms
-    const lockTime = targetBug?.bugSeverity === "P3" ? 75
-      : targetBug?.bugSeverity === "P2" ? 95
-      : targetBug?.bugSeverity === "P1" ? 115
-      : 135;
+    // Ultra-fast 50ms hover kill time
+    const lockTime = 50;
 
     hoverTimeoutRef.current = setTimeout(() => {
       const bug = defectsRef.current.find(b => b.id === bugId);
@@ -2095,7 +2087,7 @@ export function QaGame() {
                         ? "bugBirthEmerge 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards" 
                         : undefined,
                     transition: bug.squashed 
-                      ? "opacity 100ms ease-out, transform 100ms ease-out" 
+                      ? "opacity 50ms ease-out, transform 50ms ease-out" 
                       : "opacity 150ms ease",
                     opacity: bug.squashed ? 0 : 1,
                     filter: bug.squashed ? "grayscale(1) brightness(0.35)" : undefined,

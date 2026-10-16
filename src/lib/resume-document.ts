@@ -13,8 +13,7 @@ export const resumeFormats: { format: ResumeFormat; label: string; hint: string;
   { format: "jpg", label: "JPG", hint: "Image to share", type: "image/jpeg" },
 ];
 
-export const resumeFileName = (format: ResumeFormat) =>
-  `${profile.name.toLowerCase().replace(/\s+/g, "-")}-resume.${format}`;
+export const resumeFileName = (format: ResumeFormat) => `DeepakQa.${format}`;
 
 const bare = (url?: string) => (url ? url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "") : "");
 const range = (period: string) => period.replace(" — ", " – ");

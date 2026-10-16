@@ -57,7 +57,7 @@ test.describe("resume", () => {
         page.waitForEvent("download"),
         page.getByRole("link", { name: `Download resume as ${label}` }).click(),
       ]);
-      expect(download.suggestedFilename()).toBe(`deepak-gupta-resume.${ext}`);
+      expect(download.suggestedFilename()).toBe(`DeepakQa.${ext}`);
     }
   });
 
@@ -70,7 +70,7 @@ test.describe("resume", () => {
       const response = await request.get(`/resume/download/${format}`);
       expect(response.status()).toBe(200);
       expect(response.headers()["content-type"]).toBe(type);
-      expect(response.headers()["content-disposition"]).toBe(`attachment; filename="deepak-gupta-resume.${format}"`);
+      expect(response.headers()["content-disposition"]).toBe(`attachment; filename="DeepakQa.${format}"`);
       const body = await response.body();
       expect(body.subarray(0, magic.length).toString("latin1")).toBe(magic);
       expect(body.length).toBeGreaterThan(5_000);

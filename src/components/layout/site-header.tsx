@@ -101,7 +101,6 @@ export function SiteHeader() {
         <Link
           href="/"
           className="flex min-w-0 items-center gap-3 text-ink"
-          data-cursor="Return to homepage"
           onClick={closeMenu}
         >
           <Mark className="h-8 w-8 shrink-0" />
@@ -121,7 +120,6 @@ export function SiteHeader() {
                 className={`nav-link text-sm transition-colors ${
                   isActive ? "text-pass font-semibold" : "text-ink-soft hover:text-pass"
                 }`}
-                data-cursor={item.hint}
               >
                 {item.label}
               </Link>
@@ -171,7 +169,6 @@ export function SiteHeader() {
                         className={`link-line group flex min-h-11 items-center gap-3 border-b border-line py-1.5 hover:border-pass hover:text-pass ${
                           current ? "text-pass" : "text-ink"
                         }`}
-                        data-cursor={item.hint}
                         onClick={closeMenu}
                       >
                         <span

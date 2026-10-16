@@ -28,18 +28,24 @@ function nameOf(el: Element) {
   return short.charAt(0).toUpperCase() + short.slice(1);
 }
 
-function labelFor(el: Element) {
-  const custom = el.getAttribute("data-cursor") ?? el.closest("[data-cursor]")?.getAttribute("data-cursor");
-  if (custom) return custom;
-  const hasText = Boolean(el.textContent?.trim());
-  if (el instanceof HTMLAnchorElement) {
-    const href = el.getAttribute("href") ?? "";
-    if (href.startsWith("mailto:")) return "Email";
-    if (href.startsWith("tel:")) return "Call";
-    if (el.target === "_blank" || /^https?:/.test(href)) return hasText ? "↗" : `${nameOf(el)} ↗`;
-    if (href === "/") return "Home";
+function labelFor(el: Element): string {
+  if (el === document.documentElement || el === document.body) return "";
+  const custom =
+    el.getAttribute("data-cursor") ??
+    el.closest("[data-cursor]:not(html):not(body)")?.getAttribute("data-cursor");
+  if (!custom) return "";
+  const trimmed = custom.trim();
+  // Filter out any status flags, boolean-like strings, or 'on'
+  if (
+    !trimmed ||
+    trimmed.toLowerCase() === "on" ||
+    trimmed.toLowerCase() === "off" ||
+    trimmed.toLowerCase() === "true" ||
+    trimmed.toLowerCase() === "false"
+  ) {
+    return "";
   }
-  return hasText ? "" : nameOf(el);
+  return trimmed;
 }
 
 function easeInOutCubic(t: number) {
@@ -265,7 +271,7 @@ export function SiteCursor() {
     const stop = () => {
       if (frame) window.cancelAnimationFrame(frame);
       frame = 0;
-      delete document.documentElement.dataset.cursor;
+      delete document.documentElement.dataset.siteCursor;
       root.removeAttribute("data-show");
       shown = false;
     };
@@ -282,7 +288,7 @@ export function SiteCursor() {
         last.x = pos.x;
         last.y = pos.y;
         root.dataset.show = "true";
-        document.documentElement.dataset.cursor = "on";
+        document.documentElement.dataset.siteCursor = "active";
       }
       const el = event.target instanceof Element ? event.target : null;
       const field = el?.closest(FIELD) ?? null;

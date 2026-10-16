@@ -224,7 +224,7 @@ export default function ServicesPage() {
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 border-t border-line pt-12">
-            <div className="border border-line bg-card p-5" data-cursor="RCA Pillar 1: Exploratory Latency Conditioning">
+            <div className="border border-line bg-card p-5">
               <span className="font-mono text-[0.65rem] tracking-[0.16em] text-pass uppercase block">
                 01 · Discovery Method
               </span>
@@ -236,7 +236,7 @@ export default function ServicesPage() {
               </p>
             </div>
 
-            <div className="border border-line bg-card p-5" data-cursor="RCA Pillar 2: Application Memory Race Analysis">
+            <div className="border border-line bg-card p-5">
               <span className="font-mono text-[0.65rem] tracking-[0.16em] text-pass uppercase block">
                 02 · Root Cause
               </span>
@@ -248,7 +248,7 @@ export default function ServicesPage() {
               </p>
             </div>
 
-            <div className="border border-line bg-card p-5" data-cursor="RCA Pillar 3: Release Gate Concurrency Suite">
+            <div className="border border-line bg-card p-5">
               <span className="font-mono text-[0.65rem] tracking-[0.16em] text-pass uppercase block">
                 03 · Automated Prevention
               </span>

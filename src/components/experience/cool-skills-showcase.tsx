@@ -230,7 +230,6 @@ export function CoolSkillsShowcase() {
           {CORE_ARSENAL.map((tool) => (
             <div
               key={tool.name}
-              data-cursor={`Core QA tool: ${tool.name} · ${tool.role}`}
               className="group relative flex flex-col justify-between rounded-xl border border-line bg-card p-5 sm:p-6 transition-all hover:border-pass/80 hover:shadow-xs"
             >
               <div>
@@ -405,7 +404,6 @@ export function CoolSkillsShowcase() {
                   return (
                     <div
                       key={item}
-                      data-cursor={`Verified skill: ${item}${badge ? ` · ${badge}` : ''}`}
                       className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border font-mono text-xs transition-colors ${
                         badge
                           ? "border-pass/50 bg-paper text-ink shadow-2xs"

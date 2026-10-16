@@ -152,7 +152,6 @@ export default function AboutPage() {
                     <li
                       key={step.when}
                       className="journey-step"
-                      data-cursor={`Career milestone: ${step.when}`}
                       style={{ "--i": index } as CSSProperties}
                     >
                       <span className="journey-dot" aria-hidden="true" />
@@ -178,7 +177,6 @@ export default function AboutPage() {
                           <li
                             key={item}
                             className="about-chip"
-                            data-cursor={`Core competency: ${item}`}
                             data-tone={group.label === "Practice" ? undefined : "pass"}
                           >
                             {item}
@@ -194,7 +192,7 @@ export default function AboutPage() {
             <Chapter index={4} chapter={interests} body={about.interests}>
               <ul className="mt-8 flex max-w-2xl flex-wrap gap-2">
                 {about.interestTags.map((tag) => (
-                  <li key={tag} className="about-chip" data-cursor={`Interest: #${tag}`}>
+                  <li key={tag} className="about-chip">
                     <span className="text-pass" aria-hidden="true">
                       #
                     </span>
@@ -212,7 +210,6 @@ export default function AboutPage() {
                     <li
                       key={goal}
                       className="flex items-start gap-3 text-sm text-ink"
-                      data-cursor={`Release criterion: ${goal}`}
                       style={{ "--i": index } as CSSProperties}
                     >
                       <svg viewBox="0 0 20 20" aria-hidden="true" className="goal-box mt-px size-5 shrink-0">

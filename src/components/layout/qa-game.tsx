@@ -171,6 +171,43 @@ export const BUG_PRIORITY_CONFIG: Record<BugPriorityTier, PriorityConfig> = {
   },
 };
 
+// Performance & Hardware Profiling Constants (Hard ceiling: max 10 bugs on screen)
+export const ABSOLUTE_MAX_BUGS = 10;
+export const MIN_DYNAMIC_BUGS = 4;
+
+/**
+ * Zero-permission device hardware profiling:
+ * Evaluates CPU logical cores, RAM (if supported), touch points, and screen viewport.
+ * Sets a conservative baseline ceiling (never exceeding 10) so low-spec PCs/phones never hang.
+ */
+export function getDeviceHardwareSpec(): { baselineMaxBugs: number; tier: "low" | "mid" | "high" } {
+  if (typeof window === "undefined" || typeof navigator === "undefined") {
+    return { baselineMaxBugs: ABSOLUTE_MAX_BUGS, tier: "high" };
+  }
+
+  const cores = navigator.hardwareConcurrency || 4;
+  const memory = (navigator as unknown as { deviceMemory?: number }).deviceMemory ?? 8;
+  const isMobile = window.innerWidth < 768 || ('ontouchstart' in window) || (navigator.maxTouchPoints > 1);
+
+  // Low-spec device (<= 2 cores or <= 2GB memory)
+  if (cores <= 2 || memory <= 2) {
+    return { baselineMaxBugs: 5, tier: "low" };
+  }
+
+  // Mid-spec mobile or 4-core budget desktop
+  if (isMobile || cores <= 4 || memory <= 4) {
+    return { baselineMaxBugs: 7, tier: "mid" };
+  }
+
+  // 6 cores desktop/laptop
+  if (cores <= 6) {
+    return { baselineMaxBugs: 8, tier: "mid" };
+  }
+
+  // High performance (8+ cores, >4GB RAM, desktop)
+  return { baselineMaxBugs: ABSOLUTE_MAX_BUGS, tier: "high" };
+}
+
 export interface SimulatedState {
   tier: BugPriorityTier;
   color: string;
@@ -644,6 +681,14 @@ export function QaGame() {
   const waveRef = useRef(1);
   const spawnDefectRef = useRef<() => void>(() => {});
 
+  // Dynamic performance, hanging detection & bug capacity refs (Max 10)
+  const corruptedCountRef = useRef(0);
+  const lastFrameTimeRef = useRef(0);
+  const frameDeltasRef = useRef<number[]>([]);
+  const dynamicMaxBugsRef = useRef<number>(ABSOLUTE_MAX_BUGS);
+  const lastDynamicAdjustTimeRef = useRef<number>(0);
+  const activeBugCount = defects.filter(b => !b.squashed && !b.isDying).length;
+
   // Sync state refs
   useEffect(() => {
     defectsRef.current = defects;
@@ -853,6 +898,7 @@ export function QaGame() {
       targetEl.style.boxShadow = "";
       targetEl.style.backgroundColor = "";
     });
+    corruptedCountRef.current = 0;
     setEatenCount(0);
     setSystemIntegrity(100);
   }, []);
@@ -985,8 +1031,9 @@ export function QaGame() {
     // Mark bug as squashed
     setDefects(prev => prev.map(b => b.id === id ? { ...b, squashed: true, scanning: false, eating: false } : b));
 
-    // Spawn colorful debris particles matching bug color
-    const newParticles = Array.from({ length: 7 }).map(() => ({
+    // Spawn colorful debris particles matching bug color (adapted to performance tier)
+    const particleCount = dynamicMaxBugsRef.current <= 6 ? 4 : 6;
+    const newParticles = Array.from({ length: particleCount }).map(() => ({
       id: Math.random().toString(36).substring(7),
       x,
       y,
@@ -997,7 +1044,10 @@ export function QaGame() {
     setTimeout(() => {
       setDefects(prev => prev.filter(b => b.id !== id));
       if (!hasCrashedRef.current && !hasWonRef.current) {
-        spawnDefectRef.current?.();
+        const remainingActive = defectsRef.current.filter(b => !b.squashed && !b.isDying && b.id !== id).length;
+        if (remainingActive < dynamicMaxBugsRef.current && remainingActive < ABSOLUTE_MAX_BUGS) {
+          spawnDefectRef.current?.();
+        }
       }
     }, 400);
 
@@ -1171,9 +1221,10 @@ export function QaGame() {
     return null;
   }, []);
 
-  // Spawn Defect from Perimeter Edges (Always Low & Green on spawn)
+  // Spawn Defect from Perimeter Edges (Always Low & Green on spawn, capped dynamically <= 10)
   const spawnDefect = useCallback(() => {
-    if (defectsRef.current.length >= 35) return; // safe hardware ceiling only (continuous spawning allowed)
+    const activeCount = defectsRef.current.filter(b => !b.squashed && !b.isDying).length;
+    if (activeCount >= dynamicMaxBugsRef.current || activeCount >= ABSOLUTE_MAX_BUGS) return;
     if (hasCrashedRef.current || hasWonRef.current) return;
     
     // Spawn at perimeter borders outside visible area and crawl inwards
@@ -1254,10 +1305,35 @@ export function QaGame() {
       return;
     }
 
-    // Check if system integrity depleted to 0% (100% corrupted)
-    const corruptedCount = document.querySelectorAll('[data-eaten="true"]').length;
-    if (corruptedCount >= 20) {
-      setEatenCount(corruptedCount);
+    const now = Date.now();
+    const perfNow = performance.now();
+
+    // Zero-permission Dynamic FPS & Hanging Detector
+    if (lastFrameTimeRef.current > 0) {
+      const delta = perfNow - lastFrameTimeRef.current;
+      frameDeltasRef.current.push(delta);
+      if (frameDeltasRef.current.length > 25) frameDeltasRef.current.shift();
+
+      // Check performance every 1.5 seconds and dynamically scale max bugs
+      if (now - lastDynamicAdjustTimeRef.current > 1500 && frameDeltasRef.current.length >= 15) {
+        lastDynamicAdjustTimeRef.current = now;
+        const avgDelta = frameDeltasRef.current.reduce((a, b) => a + b, 0) / frameDeltasRef.current.length;
+        const { baselineMaxBugs } = getDeviceHardwareSpec();
+
+        // Avg delta > 28ms means FPS < 35 -> Frame drop / hanging detected!
+        if (avgDelta > 28) {
+          dynamicMaxBugsRef.current = Math.max(MIN_DYNAMIC_BUGS, dynamicMaxBugsRef.current - 1);
+        } else if (avgDelta < 18 && dynamicMaxBugsRef.current < baselineMaxBugs) {
+          // Smooth 55-60 FPS -> can safely restore toward hardware baseline (max 10)
+          dynamicMaxBugsRef.current = Math.min(baselineMaxBugs, dynamicMaxBugsRef.current + 1);
+        }
+      }
+    }
+    lastFrameTimeRef.current = perfNow;
+
+    // Check if system integrity depleted to 0% (100% corrupted) without 60fps DOM querying
+    if (corruptedCountRef.current >= 20) {
+      setEatenCount(corruptedCountRef.current);
       setSystemIntegrity(0);
       setHasCrashed(true);
       hasCrashedRef.current = true;
@@ -1265,7 +1341,6 @@ export function QaGame() {
       return;
     }
 
-    const now = Date.now();
     const activeDefectsList = defectsRef.current.filter(b => !b.squashed);
 
     const nextDefects: Defect[] = [];
@@ -1353,8 +1428,9 @@ export function QaGame() {
             setParticles(prev => prev.filter(p => !crashParticles.find(cp => cp.id === p.id)));
           }, 800);
 
-          // Update integrity
-          const corruptedCount = document.querySelectorAll('[data-eaten="true"]').length;
+          // Update integrity using tracked corrupted count
+          corruptedCountRef.current += 1;
+          const corruptedCount = corruptedCountRef.current;
           setEatenCount(corruptedCount);
           const integrityLeft = Math.max(0, Math.round(100 - corruptedCount * 5));
           setSystemIntegrity(integrityLeft);
@@ -1391,63 +1467,67 @@ export function QaGame() {
             speedScale: 0,
           });
 
-          // 2. AT THE SAME TIME: REPRODUCES A LOW-PRIORITY GREEN BUG RIGHT THERE WITH EMERGENCE ANIMATION!
-          playBirthAudio();
-          const birthParticles = Array.from({ length: 8 }).map(() => ({
-            id: Math.random().toString(36).substring(7),
-            x: bug.x,
-            y: bug.y,
-            color: "#10b981"
-          }));
-          setParticles(prev => [...prev, ...birthParticles]);
-          setTimeout(() => {
-            setParticles(prev => prev.filter(p => !birthParticles.find(bp => bp.id === p.id)));
-          }, 800);
+          // 2. AT THE SAME TIME: REPRODUCES A LOW-PRIORITY GREEN BUG ONLY IF UNDER MAX SCREEN CAP (<= 10)
+          const currentActiveCount = defectsRef.current.filter(b => !b.squashed && !b.isDying && b.id !== bug.id).length;
+          if (currentActiveCount < dynamicMaxBugsRef.current && currentActiveCount < ABSOLUTE_MAX_BUGS) {
+            playBirthAudio();
+            const birthParticleCount = dynamicMaxBugsRef.current <= 6 ? 4 : 6;
+            const birthParticles = Array.from({ length: birthParticleCount }).map(() => ({
+              id: Math.random().toString(36).substring(7),
+              x: bug.x,
+              y: bug.y,
+              color: "#10b981"
+            }));
+            setParticles(prev => [...prev, ...birthParticles]);
+            setTimeout(() => {
+              setParticles(prev => prev.filter(p => !birthParticles.find(bp => bp.id === p.id)));
+            }, 800);
 
-          const angle = Math.random() * Math.PI * 2;
-          const spawnX = Math.max(40, Math.min(window.innerWidth - 40, bug.x + Math.cos(angle) * 24));
-          const spawnY = Math.max(40, Math.min(window.innerHeight - 40, bug.y + Math.sin(angle) * 24));
+            const angle = Math.random() * Math.PI * 2;
+            const spawnX = Math.max(40, Math.min(window.innerWidth - 40, bug.x + Math.cos(angle) * 24));
+            const spawnY = Math.max(40, Math.min(window.innerHeight - 40, bug.y + Math.sin(angle) * 24));
 
-          const template = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
-          const lowCfg = BUG_PRIORITY_CONFIG.low;
-          const waveMultiplier = 1 + (waveRef.current - 1) * 0.2;
-          const baseSpeed = (1.15 + Math.random() * 0.25) * waveMultiplier;
-          const newRoamX = 60 + Math.random() * (window.innerWidth - 120);
-          const newRoamY = 60 + Math.random() * (window.innerHeight - 120);
+            const template = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
+            const lowCfg = BUG_PRIORITY_CONFIG.low;
+            const waveMultiplier = 1 + (waveRef.current - 1) * 0.2;
+            const baseSpeed = (1.15 + Math.random() * 0.25) * waveMultiplier;
+            const newRoamX = 60 + Math.random() * (window.innerWidth - 120);
+            const newRoamY = 60 + Math.random() * (window.innerHeight - 120);
 
-          nextDefects.push({
-            id: Math.random().toString(36).substring(7),
-            x: spawnX,
-            y: spawnY,
-            squashed: false,
-            eating: false,
-            isDying: false,
-            isBorn: true,
-            birthStartTime: now,
-            targetElement: null,
-            targetX: undefined,
-            targetY: undefined,
-            roamTargetX: newRoamX,
-            roamTargetY: newRoamY,
-            roamChangeTime: now,
-            spawnTime: now,
-            hasAlertedCritical: false,
-            originalSpeed: baseSpeed,
-            speed: baseSpeed * lowCfg.speedScale,
-            size: lowCfg.size,
-            baseSize: lowCfg.size,
-            speedScale: lowCfg.speedScale,
-            color: lowCfg.color,
-            isPulsing: false,
-            direction: Math.atan2(newRoamY - spawnY, newRoamX - spawnX),
-            wobbleSeed: Math.random() * 1000,
-            bugCode: template.code,
-            bugLabel: template.label,
-            bugSeverity: "P3",
-            initialSeverity: template.defaultSeverity,
-            bugIcon: template.icon,
-            bugCategory: template.category,
-          });
+            nextDefects.push({
+              id: Math.random().toString(36).substring(7),
+              x: spawnX,
+              y: spawnY,
+              squashed: false,
+              eating: false,
+              isDying: false,
+              isBorn: true,
+              birthStartTime: now,
+              targetElement: null,
+              targetX: undefined,
+              targetY: undefined,
+              roamTargetX: newRoamX,
+              roamTargetY: newRoamY,
+              roamChangeTime: now,
+              spawnTime: now,
+              hasAlertedCritical: false,
+              originalSpeed: baseSpeed,
+              speed: baseSpeed * lowCfg.speedScale,
+              size: lowCfg.size,
+              baseSize: lowCfg.size,
+              speedScale: lowCfg.speedScale,
+              color: lowCfg.color,
+              isPulsing: false,
+              direction: Math.atan2(newRoamY - spawnY, newRoamX - spawnX),
+              wobbleSeed: Math.random() * 1000,
+              bugCode: template.code,
+              bugLabel: template.label,
+              bugSeverity: "P3",
+              initialSeverity: template.defaultSeverity,
+              bugIcon: template.icon,
+              bugCategory: template.category,
+            });
+          }
 
           continue;
         }
@@ -1480,8 +1560,9 @@ export function QaGame() {
         // Critical attack mode: acquire and lock onto a distinct leaf target element
         const isHeader = (el: HTMLElement) => Boolean(el.closest('header, [role="banner"], nav[aria-label="Primary"]'));
 
-        // If bug is currently locked onto a header element while non-header content is still alive on page, release it!
-        if (targetEl && isHeader(targetEl)) {
+        // If bug is currently locked onto a header element while non-header content is still alive on page, release it! (throttled to 800ms)
+        if (targetEl && isHeader(targetEl) && now - (bug.lastHitTest || 0) > 800) {
+          bug.lastHitTest = now;
           const hasAliveNonHeader = Array.from(document.querySelectorAll<HTMLElement>(LEAF_SELECTOR))
             .some(el => !isHeader(el) && !el.hasAttribute('data-eaten') && !el.closest('[data-eaten="true"]'));
           if (hasAliveNonHeader) {
@@ -1677,6 +1758,13 @@ export function QaGame() {
     if (isOpen) {
       document.documentElement.dataset.game = "on";
       
+      const spec = getDeviceHardwareSpec();
+      dynamicMaxBugsRef.current = Math.min(ABSOLUTE_MAX_BUGS, spec.baselineMaxBugs);
+      frameDeltasRef.current = [];
+      lastFrameTimeRef.current = performance.now();
+      lastDynamicAdjustTimeRef.current = Date.now();
+      corruptedCountRef.current = 0;
+
       // Spawn initial defects immediately as Low & Green
       spawnDefect();
       setTimeout(() => {
@@ -1691,10 +1779,10 @@ export function QaGame() {
         const spawnDelay = Math.round((baseInterval + Math.random() * 500) * waveSpawnFactor);
 
         timeoutId = setTimeout(() => {
-          if (!hasCrashedRef.current) {
-            // Bug limit is NOT there: bugs continuously spawn if player doesn't kill them!
-            // Protected only by safe hardware ceiling of 35
-            if (defectsRef.current.length < 35) {
+          if (!hasCrashedRef.current && !hasWonRef.current) {
+            // Strictly cap bugs on screen dynamically (never exceeding 10)
+            const activeCount = defectsRef.current.filter(b => !b.squashed && !b.isDying).length;
+            if (activeCount < dynamicMaxBugsRef.current && activeCount < ABSOLUTE_MAX_BUGS) {
               spawnDefect();
             }
           }
@@ -1717,6 +1805,8 @@ export function QaGame() {
       setBreakpoints(1);
       setIsFrozen(false);
       setTerminalLogs([]);
+      corruptedCountRef.current = 0;
+      frameDeltasRef.current = [];
 
       setHasCrashed(false);
 
@@ -1806,10 +1896,16 @@ export function QaGame() {
           >
             {/* Top Row: Bug Detector Count / Quota + Wave Badge + Setting Button */}
             <div className="flex items-center justify-between gap-1 pb-0.5">
-              <div className="flex items-baseline gap-1" title="Defects neutralized / Quota">
+              <div 
+                className="flex items-baseline gap-1" 
+                title={`Defects neutralized: ${score} / Quota: ${10 + (wave - 1) * 5} | Live defects on screen: ${activeBugCount}/${dynamicMaxBugsRef.current} (Max: 10)`}
+              >
                 <Bug size={11} className="text-pass shrink-0 self-center" />
                 <span className="text-xs font-black text-pass leading-none">
                   {score}/{10 + (wave - 1) * 5}
+                </span>
+                <span className="text-[7.5px] font-mono text-muted leading-none" title="Live defects on screen / Max allowed">
+                  ({activeBugCount}/{dynamicMaxBugsRef.current})
                 </span>
                 {combo > 1 && (
                   <span className="text-[7.5px] font-bold text-amber-500 animate-pulse leading-none">
@@ -1922,6 +2018,8 @@ export function QaGame() {
                     setWave(1);
                     waveRef.current = 1;
                     setSystemIntegrity(100);
+                    corruptedCountRef.current = 0;
+                    frameDeltasRef.current = [];
                     spawnDefect();
                   }}
                   className="text-muted hover:text-amber-500 hover:border-amber-500 transition-colors p-0.5 rounded border border-line"
@@ -2213,6 +2311,8 @@ export function QaGame() {
                       setDefects([]);
                       setWave(1);
                       waveRef.current = 1;
+                      corruptedCountRef.current = 0;
+                      frameDeltasRef.current = [];
                       spawnDefect();
                     }}
                     data-cursor="Deploy hotfix & reboot environment"

@@ -204,135 +204,69 @@ export function interpolateColor(color1: string, color2: string, factor: number)
 export const easeInOutQuad = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 export const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
-// Exact Simulation: Color changes FIRST over COLOR_PHASE_MS, then Size reduces NEXT over SIZE_PHASE_MS
+// Continuous Reactive Bug Simulation: Color changes smoothly across the whole lifecycle
 export function getSimulatedBugState(age: number): SimulatedState {
   const lowCfg = BUG_PRIORITY_CONFIG.low;
   const medCfg = BUG_PRIORITY_CONFIG.med;
   const highCfg = BUG_PRIORITY_CONFIG.high;
   const critCfg = BUG_PRIORITY_CONFIG.critical;
 
-  // 1. Low Tier: age < 7000ms
+  let tier: BugPriorityTier = "low";
+  let severity: "P0" | "P1" | "P2" | "P3" = "P3";
+  let color = lowCfg.color;
+  let size = lowCfg.size;
+  let speedScale = lowCfg.speedScale;
+  let isPulsing = false;
+
+  // 1. Low Tier: 0 - 7000ms (smooth glide from Green towards Yellow)
   if (age < STAGE_DURATION_MS) {
-    return {
-      tier: "low",
-      color: lowCfg.color,
-      size: lowCfg.size,
-      speedScale: lowCfg.speedScale,
-      severity: "P3",
-      isPulsing: false,
-    };
-  }
-
-  // 2. Transition from Low to Medium (7000ms <= age < 14000ms)
-  const medAge = age - STAGE_DURATION_MS;
-  if (medAge < COLOR_PHASE_MS) {
-    // PHASE 1: COLOR CHANGES FIRST! Size remains at Low (54px)
-    const t = medAge / COLOR_PHASE_MS;
-    return {
-      tier: "med",
-      color: interpolateColor(lowCfg.color, medCfg.color, easeInOutQuad(t)),
-      size: lowCfg.size, // Size does not reduce yet!
-      speedScale: lowCfg.speedScale,
-      severity: "P2",
-      isPulsing: false,
-    };
-  } else if (medAge < COLOR_PHASE_MS + SIZE_PHASE_MS) {
-    // PHASE 2: SIZE REDUCES NEXT! Color is now fully Yellow
-    const t = (medAge - COLOR_PHASE_MS) / SIZE_PHASE_MS;
-    const progress = easeOutCubic(t);
-    return {
-      tier: "med",
-      color: medCfg.color,
-      size: Math.round((lowCfg.size + (medCfg.size - lowCfg.size) * progress) * 100) / 100,
-      speedScale: lowCfg.speedScale + (medCfg.speedScale - lowCfg.speedScale) * progress,
-      severity: "P2",
-      isPulsing: false,
-    };
+    const t = Math.max(0, Math.min(1, age / STAGE_DURATION_MS));
+    tier = "low";
+    severity = "P3";
+    color = interpolateColor(lowCfg.color, medCfg.color, easeInOutQuad(t * 0.45));
+    size = lowCfg.size + (medCfg.size - lowCfg.size) * (t * 0.2);
+    speedScale = lowCfg.speedScale + (medCfg.speedScale - lowCfg.speedScale) * (t * 0.2);
   } else if (age < STAGE_DURATION_MS * 2) {
-    // Stable Medium
-    return {
-      tier: "med",
-      color: medCfg.color,
-      size: medCfg.size,
-      speedScale: medCfg.speedScale,
-      severity: "P2",
-      isPulsing: false,
-    };
-  }
-
-  // 3. Transition from Medium to High (14000ms <= age < 21000ms)
-  const highAge = age - STAGE_DURATION_MS * 2;
-  if (highAge < COLOR_PHASE_MS) {
-    // PHASE 1: COLOR CHANGES FIRST! Size remains at Medium (44px)
-    const t = highAge / COLOR_PHASE_MS;
-    return {
-      tier: "high",
-      color: interpolateColor(medCfg.color, highCfg.color, easeInOutQuad(t)),
-      size: medCfg.size, // Size does not reduce yet!
-      speedScale: medCfg.speedScale,
-      severity: "P1",
-      isPulsing: false,
-    };
-  } else if (highAge < COLOR_PHASE_MS + SIZE_PHASE_MS) {
-    // PHASE 2: SIZE REDUCES NEXT! Color is now fully Orange
-    const t = (highAge - COLOR_PHASE_MS) / SIZE_PHASE_MS;
-    const progress = easeOutCubic(t);
-    return {
-      tier: "high",
-      color: highCfg.color,
-      size: Math.round((medCfg.size + (highCfg.size - medCfg.size) * progress) * 100) / 100,
-      speedScale: medCfg.speedScale + (highCfg.speedScale - medCfg.speedScale) * progress,
-      severity: "P1",
-      isPulsing: false,
-    };
+    // 2. Medium Tier: 7000ms - 14000ms (smooth glide from Yellow to Orange)
+    const t = Math.max(0, Math.min(1, (age - STAGE_DURATION_MS) / STAGE_DURATION_MS));
+    tier = "med";
+    severity = "P2";
+    color = interpolateColor(medCfg.color, highCfg.color, easeInOutQuad(t));
+    size = medCfg.size + (highCfg.size - medCfg.size) * easeOutCubic(t);
+    speedScale = medCfg.speedScale + (highCfg.speedScale - medCfg.speedScale) * easeOutCubic(t);
   } else if (age < STAGE_DURATION_MS * 3) {
-    // Stable High
-    return {
-      tier: "high",
-      color: highCfg.color,
-      size: highCfg.size,
-      speedScale: highCfg.speedScale,
-      severity: "P1",
-      isPulsing: false,
-    };
+    // 3. High Tier: 14000ms - 21000ms (smooth glide from Orange to Red)
+    const t = Math.max(0, Math.min(1, (age - STAGE_DURATION_MS * 2) / STAGE_DURATION_MS));
+    tier = "high";
+    severity = "P1";
+    color = interpolateColor(highCfg.color, critCfg.color, easeInOutQuad(t));
+    size = highCfg.size + (critCfg.size - highCfg.size) * easeOutCubic(t);
+    speedScale = highCfg.speedScale + (critCfg.speedScale - highCfg.speedScale) * easeOutCubic(t);
+  } else {
+    // 4. Critical Tier: 21000ms+ (Pulsing Red)
+    tier = "critical";
+    severity = "P0";
+    color = critCfg.color;
+    size = critCfg.size;
+    speedScale = critCfg.speedScale;
+    isPulsing = true;
   }
 
-  // 4. Transition from High to Critical (age >= 21000ms)
-  const critAge = age - STAGE_DURATION_MS * 3;
-  if (critAge < COLOR_PHASE_MS) {
-    // PHASE 1: COLOR CHANGES FIRST! Size remains at High (36px)
-    const t = critAge / COLOR_PHASE_MS;
-    return {
-      tier: "critical",
-      color: interpolateColor(highCfg.color, critCfg.color, easeInOutQuad(t)),
-      size: highCfg.size, // Size does not reduce yet!
-      speedScale: highCfg.speedScale,
-      severity: "P0",
-      isPulsing: true,
-    };
-  } else if (critAge < COLOR_PHASE_MS + SIZE_PHASE_MS) {
-    // PHASE 2: SIZE REDUCES NEXT! Color is now fully Red
-    const t = (critAge - COLOR_PHASE_MS) / SIZE_PHASE_MS;
-    const progress = easeOutCubic(t);
-    return {
-      tier: "critical",
-      color: critCfg.color,
-      size: Math.round((highCfg.size + (critCfg.size - highCfg.size) * progress) * 100) / 100,
-      speedScale: highCfg.speedScale + (critCfg.speedScale - highCfg.speedScale) * progress,
-      severity: "P0",
-      isPulsing: true,
-    };
-  }
-
-  // Stable Critical
   return {
-    tier: "critical",
-    color: critCfg.color,
-    size: critCfg.size,
-    speedScale: critCfg.speedScale,
-    severity: "P0",
-    isPulsing: true,
+    tier,
+    color,
+    size: Math.round(size * 10) / 10,
+    speedScale: Math.round(speedScale * 100) / 100,
+    severity,
+    isPulsing,
   };
+}
+
+// Reactive System Integrity Color: HSL 142 (green) -> 40 (amber) -> 0 (red)
+export function getReactiveIntegrityColor(integrity: number): string {
+  const clamped = Math.max(0, Math.min(100, integrity));
+  const hue = Math.round((clamped / 100) * 142);
+  return `hsl(${hue}, 80%, 42%)`;
 }
 
 export const UI_BUG_TYPES: BugTemplate[] = [
@@ -560,6 +494,45 @@ export function QaGame() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [defects, setDefects] = useState<Defect[]>([]);
   const [particles, setParticles] = useState<{ id: string; x: number; y: number; color: string }[]>([]);
+
+  // Wave transition banner state (non-skippable, transparent frosted glass merging into game stats)
+  const [waveBanner, setWaveBanner] = useState<{
+    clearedWave: number;
+    nextWave: number;
+    stage: "enter" | "merge";
+  } | null>(null);
+  const [hudPulse, setHudPulse] = useState(false);
+  const isWaveAdvancingRef = useRef(false);
+
+  // Mouse detector tracking
+  const mousePosRef = useRef({ x: -1000, y: -1000, active: false });
+  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000, active: false });
+  const [isNearBug, setIsNearBug] = useState(false);
+  const [detectorHits, setDetectorHits] = useState<{ id: string; x: number; y: number }[]>([]);
+
+  // Track mouse coordinates for evasion physics and detector reticle
+  useEffect(() => {
+    if (!isOpen) return;
+    const onPointerMove = (e: PointerEvent) => {
+      mousePosRef.current = { x: e.clientX, y: e.clientY, active: true };
+      setMousePos({ x: e.clientX, y: e.clientY, active: true });
+      const near = defectsRef.current.some(
+        b => !b.squashed && !b.isDying && Math.hypot(b.x - e.clientX, b.y - e.clientY) < 65
+      );
+      setIsNearBug(near);
+    };
+    const onPointerLeave = () => {
+      mousePosRef.current = { x: -1000, y: -1000, active: false };
+      setMousePos({ x: -1000, y: -1000, active: false });
+      setIsNearBug(false);
+    };
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("pointerleave", onPointerLeave);
+    return () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerleave", onPointerLeave);
+    };
+  }, [isOpen]);
 
   // Coordinate header space when QA game is active in top-left corner
   useEffect(() => {
@@ -830,12 +803,55 @@ export function QaGame() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, hasCrashed, triggerBreakpoint]);
 
+  // Seamless non-skippable wave advancement sequence merging into HUD stats
+  const advanceWave = useCallback(() => {
+    if (isWaveAdvancingRef.current || hasCrashedRef.current) return;
+    isWaveAdvancingRef.current = true;
+    playVictoryAudio();
+    setBreakpoints(b => Math.min(3, b + 1));
+
+    const currentW = waveRef.current;
+    const nextW = currentW + 1;
+
+    setWaveBanner({
+      clearedWave: currentW,
+      nextWave: nextW,
+      stage: "enter",
+    });
+
+    // Center display phase for 1500ms with transparent frosted glass effect
+    setTimeout(() => {
+      // Start merge into top-left HUD stats!
+      setWaveBanner(prev => (prev ? { ...prev, stage: "merge" } : null));
+
+      // Complete merge animation at 2200ms
+      setTimeout(() => {
+        setWaveBanner(null);
+        isWaveAdvancingRef.current = false;
+        setWave(nextW);
+        waveRef.current = nextW;
+        setScore(0);
+        scoreRef.current = 0;
+        // Trigger a brief HUD pulse effect
+        setHudPulse(true);
+        setTimeout(() => setHudPulse(false), 900);
+      }, 700);
+    }, 1500);
+  }, [playVictoryAudio]);
+
   // Squash Defect
   const squashDefect = useCallback((id: string, x: number, y: number) => {
     const targetBug = defectsRef.current.find(b => b.id === id);
     if (!targetBug || targetBug.squashed) return;
 
     const progress = (Date.now() - targetBug.spawnTime) / (targetBug.hungerThreshold || 10000);
+
+    // Minimal detector hit ripple effect at kill coordinates
+    const hitId = Math.random().toString(36).substring(7);
+    setDetectorHits(prev => [...prev.slice(-3), { id: hitId, x, y }]);
+    setTimeout(() => {
+      setDetectorHits(prev => prev.filter(h => h.id !== hitId));
+    }, 240);
 
     // Update combo
     if (comboTimerRef.current) clearTimeout(comboTimerRef.current);
@@ -855,10 +871,8 @@ export function QaGame() {
         setBreakpoints(b => Math.min(3, b + 1));
       }
       const quota = 10 + (waveRef.current - 1) * 5;
-      if (nextScore >= quota && !hasWonRef.current && !hasCrashedRef.current) {
-        setHasWon(true);
-        hasWonRef.current = true;
-        playVictoryAudio();
+      if (nextScore >= quota && !isWaveAdvancingRef.current && !hasCrashedRef.current) {
+        advanceWave();
       }
       return nextScore;
     });
@@ -1076,7 +1090,7 @@ export function QaGame() {
 
   // Spawn Defect from Perimeter Edges (Always Low & Green on spawn)
   const spawnDefect = useCallback(() => {
-    if (defectsRef.current.length >= 5) return; // balanced defect concurrency
+    if (defectsRef.current.length >= 35) return; // safe hardware ceiling only (continuous spawning allowed)
     if (hasCrashedRef.current || hasWonRef.current) return;
     
     // Spawn at perimeter borders outside visible area and crawl inwards
@@ -1101,7 +1115,8 @@ export function QaGame() {
     const template = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
     // Always start at Low priority & green (User rule: first a bug will spawn with low and green)
     const initialCfg = BUG_PRIORITY_CONFIG.low;
-    const waveMultiplier = 1 + (waveRef.current - 1) * 0.15;
+    // Speed increases by 0.2x on each wave
+    const waveMultiplier = 1 + (waveRef.current - 1) * 0.2;
     const baseSpeed = (1.15 + Math.random() * 0.25) * waveMultiplier;
     const baseSize = initialCfg.size;
     const bugId = Math.random().toString(36).substring(7);
@@ -1151,6 +1166,17 @@ export function QaGame() {
   // Movement, Target Navigation & Game Physics Loop
   const updatePositions = useCallback(() => {
     if (hasCrashedRef.current || hasWonRef.current) {
+      requestRef.current = requestAnimationFrame(updatePositions);
+      return;
+    }
+
+    // Check if system integrity depleted to 0% (100% corrupted)
+    const corruptedCount = document.querySelectorAll('[data-eaten="true"]').length;
+    if (corruptedCount >= 20) {
+      setEatenCount(corruptedCount);
+      setSystemIntegrity(0);
+      setHasCrashed(true);
+      hasCrashedRef.current = true;
       requestRef.current = requestAnimationFrame(updatePositions);
       return;
     }
@@ -1300,7 +1326,7 @@ export function QaGame() {
 
           const template = UI_BUG_TYPES[Math.floor(Math.random() * UI_BUG_TYPES.length)];
           const lowCfg = BUG_PRIORITY_CONFIG.low;
-          const waveMultiplier = 1 + (waveRef.current - 1) * 0.15;
+          const waveMultiplier = 1 + (waveRef.current - 1) * 0.2;
           const baseSpeed = (1.15 + Math.random() * 0.25) * waveMultiplier;
           const newRoamX = 60 + Math.random() * (window.innerWidth - 120);
           const newRoamY = 60 + Math.random() * (window.innerHeight - 120);
@@ -1466,6 +1492,33 @@ export function QaGame() {
         nextDirection += diff * steerRate;
       }
 
+      // --- CURSOR HOVER EVASION AS PER DIFFICULTY ---
+      let evadeDx = 0;
+      let evadeDy = 0;
+      const mouse = mousePosRef.current;
+      if (mouse.active && !isFrozen && !bug.eating && !bug.isDying) {
+        const distToMouse = Math.hypot(bug.x - mouse.x, bug.y - mouse.y);
+        const EVASION_RADIUS = 100;
+        if (distToMouse > 0 && distToMouse < EVASION_RADIUS) {
+          const proximity = (EVASION_RADIUS - distToMouse) / EVASION_RADIUS; // 0 (edge) to 1 (cursor center)
+          // Tier/Difficulty scaling: P0 > P1 > P2 > P3
+          const tierMultiplier = tier === "critical" ? 3.2 : tier === "high" ? 2.4 : tier === "med" ? 1.6 : 0.85;
+          // Wave speed scaling (+0.2x per wave)
+          const waveMultiplier = 1.0 + (waveRef.current - 1) * 0.2;
+          const fleeForce = proximity * 5.2 * tierMultiplier * waveMultiplier;
+
+          const fleeAngle = Math.atan2(bug.y - mouse.y, bug.x - mouse.x);
+          const lateralJitter = Math.sin(now * 0.025 + bug.wobbleSeed) * 0.45;
+          const finalFleeAngle = fleeAngle + lateralJitter;
+
+          evadeDx = Math.cos(finalFleeAngle) * fleeForce;
+          evadeDy = Math.sin(finalFleeAngle) * fleeForce;
+
+          // Steer rapidly towards escape vector
+          nextDirection = fleeAngle;
+        }
+      }
+
       // --- ANTI-STACKING FLOCKING REPULSION FORCE ---
       let repelX = 0;
       let repelY = 0;
@@ -1484,8 +1537,8 @@ export function QaGame() {
 
       // Smooth floating stride oscillation
       const scuttleStride = isFrozen ? 0 : nextSpeed * (1 + 0.15 * Math.sin(now * 0.02 + bug.wobbleSeed));
-      let newX = bug.x + Math.cos(nextDirection) * scuttleStride + repelX;
-      let newY = bug.y + Math.sin(nextDirection) * scuttleStride + repelY;
+      let newX = bug.x + Math.cos(nextDirection) * scuttleStride + repelX + evadeDx;
+      let newY = bug.y + Math.sin(nextDirection) * scuttleStride + repelY + evadeDy;
 
       // Bounce off screen boundaries
       const halfW = 28;
@@ -1529,19 +1582,29 @@ export function QaGame() {
     if (isOpen) {
       document.documentElement.dataset.game = "on";
       
-      // Spawn initial defect immediately as Low & Green
+      // Spawn initial defects immediately as Low & Green
       spawnDefect();
+      setTimeout(() => {
+        if (!hasCrashedRef.current) spawnDefect();
+      }, 900);
 
       let timeoutId: NodeJS.Timeout;
       const scheduleNext = () => {
+        // Base spawn interval 2400ms reduced by 0.1x (10% faster) on each wave
+        const baseInterval = 2400;
+        const waveSpawnFactor = Math.max(0.25, 1.0 - (waveRef.current - 1) * 0.1);
+        const spawnDelay = Math.round((baseInterval + Math.random() * 500) * waveSpawnFactor);
+
         timeoutId = setTimeout(() => {
-          if (!hasCrashedRef.current && !hasWonRef.current) {
-            if (defectsRef.current.length < 4) {
+          if (!hasCrashedRef.current) {
+            // Bug limit is NOT there: bugs continuously spawn if player doesn't kill them!
+            // Protected only by safe hardware ceiling of 35
+            if (defectsRef.current.length < 35) {
               spawnDefect();
             }
           }
           scheduleNext();
-        }, 2200 + Math.random() * 800);
+        }, spawnDelay);
       };
       scheduleNext();
 
@@ -1592,10 +1655,12 @@ export function QaGame() {
     const remainingOnPage = document.querySelectorAll(
       'main p:not([data-eaten]), main h1:not([data-eaten]), main h2:not([data-eaten]), main h3:not([data-eaten]), main li:not([data-eaten])'
     );
-    if (corruptedCount > 0 && remainingOnPage.length === 0) {
+    if (corruptedCount > 0 && (remainingOnPage.length === 0 || integrityLeft <= 0)) {
       setHasCrashed(true);
+      hasCrashedRef.current = true;
     } else {
       setHasCrashed(false);
+      hasCrashedRef.current = false;
     }
   }, [pathname, isOpen]);
 
@@ -1638,7 +1703,11 @@ export function QaGame() {
           {/* QA Defect Hunter Stat HUD - Optimized, minimal, with Quota, Wave, Health Bar & Settings Button */}
           <aside 
             aria-label="QA Game Stats"
-            className="fixed z-[60] flex flex-col gap-1 bg-paper/95 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-pass text-ink shadow-[2.5px_2.5px_0_var(--ink)] font-mono select-none pointer-events-auto animate-fade-in w-[150px] sm:w-[158px] top-3 left-3 sm:top-3.5 sm:left-4"
+            className={`fixed z-[60] flex flex-col gap-1 bg-paper/95 backdrop-blur-md px-2.5 py-1.5 rounded-xl border font-mono select-none pointer-events-auto transition-all duration-500 ease-out w-[150px] sm:w-[158px] top-3 left-3 sm:top-3.5 sm:left-4 ${
+              hudPulse 
+                ? "border-pass ring-2 ring-pass shadow-[0_0_16px_rgba(18,95,59,0.5)] scale-105" 
+                : "border-pass text-ink shadow-[2.5px_2.5px_0_var(--ink)] scale-100"
+            }`}
           >
             {/* Top Row: Bug Detector Count / Quota + Wave Badge + Setting Button */}
             <div className="flex items-center justify-between gap-1 pb-0.5">
@@ -1655,7 +1724,9 @@ export function QaGame() {
               </div>
 
               <div className="flex items-center gap-1">
-                <span className="text-[8px] font-mono font-bold text-muted uppercase tracking-wider bg-card px-1 py-0.5 rounded border border-line">
+                <span className={`text-[8px] font-mono font-bold uppercase tracking-wider px-1 py-0.5 rounded border transition-colors duration-500 ${
+                  hudPulse ? "bg-pass text-on-band border-pass" : "bg-card text-muted border-line"
+                }`}>
                   W{wave}
                 </span>
                 {/* Setting Button */}
@@ -1676,22 +1747,26 @@ export function QaGame() {
               </div>
             </div>
 
-            {/* Health Bar + Percentage */}
+            {/* Health Bar + Percentage with Reactive Smooth Color Transition */}
             <div className="flex items-center gap-1.5 pt-0.5 border-t border-line">
-              <div className="flex-1 h-1 bg-line rounded-full overflow-hidden">
+              <div className="flex-1 h-1 bg-line/80 rounded-full overflow-hidden">
                 <div 
-                  className={`h-full transition-all duration-300 rounded-full ${
-                    systemIntegrity < 30 ? "bg-red-500" : systemIntegrity < 65 ? "bg-amber-500" : "bg-pass"
-                  }`} 
-                  style={{ width: `${systemIntegrity}%` }} 
+                  className="h-full rounded-full transition-all duration-500 ease-out" 
+                  style={{ 
+                    width: `${systemIntegrity}%`,
+                    backgroundColor: getReactiveIntegrityColor(systemIntegrity)
+                  }} 
                 />
               </div>
               <div className="flex items-center gap-0.5 shrink-0">
-                <AlertTriangle size={7} className={systemIntegrity < 40 ? "text-red-500 animate-pulse shrink-0" : "text-pass shrink-0"} />
+                <AlertTriangle 
+                  size={7} 
+                  className={`shrink-0 transition-colors duration-500 ${systemIntegrity < 35 ? "animate-pulse" : ""}`}
+                  style={{ color: getReactiveIntegrityColor(systemIntegrity) }}
+                />
                 <span 
-                  className={`text-[9px] font-extrabold leading-none ${
-                    systemIntegrity < 30 ? "text-red-500 animate-pulse" : systemIntegrity < 65 ? "text-amber-500" : "text-pass"
-                  }`}
+                  className={`text-[9px] font-extrabold leading-none transition-colors duration-500 font-mono ${systemIntegrity < 30 ? "animate-pulse" : ""}`}
+                  style={{ color: getReactiveIntegrityColor(systemIntegrity) }}
                 >
                   {systemIntegrity}%
                 </span>
@@ -1936,75 +2011,127 @@ export function QaGame() {
             </aside>
           )}
 
-          {/* Fatal System Crash / Post-Mortem Incident Screen - Fully on-theme */}
+          {/* Minimal QA Detector Reticle tracking the cursor */}
+          {mousePos.active && (
+            <div 
+              className={`fixed pointer-events-none z-[85] -translate-x-1/2 -translate-y-1/2 rounded-full border transition-transform duration-100 ease-out flex items-center justify-center ${
+                isNearBug 
+                  ? "w-8 h-8 border-pass scale-90" 
+                  : "w-9 h-9 border-pass/45 scale-100"
+              }`}
+              style={{ left: mousePos.x, top: mousePos.y }}
+            >
+              {/* 4 hairline crosshair marks */}
+              <span className="absolute -top-1 w-[1px] h-1.5 bg-pass/70" />
+              <span className="absolute -bottom-1 w-[1px] h-1.5 bg-pass/70" />
+              <span className="absolute -left-1 h-[1px] w-1.5 bg-pass/70" />
+              <span className="absolute -right-1 h-[1px] w-1.5 bg-pass/70" />
+              {/* Center micro dot */}
+              <span className={`w-1 h-1 rounded-full ${isNearBug ? "bg-pass animate-ping" : "bg-pass/50"}`} />
+            </div>
+          )}
+
+          {/* Minimal Detector Hit-Snap Ripple on Bug Kill */}
+          {detectorHits.map(hit => (
+            <div
+              key={hit.id}
+              className="fixed pointer-events-none z-[86] -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
+              style={{
+                left: hit.x,
+                top: hit.y,
+                animation: "detectorSnap 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards"
+              }}
+            >
+              <div className="w-8 h-8 rounded-full border border-pass/80" />
+              <span className="absolute w-2 h-[1px] bg-pass/90 -left-1" />
+              <span className="absolute w-2 h-[1px] bg-pass/90 -right-1" />
+              <span className="absolute h-2 w-[1px] bg-pass/90 -top-1" />
+              <span className="absolute h-2 w-[1px] bg-pass/90 -bottom-1" />
+            </div>
+          ))}
+
+          {/* Transparent Non-Skippable Wave Upgrade Banner Merging into HUD Stats */}
+          {waveBanner && (
+            <div 
+              className={`fixed z-[70] pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                waveBanner.stage === "enter"
+                  ? "top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 opacity-100"
+                  : "top-4 left-4 -translate-x-0 -translate-y-0 scale-[0.25] opacity-0"
+              }`}
+            >
+              <div className="bg-paper/85 dark:bg-card/85 backdrop-blur-md border border-pass/50 px-6 py-4 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.18)] font-mono text-center flex flex-col items-center gap-2 min-w-[280px]">
+                <div className="flex items-center gap-2 text-pass text-[10px] uppercase font-bold tracking-widest">
+                  <Zap size={12} className="text-pass animate-bounce" />
+                  <span>System Upgrade · Wave {waveBanner.clearedWave} Cleared</span>
+                </div>
+                <h3 className="font-serif text-2xl font-bold text-ink tracking-tight">
+                  Advancing to Wave {waveBanner.nextWave}
+                </h3>
+                <div className="flex items-center gap-2 pt-1 border-t border-line/60 text-[11px] text-muted">
+                  <span className="px-2 py-0.5 rounded bg-pass/10 text-pass font-bold border border-pass/30">
+                    Speed +0.2x ({(1 + (waveBanner.nextWave - 1) * 0.2).toFixed(1)}x)
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/30">
+                    Spawn -10%
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Fatal System Crash Incident Screen - Natural, Authentic & Matching Portfolio Theme */}
           {hasCrashed && (
             <div 
               role="dialog"
               aria-modal="true"
               aria-labelledby="crash-title"
-              className="fixed inset-0 z-[100] bg-ink/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 font-mono pointer-events-auto animate-fade-in overflow-y-auto"
+              className="fixed inset-0 z-[100] bg-ink/65 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 font-mono pointer-events-auto animate-fade-in overflow-y-auto"
             >
-              <div className="relative max-w-lg w-full bg-paper border-2 border-pass text-ink rounded-2xl p-6 sm:p-8 shadow-[6px_6px_0_var(--ink)] overflow-hidden font-mono">
+              <div className="relative max-w-xl w-full bg-paper border border-line text-ink rounded-2xl p-6 sm:p-8 shadow-[8px_8px_0_var(--ink)] overflow-hidden font-mono">
                 {/* Header Badge */}
                 <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-line">
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-[10.5px] font-bold font-mono tracking-wider whitespace-nowrap">
                     <span className="w-2 h-2 rounded-full bg-red-600 dark:bg-red-400 animate-pulse shrink-0" />
-                    <span>SEV-1 · SYSTEM OUTAGE</span>
+                    <span>SEV-0 · 100% SYSTEM CORRUPTION</span>
                   </div>
                   <span className="text-[11px] text-muted font-mono tracking-wider uppercase font-semibold">
-                    SUITE HALTED
+                    PIPELINE HALTED
                   </span>
                 </div>
 
                 {/* Title & Description */}
                 <h2 id="crash-title" className="font-serif text-2xl sm:text-3xl text-ink tracking-tight font-bold mb-2 leading-tight">
-                  Pipeline Assertion Failure
+                  Production Gate Breach
                 </h2>
-                <p className="text-ink-soft text-xs sm:text-sm leading-relaxed mb-6 font-sans">
-                  Critical defects breached automated test guardrails and depleted page integrity. Execution was halted to prevent cascading layout collapse.
+                <p className="text-ink-soft text-xs sm:text-sm leading-relaxed mb-4 font-sans">
+                  Critical defects breached test boundaries and corrupted 100% of tested components. System breakers tripped to prevent cascading downtime.
                 </p>
 
+                {/* Terminal Audit Log Snippet */}
+                <div className="bg-card/90 border border-line rounded-xl p-3 mb-5 font-mono text-[11px] text-muted leading-relaxed select-all">
+                  <div className="text-red-600 dark:text-red-400 font-bold mb-1">[ASSERTION_FAILURE] Page integrity depleted to 0.00%</div>
+                  <div>[BREACH_NODES] {eatenCount} DOM elements corrupted across active viewport</div>
+                  <div>[INTERCEPTED]  {score} defects neutralized in Wave {wave}</div>
+                  <div className="text-ink/80 mt-1">[RECOVERY]     Quarantine engaged. Hotfix patch required to restore state.</div>
+                </div>
+
                 {/* Post-Mortem 4-Box Metrics Grid */}
-                <div className="grid grid-cols-2 gap-2.5 mb-6">
-                  {/* Metric 1: Bugs Intercepted */}
-                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
-                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
-                      Intercepted
-                    </span>
-                    <span className="text-2xl font-black text-pass leading-none">
-                      {score} <span className="text-xs font-normal text-muted">defects</span>
-                    </span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+                  <div className="bg-card border border-line rounded-xl p-2.5 shadow-[1.5px_1.5px_0_var(--line)]">
+                    <span className="text-[9.5px] uppercase tracking-wider text-muted font-semibold block mb-0.5">Neutralized</span>
+                    <span className="text-xl font-black text-pass leading-none">{score}</span>
                   </div>
-
-                  {/* Metric 2: QA Rank */}
-                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
-                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
-                      Hunter Rank
-                    </span>
-                    <div className="text-sm font-bold text-ink truncate leading-none mt-1" title={currentRank.title}>
-                      <span className="mr-1">{currentRank.badge}</span>
-                      <span className="text-ink-soft font-normal">{currentRank.title}</span>
-                    </div>
+                  <div className="bg-card border border-line rounded-xl p-2.5 shadow-[1.5px_1.5px_0_var(--line)]">
+                    <span className="text-[9.5px] uppercase tracking-wider text-muted font-semibold block mb-0.5">Peak Streak</span>
+                    <span className="text-xl font-black text-amber-600 dark:text-amber-400 leading-none">{maxCombo > 1 ? `${maxCombo}x` : "1x"}</span>
                   </div>
-
-                  {/* Metric 3: Peak Streak */}
-                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
-                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
-                      Peak Streak
-                    </span>
-                    <span className="text-2xl font-black text-amber-600 dark:text-amber-400 leading-none">
-                      {maxCombo > 1 ? `${maxCombo}x` : "1x"}
-                    </span>
+                  <div className="bg-card border border-line rounded-xl p-2.5 shadow-[1.5px_1.5px_0_var(--line)]">
+                    <span className="text-[9.5px] uppercase tracking-wider text-muted font-semibold block mb-0.5">Waves Survived</span>
+                    <span className="text-xl font-black text-ink leading-none">W{wave}</span>
                   </div>
-
-                  {/* Metric 4: Root Cause */}
-                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
-                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
-                      Failure Signature
-                    </span>
-                    <span className="text-[11px] font-mono font-bold text-red-600 dark:text-red-400 block truncate leading-none mt-1">
-                      ASSERTION_FAIL
-                    </span>
+                  <div className="bg-card border border-line rounded-xl p-2.5 shadow-[1.5px_1.5px_0_var(--line)]">
+                    <span className="text-[9.5px] uppercase tracking-wider text-muted font-semibold block mb-0.5">Rank</span>
+                    <span className="text-xs font-bold text-ink truncate block mt-1 leading-none">{currentRank.badge}</span>
                   </div>
                 </div>
 
@@ -2016,8 +2143,6 @@ export function QaGame() {
                       restoreAllEatenElements();
                       setHasCrashed(false);
                       hasCrashedRef.current = false;
-                      setHasWon(false);
-                      hasWonRef.current = false;
                       setScore(0);
                       scoreRef.current = 0;
                       setCombo(0);
@@ -2025,13 +2150,15 @@ export function QaGame() {
                       setBreakpoints(1);
                       setSystemIntegrity(100);
                       setDefects([]);
+                      setWave(1);
+                      waveRef.current = 1;
                       spawnDefect();
                     }}
-                    data-cursor="Deploy hotfix & retry regression"
-                    className="press flex-1 inline-flex items-center justify-center gap-2 border border-pass bg-pass text-on-band hover:bg-pass-fill font-bold py-3 px-4 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm tracking-wide transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer whitespace-nowrap"
+                    data-cursor="Deploy hotfix & reboot environment"
+                    className="press flex-1 inline-flex items-center justify-center gap-2 border border-pass bg-pass text-on-band hover:bg-pass-fill font-bold py-2.5 px-4 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm tracking-wide transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer whitespace-nowrap"
                   >
-                    <RefreshCw size={14} className="shrink-0" />
-                    Deploy Hotfix & Retry
+                    <RefreshCw size={13} className="shrink-0" />
+                    Deploy Hotfix & Reboot
                   </button>
                   <button
                     type="button"
@@ -2039,8 +2166,6 @@ export function QaGame() {
                       restoreAllEatenElements();
                       setHasCrashed(false);
                       hasCrashedRef.current = false;
-                      setHasWon(false);
-                      hasWonRef.current = false;
                       setDefects([]);
                       setScore(0);
                       scoreRef.current = 0;
@@ -2048,133 +2173,10 @@ export function QaGame() {
                       setMaxCombo(0);
                       setIsOpen(false);
                     }}
-                    data-cursor="Close mini-game & restore UI"
-                    className="press inline-flex items-center justify-center border border-line bg-card text-ink hover:border-ink hover:text-ink font-semibold py-3 px-5 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer"
+                    data-cursor="Exit defect hunter & return to portfolio"
+                    className="press inline-flex items-center justify-center border border-line bg-card text-ink hover:border-ink hover:text-ink font-semibold py-2.5 px-5 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer"
                   >
-                    Close Game
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Quality Gate Certified / Mission Victory Incident Screen */}
-          {hasWon && (
-            <div 
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="victory-title"
-              className="fixed inset-0 z-[100] bg-ink/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 font-mono pointer-events-auto animate-fade-in overflow-y-auto"
-            >
-              <div className="relative max-w-lg w-full bg-paper border-2 border-pass text-ink rounded-2xl p-6 sm:p-8 shadow-[6px_6px_0_var(--ink)] overflow-hidden font-mono">
-                {/* Header Badge */}
-                <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-line">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-pass/10 border border-pass/30 text-pass text-[10.5px] font-bold font-mono tracking-wider whitespace-nowrap">
-                    <ShieldCheck size={12} className="text-pass shrink-0" />
-                    <span>ALL TESTS PASSED · ZERO REGRESSIONS</span>
-                  </div>
-                  <span className="text-[11px] text-muted font-mono tracking-wider uppercase font-semibold">
-                    WAVE {wave} CLEAR
-                  </span>
-                </div>
-
-                {/* Title & Description */}
-                <h2 id="victory-title" className="font-serif text-2xl sm:text-3xl text-ink tracking-tight font-bold mb-2 leading-tight">
-                  Quality Gate Certified
-                </h2>
-                <p className="text-ink-soft text-xs sm:text-sm leading-relaxed mb-6 font-sans">
-                  All critical defects intercepted before customer impact. System integrity preserved at {systemIntegrity}%. Build promoted to Production.
-                </p>
-
-                {/* 4-Box Metrics Grid */}
-                <div className="grid grid-cols-2 gap-2.5 mb-6">
-                  {/* Metric 1: Bugs Intercepted */}
-                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
-                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
-                      Neutralized
-                    </span>
-                    <span className="text-2xl font-black text-pass leading-none">
-                      {score} <span className="text-xs font-normal text-muted">defects</span>
-                    </span>
-                  </div>
-
-                  {/* Metric 2: QA Rank */}
-                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
-                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
-                      Hunter Rank
-                    </span>
-                    <div className="text-sm font-bold text-ink truncate leading-none mt-1" title={currentRank.title}>
-                      <span className="mr-1">{currentRank.badge}</span>
-                      <span className="text-ink-soft font-normal">{currentRank.title}</span>
-                    </div>
-                  </div>
-
-                  {/* Metric 3: Peak Streak */}
-                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
-                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
-                      Peak Streak
-                    </span>
-                    <span className="text-2xl font-black text-amber-600 dark:text-amber-400 leading-none">
-                      {maxCombo > 1 ? `${maxCombo}x` : "1x"}
-                    </span>
-                  </div>
-
-                  {/* Metric 4: Integrity Retained */}
-                  <div className="bg-card border border-line rounded-xl p-3 shadow-[2px_2px_0_var(--line)]">
-                    <span className="text-[10px] uppercase tracking-wider text-muted font-semibold block mb-1">
-                      Integrity Retained
-                    </span>
-                    <span className="text-2xl font-black text-pass leading-none">
-                      {systemIntegrity}%
-                    </span>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      restoreAllEatenElements();
-                      setHasWon(false);
-                      hasWonRef.current = false;
-                      setWave(w => {
-                        const nextW = w + 1;
-                        waveRef.current = nextW;
-                        return nextW;
-                      });
-                      setScore(0);
-                      scoreRef.current = 0;
-                      setCombo(0);
-                      setMaxCombo(0);
-                      setBreakpoints(b => Math.min(3, b + 1));
-                      setSystemIntegrity(100);
-                      setDefects([]);
-                      spawnDefect();
-                    }}
-                    data-cursor="Proceed to next incident wave"
-                    className="press flex-1 inline-flex items-center justify-center gap-2 border border-pass bg-pass text-on-band hover:bg-pass-fill font-bold py-3 px-4 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm tracking-wide transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer whitespace-nowrap"
-                  >
-                    <Zap size={14} className="shrink-0" />
-                    Next Wave (Wave {wave + 1})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      restoreAllEatenElements();
-                      setHasWon(false);
-                      hasWonRef.current = false;
-                      setDefects([]);
-                      setScore(0);
-                      scoreRef.current = 0;
-                      setCombo(0);
-                      setMaxCombo(0);
-                      setIsOpen(false);
-                    }}
-                    data-cursor="Close mini-game & restore UI"
-                    className="press inline-flex items-center justify-center border border-line bg-card text-ink hover:border-ink hover:text-ink font-semibold py-3 px-5 rounded-xl shadow-[3px_3px_0_var(--ink)] text-xs sm:text-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] cursor-pointer"
-                  >
-                    Close Game
+                    Exit Defect Hunter
                   </button>
                 </div>
               </div>
@@ -2334,6 +2336,21 @@ export function QaGame() {
                 transform: scale(2.6);
                 opacity: 0;
                 border-color: #34d399;
+              }
+            }
+
+            /* --- Minimal Detector Crosshair & Hit Snap Keyframes --- */
+            @keyframes detectorSnap {
+              0% {
+                transform: translate(-50%, -50%) scale(0.65);
+                opacity: 1;
+              }
+              50% {
+                opacity: 0.8;
+              }
+              100% {
+                transform: translate(-50%, -50%) scale(1.45);
+                opacity: 0;
               }
             }
           `}} />

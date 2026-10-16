@@ -32,6 +32,20 @@ interface UserAnswer {
   isCorrect: boolean;
 }
 
+interface SavedQuizSession {
+  activeQuestions: QuizQuestion[];
+  currentIndex: number;
+  selectedOption: number | null;
+  isAnswerSubmitted: boolean;
+  answersHistory: UserAnswer[];
+  currentStreak: number;
+  maxStreak: number;
+  selectedSectionIds: string[];
+  questionCountLimit: number;
+  difficultyFilter: string;
+  savedAt: number;
+}
+
 export function QuizModal({ isOpen, onClose }: QuizModalProps) {
   // All sections auto-selected (checked) by default
   const [selectedSectionIds, setSelectedSectionIds] = useState<Set<string>>(
@@ -41,6 +55,9 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
   const [quizState, setQuizState] = useState<QuizState>("config");
   const [questionCountLimit, setQuestionCountLimit] = useState<number>(20);
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
+
+  // Saved in-progress session state
+  const [savedSession, setSavedSession] = useState<SavedQuizSession | null>(null);
 
   // Active quiz session state
   const [activeQuestions, setActiveQuestions] = useState<QuizQuestion[]>([]);
@@ -91,6 +108,89 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
     return pool;
   }, [selectedSectionIds, difficultyFilter]);
 
+  // Check for saved in-progress quiz session when opening modal
+  useEffect(() => {
+    if (!isOpen || typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem("deepak_qa_saved_quiz_session");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (
+          parsed &&
+          Array.isArray(parsed.activeQuestions) &&
+          parsed.activeQuestions.length > 0 &&
+          parsed.currentIndex < parsed.activeQuestions.length
+        ) {
+          setSavedSession(parsed);
+        } else {
+          setSavedSession(null);
+        }
+      } else {
+        setSavedSession(null);
+      }
+    } catch {
+      setSavedSession(null);
+    }
+  }, [isOpen]);
+
+  // Helper to persist current quiz session to localStorage
+  const persistSession = useCallback(
+    (
+      questions: QuizQuestion[],
+      cIndex: number,
+      selOption: number | null,
+      submitted: boolean,
+      history: UserAnswer[],
+      streak: number,
+      mStreak: number
+    ) => {
+      if (typeof window === "undefined" || questions.length === 0) return;
+      try {
+        const session: SavedQuizSession = {
+          activeQuestions: questions,
+          currentIndex: cIndex,
+          selectedOption: selOption,
+          isAnswerSubmitted: submitted,
+          answersHistory: history,
+          currentStreak: streak,
+          maxStreak: mStreak,
+          selectedSectionIds: Array.from(selectedSectionIds),
+          questionCountLimit,
+          difficultyFilter,
+          savedAt: Date.now(),
+        };
+        localStorage.setItem("deepak_qa_saved_quiz_session", JSON.stringify(session));
+        setSavedSession(session);
+      } catch (e) {
+        console.error("Failed to persist quiz session", e);
+      }
+    },
+    [selectedSectionIds, questionCountLimit, difficultyFilter]
+  );
+
+  // Resume saved session
+  const handleResumeSavedSession = () => {
+    if (!savedSession) return;
+    setActiveQuestions(savedSession.activeQuestions);
+    setCurrentIndex(savedSession.currentIndex);
+    setSelectedOption(savedSession.selectedOption);
+    setIsAnswerSubmitted(savedSession.isAnswerSubmitted);
+    setAnswersHistory(savedSession.answersHistory || []);
+    setCurrentStreak(savedSession.currentStreak || 0);
+    setMaxStreak(savedSession.maxStreak || 0);
+    setQuizState("active");
+  };
+
+  // Discard saved session
+  const handleDiscardSavedSession = () => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("deepak_qa_saved_quiz_session");
+      } catch {}
+    }
+    setSavedSession(null);
+  };
+
   // Start Quiz
   const startQuiz = useCallback(
     (customQuestions?: QuizQuestion[]) => {
@@ -113,8 +213,9 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
       setCurrentStreak(0);
       setMaxStreak(0);
       setQuizState("active");
+      persistSession(questionsToUse, 0, null, false, [], 0, 0);
     },
-    [availablePool, questionCountLimit]
+    [availablePool, questionCountLimit, persistSession]
   );
 
   // Select an option
@@ -126,28 +227,34 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
 
     const isCorrect = idx === currentQ.answerIndex;
     const newStreak = isCorrect ? currentStreak + 1 : 0;
+    const newMaxStreak = Math.max(newStreak, maxStreak);
     setCurrentStreak(newStreak);
     if (newStreak > maxStreak) {
       setMaxStreak(newStreak);
     }
 
-    setAnswersHistory((prev) => [
-      ...prev,
+    const nextHistory = [
+      ...answersHistory,
       {
         question: currentQ,
         selectedIndex: idx,
         isCorrect,
       },
-    ]);
+    ];
+    setAnswersHistory(nextHistory);
+    persistSession(activeQuestions, currentIndex, idx, true, nextHistory, newStreak, newMaxStreak);
   };
 
   // Next question
   const handleNextQuestion = () => {
     if (currentIndex < activeQuestions.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
+      const nextIdx = currentIndex + 1;
+      setCurrentIndex(nextIdx);
       setSelectedOption(null);
       setIsAnswerSubmitted(false);
+      persistSession(activeQuestions, nextIdx, null, false, answersHistory, currentStreak, maxStreak);
     } else {
+      handleDiscardSavedSession();
       setQuizState("scorecard");
     }
   };
@@ -263,6 +370,48 @@ export function QuizModal({ isOpen, onClose }: QuizModalProps) {
                   All 12 QA sections are auto-selected. Click any chip to toggle.
                 </p>
               </div>
+
+              {/* Continue In-Progress Quiz Banner */}
+              {savedSession && (
+                <div className="rounded-xl border border-pass/35 bg-pass/10 p-3 sm:p-3.5 flex items-center justify-between gap-3 animate-in fade-in duration-150">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-pass/20 border border-pass/40 text-pass flex items-center justify-center shrink-0">
+                      <RotateCcw className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono text-xs font-semibold text-ink">
+                          Resume In-Progress Quiz
+                        </span>
+                        <span className="font-mono text-[9px] uppercase px-1.5 py-0.2 rounded bg-pass/20 text-pass font-semibold">
+                          Saved
+                        </span>
+                      </div>
+                      <p className="font-mono text-[11px] text-muted truncate mt-0.5">
+                        Question {savedSession.currentIndex + 1} of {savedSession.activeQuestions.length} · {savedSession.answersHistory.filter((a) => a.isCorrect).length} correct
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleDiscardSavedSession}
+                      className="text-[11px] font-mono text-muted hover:text-rose-500 px-2 py-1 transition cursor-pointer"
+                    >
+                      Discard
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleResumeSavedSession}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs"
+                    >
+                      <span>Continue</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Minimal Section Chips (Auto-selected by default) */}
               <div>

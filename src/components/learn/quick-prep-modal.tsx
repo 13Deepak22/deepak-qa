@@ -11,6 +11,7 @@ import {
   Check,
   ArrowRight,
   SlidersHorizontal,
+  RotateCcw,
 } from "lucide-react";
 import {
   QUICK_PREP_SECTIONS,
@@ -25,6 +26,13 @@ interface QuickPrepModalProps {
 
 type PrepViewState = "config" | "active";
 
+interface SavedPrepSession {
+  history: QuickPrepItem[];
+  historyIndex: number;
+  selectedSectionIds: string[];
+  savedAt: number;
+}
+
 export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
   // All 12 sections auto-selected by default
   const [selectedSectionIds, setSelectedSectionIds] = useState<Set<string>>(
@@ -36,9 +44,33 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
   const [isAnswerRevealed, setIsAnswerRevealed] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
 
+  // Saved in-progress quick prep session
+  const [savedPrepSession, setSavedPrepSession] = useState<SavedPrepSession | null>(null);
+
   // History tracking for Next/Previous random navigation
   const [history, setHistory] = useState<QuickPrepItem[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
+
+  // Load saved session on open & always show config first
+  useEffect(() => {
+    if (!isOpen || typeof window === "undefined") return;
+    setViewState("config");
+    try {
+      const raw = localStorage.getItem("deepak_qa_saved_quick_prep_session");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.history) && parsed.history.length > 0) {
+          setSavedPrepSession(parsed);
+        } else {
+          setSavedPrepSession(null);
+        }
+      } else {
+        setSavedPrepSession(null);
+      }
+    } catch {
+      setSavedPrepSession(null);
+    }
+  }, [isOpen]);
 
   // Section toggle handlers
   const toggleSection = (id: string) => {
@@ -73,25 +105,69 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
     return pool;
   }, [selectedSectionIds]);
 
+  // Persist prep session helper
+  const persistPrepSession = useCallback(
+    (hist: QuickPrepItem[], hIdx: number) => {
+      if (typeof window === "undefined" || hist.length === 0) return;
+      try {
+        const session: SavedPrepSession = {
+          history: hist,
+          historyIndex: hIdx,
+          selectedSectionIds: Array.from(selectedSectionIds),
+          savedAt: Date.now(),
+        };
+        localStorage.setItem("deepak_qa_saved_quick_prep_session", JSON.stringify(session));
+        setSavedPrepSession(session);
+      } catch (e) {
+        console.error("Failed to persist prep session", e);
+      }
+    },
+    [selectedSectionIds]
+  );
+
+  // Resume saved prep session
+  const handleResumeSavedPrepSession = () => {
+    if (!savedPrepSession) return;
+    setHistory(savedPrepSession.history);
+    setHistoryIndex(savedPrepSession.historyIndex);
+    setIsAnswerRevealed(false);
+    setViewState("active");
+  };
+
+  // Discard saved prep session
+  const handleDiscardSavedPrepSession = () => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("deepak_qa_saved_quick_prep_session");
+      } catch {}
+    }
+    setSavedPrepSession(null);
+  };
+
   // Function to pick a new random question from selected pool
   const pickRandomQuestion = useCallback(() => {
     if (activePool.length === 0) return;
     const randomIndex = Math.floor(Math.random() * activePool.length);
     const chosen = activePool[randomIndex];
-    setHistory((prev) => [...prev.slice(0, historyIndex + 1), chosen]);
-    setHistoryIndex((prev) => prev + 1);
+    const newHistory = [...history.slice(0, historyIndex + 1), chosen];
+    const newIndex = historyIndex + 1;
+    setHistory(newHistory);
+    setHistoryIndex(newIndex);
     setIsAnswerRevealed(false);
-  }, [activePool, historyIndex]);
+    persistPrepSession(newHistory, newIndex);
+  }, [activePool, history, historyIndex, persistPrepSession]);
 
   // Handler to start Quick Prep
   const handleStartPrep = () => {
     if (activePool.length === 0) return;
     const randomIndex = Math.floor(Math.random() * activePool.length);
     const chosen = activePool[randomIndex];
-    setHistory([chosen]);
+    const newHistory = [chosen];
+    setHistory(newHistory);
     setHistoryIndex(0);
     setIsAnswerRevealed(false);
     setViewState("active");
+    persistPrepSession(newHistory, 0);
   };
 
   // Current active question
@@ -101,8 +177,10 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
   // Handlers for Next and Prev
   const handleNext = () => {
     if (historyIndex < history.length - 1) {
-      setHistoryIndex((prev) => prev + 1);
+      const nextIdx = historyIndex + 1;
+      setHistoryIndex(nextIdx);
       setIsAnswerRevealed(false);
+      persistPrepSession(history, nextIdx);
     } else {
       pickRandomQuestion();
     }
@@ -110,8 +188,10 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
 
   const handlePrev = () => {
     if (historyIndex > 0) {
-      setHistoryIndex((prev) => prev - 1);
+      const prevIdx = historyIndex - 1;
+      setHistoryIndex(prevIdx);
       setIsAnswerRevealed(false);
+      persistPrepSession(history, prevIdx);
     }
   };
 
@@ -125,6 +205,7 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
 
   // Reset to config state when modal closes
   const handleClose = () => {
+    setViewState("config");
     onClose();
   };
 
@@ -211,6 +292,48 @@ export function QuickPrepModal({ isOpen, onClose }: QuickPrepModalProps) {
                   Choose which sections to include in random Q&amp;A. All 12 tracks are auto-selected.
                 </p>
               </div>
+
+              {/* Continue Saved Quick Prep Session */}
+              {savedPrepSession && (
+                <div className="rounded-xl border border-pass/35 bg-pass/10 p-3 sm:p-3.5 flex items-center justify-between gap-3 animate-in fade-in duration-150">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-pass/20 border border-pass/40 text-pass flex items-center justify-center shrink-0">
+                      <RotateCcw className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono text-xs font-semibold text-ink">
+                          Resume Previous Prep
+                        </span>
+                        <span className="font-mono text-[9px] uppercase px-1.5 py-0.2 rounded bg-pass/20 text-pass font-semibold">
+                          Saved
+                        </span>
+                      </div>
+                      <p className="font-mono text-[11px] text-muted truncate mt-0.5">
+                        {savedPrepSession.history.length} flashcards in session · Currently on #{savedPrepSession.historyIndex + 1}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleDiscardSavedPrepSession}
+                      className="text-[11px] font-mono text-muted hover:text-rose-500 px-2 py-1 transition cursor-pointer"
+                    >
+                      Discard
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleResumeSavedPrepSession}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pass text-paper hover:bg-pass-fill font-mono text-xs font-medium transition cursor-pointer shadow-2xs"
+                    >
+                      <span>Continue Prep</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Section Checkbox Chips (All 12 auto-selected by default) */}
               <div className="pt-0.5">

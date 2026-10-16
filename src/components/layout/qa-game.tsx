@@ -129,28 +129,28 @@ export const BUG_PRIORITY_CONFIG: Record<BugPriorityTier, PriorityConfig> = {
     name: "low",
     label: "P3 [Low]",
     color: "#10b981", // Low: Green
-    size: 36,
+    size: 54, // Largest size: easiest to detect
     speedScale: 0.95,
   },
   med: {
     name: "med",
     label: "P2 [Medium]",
     color: "#eab308", // Med: Yellow
-    size: 42,
+    size: 44, // Medium size
     speedScale: 1.75,
   },
   high: {
     name: "high",
     label: "P1 [High]",
     color: "#f97316", // High: Orange
-    size: 48,
+    size: 36, // Smaller size: harder to spot & catch
     speedScale: 2.75,
   },
   critical: {
     name: "critical",
     label: "P0 [Critical]",
     color: "#ef4444", // Critical: Red
-    size: 54,
+    size: 28, // Smurfed micro-defect: smallest & hardest to detect
     speedScale: 4.1,
   },
 };
@@ -1478,6 +1478,8 @@ export function QaGame() {
                     top: bug.y,
                     width: `${bug.size}px`,
                     height: `${bug.size}px`,
+                    minWidth: "32px",
+                    minHeight: "32px",
                     transform: `translate(-50%, -50%) ${bug.squashed ? "scale(1.45, 0.22)" : "scale(1, 1)"}`,
                     transition: bug.squashed 
                       ? "transform 320ms cubic-bezier(0.1, 0.9, 0.2, 1), opacity 320ms ease" 
